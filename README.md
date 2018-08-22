@@ -24,11 +24,11 @@ the original applications in this regard and for that reason writing is not supp
 The original motivation came from reading sas7bdat files in python. That is already possible using either the (pure
 python) package [sas7bdat](https://pypi.org/project/sas7bdat/) or the (cythonized) method 
 [read_sas](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_sas.html)
-from pandas. However, those methods are slow (important if you want to read several large files), do not give you
-the possibility to recover variable labels (only variable names), do not give the possibility to recover value labels (stored in 
+from pandas. However, those methods are slow (important if you want to read several large files), do not give the 
+possibility to recover value labels (stored in 
 the file itself in the case of spss or stata, or in catalog files in sas), convert both dates and datetime variables to datetime,
-you have to specify the encoding otherwise in python 3 instead of strings you get bytes and do not offer the possibility to read
-only the headers.
+and you have to specify the encoding otherwise in python 3 instead of strings you get bytes. 
+
 This package corrects those problems. 
 
 **1. Good Performance:** Here a comparison of reading a 190 Mb sas7dat file with different methods. As you can see
@@ -41,30 +41,30 @@ pyreadstat is the fastest for python and matches the speeds of R Haven.
 | Python 3- pyreadstat | 7 s  | 
 | R - Haven | 7 s | 
 
-**2. Reading Variable Labels** sas7bdat and pandas.read_sas gives you the numerical data with column names and do not
- extract the variable labels. Pyreadstat also gives you the numerical data as a pandas data frame, but also gives you
- a metadata object that contains the variable labels for reference. As pandas dataframe cannot handle both variable names and labels, 
- you as user can take the decision of replacing the column names by labels if you want.
- 
-**3. Reading Value Labels** Neither sas7bdat and pandas.read_sas gives the possibility to read sas7bcat catalog files.
-Pyreadstat can do that and also extract value labels from SPSS and STATA files. As pandas dataframes cannot handle value
-labels, you as user will have to take the decision wether to use those values or not.
+**2. Reading Value Labels** Neither sas7bdat and pandas.read_sas gives the possibility to read sas7bcat catalog files.
+Pyreadstat can do that and also extract value labels from SPSS and STATA files. 
 
-**4. Reading dates and datetimes** sas7bdat and pandas.read_sas convert both date and datetime variables into datetime.
+**3. Reading dates and datetimes** sas7bdat and pandas.read_sas convert both date and datetime variables into datetime.
 That means if you have a date such a '01-01-2018' it will be transformed to '01-01-2018 00:00:00' (it always inserts a 
 time), making it impossible
 to know looking only at the data if the variable was originally a datetime (if it had a time) or not. 
 Pyreadstat transforms dates to dates and datetimes to datetimes, so that you have a better correspondence with the original
 data. However, it is possible to keep the original pandas behavior and get always datetimes.
 
-**5. Encoding** On python 3, pandas.read_sas reads all strings as bytes. If you want strings you have to specify the encoding manually.
-pyreadstat read strings as str. Thas is possible because readstat guesses correctly the original encoding and translates 
+**4. Encoding** On python 3, pandas.read_sas reads all strings as bytes. If you want strings you have to specify the encoding manually.
+pyreadstat read strings as str. Thas is possible because readstat extracts the original encoding and translates 
 to utf-8, so that you don't have to care about that anymore. However it is still possible to manually set the encoding.
 
-**6. Read only headers** sas7bdat and pandas.read_sas read all the data, no possibility to read only the headers. The
-same with R Haven. Sometimes you want to take a quick look to many (sas) files looking for the datasets that contain
+In addition pyreadstat exposes the variable labels in an easy way (see later). As pandas dataframes cannot handle value
+labels, you as user will have to take the decision wether to use those values or not. Pandas read_sas reads those labels, 
+but in order to recover them you have to work a bit harder. 
+
+Compared to R Haven, pyreadstat offers the possibility to read only the headers: Sometimes you want to take a quick 
+look to many (sas) files looking for the datasets that contain
 some specific columns, and you want to do it quick. This package offers the possibility to read only the metadata making 
-it possible a very fast metadata scraping.
+it possible a very fast metadata scraping (Pandas read_sas can also do it if you pass the value iterator=True). 
+In addition it offers the capability to read sas7bcat files separately from the sas7bdat files.
+
 
 ## Dependencies
 
@@ -155,6 +155,7 @@ print(meta.number_rows)
 print(meta.number_columns)
 print(meta.file_label)
 print(meta.file_encoding)
+# there are other metadata pieces extracted. See the documentation for more details.
 ```
 
 You can replace the column names by column labels very easily (but check first that all columns have distinct labels!):
@@ -266,6 +267,28 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 ```
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
+
+## Roadmap
+
+* testing on mac.
+* Support for tagged missing values.
+* Support for skipping columns.
+
+# Known limitations
+
+pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
+
+* Not able to read SAS compressed files. 
+* Not reading sas7bcat files produced on linux (windows are fine).
+* Not able to skip rows.
+
+## Contributing
+
+Contributions are welcome! Those include corrections to the documentation, bugs reporting, testing, 
+providing compiled wheels (if you managed to compile
+in a OS-python version combination not reported yet) and of course code pull requests. For code pull requests please 
+consider opening an issue explaining what you plan to do, so that we can get aligned before you start investing time on
+it. 
 
 ## People
 
