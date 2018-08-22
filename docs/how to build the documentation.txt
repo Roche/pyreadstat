@@ -1,0 +1,60 @@
+It assumes you have compiled the cython extension in place
+(python3 setup.py build_ext --inplace), so that sphinx will find it.
+
+you need to have installed sphinx. You do if you are using anaconda.
+You will also need numpydocs, you have if you have anaconda, otherwise install with pip.
+In addition, install the readthedocs theme:
+
+pip install sphinx_rtd_theme
+
+Then, open a shell, navigate to this folder, and do: 
+
+make html
+
+The refreshed documentation will be in _build/html/index.html.
+
+## how this was done
+
+This is a good resource to learn how to use sphinx:
+https://codeandchaos.wordpress.com/2012/07/30/sphinx-autodoc-tutorial-for-dummies/
+
+There are however some differences with cython and not everything is explained well enough in the internet.
+Here there is a resource on how to compile cython:
+https://github.com/abingham/cython-sphinx-example
+
+But it is very sensitive and unstable, there a are a few things to note:
+
+IN summary:
+1- Create a folder docs in your repository. It has to be called docs because that is what git likes.
+2- in a shell, go there and do sphinx-quickstart. when asked about autodocs say yes. When asked about keeping separated source and build directories say no, 
+this is very important, for some reason if it is separated it will not work for cython. Other options just the default. 
+3- Open the file conf.py and:
+   a) Look for the line where you are inserting into sys.path. Make sure you insert a path where you could import your module (.. because sources and build are not separated)
+   b) In the list extensions, add 'sphinx.ext.napoleon'. 'numpydoc' gives errors (assuming your docstrigs are in numpy style). 
+   c) In the line about html_theme, comment alabaster and insert: (previosly you need to install sphinx_rtd_theme via pip).
+		import sphinx_rtd_theme
+		html_theme = 'sphinx_rtd_theme'
+		html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+3.5 - In the file index.rst, it should look like this:
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+.. automodule:: pyreadstat.pyreadstat
+    :members:
+    :undoc-members:
+    
+for some reason :undoc-members is absolutely necessary otherwise nothing is shown. pyreadstat.pyreadstat as well.
+
+4- Just in the folders doc, create a file .nojekyll otherwise github pages will ignore all folders with
+   underscores (sphinx loves them) and you page won't be rendered correctly.
+   In addition create a file index.html and write on it:
+   <meta http-equiv="refresh" content="0; url=./_build/html/index.html" />
+   this will re-direct to the index.html created by sphinx. If it is produced somewhere else, adapt the path.
+   Copy .nojekyll and add it to _build/html as well.
+5- Now, in the shell run "make html". This should generate build/html/index.html check that it is good.
+5.5- If you have built the docs on BEE, download it to windows if the git is on windows.
+6- Commit your changes to the repo.
+7- Go to your github repo, settings and enable githubpages from a docs folder. 
+8- You should now be able to browse to your new github pages.
+   

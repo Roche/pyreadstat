@@ -1,0 +1,8 @@
+/.idea
+/__pycache__
+*.pyc
+*.pyd
+~$*
+/build
+*.so
+/pyreadstat.egg-info

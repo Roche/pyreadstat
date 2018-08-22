@@ -1,0 +1,19 @@
+# compile and install
+
+python3 setup.py install --user
+
+
+# compile in place (needed to build the documentation)
+
+python3 setup.py build_ext --inplace
+
+# compile in place rebuilding c sources
+
+python3 setup.py build_ext --inplace --use-cython
+
+# build documentation: go to docs folder and:
+
+make html
+
+# build distribution
+python3 setup.py sdist bdist_wheel

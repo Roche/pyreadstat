@@ -1,0 +1,715 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8
+
+from cpython.datetime cimport import_datetime, timedelta_new, datetime_new
+from cpython.exc cimport PyErr_Occurred
+from cpython.object cimport PyObject
+from libc.math cimport NAN, floor
+
+#from datetime import timedelta, datetime
+from collections import OrderedDict
+
+import pandas as pd
+#from pandas._libs import Timestamp
+
+from readstat_api cimport *
+
+# necessary to work with the datetime C API
+import_datetime()
+
+cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10"]
+cdef list sas_datetime_formats = ["DATETIME", "DATETIME20"]
+cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3"]
+cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
+#sas_origin = datetime(1960,1,1)
+cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+
+cdef list spss_datetime_formats = ["DATETIME", 'DATETIME20']
+cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE", 'EDATE10']
+cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8']
+cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
+cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
+
+cdef list stata_datetime_formats = ["%tC", "%tc"]
+cdef list stata_date_formats = ["%td", "%d", "%tdD_m_Y"]
+cdef list stata_time_formats = []
+cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
+cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+
+
+cdef class data_container:
+    """
+    This extension type holds all the data we need to get from our file from 
+    the readstat parser and will be used later to compose our pandas data frame
+    """
+    
+    def __cinit__(self):
+        self.n_obs = 0
+        self.n_vars = 0
+        self.max_n_obs = 0
+        self.col_data = list()
+        self.col_data_len = list()
+        self.col_names = list()
+        self.col_labels = list()
+        self.col_dtypes = list()
+        self.col_formats = list()
+        self.col_formats_original = list()
+        self.origin = None
+        self.is_unkown_number_rows = 0
+        self.file_encoding = None
+        self.file_label = None
+        self.metaonly = 0
+        self.dates_as_pandas = 0
+        self.label_to_var_name = dict()
+        self.labels_raw = dict()
+        self.notes = list()
+        self.user_encoding = None
+        self.table_name = None
+        
+class metadata_container:
+    """
+    This class holds metadata we want to give back to python
+    """
+    def __init__(self):
+        self.column_names = list()
+        self.column_labels = list()
+        self.file_encoding = None
+        self.number_columns = None
+        self.number_rows = None
+        self.variable_value_labels = dict()
+        self.value_labels = dict()
+        self.variable_to_label = dict()
+        self.notes = list()
+        self.original_variable_types = dict()
+        self.table_name = None
+
+
+class ReadstatError(Exception):
+    """
+    Just defining a custom exception to raise when readstat gives an error return code.
+    """
+    pass
+
+
+cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format):
+    """
+    Transforms a readstat var_format to a date, datetime or time format label
+    """
+    if file_format == FILE_FORMAT_SAS:
+        if var_format in sas_all_formats:
+            if var_format in sas_date_formats:
+                return DATE_FORMAT_DATE
+            elif var_format in sas_datetime_formats:
+                return DATE_FORMAT_DATETIME
+            elif var_format in sas_time_formats:
+                return DATE_FORMAT_TIME
+        else:
+            return DATE_FORMAT_NOTADATE
+        
+    elif file_format == FILE_FORMAT_SPSS:
+        if var_format in spss_all_formats:
+            if var_format in spss_date_formats:
+                return DATE_FORMAT_DATE
+            elif var_format in spss_datetime_formats:
+                return DATE_FORMAT_DATETIME
+            elif var_format in spss_time_formats:
+                return DATE_FORMAT_TIME
+        else:
+            return DATE_FORMAT_NOTADATE
+        
+    elif file_format == FILE_FORMAT_STATA:
+        if var_format in stata_all_formats:
+            if var_format in stata_date_formats:
+                return DATE_FORMAT_DATE
+            elif var_format in stata_datetime_formats:
+                return DATE_FORMAT_DATETIME
+            elif var_format in stata_time_formats:
+                return DATE_FORMAT_TIME
+        else:
+            return DATE_FORMAT_NOTADATE
+
+cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin, bint dates_as_pandas):
+    """
+    Transforms a tstamp integer value to a date, time or datetime pyton object.
+    tstamp could represent number of days, seconds or milliseconds
+    """
+    
+    cdef object tdelta
+    cdef int days
+    cdef int secs
+    cdef int usecs
+
+    if var_format == DATE_FORMAT_DATE:
+        if file_format == FILE_FORMAT_SPSS:
+            # tstamp is in seconds
+            days = <int> (floor(tstamp / 86400))
+            secs = <int> (tstamp % 86400)
+            tdelta = timedelta_new(days, secs, 0)
+            #tdelta = timedelta(seconds=tstamp)
+        else:
+            # tstamp is in days
+            days = <int> tstamp
+            tdelta = timedelta_new(days, 0, 0)
+            #tdelta = timedelta(days=tstamp)
+        mydat = origin + tdelta
+        if dates_as_pandas:
+            return mydat
+        else:
+            return mydat.date()
+    elif var_format == DATE_FORMAT_DATETIME:
+        if file_format == FILE_FORMAT_STATA:
+            # tstamp is in millisecons
+            days = <int> (floor(tstamp / 86400000))
+            usecs = <int> ((tstamp % 86400000) * 1000 )
+            tdelta = timedelta_new(days, 0, usecs)
+            #tdelta = timedelta(milliseconds=tstamp)
+        else:
+            # tstamp in seconds
+            days = <int> (floor(tstamp / 86400))
+            secs = <int> (tstamp % 86400)
+            tdelta = timedelta_new(days, secs, 0)
+            #tdelta = timedelta(seconds=tstamp)
+        mydat = origin + tdelta
+        return mydat
+    elif var_format == DATE_FORMAT_TIME:
+        # tstamp in seconds
+        days = <int> (floor(tstamp / 86400))
+        secs = <int> (tstamp % 86400)
+        tdelta = timedelta_new(days, secs, 0)
+        #tdelta = timedelta(seconds=tstamp)
+        mydat = origin + tdelta
+        return mydat.time()
+
+
+cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READSTAT_HANDLER_ABORT:
+    """
+    This function sets the number of observations(rows), number of variables
+    (columns) in data container and initializes the col_data which will store
+    all the data we need.
+    It also reads other metadata from the file.
+    """
+        
+    cdef int var_count, obs_count
+    cdef  data_container dc = <data_container> ctx
+    cdef list row
+    cdef char * flabel_orig
+    cdef char * fencoding_orig
+    cdef str flabel, fencoding
+    cdef bint metaonly
+    cdef char * table
+
+    metaonly = dc.metaonly
+    
+    var_count = readstat_get_var_count(metadata)
+    if var_count<0:
+        raise Exception("Failed to read number of variables")
+    obs_count = readstat_get_row_count(metadata)
+    if obs_count <0:
+        # if <0 it means the number of rows is not known, allocate 100 000
+        obs_count = 100000
+        dc.is_unkown_number_rows = 1
+    
+    dc.n_obs = obs_count
+    dc.n_vars = var_count
+    
+    # pre-allocate data
+    data= list()
+    for var in range(0,var_count):
+        if metaonly:
+            row = list()
+        else:
+            row = [None] * obs_count
+        data.append(row)
+    dc.col_data = data
+    row = [obs_count] * var_count
+    dc.col_data_len = row
+    
+    # read other metadata
+    flabel_orig = readstat_get_file_label(metadata);
+    fencoding_orig = readstat_get_file_encoding(metadata)
+    if flabel_orig != NULL and flabel_orig[0]:
+        flabel = <str> flabel_orig
+    else:
+        flabel = None
+    if fencoding_orig != NULL and fencoding_orig[0]:
+        fencoding = <str> fencoding_orig
+    else:
+        fencoding = None
+        
+    dc.file_encoding = fencoding
+    dc.file_label = flabel
+
+    table = readstat_get_table_name(metadata)
+    if table != NULL and table[0]:
+        dc.table_name = <str> table
+        
+    return READSTAT_HANDLER_OK
+
+cdef int handle_variable(int index, readstat_variable_t *variable, 
+                         char *val_labels, void *ctx) except READSTAT_HANDLER_ABORT:
+    """
+    This function extracts the name, label, type and format from a variable
+    and stores it in data container for a later access. It also extracts the label set to which the variable is associated,
+    if any.
+    """
+
+
+    cdef char * var_name, 
+    cdef char * var_label
+    cdef char * var_format
+    cdef str col_name, col_label, label_name, col_format_original
+    cdef py_datetime_format col_format_final
+    cdef readstat_type_t var_type
+    cdef py_file_format file_format
+    cdef readstat_label_set_t * lset
+
+    cdef  data_container dc = <data_container> ctx
+    
+    # get variable name, label, format and type and put into our data container
+    var_name = readstat_variable_get_name(variable)
+    if var_name == NULL:
+        col_name = None
+    else:
+        col_name = <str>var_name
+    dc.col_names.append(col_name)
+
+    # the name of the value label for the variable
+    if val_labels != NULL:
+        label_name = <str> val_labels
+        if label_name:
+            dc.label_to_var_name[col_name] = label_name
+    
+    var_label = readstat_variable_get_label(variable)
+    if var_label == NULL:
+        col_label = None
+    else:
+        col_label = <str>var_label
+    dc.col_labels.append(col_label)
+    
+    
+    var_type = readstat_variable_get_type(variable)
+    dc.col_dtypes.append(var_type)
+    
+    # format, we have to transform it in something more usable
+    var_format = readstat_variable_get_format(variable)
+    if var_format == NULL:
+        col_format_original = "NULL"
+    else:
+        col_format_original = <str>var_format
+    file_format = dc.file_format
+    dc.col_formats_original.append(col_format_original)
+    col_format_final = transform_variable_format(col_format_original, file_format)
+    dc.col_formats.append(col_format_final)
+
+    return READSTAT_HANDLER_OK
+
+
+cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_value_t value, void *ctx) except READSTAT_HANDLER_ABORT:
+    """
+    This function transforms every value to python types, and to datetime if 
+    necessary and stores it into the arrays in data container col_data
+    """
+    
+    cdef int index, ismissing
+    cdef readstat_type_t var_type
+    cdef char * c_str_value
+    cdef str py_str_value
+    cdef int8_t c_int8_value
+    cdef int16_t c_int16_value
+    cdef int32_t c_int32_value
+    cdef int64_t c_int64_value
+    cdef float c_float_value
+    cdef double c_double_value
+    cdef long py_long_value
+    cdef double py_float_value
+    cdef py_datetime_format var_format
+    cdef py_variable_format py_format
+    #cdef bytes str_byte_val
+    cdef double tstamp
+    cdef object origin
+    cdef py_file_format file_format
+    cdef object mydat
+    cdef data_container dc
+    cdef int max_n_obs
+    cdef bint is_unkown_number_rows
+    cdef int var_max_rows
+    cdef list buf_list
+    cdef bint dates_as_pandas
+    cdef py_variable_format pyformat
+    
+    # extract variables we need from data container
+    dc = <data_container> ctx
+    index = <int>variable.index
+    var_type = dc.col_dtypes[index]
+    var_format = dc.col_formats[index]
+    origin = dc.origin
+    max_n_obs = dc.max_n_obs
+    is_unkown_number_rows = dc.is_unkown_number_rows
+    dates_as_pandas = dc.dates_as_pandas
+    
+    # check that we still have enough room in our pre-allocated lists
+    # if not, add more room
+    if is_unkown_number_rows:
+        if max_n_obs <= obs_index:
+            dc.max_n_obs = obs_index + 1
+        var_max_rows = dc.col_data_len[index]
+        if var_max_rows <= obs_index:
+            buf_list = [None] * 100000
+            dc.col_data[index].extend(buf_list)
+            var_max_rows += 100000
+            dc.col_data_len[index] = var_max_rows
+    
+    # transform to values cython can deal with        
+    ismissing = readstat_value_is_missing(value, variable)
+    if ismissing:
+        dc.col_data[index][obs_index] = NAN
+        pyformat = VAR_FORMAT_MISSING
+    else:
+        dc.col_data[index][obs_index] = value
+        if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
+            c_str_value = readstat_string_value(value)
+            py_str_value = <str> c_str_value
+            pyformat = VAR_FORMAT_STRING
+        elif var_type == READSTAT_TYPE_INT8:
+            c_int8_value = readstat_int8_value(value)
+            py_long_value = <long> c_int8_value
+            pyformat = VAR_FORMAT_LONG
+        elif var_type == READSTAT_TYPE_INT16:
+            c_int16_value = readstat_int16_value(value)
+            py_long_value = <long> c_int16_value
+            pyformat = VAR_FORMAT_LONG
+        elif var_type == READSTAT_TYPE_INT32:
+            c_int32_value = readstat_int32_value(value)
+            py_long_value = <long> c_int32_value
+            pyformat = VAR_FORMAT_LONG
+        elif var_type == READSTAT_TYPE_FLOAT:
+            c_float_value = readstat_float_value(value)
+            py_float_value = <double> c_float_value
+            pyformat = VAR_FORMAT_FLOAT
+        elif var_type == READSTAT_TYPE_DOUBLE:
+            c_double_value = readstat_double_value(value);
+            py_float_value = <double> c_double_value
+            pyformat = VAR_FORMAT_FLOAT
+        else:
+            raise Exception("Unkown data type")
+            
+    # final transformation and storage
+    file_format = dc.file_format
+    if pyformat == VAR_FORMAT_STRING:
+        if var_format == DATE_FORMAT_NOTADATE:
+            dc.col_data[index][obs_index] = py_str_value
+        else:
+            #str_byte_val = py_str_value.encode("UTF-8")
+            raise Exception("STRING type with value %s with date type" % py_str_value )
+    elif pyformat == VAR_FORMAT_LONG:
+        if var_format == DATE_FORMAT_NOTADATE:
+            dc.col_data[index][obs_index] = py_long_value
+        else:
+            tstamp = <double> py_long_value
+            mydat = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            dc.col_data[index][obs_index] = mydat
+    elif pyformat == VAR_FORMAT_FLOAT:
+        if var_format == DATE_FORMAT_NOTADATE:
+            dc.col_data[index][obs_index] = py_float_value
+        else:
+            #tstamp = <int> py_float_value
+            tstamp = py_float_value
+            mydat = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            dc.col_data[index][obs_index] = mydat
+    elif pyformat == VAR_FORMAT_MISSING:
+        pass
+    else:
+        raise Exception("Failed convert C to python value")
+
+        
+    return READSTAT_HANDLER_OK
+
+
+cdef int handle_value_label(char *val_labels, readstat_value_t value, char *label, void *ctx) except READSTAT_HANDLER_ABORT:
+    """
+    Reads the label for the value that belongs to the label set val_labels. In Handle variable we need to do a map
+    from variable name to val_label so that later we can match both things.    
+    """
+
+    cdef  data_container dc = <data_container> ctx
+
+    cdef char * c_str_value
+    cdef str py_str_value
+    cdef int8_t c_int8_value
+    cdef int16_t c_int16_value
+    cdef int32_t c_int32_value
+    cdef int64_t c_int64_value
+    cdef float c_float_value
+    cdef double c_double_value
+    cdef long py_long_value
+    cdef double py_float_value
+    cdef py_variable_format pyformat
+    cdef object labels_raw
+    cdef str var_label
+    cdef object cur_dir
+    cdef str value_label_name
+
+    var_label = <str> val_labels
+    value_label_name = <str> label
+
+    cdef readstat_type_t value_type
+    value_type = readstat_value_type(value)
+
+    if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:
+        c_str_value = readstat_string_value(value)
+        py_str_value = <str> c_str_value
+        pyformat = VAR_FORMAT_STRING
+    elif value_type == READSTAT_TYPE_INT8:
+        c_int8_value = readstat_int8_value(value)
+        py_long_value = <long> c_int8_value
+        pyformat = VAR_FORMAT_LONG
+    elif value_type == READSTAT_TYPE_INT16:
+        c_int16_value = readstat_int16_value(value)
+        py_long_value = <long> c_int16_value
+        pyformat = VAR_FORMAT_LONG
+    elif value_type == READSTAT_TYPE_INT32:
+        c_int32_value = readstat_int32_value(value)
+        py_long_value = <long> c_int32_value
+        pyformat = VAR_FORMAT_LONG
+    elif value_type == READSTAT_TYPE_FLOAT:
+        c_float_value = readstat_float_value(value)
+        py_float_value = <double> c_float_value
+        pyformat = VAR_FORMAT_FLOAT
+    elif value_type == READSTAT_TYPE_DOUBLE:
+        c_double_value = readstat_double_value(value);
+        py_float_value = <double> c_double_value
+        pyformat = VAR_FORMAT_FLOAT
+    else:
+        raise Exception("Unkown data type")
+
+    labels_raw = dc.labels_raw
+    cur_dict = labels_raw.get(var_label)
+    if not cur_dict:
+        cur_dict = dict()
+
+    if pyformat == VAR_FORMAT_STRING:
+        cur_dict[py_str_value] = value_label_name
+    elif pyformat == VAR_FORMAT_LONG:
+        cur_dict[py_long_value] = value_label_name
+    elif pyformat == VAR_FORMAT_FLOAT:
+        cur_dict[py_float_value] = value_label_name
+    elif pyformat == VAR_FORMAT_MISSING:
+        pass
+    else:
+        raise Exception("Failed convert C to python value")
+
+    dc.labels_raw[var_label] = cur_dict
+
+    return READSTAT_HANDLER_OK
+
+cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HANDLER_ABORT:
+    """
+    Collects notes (text annotations) attached to the documents. It happens for spss and stata
+    """
+
+    cdef str pynote
+    cdef  data_container dc = <data_container> ctx
+
+    pynote = <str> note
+    dc.notes.append(pynote)
+
+    return READSTAT_HANDLER_OK
+
+
+cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
+    """
+    Runs the parsing of the file by readstat library
+    """
+    
+    cdef readstat_parser_t *parser
+    cdef readstat_error_t error
+    cdef readstat_metadata_handler metadata_handler
+    cdef readstat_variable_handler variable_handler
+    cdef readstat_value_handler value_handler
+    cdef readstat_value_label_handler value_label_handler
+    cdef readstat_note_handler note_handler
+
+    cdef void *ctx
+    cdef int retcode
+    cdef str err_message
+    cdef PyObject *pyerr
+    cdef bint metaonly
+    cdef char *err_readstat
+    cdef bytes encoding_byte
+
+    metaonly = data.metaonly
+    ctx = <void *>data
+    
+    #readstat_error_t error = READSTAT_OK;
+    parser = readstat_parser_init();
+    metadata_handler = <readstat_metadata_handler> handle_metadata
+    variable_handler = <readstat_variable_handler> handle_variable
+    value_handler = <readstat_value_handler> handle_value
+    value_label_handler = <readstat_value_label_handler> handle_value_label
+    note_handler = <readstat_note_handler> handle_note
+    
+    
+    retcode = readstat_set_metadata_handler(parser, metadata_handler)
+    retcode = readstat_set_variable_handler(parser, variable_handler)
+    retcode = readstat_set_value_label_handler(parser, value_label_handler)
+    retcode = readstat_set_note_handler(parser, note_handler)
+    if not metaonly:
+        retcode = readstat_set_value_handler(parser, value_handler)
+
+    # if the user set the encoding manually
+    if data.user_encoding:
+        encoding_bytes = data.user_encoding.encode("utf-8")
+        readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
+
+    # parse!
+    error = parse_func(parser, filename, ctx);
+    readstat_parser_free(parser)
+    # check if a python error ocurred, if yes, it will be printed by the interpreter, 
+    # if not, make sure that the return from parse_func is OK, if not print
+    pyerr = PyErr_Occurred()
+    if <void *>pyerr == NULL:
+        if error != READSTAT_OK:
+            err_readstat = readstat_error_message(error)
+            err_message = <str> err_readstat
+            raise ReadstatError(err_message)
+        
+
+cdef object data_container_to_pandas_dataframe(data_container data):
+    """
+    Transforms a data container object to a pandas data frame
+    """
+    
+    cdef object final_container
+    cdef list col_data
+    cdef list col_names
+    cdef str cur_name_str
+    cdef int fc_cnt
+    cdef bint is_unkown_number_rows
+    cdef int max_n_obs
+    cdef bint metaonly
+
+    final_container = OrderedDict()
+    col_data = data.col_data
+    col_names = data.col_names
+    is_unkown_number_rows = data.is_unkown_number_rows
+    max_n_obs = data.max_n_obs
+    metaonly = data.metaonly
+    
+    for fc_cnt in range(0, len(col_names)):
+        cur_name_str = col_names[fc_cnt]
+        cur_data = col_data[fc_cnt]
+        if is_unkown_number_rows and not metaonly:
+            cur_data = cur_data[0:max_n_obs]
+        final_container[cur_name_str] = cur_data
+
+    if final_container:
+        data_frame = pd.DataFrame.from_dict(final_container)
+    else:
+        data_frame = pd.DataFrame()
+
+    return data_frame
+
+
+cdef object data_container_extract_metadata(data_container data):
+    """
+    Extracts metadata from a data container and puts it into a metadata 
+    object
+    """
+    #cdef list col_names, col_labels_str
+    cdef list col_names_byte, col_labels_byte
+    cdef str colstr
+    cdef bint metaonly
+    cdef bint is_unkown_number_rows
+    cdef object label_to_var_name
+    cdef object labels_raw
+    cdef str var_name, var_label
+    cdef object current_labels
+    cdef object labels_str
+    cdef object original_types
+
+    metaonly = data.metaonly
+    is_unkown_number_rows = data.is_unkown_number_rows
+    
+    cdef object metadata = metadata_container()
+
+    # number of rows
+    metadata.number_columns = data.n_vars
+    if is_unkown_number_rows:
+        if not metaonly:
+            metadata.number_rows = data.max_n_obs
+    else:
+        metadata.number_rows = data.n_obs
+
+    # value labels
+    labels_raw = data.labels_raw
+    label_to_var_name = data.label_to_var_name
+    variable_value_labels = dict()
+
+    if labels_raw:
+        for var_name, var_label in label_to_var_name.items():
+            current_labels = labels_raw.get(var_label)
+            if current_labels:
+                variable_value_labels[var_name] = current_labels
+
+    original_types = dict()
+    for indx in range(metadata.number_columns):
+        cur_col = data.col_names[indx]
+        cur_type = data.col_formats_original[indx]
+        original_types[cur_col] = cur_type
+
+    metadata.notes = data.notes
+    metadata.column_names = data.col_names
+    metadata.column_labels = data.col_labels
+    metadata.file_encoding = data.file_encoding
+    metadata.file_label = data.file_label
+    metadata.variable_value_labels = variable_value_labels
+    metadata.value_labels = labels_raw
+    metadata.variable_to_label = label_to_var_name
+    metadata.original_variable_types = original_types
+    metadata.table_name = data.table_name
+    
+    return metadata
+
+
+cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
+                           str encoding, bint metaonly, bint dates_as_pandas):
+    """
+    Coordinates the activities to parse a file. This is the entry point 
+    for the public methods
+    """
+    
+    cdef bytes filename_bytes
+    cdef char * filename    
+    cdef data_container data
+    cdef object origin
+           
+    filename_bytes = filename_path.encode("utf-8")
+    filename = <char *> filename_bytes
+    
+    data = data_container()
+    ctx = <void *>data        
+    
+    data.file_format = file_format
+    data.metaonly = metaonly
+    data.dates_as_pandas = dates_as_pandas
+
+    if encoding:
+        data.user_encoding = encoding
+    
+    if file_format == FILE_FORMAT_SAS:
+        origin = sas_origin
+    elif file_format == FILE_FORMAT_SPSS:
+        origin = spss_origin
+    elif file_format == FILE_FORMAT_STATA:
+        origin = stata_origin
+    else:
+        raise Exception("Unknown file format")
+    
+    data.origin = origin
+    
+    # go!
+    run_readstat_parser(filename, data, parse_func)    
+    data_frame = data_container_to_pandas_dataframe(data)
+    metadata = data_container_extract_metadata(data)
+
+    return data_frame, metadata
+    

@@ -1,0 +1,514 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 0.1.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> pyreadstat
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Welcome to pyreadstat’s documentation!</a></li>
+<li><a class="reference internal" href="#metadata-object-description">Metadata Object Description</a></li>
+<li><a class="reference internal" href="#module-pyreadstat.pyreadstat">Functions Documentation</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">pyreadstat</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Welcome to pyreadstat’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-pyreadstat-s-documentation">
+<h1>Welcome to pyreadstat’s documentation!<a class="headerlink" href="#welcome-to-pyreadstat-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="metadata-object-description">
+<h1>Metadata Object Description<a class="headerlink" href="#metadata-object-description" title="Permalink to this headline">¶</a></h1>
+<p>Each parsing function returns a metadata object in addition to a pandas dataframe. That
+object contains the following fields:</p>
+<blockquote>
+<div><ul class="simple">
+<li>notes: notes or documents (text annotations) attached to the file if any (spss and stata).</li>
+<li>column_names : a list with the names of the columns.</li>
+<li>column_labels : a list with the column labels, if any.</li>
+<li>file_encoding : a string with the file encoding, may be empty</li>
+<li>number_columns : an int with the number of columns</li>
+<li>number_rows : an int with the number of rows. If metadataonly option was used, it may
+be None if the number of rows could not be determined. If you need the number of rows in
+this case you need to parse the whole file.</li>
+<li>variable_value_labels : a dict with keys being variable names, and values being a dict with values as keys and labels
+as values. It may be empty if the dataset did not contain such labels. For sas7bdat files it will be empty unless
+a sas7bcat was given. It is a combination of value_labels and variable_to_label.</li>
+<li>value_labels : a dict with label name as key and a dict as value, with values as keys and labels
+as values. In the case of parsing a sas7bcat file this is where the formats are.</li>
+<li>variable_to_label : A dict with variable name as key and label name as value. Label names are those described in
+value_labels. Sas7bdat files may have this member populated and its information can be used to match the information
+in the value_labels coming from the sas7bcat file.</li>
+<li>original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.</li>
+<li>table_name : table name (string)</li>
+</ul>
+</div></blockquote>
+<p>There are two functions to deal with value labels: set_value_labels and set_catalog_to_sas. You can read about them
+in the next section.</p>
+</div>
+<div class="section" id="module-pyreadstat.pyreadstat">
+<span id="functions-documentation"></span><h1>Functions Documentation<a class="headerlink" href="#module-pyreadstat.pyreadstat" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_dta">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">read_dta</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_dta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a STATA dta file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_path</strong> (<em>str</em>) – path to the file. The string is assumed to be utf-8 encoded</li>
+<li><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
+metadata object. The data frame will be set with the correct column names but no data.</li>
+<li><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</li>
+<li><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
+if any appropiate are found.</li>
+<li><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default True. Takes effect only if apply_value_formtas is True. If True, variables with values changed
+for their formatted version will be transformed into pandas categories.</li>
+<li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
+iconv-compatible name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</li>
+<li><em>metadata</em> – object with metadata. Look at the documentation for more information.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_por">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">read_por</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_por" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SPSS por file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_path</strong> (<em>str</em>) – path to the file. The string is assumed to be utf-8 encoded</li>
+<li><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
+metadata object. The data frame will be set with the correct column names but no data.</li>
+<li><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</li>
+<li><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
+if any appropiate are found.</li>
+<li><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default True. Takes effect only if apply_value_formtas is True. If True, variables with values changed
+for their formatted version will be transformed into pandas categories.</li>
+<li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
+iconv-compatible name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</li>
+<li><em>metadata</em> – object with metadata. Look at the documentation for more information.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_sas7bcat">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">read_sas7bcat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sas7bcat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
+value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
+variable_to_label contains a map from variable name to the formats.
+In order to apply the catalog to the sas7bdat file use set_catalog_to_sas or pass the catalog file as an argument
+to read_sas7bdat directly.
+SAS catalog files are difficult ones, some of them can be read only in specific SAS version, may contain strange
+encodings etc. Therefore it may be that many catalog files are not readable from this application.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_path</strong> (<em>str</em>) – path to the file. The string is assumed to be utf-8 encoded</li>
+<li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
+iconv-compatible name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data (no data in this case, so will be empty)</li>
+<li><em>metadata</em> – object with metadata. The member value_labels is the one that contains the formats.
+Look at the documentation for more information.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_sas7bdat">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">read_sas7bdat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sas7bdat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SAS sas7bdat file.
+It accepts the path to a sas7bcat.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_path</strong> (<em>str</em>) – path to the file. The string is assumed to be utf-8 encoded.</li>
+<li><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
+metadata object. The data frame will be set with the correct column names but no data.</li>
+<li><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</li>
+<li><strong>catalog_file</strong> (<em>str</em><em>, </em><em>optional</em>) – path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values
+by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,
+Use read_sas7bcat to parse the catalog independently
+of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.</li>
+<li><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – Will take effect only if the catalog_file was specified. If True the variables whose values were replaced
+by the formats will be transformed into pandas categories.</li>
+<li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
+iconv-compatible name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</li>
+<li><em>metadata</em> – object with metadata. The members variables_value_labels will be empty unless a valid catalog file is
+supplied.
+Look at the documentation for more information.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_sav">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">read_sav</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sav" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SPSS sav or zsav (compressed) files</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_path</strong> (<em>str</em>) – path to the file. The string is assumed to be utf-8 encoded</li>
+<li><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
+metadata object. The data frame will be set with the correct column names but no data.</li>
+<li><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</li>
+<li><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
+if any appropiate are found.</li>
+<li><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default True. Takes effect only if apply_value_formtas is True. If True, variables with values changed
+for their formatted version will be transformed into pandas categories.</li>
+<li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
+iconv-compatible name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</li>
+<li><em>metadata</em> – object with metadata. Look at the documentation for more information.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_xport">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">read_xport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_xport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a SAS xport file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename_path</strong> (<em>str</em>) – path to the file. The string is assumed to be utf-8 encoded</li>
+<li><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
+metadata object. The data frame will be set with the correct column names but no data.</li>
+<li><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</li>
+<li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
+iconv-compatible name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</li>
+<li><em>metadata</em> – object with metadata. Look at the documentation for more information.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.set_catalog_to_sas">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">set_catalog_to_sas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.set_catalog_to_sas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the values in the dataframe and sas_metadata according to the formats in the catalog.
+It will return a copy of the dataframe and metadata. If no appropriate formats were found, the result will
+be an unchanged copy of the original dataframe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sas_dataframe</strong> (<em>pandas dataframe</em>) – resulting from parsing a sas file</li>
+<li><strong>sas_metadata</strong> (<em>dictionary</em>) – resulting from parsing a sas file</li>
+<li><strong>catalog_metadata</strong> (<em>dictionary</em>) – resulting from parsing a sas7bcat (catalog) file</li>
+<li><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to True. If True the variables having formats will be transformed into pandas categories.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>df_copy</strong> (<em>pandas dataframe</em>) – a copy of the original dataframe with the values changed, if appropriate formats were found, unaltered
+otherwise</li>
+<li><strong>metadata</strong> (<em>dict</em>) – a copy of the original sas_metadata enriched with catalog information if found, otherwise unaltered</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.set_value_labels">
+<code class="descclassname">pyreadstat.pyreadstat.</code><code class="descname">set_value_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.set_value_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the values in the dataframe according to the value formats in the metadata.
+It will return a copy of the dataframe. If no appropiate formats were found, the result will be an unchanged copy
+of the original dataframe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dataframe</strong> (<em>pandas dataframe</em>) – resulting from parsing a file</li>
+<li><strong>metadata</strong> (<em>dictionary</em>) – resulting from parsing a file</li>
+<li><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to True. If True the variables having formats will be transformed into pandas categories.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>df_copy</strong> – a copy of the original dataframe with the values changed, if appropiate formats were found, unaltered
+otherwise</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pandas dataframe</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Otto Fajardo.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.2',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>
