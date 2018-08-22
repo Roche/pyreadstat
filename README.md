@@ -9,7 +9,7 @@ This module is a wrapper around the excellent [Readstat](https://github.com/Wiza
 meaning pyreadstat is a python equivalent to R Haven (but writing files is currently not supported.)
 
 Detailed documentation on all available methods is in the 
-[Module documentation](https://pages.github.roche.com/MDH-Tools/pyreadstat/_build/html/index.html)
+[Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html)
 
 
 **DISCLAIMER** 
@@ -167,7 +167,7 @@ df.columns = meta.column_names
 ```
 
 Here there is a relation of all functions available. 
-You can also check the [Module documentation](https://pages.github.roche.com/MDH-Tools/pyreadstat/_build/html/index.html).
+You can also check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
 | Function in this package | Purpose |
 | ------------------- | ----------- |
@@ -265,7 +265,7 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_datetime=True)
 ```
 
-For more information, please check the [Module documentation](https://pages.github.roche.com/MDH-Tools/pyreadstat/_build/html/index.html).
+For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
 ## People
 
