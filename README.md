@@ -147,7 +147,7 @@ python3 setup.py install --user
 You need a working C compiler.
 
 Compiling on linux is very easy, but on windows is a bit more challenging. 
-Some instructions are found [here](https://github.roche.com/MDH-Tools/pyreadstat/blob/master/windows_compilation.md)
+Some instructions are found [here](https://github.com/Roche/pyreadstat/blob/master/windows_compilation.md)
 
 ## Basic Usage
 
