@@ -76,6 +76,24 @@ cython source code, you will need cython.
 
 ## Installation
 
+### Using pip
+
+Probably the easiest way: from your conda, virtualenv or just base installation do:
+
+```python
+pip install pyreadstat
+```
+
+If you are running on a machine without admin rights, and you want to install against your base installation you can do:
+
+```python
+pip install pyreadstat --user
+```
+
+Notice that at the moment we offer pre-compiled wheels for windows 64 bit and Python 3.5, 3.6 and 3.7. If not one of 
+these versions, or running on linux or mac, pip will attempt to compile the package. We also have wheels for linux 
+readhat 7.5 64 bits in the dist folder (see next section).
+
 ### From a pre-compiled python wheel
 
 In this repository, look in the folder dist. If there is a wheel (.whl file) compatible for your python version and 
@@ -281,6 +299,11 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not able to read SAS compressed files. 
 * Not reading sas7bcat files produced on linux (windows are fine).
 * Not able to skip rows.
+
+## License
+
+pyreadstat is distributed under Apache 2.0 license. Readstat is distributed under MIT license. See the License file for
+more information.
 
 ## Contributing
 

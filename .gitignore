@@ -6,3 +6,4 @@
 /build
 *.so
 /pyreadstat.egg-info
+/dist2

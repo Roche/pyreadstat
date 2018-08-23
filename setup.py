@@ -76,23 +76,31 @@ if USE_CYTHON:
     from Cython.Build import cythonize
     extensions = cythonize(extensions)
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+long_description = """Please visit out project home page for more information:<br>
+https://github.com/Roche/pyreadstat"""
+#with open("README.md", "r") as fh:
+#    long_description = fh.read()
 
 setup(
     name='pyreadstat',
-    version='0.1.4',
+    version='0.1.6',
     description="Python package to read sas, spss and stata files into pandas data frames. It is a wrapper around the C library readstat",
     author="Otto Fajardo",
+    author_email="otto.fajardob@gmail.com",
     url="https://github.com/Roche/pyreadstat",
-    download_url="https://github.com/Roche/pyreadstat",
+    download_url="https://github.com/Roche/pyreadstat/dist",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python",
+        "Programming Language :: Cython",
+        "Programming Language :: C",
         "License :: OSI Approved :: Apache Software License",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering",
+        "Environment :: Console",
     ],
     ext_modules=extensions,
     packages=["pyreadstat"],
-	data_files = data_files
+    data_files=data_files
 )
