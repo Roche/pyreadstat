@@ -76,6 +76,9 @@ if USE_CYTHON:
     from Cython.Build import cythonize
     extensions = cythonize(extensions)
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='pyreadstat',
     version='0.1.4',
@@ -83,6 +86,12 @@ setup(
     author="Otto Fajardo",
     url="https://github.com/Roche/pyreadstat",
     download_url="https://github.com/Roche/pyreadstat",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    classifiers=[
+        "Programming Language :: Python",
+        "License :: OSI Approved :: Apache Software License",
+    ],
     ext_modules=extensions,
     packages=["pyreadstat"],
 	data_files = data_files

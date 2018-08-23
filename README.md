@@ -274,7 +274,7 @@ For more information, please check the [Module documentation](https://ofajardo.g
 * Support for tagged missing values.
 * Support for skipping columns.
 
-# Known limitations
+## Known limitations
 
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
 
