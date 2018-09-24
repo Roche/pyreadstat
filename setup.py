@@ -51,6 +51,10 @@ if os.name == 'nt':
         data_folder = "win_libs/32bit/"
     data_files = [("",[data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     libraries.append("iconv")
+else:
+    _platform = sys.platform
+    if _platform.lower().startswith("darwin"):
+        libraries.append("iconv")
 
 # Extensions
 
@@ -83,7 +87,7 @@ https://github.com/Roche/pyreadstat"""
 
 setup(
     name='pyreadstat',
-    version='0.1.6',
+    version='0.1.7',
     description="Python package to read sas, spss and stata files into pandas data frames. It is a wrapper around the C library readstat",
     author="Otto Fajardo",
     author_email="otto.fajardob@gmail.com",
