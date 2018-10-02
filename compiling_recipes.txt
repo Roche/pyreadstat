@@ -19,9 +19,9 @@ make html
 python3 setup.py sdist bdist_wheel
 
 # upload to pypi test
-twine upload --repository-url https://test.pypi.org/legacy/ dist2/*
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 # install from pypi test
  pip install --index-url https://test.pypi.org/simple/ pyreadstat
 
  # upload to pypi prod
- twine upload dist2/*
+ twine upload dist/*

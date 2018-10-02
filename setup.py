@@ -16,7 +16,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 source_dir_root = "src"
 
 # Get a list of C source files and C source directories but omitting certain things
-
 omitted_sources = [
     "mod_xlsx.c",
     "mod_csv_reader.c",
@@ -36,6 +35,7 @@ source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname 
 # libraries and data (in this case data are windows dlls)
 data_files = []
 libraries=["m", "z"]
+# Windows
 if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
     if is64bit:
@@ -53,11 +53,11 @@ if os.name == 'nt':
     libraries.append("iconv")
 else:
     _platform = sys.platform
+    # Mac: iconv needs to be linked statically
     if _platform.lower().startswith("darwin"):
         libraries.append("iconv")
 
 # Extensions
-
 extensions = [Extension("pyreadstat.pyreadstat",
                 sources=["pyreadstat/pyreadstat" + ext] + sources,
                 # this dot here is important for cython to find the pxd files
@@ -82,15 +82,14 @@ if USE_CYTHON:
 
 long_description = """Please visit out project home page for more information:<br>
 https://github.com/Roche/pyreadstat"""
-#with open("README.md", "r") as fh:
-#    long_description = fh.read()
+
+short_description = """ A python package to read SAS (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta)
+files into pandas data frames. It is a wrapper around the C library readstat."""
 
 setup(
     name='pyreadstat',
     version='0.1.7',
-    description="Python package to read sas, spss and stata files into pandas data frames. It is a wrapper around the C library readstat",
-    author="Otto Fajardo",
-    author_email="otto.fajardob@gmail.com",
+    description=short_description,
     url="https://github.com/Roche/pyreadstat",
     download_url="https://github.com/Roche/pyreadstat/dist",
     long_description=long_description,

@@ -1,6 +1,7 @@
 # pyreadstat
 
-A python module to read sas (sas7bdat, xport), spps (sav, zsav, por) and stata (dta) data files into pandas dataframes.
+A python package to read sas (sas7bdat, sas7bcat, xport), spps (sav, zsav, por) and stata (dta) data files into 
+pandas dataframes.
 <br> 
 
 This module is a wrapper around the excellent [Readstat](https://github.com/WizardMac/ReadStat) C library by 
@@ -56,10 +57,10 @@ pyreadstat read strings as str. Thas is possible because readstat extracts the o
 to utf-8, so that you don't have to care about that anymore. However it is still possible to manually set the encoding.
 
 In addition pyreadstat exposes the variable labels in an easy way (see later). As pandas dataframes cannot handle value
-labels, you as user will have to take the decision wether to use those values or not. Pandas read_sas reads those labels, 
+labels, you as user will have to take the decision whether to use those values or not. Pandas read_sas reads those labels, 
 but in order to recover them you have to work a bit harder. 
 
-Compared to R Haven, pyreadstat offers the possibility to read only the headers: Sometimes you want to take a quick 
+Compared to R Haven, pyreadstat offers the possibility to read only the headers: Sometimes you want to take a 
 look to many (sas) files looking for the datasets that contain
 some specific columns, and you want to do it quick. This package offers the possibility to read only the metadata making 
 it possible a very fast metadata scraping (Pandas read_sas can also do it if you pass the value iterator=True). 
@@ -73,6 +74,10 @@ will have to install it manually before using pyreadstat.
 
 In order to compile from source, you will need a C compiler (see installation). If you want to do changes to the
 cython source code, you will need cython.
+
+Readstat depends on the C library iconv to handle character encodings. On mac, the library is found on the system, but
+users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
+on mac)
 
 ## Installation
 
@@ -91,22 +96,18 @@ pip install pyreadstat --user
 ```
 
 Notice that at the moment we offer pre-compiled wheels for windows 64 bit and Python 3.5, 3.6 and 3.7. If not one of 
-these versions, or running on linux or mac, pip will attempt to compile the package. We also have wheels for linux 
-readhat 7.5 64 bits in the dist folder (see next section).
+these versions, or running on linux or mac, pip will attempt to compile the package. 
 
 ### From a pre-compiled python wheel
 
-In this repository, look in the folder dist. If there is a wheel (.whl file) compatible for your python version and 
-operating system, download it and do:
+In this repository, look in the folder dist, we offer wheels for windows. If there is a wheel (.whl file) compatible 
+for your python version and operating system, download it and do:
 
 ```
-pip install pyreadstat-0.1.0-cp36-cp36m-linux_x86_64.whl
+pip install pyreadstat-0.1.7-cp36-cp36m-win_amd64.whl
 ```
 
-the example file pyreadstat-0.1.0-cp36-cp36m-linux_x86_64.whl can be a different one depending on your python version and system.
-
-cp36-cp36m-linux_x86_64 means (C)Python 3.6 linux (Red Hat 7.5) 32/64 bits and is good for BEE. We also provide wheels
-for python 3.7 and 3.5 for this operating system.
+the example file pyreadstat-0.1.7-cp36-cp36m-win_amd64.whl can be a different one depending on your python version and system.
 
 cp36-cp36m-win_amd64.whl means (C) Python 3.6 windows 64 bits and it has been tested both on win 7 and win 10 standard
 roche computers, with Anaconda Python installed (it has not been tested with plain python). We also provide wheels for
@@ -144,10 +145,31 @@ If you don't have admin privileges to the machine (for example on Bee) do:
 python3 setup.py install --user
 ```
 
+You can also install from the github repo directly (without cloning). Use the flag --user if necessary.
+
+```
+pip install git+https://github.com/Roche/pyreadstat.git
+```
+
 You need a working C compiler.
+
+### Compiling on Windows
 
 Compiling on linux is very easy, but on windows is a bit more challenging. 
 Some instructions are found [here](https://github.com/Roche/pyreadstat/blob/master/windows_compilation.md)
+
+### Compiling on Mac
+
+Compiling on mac is usually easy. Readstat depends however on the C library iconv to handle character encodings; while 
+on linux is part of gclib, on mac it is a separated shared library found on the system (h file is in /usr/include and shared
+library on /usr/lib). While compiling against this usually works fine, some users have reported problems (for example
+missing symbol _iconv, or libiconv version too old). In those cases it helped to install libiconv with conda:
+
+```
+conda install libiconv
+```
+
+and then recompile again (be sure to delete any cache).
 
 ## Basic Usage
 
@@ -288,9 +310,9 @@ For more information, please check the [Module documentation](https://ofajardo.g
 
 ## Roadmap
 
-* testing on mac.
-* Support for tagged missing values.
+* Conda recipe.
 * Support for skipping columns.
+* Support for tagged missing values.
 
 ## Known limitations
 
@@ -299,6 +321,10 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not able to read SAS compressed files. 
 * Not reading sas7bcat files produced on linux (windows are fine).
 * Not able to skip rows.
+
+## Changelog
+
+A log with the changes for each version can be found [here](https://github.com/Roche/pyreadstat/blob/master/change_log.md)
 
 ## License
 
@@ -311,8 +337,9 @@ Contributions are welcome! Those include corrections to the documentation, bugs 
 providing compiled wheels (if you managed to compile
 in a OS-python version combination not reported yet) and of course code pull requests. For code pull requests please 
 consider opening an issue explaining what you plan to do, so that we can get aligned before you start investing time on
-it. 
+it (this also avoids duplicated efforts).
 
 ## People
 
 Otto Fajardo - author
+
