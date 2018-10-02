@@ -169,7 +169,8 @@ missing symbol _iconv, or libiconv version too old). In those cases it helped to
 conda install libiconv
 ```
 
-and then recompile again (be sure to delete any cache).
+and then recompile again (be sure to delete any cache, if using pip do pip --no-cache-dir, if using setup.py remove
+the folder build, otherwise you may be installing the old compilation again).
 
 ## Basic Usage
 

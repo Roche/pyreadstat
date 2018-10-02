@@ -80,16 +80,20 @@ if USE_CYTHON:
     from Cython.Build import cythonize
     extensions = cythonize(extensions)
 
-long_description = """Please visit out project home page for more information:<br>
+long_description = """ A Python package to read SAS
+(sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into pandas data frames. It is a wrapper
+around the C library readstat.<br>
+Please visit out project home page for more information:<br>
 https://github.com/Roche/pyreadstat"""
 
-short_description = """ A python package to read SAS (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta)
-files into pandas data frames. It is a wrapper around the C library readstat."""
+short_description = "Reads SAS, SPSS and Stata files into pandas data frames."
 
 setup(
     name='pyreadstat',
-    version='0.1.7',
+    version='0.1.8',
     description=short_description,
+    author="Otto Fajardo",
+    author_email="pleasecontactviagithub@notvalid.com",
     url="https://github.com/Roche/pyreadstat",
     download_url="https://github.com/Roche/pyreadstat/dist",
     long_description=long_description,
