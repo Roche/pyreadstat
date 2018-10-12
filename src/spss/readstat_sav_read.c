@@ -895,6 +895,9 @@ static readstat_error_t sav_parse_machine_integer_info_record(const void *data, 
         if (converter == (iconv_t)-1) {
             return READSTAT_ERROR_UNSUPPORTED_CHARSET;
         }
+        if (ctx->converter) {
+            iconv_close(ctx->converter);
+        }
         ctx->converter = converter;
     }
     return READSTAT_OK;

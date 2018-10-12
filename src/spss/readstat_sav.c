@@ -81,9 +81,8 @@ void sav_ctx_free(sav_ctx_t *ctx) {
         free(ctx->raw_string);
     if (ctx->utf8_string)
         free(ctx->utf8_string);
-    if (ctx->converter) {
+    if (ctx->converter)
         iconv_close(ctx->converter);
-    }
     if (ctx->variable_display_values) {
         free(ctx->variable_display_values);
     }

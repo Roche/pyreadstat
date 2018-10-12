@@ -41,7 +41,9 @@ static char spss_type_strings[][16] = {
     [SPSS_FORMAT_TYPE_CCD] = "CCD",
     [SPSS_FORMAT_TYPE_CCE] = "CCE",
     [SPSS_FORMAT_TYPE_EDATE] = "EDATE",
-    [SPSS_FORMAT_TYPE_SDATE] = "SDATE"
+    [SPSS_FORMAT_TYPE_SDATE] = "SDATE",
+    [SPSS_FORMAT_TYPE_MTIME] = "MTIME",
+    [SPSS_FORMAT_TYPE_YMDHMS] = "YMDHMS",
 };
 
 int spss_format(char *buffer, size_t len, spss_format_t *format) {

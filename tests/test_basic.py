@@ -1,4 +1,19 @@
-import math
+# #############################################################################
+# Copyright 2018 Hoffmann-La Roche
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# #############################################################################
+
 from datetime import datetime
 import unittest
 import os
@@ -22,12 +37,11 @@ class TestBasic(unittest.TestCase):
         # basic
         pandas_csv = os.path.join(self.basic_data_folder, "sample.csv")
         df_pandas = pd.read_csv(pandas_csv)
-        df_pandas["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else math.nan for x in
-                               df_pandas["mydate"]]
+        df_pandas["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else float('nan') for x in df_pandas["mydate"]]
         # df_pandas["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else pd._libs.tslib.NaTType() for x in df_pandas["dtime"]]
-        df_pandas["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else math.nan for x in
+        df_pandas["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan') for x in
                               df_pandas["dtime"]]
-        df_pandas["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else math.nan for x in
+        df_pandas["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan') for x in
                                df_pandas["mytime"]]
         df_pandas["myord"] = df_pandas["myord"].astype(float)
         df_pandas["mylabl"] = df_pandas["mylabl"].astype(float)
@@ -107,7 +121,7 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"))
         df_pandas_dta = self.df_pandas.drop(labels="dtime", axis=1)
         df_dta = df.drop(labels="dtime", axis=1)
-        df_dta["mytime"] = [datetime.strptime(x, '%H:%M:%S').time() if x else math.nan for x in df_dta["mytime"]]
+        df_dta["mytime"] = [datetime.strptime(x, '%H:%M:%S').time() if x else float('nan') for x in df_dta["mytime"]]
         self.assertTrue(df_dta.equals(df_pandas_dta))
         self.assertTrue(meta.number_columns - 1 == len(df_pandas_dta.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_dta))
@@ -230,6 +244,6 @@ if __name__ == '__main__':
 
     import pyreadstat
 
-    print(pyreadstat.__file__)
+    print("package location:", pyreadstat.__file__)
 
     unittest.main()

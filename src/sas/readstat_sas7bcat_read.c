@@ -86,12 +86,11 @@ static readstat_error_t sas7bcat_parse_value_labels(const char *value_start, siz
             retval = READSTAT_ERROR_PARSE;
             goto cleanup;
         }
-        size_t label_len = sas_read2(&lbp2[8], ctx->bswap);
-        size_t value_entry_len = 6 + lbp1[2];
-        const char *label = &lbp2[10];
-        char string_val[4*16+1];
         readstat_value_t value = { .type = is_string ? READSTAT_TYPE_STRING : READSTAT_TYPE_DOUBLE };
+        size_t label_len = sas_read2(&lbp2[8], ctx->bswap);
+        char string_val[4*16+1];
         if (is_string) {
+            size_t value_entry_len = 6 + lbp1[2];
             retval = readstat_convert(string_val, sizeof(string_val),
                     &lbp1[value_entry_len-16], 16, ctx->converter);
             if (retval != READSTAT_OK)
@@ -116,6 +115,12 @@ static readstat_error_t sas7bcat_parse_value_labels(const char *value_start, siz
             value.v.double_value = dval;
         }
         if (ctx->value_label_handler) {
+            char label[4*label_len+1];
+            retval = readstat_convert(label, sizeof(label),
+                    &lbp2[10], label_len, ctx->converter);
+            if (retval != READSTAT_OK)
+                goto cleanup;
+
             if (ctx->value_label_handler(name, value, label, ctx->user_ctx) != READSTAT_HANDLER_OK) {
                 retval = READSTAT_ERROR_USER_ABORT;
                 goto cleanup;
@@ -279,13 +284,14 @@ static readstat_error_t sas7bcat_read_block(char *buffer, size_t buffer_len,
     readstat_io_t *io = ctx->io;
     int next_page = start_page;
     int next_page_pos = start_page_pos;
+    int link_count = 0;
 
     int chain_link_len = 0;
     int buffer_offset = 0;
 
     char chain_link[16];
 
-    while (next_page > 0 && next_page_pos > 0) {
+    while (next_page > 0 && next_page_pos > 0 && next_page <= ctx->page_count && link_count++ < ctx->page_count) {
         if (io->seek(ctx->header_size+(next_page-1)*ctx->page_size+next_page_pos, READSTAT_SEEK_SET, io->io_ctx) == -1) {
             retval = READSTAT_ERROR_SEEK;
             goto cleanup;
@@ -367,7 +373,7 @@ readstat_error_t readstat_parse_sas7bcat(readstat_parser_t *parser, const char *
     if (ctx->metadata_handler) {
         char file_label[4*64+1];
         readstat_metadata_t metadata = { 
-            .file_encoding = hinfo->encoding, 
+            .file_encoding = ctx->input_encoding, /* orig encoding? */
             .modified_time = hinfo->modification_time,
             .creation_time = hinfo->creation_time,
             .file_format_version = hinfo->major_version,

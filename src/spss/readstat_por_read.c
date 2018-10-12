@@ -509,7 +509,7 @@ static readstat_error_t read_variable_label_record(por_ctx_t *ctx) {
         goto cleanup;
     }
 
-    varinfo->label = malloc(strlen(string) + 1);
+    varinfo->label = realloc(varinfo->label, strlen(string) + 1);
     strcpy(varinfo->label, string);
 
 cleanup:
