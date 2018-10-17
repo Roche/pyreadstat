@@ -235,6 +235,19 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', metadataonly=True)
 ```
 
+## Reading selected columns
+
+All functions accept a keyword "usecols" which should be a list of column names. Only the columns which names match those
+in the list will be imported (case sensitive). This decreases memory consumption and speeds up the process. Usecols must
+always be a list, even if there is only one member.
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variable1", "variable2"])
+
+```
+
 ## Reading value labels
 
 For sas7bdat files, value labels are stored in separated sas7bcat files. You can use them in combination with the sas7bdat

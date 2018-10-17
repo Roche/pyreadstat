@@ -562,9 +562,11 @@ static readstat_error_t xport_process_row(xport_ctx_t *ctx, const char *row, siz
         }
         pos += variable->storage_width;
 
-        if (ctx->handle.value(ctx->parsed_row_count, variable, value, ctx->user_ctx) != READSTAT_HANDLER_OK) {
-            retval = READSTAT_ERROR_USER_ABORT;
-            goto cleanup;
+        if (ctx->handle.value && !ctx->variables[i]->skip) {
+            if (ctx->handle.value(ctx->parsed_row_count, variable, value, ctx->user_ctx) != READSTAT_HANDLER_OK) {
+                retval = READSTAT_ERROR_USER_ABORT;
+                goto cleanup;
+            }
         }
     }
 
