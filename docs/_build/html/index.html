@@ -176,6 +176,15 @@ value_labels. Sas7bdat files may have this member populated and its information 
 in the value_labels coming from the sas7bcat file.</li>
 <li>original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.</li>
 <li>table_name : table name (string)</li>
+<li>variable_missing_ranges: a dict with keys being variable names. Values are a list of dicts. Each dict contains two
+keys, ‘lo’ and ‘hi’ being the lower boundary and higher boundary for the missing range. Even if the value in both
+lo and hi are the same, the two elements will always be present. This appears for SPSS (sav) files when using the
+option user_missing=True: user defined missing values appear not as nan but as their true value and this dictionary
+stores the information about which values are to be considered missing.</li>
+<li>variable_alignment: a dict with keys being variable names and values being the display alignment: left, center, right or unknown</li>
+<li>variable_storage_width: a dict with keys being variable names and values being the storage width</li>
+<li>variable_display_width: a dict with keys being variable names and values being the display width</li>
+<li>variable_measure: a dict with keys being variable names and values being the measure: nominal, ordinal, scale or unknown</li>
 </ul>
 </div></blockquote>
 <p>There are two functions to deal with value labels: set_value_labels and set_catalog_to_sas. You can read about them
@@ -202,6 +211,7 @@ if any appropiate are found.</li>
 for their formatted version will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
+<li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 </ul>
 </td>
 </tr>
@@ -235,6 +245,7 @@ if any appropiate are found.</li>
 for their formatted version will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
+<li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 </ul>
 </td>
 </tr>
@@ -304,6 +315,7 @@ of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bd
 by the formats will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
+<li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 </ul>
 </td>
 </tr>
@@ -339,6 +351,10 @@ if any appropiate are found.</li>
 for their formatted version will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
+<li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
+<li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
+will be deliver as is, and an extra piece of information will be set in the metadata (missing_ranges)
+to be able to interpretate those values as missing</li>
 </ul>
 </td>
 </tr>
@@ -368,6 +384,7 @@ metadata object. The data frame will be set with the correct column names but no
 <li><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
+<li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 </ul>
 </td>
 </tr>

@@ -77,6 +77,27 @@ class TestBasic(unittest.TestCase):
         df_dates2["date"] = df_dates2["date"].apply(lambda x: x.date())
         self.df_sas_dates = df_dates2
 
+        # missing data
+        pandas_missing_sav_csv = os.path.join(self.basic_data_folder, "sample_missing.csv")
+        df_missing_sav = pd.read_csv(pandas_missing_sav_csv, na_values="#NULL!", keep_default_na=False)
+        df_missing_sav["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else float('nan') for x in
+                                    df_missing_sav["mydate"]]
+        df_missing_sav["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan') for x
+                              in df_missing_sav["dtime"]]
+        df_missing_sav["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan') for x
+                               in df_missing_sav["mytime"]]
+        self.df_missing_sav = df_missing_sav
+
+        pandas_missing_user_sav_csv = os.path.join(self.basic_data_folder, "sample_missing_user.csv")
+        df_user_missing_sav = pd.read_csv(pandas_missing_user_sav_csv, na_values="#NULL!", keep_default_na=False)
+        df_user_missing_sav["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else float('nan') for x in
+                                         df_user_missing_sav["mydate"]]
+        df_user_missing_sav["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan')
+                                   for x in df_user_missing_sav["dtime"]]
+        df_user_missing_sav["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan')
+                                    for x in df_user_missing_sav["mytime"]]
+        self.df_user_missing_sav = df_user_missing_sav
+
     def setUp(self):
 
         # set paths
@@ -166,6 +187,9 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
+        self.assertTrue(meta.variable_display_width["mychar"]==9)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_measure["mychar"]=="nominal")
 
     def test_sav_metaonly(self):
 
@@ -191,6 +215,14 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_usecols))
         self.assertTrue(meta.number_columns == len(self.usecols))
         self.assertTrue(meta.column_names == self.usecols)
+
+    def test_sav_missing(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample_missing.sav"))
+        self.assertTrue(df.equals(self.df_missing_sav))
+        self.assertTrue(meta.missing_ranges == {})
+        df_user, meta_user = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample_missing.sav"), user_missing=True)
+        self.assertTrue(df_user.equals(self.df_user_missing_sav))
+        self.assertTrue(meta_user.missing_ranges['mynum'][0]=={'lo': 2000.0, 'hi': 3000.0})
 
     def test_zsav(self):
 

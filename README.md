@@ -300,6 +300,79 @@ df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=Fals
 df_enriched = pyreadstat.set_value_labels(df, meta, formats_as_category=True)
 ```
 
+## Missing Values
+
+There are two types of missing values: system and user defined. System are assigned by the program by default. User defined are 
+valid values that the user decided to give the meaning of missing in order to differentiate between several situations.For
+example if one has a categorical variable representing if the person passed a test, you could have 0 for did not pass, 
+1 for pass, and as user defined missing variables 2 for did not show up for the test, 3 for unable to process the results, 
+etc.
+
+**By default both cases are represented by NaN when
+read with pyreadstat**. Notice that the only possible missing value in pandas is NaN (Not a Number) for both string and numeric
+variables, date, datetime and time variables have NaT (Not a Time).
+
+In the case of SPSS sav files, the user can assign to a numeric variable either up to three discrete missing values or
+one range plus one discrete missing value. As mentioned by default all of these possiblities are translated into NaN, 
+but one can get those original values by passing the argument user_missing=True to the read_sav function:
+
+```python
+# user set with default missing values
+import pypreadstat
+df, meta = pyreadstat.read_sav("/path/to/file.sav")
+print(df)
+>> test_passed
+   1
+   0
+   NaN
+   NaN
+```
+
+Now, reading the user defined missing values:
+
+```python
+# user set with user defined missing values
+import pypreadstat
+df, meta = pyreadstat.read_sav("/path/to/file.sav", user_missing=True)
+print(df)
+>> test_passed
+   1
+   0
+   2
+   3
+```
+
+As you see now instead o NaN the values 2 and 3 appear. In case the dataset had value labels, we could bring those in
+```python
+# user set with user defined missing values and labels
+import pypreadstat
+df, meta = pyreadstat.read_sav("/path/to/file.sav", user_missing=True, apply_value_formats=True)
+print(df)
+>> test_passed
+   "passed"
+   "not passed"
+   "not shown"
+   "not processed"
+```
+
+Finally, the information about what values are user missing is stored in the meta object, in the variable missing_ranges.
+This is a dicitonary with the key being the name of the variable, and as value a list of dictionaries, each dictionary
+contains the elements "hi" and "lo" to represent the lower and upper bound of the range, however for discrete values
+as in the example, both boundaries are also present altough the value is the same in both cases.
+
+```python
+# user set with default missing values
+import pypreadstat
+df, meta = pyreadstat.read_sav("/path/to/file.sav", user_missing=True, apply_value_formats=True)
+print(meta.missing_ranges)
+>>> {'test_passed':[{'hi':2, 'lo':2}, {'hi':3, 'lo':3}]}
+```
+
+For SPSS sav files user defined missing values for non numeric (character) variables is not supported. In addition, if the value in
+a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string.
+
+For SPSS por files, and SAS and STATA files, user defined missing values are currently not supported. 
+
 
 ## Other options
 
@@ -325,8 +398,7 @@ For more information, please check the [Module documentation](https://ofajardo.g
 ## Roadmap
 
 * Conda recipe.
-* Support for skipping columns.
-* Support for tagged missing values.
+
 
 ## Known limitations
 
@@ -335,6 +407,9 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not able to read SAS compressed files. 
 * Not reading sas7bcat files produced on linux (windows are fine).
 * Not able to skip rows.
+* Not handling SPSS user defined missing values for character variables (numeric are fine).
+* Not handling SAS and Stata user defined missing values.
+
 
 ## Changelog
 
