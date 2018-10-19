@@ -69,11 +69,13 @@ In addition it offers the capability to read sas7bcat files separately from the 
 
 ## Dependencies
 
-The module depends on pandas, which you normally have installed if you got Anaconda (highly recommended.) Otherwise you
-will have to install it manually before using pyreadstat.
+The module depends on pandas, which you normally have installed if you got Anaconda (highly recommended.) If creating
+a new conda or virtual environment or if you don't have it in your base installation, you will have to install it 
+manually before using pyreadstat. Pandas is not selected as a dependency in the pip package, as that would install 
+pandas with pip and many people would prefer installing it with conda.
 
-In order to compile from source, you will need a C compiler (see installation). If you want to do changes to the
-cython source code, you will need cython.
+In order to compile from source (necessary for linux and mac), you will need a C compiler (see installation). 
+Only if you want to do changes to the cython source code, you will need cython (normally not necessary).
 
 Readstat depends on the C library iconv to handle character encodings. On mac, the library is found on the system, but
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
@@ -358,7 +360,7 @@ print(df)
 Finally, the information about what values are user missing is stored in the meta object, in the variable missing_ranges.
 This is a dicitonary with the key being the name of the variable, and as value a list of dictionaries, each dictionary
 contains the elements "hi" and "lo" to represent the lower and upper bound of the range, however for discrete values
-as in the example, both boundaries are also present altough the value is the same in both cases.
+as in the example, both boundaries are also present although the value is the same in both cases.
 
 ```python
 # user set with default missing values
@@ -369,7 +371,9 @@ print(meta.missing_ranges)
 ```
 
 For SPSS sav files user defined missing values for non numeric (character) variables is not supported. In addition, if the value in
-a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string.
+a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string. This
+is because the empty string is a valid character value in SPSS and pyreadstat preserves that property. You can convert
+empty strings to nan very easily with pandas. 
 
 For SPSS por files, and SAS and STATA files, user defined missing values are currently not supported. 
 

@@ -28,7 +28,6 @@ cimport _readstat_parser
 from copy import deepcopy
 
 
-
 # Public interface
 
 # Parsing functions

@@ -524,18 +524,20 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
         if not dc.usernan or readstat_value_is_system_missing(value):
             dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
+            # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
             dc.col_data[index][obs_index] = pyvalue
         elif readstat_value_is_tagged_missing(value):
-            # It is not very clear what this is.
+            # SAS and Stata missing values
             # In the case of SAS datasets sometimes it returns a number that translated to
             # charater gives correctly the missing value (A, B, etc). But sometimes
             # the numbers do not correlate to the missing character seen, for example,
             # A gets translated to 2, B to 3 etc, while the true missing value . gets 1
-            # maybe it is something dependent on the version?
-            # On sav I have not seen an example of this. Neither on dta.
+            # maybe it is something dependent on the version or operating system (windows vs linux generated files?)
+            # As for now usernan is disabled for SAS and stata, we should not get to this line.
             missing_tag = readstat_value_tag(value)
             dc.col_data[index][obs_index] = <float> missing_tag
+            #dc.col_data[index][obs_index] = chr(<int> missing_tag) # this should be the correct one but sometimes gives nonsense
     else:
         pyvalue = convert_readstat_to_python_value(value, index, dc)
         dc.col_data[index][obs_index] = pyvalue
