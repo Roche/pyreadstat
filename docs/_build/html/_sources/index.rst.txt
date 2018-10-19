@@ -34,6 +34,15 @@ object contains the following fields:
     in the value_labels coming from the sas7bcat file.
   * original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.
   * table_name : table name (string)
+  * variable_missing_ranges: a dict with keys being variable names. Values are a list of dicts. Each dict contains two
+    keys, 'lo' and 'hi' being the lower boundary and higher boundary for the missing range. Even if the value in both
+    lo and hi are the same, the two elements will always be present. This appears for SPSS (sav) files when using the
+    option user_missing=True: user defined missing values appear not as nan but as their true value and this dictionary
+    stores the information about which values are to be considered missing.
+  * variable_alignment: a dict with keys being variable names and values being the display alignment: left, center, right or unknown
+  * variable_storage_width: a dict with keys being variable names and values being the storage width
+  * variable_display_width: a dict with keys being variable names and values being the display width
+  * variable_measure: a dict with keys being variable names and values being the measure: nominal, ordinal, scale or unknown
 
 There are two functions to deal with value labels: set_value_labels and set_catalog_to_sas. You can read about them
 in the next section.

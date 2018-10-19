@@ -97,7 +97,19 @@ cdef extern from "readstat.h":
     
     ctypedef struct readstat_parser_t:
         pass
-    
+
+    ctypedef enum readstat_measure_t:
+        READSTAT_MEASURE_UNKNOWN,
+        READSTAT_MEASURE_NOMINAL = 1,
+        READSTAT_MEASURE_ORDINAL,
+        READSTAT_MEASURE_SCALE
+
+    ctypedef enum readstat_alignment_t:
+        READSTAT_ALIGNMENT_UNKNOWN,
+        READSTAT_ALIGNMENT_LEFT = 1,
+        READSTAT_ALIGNMENT_CENTER,
+        READSTAT_ALIGNMENT_RIGHT
+
     cdef readstat_parser_t *readstat_parser_init()
     cdef void readstat_parser_free(readstat_parser_t *parser)
 
@@ -120,13 +132,27 @@ cdef extern from "readstat.h":
     cdef char *readstat_get_file_label(readstat_metadata_t *metadata);
     cdef char *readstat_get_file_encoding(readstat_metadata_t *metadata);
     cdef char *readstat_get_table_name(readstat_metadata_t *metadata);
-    
+
+    cdef int readstat_variable_get_index_after_skipping(readstat_variable_t *variable)
     cdef char *readstat_variable_get_name(readstat_variable_t *variable)
     cdef char *readstat_variable_get_label(readstat_variable_t *variable)
     cdef char *readstat_variable_get_format(readstat_variable_t *variable)
-    readstat_type_t readstat_variable_get_type(const readstat_variable_t *variable);
-    
+    cdef readstat_type_t readstat_variable_get_type(const readstat_variable_t *variable);
+    cdef readstat_measure_t readstat_variable_get_measure(const readstat_variable_t *variable);
+    cdef readstat_alignment_t readstat_variable_get_alignment(const readstat_variable_t *variable)
+    cdef int readstat_variable_get_display_width(const readstat_variable_t *variable);
+    cdef size_t readstat_variable_get_storage_width(const readstat_variable_t *variable)
+
     cdef int readstat_value_is_missing(readstat_value_t value, readstat_variable_t *variable);
+    cdef int readstat_value_is_system_missing(readstat_value_t value);
+    cdef int readstat_value_is_tagged_missing(readstat_value_t value);
+    cdef int readstat_value_is_defined_missing(readstat_value_t value, readstat_variable_t *variable);
+    cdef char readstat_value_tag(readstat_value_t value);
+
+    cdef int readstat_variable_get_missing_ranges_count(const readstat_variable_t *variable);
+    cdef readstat_value_t readstat_variable_get_missing_range_lo(const readstat_variable_t *variable, int i);
+    cdef readstat_value_t readstat_variable_get_missing_range_hi(const readstat_variable_t *variable, int i);
+
     cdef readstat_type_t readstat_value_type(readstat_value_t value);
     
     cdef readstat_error_t readstat_parse_dta(readstat_parser_t *parser, const char *path, void *user_ctx);

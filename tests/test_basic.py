@@ -38,7 +38,6 @@ class TestBasic(unittest.TestCase):
         pandas_csv = os.path.join(self.basic_data_folder, "sample.csv")
         df_pandas = pd.read_csv(pandas_csv)
         df_pandas["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else float('nan') for x in df_pandas["mydate"]]
-        # df_pandas["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else pd._libs.tslib.NaTType() for x in df_pandas["dtime"]]
         df_pandas["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan') for x in
                               df_pandas["dtime"]]
         df_pandas["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan') for x in
@@ -55,6 +54,10 @@ class TestBasic(unittest.TestCase):
         df_pandas_formatted["mylabl"] = df_pandas_formatted["mylabl"].astype("category")
         df_pandas_formatted["myord"] = df_pandas_formatted["myord"].astype("category")
         self.df_pandas_formatted = df_pandas_formatted
+        # skip some columns
+        self.usecols = ['mynum', 'myord']
+        cols_to_drop = list(set(df_pandas.columns.values.tolist()) - set(self.usecols))
+        self.df_usecols = df_pandas.drop(cols_to_drop, axis=1)
         # sas formatted
         sas_formatted = os.path.join(self.catalog_data_folder, "sas_formatted.csv")
         df_sas = pd.read_csv(sas_formatted)
@@ -74,6 +77,27 @@ class TestBasic(unittest.TestCase):
         df_dates2["date"] = df_dates2["date"].apply(lambda x: x.date())
         self.df_sas_dates = df_dates2
 
+        # missing data
+        pandas_missing_sav_csv = os.path.join(self.basic_data_folder, "sample_missing.csv")
+        df_missing_sav = pd.read_csv(pandas_missing_sav_csv, na_values="#NULL!", keep_default_na=False)
+        df_missing_sav["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else float('nan') for x in
+                                    df_missing_sav["mydate"]]
+        df_missing_sav["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan') for x
+                              in df_missing_sav["dtime"]]
+        df_missing_sav["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan') for x
+                               in df_missing_sav["mytime"]]
+        self.df_missing_sav = df_missing_sav
+
+        pandas_missing_user_sav_csv = os.path.join(self.basic_data_folder, "sample_missing_user.csv")
+        df_user_missing_sav = pd.read_csv(pandas_missing_user_sav_csv, na_values="#NULL!", keep_default_na=False)
+        df_user_missing_sav["mydate"] = [datetime.strptime(x, '%Y-%m-%d').date() if type(x) == str else float('nan') for x in
+                                         df_user_missing_sav["mydate"]]
+        df_user_missing_sav["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan')
+                                   for x in df_user_missing_sav["dtime"]]
+        df_user_missing_sav["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan')
+                                    for x in df_user_missing_sav["mytime"]]
+        self.df_user_missing_sav = df_user_missing_sav
+
     def setUp(self):
 
         # set paths
@@ -81,7 +105,6 @@ class TestBasic(unittest.TestCase):
 
     def test_sas7bdat(self):
 
-        # OK
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"))
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
@@ -96,6 +119,13 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == meta2.number_rows)
         self.assertTrue(meta.column_names == meta2.column_names)
         self.assertTrue(meta.column_labels == meta2.column_labels)
+
+    def test_sas7bdat_usecols(self):
+
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), usecols=self.usecols)
+        self.assertTrue(df.equals(self.df_usecols))
+        self.assertTrue(meta.number_columns == len(self.usecols))
+        self.assertTrue(meta.column_names == self.usecols)
 
     def test_xport(self):
 
@@ -114,6 +144,14 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta2.number_rows is None)
         self.assertTrue(meta.column_names == meta2.column_names)
         self.assertTrue(meta.column_labels == meta2.column_labels)
+
+    def test_xport_usecols(self):
+        # Currently readstat does not support skipping cols for XPT files,
+        usecols = [x.upper() for x in self.usecols]
+        df, meta = pyreadstat.pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"), usecols=usecols)
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(self.df_usecols))
+        self.assertTrue(meta.number_columns == len(self.usecols))
 
     def test_dta(self):
 
@@ -136,6 +174,12 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.column_names == meta2.column_names)
         self.assertTrue(meta.column_labels == meta2.column_labels)
 
+    def test_dta_usecols(self):
+        df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), usecols=self.usecols)
+        self.assertTrue(df.equals(self.df_usecols))
+        self.assertTrue(meta.number_columns == len(self.usecols))
+        self.assertTrue(meta.column_names == self.usecols)
+
     def test_sav(self):
 
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
@@ -143,6 +187,9 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
+        self.assertTrue(meta.variable_display_width["mychar"]==9)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_measure["mychar"]=="nominal")
 
     def test_sav_metaonly(self):
 
@@ -162,6 +209,20 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas_formatted.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas_formatted))
         self.assertTrue(len(meta.notes) > 0)
+
+    def test_sav_usecols(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), usecols=self.usecols)
+        self.assertTrue(df.equals(self.df_usecols))
+        self.assertTrue(meta.number_columns == len(self.usecols))
+        self.assertTrue(meta.column_names == self.usecols)
+
+    def test_sav_missing(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample_missing.sav"))
+        self.assertTrue(df.equals(self.df_missing_sav))
+        self.assertTrue(meta.missing_ranges == {})
+        df_user, meta_user = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample_missing.sav"), user_missing=True)
+        self.assertTrue(df_user.equals(self.df_user_missing_sav))
+        self.assertTrue(meta_user.missing_ranges['mynum'][0]=={'lo': 2000.0, 'hi': 3000.0})
 
     def test_zsav(self):
 
@@ -190,6 +251,12 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas_formatted))
         self.assertTrue(len(meta.notes) > 0)
 
+    def test_zsav_usecols(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), usecols=self.usecols)
+        self.assertTrue(df.equals(self.df_usecols))
+        self.assertTrue(meta.number_columns == len(self.usecols))
+        self.assertTrue(meta.column_names == self.usecols)
+
     def test_por(self):
 
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
@@ -211,6 +278,13 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.column_names == meta2.column_names)
         self.assertTrue(meta.column_labels == meta2.column_labels)
         self.assertTrue(len(meta2.notes) > 0)
+
+    def test_por_usecols(self):
+        df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"),  usecols=["MYNUM"])
+        df_pandas_por = self.df_pandas[["mynum"]]
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(df_pandas_por))
+        self.assertTrue(meta.number_columns == len(df_pandas_por.columns.values.tolist()))
 
     def test_sas_catalog_win(self):
 

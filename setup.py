@@ -106,7 +106,7 @@ short_description = "Reads SAS, SPSS and Stata files into pandas data frames."
 
 setup(
     name='pyreadstat',
-    version='0.1.9',
+    version='0.2.0',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

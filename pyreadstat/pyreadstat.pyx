@@ -19,6 +19,7 @@
 # TODO:
 ## if want to profile: # cython: profile=True
 
+
 from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
 from readstat_api cimport readstat_parse_por, readstat_parse_xport
 from readstat_api cimport readstat_parse_sas7bcat
@@ -27,13 +28,12 @@ cimport _readstat_parser
 from copy import deepcopy
 
 
-
 # Public interface
 
 # Parsing functions
 
 def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
-                  formats_as_category=True, str encoding=None):
+                  formats_as_category=True, str encoding=None, list usecols=None):
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
@@ -58,6 +58,8 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        usecols : list, optional
+            a list with column names to read from the file. Only those columns will be imported. Case sensitive!
 
     Returns
     -------
@@ -76,9 +78,12 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     cdef bint dates_as_pandas = 0
     if dates_as_pandas_datetime:
         dates_as_pandas = 1
+
+    cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bdat, encoding, metaonly, dates_as_pandas)
+    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bdat, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan)
     metadata.file_format = "sas7bdat"
 
     if catalog_file:
@@ -88,7 +93,7 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     return data_frame, metadata
 
 
-def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None):
+def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None, list usecols=None):
     r"""
     Read a SAS xport file.
 
@@ -104,6 +109,8 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        usecols : list, optional
+            a list with column names to read from the file. Only those columns will be imported. Case sensitive!
 
     Returns
     -------
@@ -120,16 +127,19 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
     cdef bint dates_as_pandas = 0
     if dates_as_pandas_datetime:
         dates_as_pandas = 1
+
+    cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_xport, encoding, metaonly, dates_as_pandas)
+    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_xport, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan)
     metadata.file_format = "xport"
 
     return data_frame, metadata
 
 
 def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None):
+             formats_as_category=True, str encoding=None, list usecols=None):
     r"""
     Read a STATA dta file
 
@@ -151,6 +161,8 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        usecols : list, optional
+            a list with column names to read from the file. Only those columns will be imported. Case sensitive!
 
     Returns
     -------
@@ -167,9 +179,12 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint dates_as_pandas = 0
     if dates_as_pandas_datetime:
         dates_as_pandas = 1
+
+    cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly, dates_as_pandas)
+    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan)
     metadata.file_format = "dta"
 
     if apply_value_formats:
@@ -179,7 +194,7 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
 
 def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None):
+             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False):
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -201,6 +216,12 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        usecols : list, optional
+            a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        user_missing : bool, optional
+            by default False, in this case user defined missing values are delivered as nan. If true, the missing values
+            will be deliver as is, and an extra piece of information will be set in the metadata (missing_ranges)
+            to be able to interpret those values as missing
 
     Returns
     -------
@@ -217,9 +238,14 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint dates_as_pandas = 0
     if dates_as_pandas_datetime:
         dates_as_pandas = 1
+
+    cdef bint usernan = 0
+    if user_missing:
+        usernan = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sav, encoding, metaonly, dates_as_pandas)
+    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sav, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan)
     metadata.file_format = "sav/zsav"
 
     if apply_value_formats:
@@ -229,7 +255,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
 
 def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None):
+             formats_as_category=True, str encoding=None, list usecols=None):
     r"""
     Read a SPSS por file
 
@@ -251,6 +277,8 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        usecols : list, optional
+            a list with column names to read from the file. Only those columns will be imported. Case sensitive!
 
     Returns
     -------
@@ -267,9 +295,12 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint dates_as_pandas = 0
     if dates_as_pandas_datetime:
         dates_as_pandas = 1
+
+    cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_por, encoding, metaonly, dates_as_pandas)
+    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_por, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan)
     metadata.file_format = "por"
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
@@ -306,9 +337,12 @@ def read_sas7bcat(str filename_path, str encoding=None):
     """
     cdef bint metaonly = 1
     cdef bint dates_as_pandas = 0
+    cdef list usecols = None
+    cdef bint usernan = 0
 
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bcat, encoding, metaonly, dates_as_pandas)
+    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bcat, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan)
     metadata.file_format = "sas7bcat"
 
     return data_frame, metadata
@@ -344,7 +378,7 @@ def set_value_labels(dataframe, metadata, formats_as_category=True):
         for var_name, label_name in metadata.variable_to_label.items():
             labels = metadata.value_labels.get(label_name)
             if labels:
-                df_copy[var_name] = df_copy[var_name].apply(lambda x: labels[x])
+                df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
                 if formats_as_category:
                     df_copy[var_name] = df_copy[var_name].astype("category")
 
