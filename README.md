@@ -87,13 +87,13 @@ on mac)
 
 Probably the easiest way: from your conda, virtualenv or just base installation do:
 
-```python
+```
 pip install pyreadstat
 ```
 
 If you are running on a machine without admin rights, and you want to install against your base installation you can do:
 
-```python
+```
 pip install pyreadstat --user
 ```
 
@@ -121,13 +121,13 @@ If there is not a suitable wheel for your system, you have to compile the packag
 
 From this repository, in the folder dist, download the file pyreadstat-x.x.x.tar.gz where x.x.x is the version and do:
 
-```python
+```
 pip install pyreadstat-x.x.x.tar.gz
 ```
 
 If you don't have admin privileges on the machine (for example on BEE) do:
 
-```python
+```
 pip install pyreadstat-x.x.x.tar.gz --user
 ```
 
