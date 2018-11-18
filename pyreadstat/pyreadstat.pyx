@@ -32,16 +32,16 @@ from copy import deepcopy
 
 # Parsing functions
 
-def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
-                  formats_as_category=True, str encoding=None, list usecols=None):
+def read_sas7bdat(str filename_path="", metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
+                  formats_as_category=True, str encoding=None, list usecols=None, bytes data=b"", bytes catalog_data=b""):
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
     
     Parameters
     ----------
-        filename_path : str
-            path to the file. The string is assumed to be utf-8 encoded.
+        filename_path : str, optional
+            path to the file. The string is assumed to be utf-8 encoded. Optional if data is specified.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -60,7 +60,9 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
-
+        data : bytes, optional
+            raw data. Used to load the contents from memory rather than a file path.
+        
     Returns
     -------
         data_frame : pandas dataframe
@@ -82,25 +84,29 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bdat, encoding, metaonly,
+    data_frame, metadata = run_conversion(filename_path, data, file_format, readstat_parse_sas7bdat, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan)
     metadata.file_format = "sas7bdat"
 
     if catalog_file:
         _ , catalog = read_sas7bcat(catalog_file, encoding=encoding)
         data_frame, metadata = set_catalog_to_sas(data_frame, metadata, catalog, formats_as_category=formats_as_category)
+    elif catalog_data:
+        _ , catalog = read_sas7bcat(encoding=encoding, data=catalog_data)
+        data_frame, metadata = set_catalog_to_sas(data_frame, metadata, catalog, formats_as_category=formats_as_category)
 
     return data_frame, metadata
 
 
-def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None, list usecols=None):
+def read_xport(str filename_path="", metadataonly=False, dates_as_pandas_datetime=False,
+               str encoding=None, list usecols=None, bytes data=b""):
     r"""
     Read a SAS xport file.
 
     Parameters
     ----------
-        filename_path : str
-            path to the file. The string is assumed to be utf-8 encoded
+        filename_path : str, optional
+            path to the file. The string is assumed to be utf-8 encoded. Optional if data is specified.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -111,6 +117,8 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        data : bytes, optional
+            raw data. Used to load the contents from memory rather than a file path.
 
     Returns
     -------
@@ -131,22 +139,22 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
     cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_xport, encoding, metaonly,
+    data_frame, metadata = run_conversion(filename_path, data, file_format, readstat_parse_xport, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan)
     metadata.file_format = "xport"
 
     return data_frame, metadata
 
 
-def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None):
+def read_dta(str filename_path="", metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+             formats_as_category=True, str encoding=None, list usecols=None, bytes data=b""):
     r"""
     Read a STATA dta file
 
     Parameters
     ----------
-        filename_path : str
-            path to the file. The string is assumed to be utf-8 encoded
+        filename_path : str, optional
+            path to the file. The string is assumed to be utf-8 encoded. Optional if data is specified.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -163,6 +171,8 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        data : bytes, optional
+            raw data. Used to load the contents from memory rather than a file path.
 
     Returns
     -------
@@ -183,7 +193,7 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly,
+    data_frame, metadata = run_conversion(filename_path, data, file_format, readstat_parse_dta, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan)
     metadata.file_format = "dta"
 
@@ -193,15 +203,15 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     return data_frame, metadata
 
 
-def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False):
+def read_sav(str filename_path="", metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False, bytes data=b""):
     r"""
     Read a SPSS sav or zsav (compressed) files
 
     Parameters
     ----------
-        filename_path : str
-            path to the file. The string is assumed to be utf-8 encoded
+        filename_path : str, optional
+            path to the file. The string is assumed to be utf-8 encoded. Optional if data is specified.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -222,6 +232,8 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             by default False, in this case user defined missing values are delivered as nan. If true, the missing values
             will be deliver as is, and an extra piece of information will be set in the metadata (missing_ranges)
             to be able to interpret those values as missing
+        data : bytes, optional
+            raw data. Used to load the contents from memory rather than a file path.
 
     Returns
     -------
@@ -244,7 +256,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         usernan = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sav, encoding, metaonly,
+    data_frame, metadata = run_conversion(filename_path, data, file_format, readstat_parse_sav, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan)
     metadata.file_format = "sav/zsav"
 
@@ -254,15 +266,15 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     return data_frame, metadata
 
 
-def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None):
+def read_por(str filename_path="", metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+             formats_as_category=True, str encoding=None, list usecols=None, bytes data=b""):
     r"""
     Read a SPSS por file
 
     Parameters
     ----------
-        filename_path : str
-            path to the file. The string is assumed to be utf-8 encoded
+        filename_path : str, optional
+            path to the file. The string is assumed to be utf-8 encoded. Optional if data is specified.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -279,6 +291,8 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        data : bytes, optional
+            raw data. Used to load the contents from memory rather than a file path.
 
     Returns
     -------
@@ -299,7 +313,7 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint usernan = 0
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_por, encoding, metaonly,
+    data_frame, metadata = run_conversion(filename_path, data, file_format, readstat_parse_por, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan)
     metadata.file_format = "por"
     if apply_value_formats:
@@ -309,7 +323,7 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     
 
 
-def read_sas7bcat(str filename_path, str encoding=None):
+def read_sas7bcat(str filename_path="", str encoding=None, bytes data=b""):
     r"""
     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
     value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
@@ -321,11 +335,13 @@ def read_sas7bcat(str filename_path, str encoding=None):
 
     Parameters
     ----------
-        filename_path : str
-            path to the file. The string is assumed to be utf-8 encoded
+        filename_path : str, optional
+            path to the file. The string is assumed to be utf-8 encoded. Optional if data is specified.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        data : bytes, optional
+            raw data. Used to load the contents from memory rather than a file path.
 
     Returns
     -------
@@ -341,7 +357,7 @@ def read_sas7bcat(str filename_path, str encoding=None):
     cdef bint usernan = 0
 
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bcat, encoding, metaonly,
+    data_frame, metadata = run_conversion(filename_path, data, file_format, readstat_parse_sas7bcat, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan)
     metadata.file_format = "sas7bcat"
 

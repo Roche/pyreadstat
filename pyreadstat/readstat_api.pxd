@@ -110,7 +110,7 @@ cdef extern from "readstat.h":
         READSTAT_ALIGNMENT_CENTER,
         READSTAT_ALIGNMENT_RIGHT
 
-    cdef readstat_parser_t *readstat_parser_init()
+    cdef readstat_parser_t *readstat_parser_init(const char* buf, size_t buf_size)
     cdef void readstat_parser_free(readstat_parser_t *parser)
 
     ctypedef int (*readstat_metadata_handler)(readstat_metadata_t *metadata, void *ctx);

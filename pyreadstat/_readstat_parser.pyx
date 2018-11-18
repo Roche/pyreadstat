@@ -636,7 +636,7 @@ cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HAN
     return READSTAT_HANDLER_OK
 
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
+cdef void run_readstat_parser(char * filename, char * buf, size_t buf_size, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
     """
     Runs the parsing of the file by readstat library
     """
@@ -661,7 +661,7 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     ctx = <void *>data
     
     #readstat_error_t error = READSTAT_OK;
-    parser = readstat_parser_init();
+    parser = readstat_parser_init(buf, buf_size);
     metadata_handler = <readstat_metadata_handler> handle_metadata
     variable_handler = <readstat_variable_handler> handle_variable
     value_handler = <readstat_value_handler> handle_value
@@ -796,20 +796,26 @@ cdef object data_container_extract_metadata(data_container data):
     return metadata
 
 
-cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
+cdef object run_conversion(str filename_path, bytes data_buffer, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan):
     """
-    Coordinates the activities to parse a file. This is the entry point 
-    for the public methods
+    Coordinates the activities to parse a file or buffer. This is the entry point 
+    for the public methods.
     """
-    
+
+    cdef char * buffer_ptr = NULL
+    cdef size_t buffer_size = len(data_buffer)
+
     cdef bytes filename_bytes
-    cdef char * filename    
+    cdef char * filename = NULL   
     cdef data_container data
     cdef object origin
-           
-    filename_bytes = filename_path.encode("utf-8")
-    filename = <char *> filename_bytes
+    
+    if buffer_size:
+        buffer_ptr = <char *> data_buffer
+    else:
+        filename_bytes = filename_path.encode("utf-8")
+        filename = <char *> filename_bytes
     
     data = data_container()
     ctx = <void *>data        
@@ -839,9 +845,9 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     data.usernan = usernan
     
     # go!
-    run_readstat_parser(filename, data, parse_func)    
+    run_readstat_parser(filename, buffer_ptr, buffer_size, data, parse_func)    
     data_frame = data_container_to_pandas_dataframe(data)
     metadata = data_container_extract_metadata(data)
 
     return data_frame, metadata
-    
+

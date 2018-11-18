@@ -110,6 +110,12 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
 
+    def test_sas7bdat_buffer(self):
+
+        buf = open(os.path.join(self.basic_data_folder, "sample.sas7bdat")).read()
+        df, _ = pyreadstat.read_sas7bdat(data=buf)
+        self.assertTrue(df.equals(self.df_pandas))
+        
     def test_sas7bdat_metaonly(self):
 
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"))
@@ -134,6 +140,14 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
+
+
+    def test_xport_buffer(self):
+
+        buf = open(os.path.join(self.basic_data_folder, "sample.xpt")).read()
+        df, _ = pyreadstat.read_xport(data=buf)
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(self.df_pandas))
 
     def test_xport_metaonly(self):
 
@@ -164,6 +178,15 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns - 1 == len(df_pandas_dta.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_dta))
 
+    def test_dta_buffer(self):
+
+        buf = open(os.path.join(self.basic_data_folder, "sample.dta")).read()
+        df, _ = pyreadstat.read_dta(data=buf)
+        df_pandas_dta = self.df_pandas.drop(labels="dtime", axis=1)
+        df_dta = df.drop(labels="dtime", axis=1)
+        df_dta["mytime"] = [datetime.strptime(x, '%H:%M:%S').time() if x else float('nan') for x in df_dta["mytime"]]
+        self.assertTrue(df_dta.equals(df_pandas_dta))
+
     def test_dta_metaonly(self):
 
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"))
@@ -190,6 +213,12 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.variable_display_width["mychar"]==9)
         self.assertTrue(meta.variable_storage_width["mychar"] == 8)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
+    
+    def test_sav_buffer(self):
+
+        buf = open(os.path.join(self.basic_data_folder, "sample.sav")).read()
+        df, _ = pyreadstat.read_sav(data=buf)
+        self.assertTrue(df.equals(self.df_pandas))
 
     def test_sav_metaonly(self):
 
@@ -231,6 +260,12 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes) > 0)
+    
+    def test_zsav_buffer(self):
+
+        buf = open(os.path.join(self.basic_data_folder, "sample.zsav")).read()
+        df, _ = pyreadstat.read_sav("sample.zsav", data=buf)
+        self.assertTrue(df.equals(self.df_pandas))
 
     def test_zsav_metaonly(self):
 
@@ -268,6 +303,14 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas_por))
         self.assertTrue(len(meta.notes) > 0)
 
+    def test_por_buffer(self):
+
+        buf = open(os.path.join(self.basic_data_folder, "sample.por")).read()
+        df, _ = pyreadstat.read_por(data=buf)
+        df_pandas_por = self.df_pandas[["mychar", "mynum"]]
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(df_pandas_por))
+
     def test_por_metaonly(self):
 
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
@@ -291,6 +334,13 @@ class TestBasic(unittest.TestCase):
         dat = os.path.join(self.catalog_data_folder, "test_data_win.sas7bdat")
         cat = os.path.join(self.catalog_data_folder, "test_formats_win.sas7bcat")
         df, meta = pyreadstat.read_sas7bdat(dat, catalog_file=cat)
+        self.assertTrue(df.equals(self.df_sas_format))
+
+    def test_sas_catalog_win_buffer(self):
+
+        dat = open(os.path.join(self.catalog_data_folder, "test_data_win.sas7bdat")).read()
+        cat = open(os.path.join(self.catalog_data_folder, "test_formats_win.sas7bcat")).read()
+        df, _ = pyreadstat.read_sas7bdat(data=dat, catalog_data=cat)
         self.assertTrue(df.equals(self.df_sas_format))
 
     def test_sas_dates(self):

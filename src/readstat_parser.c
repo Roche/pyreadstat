@@ -2,13 +2,21 @@
 #include <stdlib.h>
 #include "readstat.h"
 #include "readstat_io_unistd.h"
+#include "readstat_io_buffer.h"
 
-readstat_parser_t *readstat_parser_init() {
+readstat_parser_t *readstat_parser_init(const char* buf, size_t buf_size) {
     readstat_parser_t *parser = calloc(1, sizeof(readstat_parser_t));
     parser->io = calloc(1, sizeof(readstat_io_t));
-    if (unistd_io_init(parser) != READSTAT_OK) {
-        readstat_parser_free(parser);
-        return NULL;
+    if(buf_size > 0) {
+        if (buffer_io_init(parser, buf, buf_size) != READSTAT_OK) {
+            readstat_parser_free(parser);
+            return NULL;
+        }
+    } else {
+        if (unistd_io_init(parser) != READSTAT_OK) {
+            readstat_parser_free(parser);
+            return NULL;
+        }
     }
     parser->output_encoding = "UTF-8";
     return parser;
