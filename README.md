@@ -427,10 +427,15 @@ more information.
 ## Contributing
 
 Contributions are welcome! Those include corrections to the documentation, bugs reporting, testing, 
-providing compiled wheels (if you managed to compile
-in a OS-python version combination not reported yet) and of course code pull requests. For code pull requests please 
+and of course code pull requests. For code pull requests please 
 consider opening an issue explaining what you plan to do, so that we can get aligned before you start investing time on
 it (this also avoids duplicated efforts).
+
+The ReadStat code in this repo (under the subfolder src) is coming from the main Readstat trunk and should not be 
+modified in order to
+keep full compatibility with the original. In that way improvements in ReadStat can be taken here with almost
+no effort. If you would like to propose new features involving changes in the ReadStat code, please submit a
+pull request to ReadStat first. 
 
 ## People
 
