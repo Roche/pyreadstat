@@ -81,6 +81,9 @@ Readstat depends on the C library iconv to handle character encodings. On mac, t
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
 on mac)
 
+Readstat also depends on zlib; it was reported not to be installed on Lubuntu. If you face this problem intalling the 
+library solves it.
+
 ## Installation
 
 ### Using pip
