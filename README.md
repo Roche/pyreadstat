@@ -317,6 +317,8 @@ etc.
 read with pyreadstat**. Notice that the only possible missing value in pandas is NaN (Not a Number) for both string and numeric
 variables, date, datetime and time variables have NaT (Not a Time).
 
+### SPSS 
+
 In the case of SPSS sav files, the user can assign to a numeric variable either up to three discrete missing values or
 one range plus one discrete missing value. As mentioned by default all of these possiblities are translated into NaN, 
 but one can get those original values by passing the argument user_missing=True to the read_sav function:
@@ -378,7 +380,22 @@ a character variable is an empty string (''), it will not be translated to NaN, 
 is because the empty string is a valid character value in SPSS and pyreadstat preserves that property. You can convert
 empty strings to nan very easily with pandas. 
 
-For SPSS por files, and SAS and STATA files, user defined missing values are currently not supported. 
+For SPSS por files, 
+
+# SAS
+
+In SAS the user can assign values from .A to .Z and ._ as missing values. As in SPSS, those are normally translated to
+NaN. However, using user_missing=True with read_sas7bdat will produce values from A to Z and _. In addition a variable
+missing_user_values will appear in the metadata object, being a list with those values that are user defined missing
+values.
+ 
+At the moment of writing these lines, this is not working for all sas7bdat files: it seems to be working for
+files produced on windows but not for files produced on unix, even files without user defined missing values will throw
+errors. 
+
+Empty strings are still transtaled as empty strings and not as NaN.
+
+User defined missing values are currently not supported for file types other than sas7bdat, at the moment.
 
 
 ## Other options
@@ -415,7 +432,7 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not reading sas7bcat files produced on linux (windows are fine).
 * Not able to skip rows.
 * Not handling SPSS user defined missing values for character variables (numeric are fine).
-* Not handling SAS and Stata user defined missing values.
+* Not handling correctly SAS user defined missing values: seems to always generate errors for files produced on unix.
 
 
 ## Changelog

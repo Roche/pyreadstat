@@ -1,3 +1,6 @@
+# 0.2.1 (github 14.12.2018)
+* Implemented user defined missing values for read_sas7bdat. Documnented to be failing for files produced on unix.
+* Readstat source update, latest version as 14.12.2018 (latest commit: a952c6b034bd733ee93d96971482e6e3c4c3857d)
 
 # 0.2.0 (github 19.10.2018, Pypi 19.10.2018)
 * Implemented usecols to be able to read only selected columns.

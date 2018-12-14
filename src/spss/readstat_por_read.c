@@ -200,7 +200,7 @@ static readstat_error_t maybe_read_string(por_ctx_t *ctx, char *data, size_t len
         return retval;
     }
     
-    if (value <= 0 || value > 20000 || isnan(value)) {
+    if (value < 0 || value > 20000 || isnan(value)) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }

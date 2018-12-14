@@ -84,6 +84,7 @@ cdef class data_container:
         self.use_cols = list()
         self.usernan = 0
         self.missing_ranges = dict()
+        self.missing_user_values = set()
         self.variable_storage_width = dict()
         self.variable_display_width = dict()
         self.variable_alignment = dict()
@@ -106,6 +107,7 @@ class metadata_container:
         self.original_variable_types = dict()
         self.table_name = None
         self.missing_ranges = dict()
+        self.missing_user_values = list()
         self.variable_storage_width = dict()
         self.variable_display_width = dict()
         self.variable_alignment = dict()
@@ -496,7 +498,7 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef int var_max_rows
     cdef list buf_list
 
-    cdef char missing_tag
+    cdef int missing_tag
 
     cdef object pyvalue
     
@@ -534,10 +536,16 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             # the numbers do not correlate to the missing character seen, for example,
             # A gets translated to 2, B to 3 etc, while the true missing value . gets 1
             # maybe it is something dependent on the version or operating system (windows vs linux generated files?)
-            # As for now usernan is disabled for SAS and stata, we should not get to this line.
-            missing_tag = readstat_value_tag(value)
-            dc.col_data[index][obs_index] = <float> missing_tag
-            #dc.col_data[index][obs_index] = chr(<int> missing_tag) # this should be the correct one but sometimes gives nonsense
+            # As for now usernan is disabled for stata, as I have not been able to test it, enabled for SAS.
+            missing_tag = <int> readstat_value_tag(value)
+            # In SAS missing values are A to Z or _
+            if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95:
+                dc.col_data[index][obs_index] =  chr(missing_tag)
+                dc.missing_user_values.add(chr(missing_tag))
+            else:
+                msg = "Expecting missing tag value from 65(A) to 90(Z), got %d instead" % missing_tag
+                raise Exception(msg)
+
     else:
         pyvalue = convert_readstat_to_python_value(value, index, dc)
         dc.col_data[index][obs_index] = pyvalue
@@ -788,6 +796,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.original_variable_types = original_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
+    metadata.missing_user_values = list(data.missing_user_values)
     metadata.variable_storage_width = data.variable_storage_width
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment
