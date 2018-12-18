@@ -1,6 +1,10 @@
-# 0.2.1 (github 14.12.2018)
-* Implemented user defined missing values for read_sas7bdat. Documnented to be failing for files produced on unix.
-* Readstat source update, latest version as 14.12.2018 (latest commit: a952c6b034bd733ee93d96971482e6e3c4c3857d)
+# 0.2.1 (github 18.12.2018, release tag)
+* Implemented user defined missing values for read_sas7bdat. Currently not working for 64 bit files.
+* Corrected datetime transformations for stata dta files, sample.dta updated
+* cython updated from 26.1 to 29.1
+* Readstat source update, latest version as 17.12.2018 (latest commit: b52b77447d293f0fd530aabdab3330909a61bb8d)
+* The latest readstat brings: POR files support improved (sample.por updated), sas7bcat support improved, improvements
+  for sav files. 
 
 # 0.2.0 (github 19.10.2018, Pypi 19.10.2018)
 * Implemented usecols to be able to read only selected columns.

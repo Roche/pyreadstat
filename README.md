@@ -463,5 +463,6 @@ pull request to ReadStat first.
 
 ## People
 
-Otto Fajardo - author
+Otto Fajardo - author, maintainer
+[Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
 

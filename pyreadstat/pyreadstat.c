@@ -4,7 +4,7 @@
 {
     "distutils": {
         "depends": [
-            "src/readstat.h"
+            "src\\readstat.h"
         ],
         "extra_compile_args": [
             "-Ireadstat",
@@ -13,59 +13,60 @@
         "include_dirs": [
             "src",
             "src",
-            "src/sas",
-            "src/spss",
-            "src/stata",
+            "src\\sas",
+            "src\\spss",
+            "src\\stata",
             "pyreadstat",
             "."
         ],
         "libraries": [
             "m",
-            "z"
+            "z",
+            "iconv"
         ],
         "name": "pyreadstat.pyreadstat",
         "sources": [
             "pyreadstat/pyreadstat.pyx",
-            "./src/CKHashTable.c",
-            "./src/readstat_bits.c",
-            "./src/readstat_convert.c",
-            "./src/readstat_error.c",
-            "./src/readstat_io_unistd.c",
-            "./src/readstat_malloc.c",
-            "./src/readstat_metadata.c",
-            "./src/readstat_parser.c",
-            "./src/readstat_value.c",
-            "./src/readstat_variable.c",
-            "./src/readstat_writer.c",
-            "./src/sas/ieee.c",
-            "./src/sas/readstat_sas.c",
-            "./src/sas/readstat_sas7bcat_read.c",
-            "./src/sas/readstat_sas7bcat_write.c",
-            "./src/sas/readstat_sas7bdat_read.c",
-            "./src/sas/readstat_sas7bdat_write.c",
-            "./src/sas/readstat_sas_rle.c",
-            "./src/sas/readstat_xport.c",
-            "./src/sas/readstat_xport_read.c",
-            "./src/sas/readstat_xport_write.c",
-            "./src/spss/readstat_por.c",
-            "./src/spss/readstat_por_parse.c",
-            "./src/spss/readstat_por_read.c",
-            "./src/spss/readstat_por_write.c",
-            "./src/spss/readstat_sav.c",
-            "./src/spss/readstat_sav_compress.c",
-            "./src/spss/readstat_sav_parse.c",
-            "./src/spss/readstat_sav_parse_timestamp.c",
-            "./src/spss/readstat_sav_read.c",
-            "./src/spss/readstat_sav_write.c",
-            "./src/spss/readstat_spss.c",
-            "./src/spss/readstat_spss_parse.c",
-            "./src/spss/readstat_zsav_compress.c",
-            "./src/spss/readstat_zsav_read.c",
-            "./src/spss/readstat_zsav_write.c",
-            "./src/stata/readstat_dta.c",
-            "./src/stata/readstat_dta_parse_timestamp.c",
-            "./src/stata/readstat_dta_read.c",
-            "./src/stata/readstat_dta_write.c"
+            ".\\src\\CKHashTable.c",
+            ".\\src\\readstat_bits.c",
+            ".\\src\\readstat_convert.c",
+            ".\\src\\readstat_error.c",
+            ".\\src\\readstat_io_unistd.c",
+            ".\\src\\readstat_malloc.c",
+            ".\\src\\readstat_metadata.c",
+            ".\\src\\readstat_parser.c",
+            ".\\src\\readstat_value.c",
+            ".\\src\\readstat_variable.c",
+            ".\\src\\readstat_writer.c",
+            ".\\src\\sas\\ieee.c",
+            ".\\src\\sas\\readstat_sas.c",
+            ".\\src\\sas\\readstat_sas7bcat_read.c",
+            ".\\src\\sas\\readstat_sas7bcat_write.c",
+            ".\\src\\sas\\readstat_sas7bdat_read.c",
+            ".\\src\\sas\\readstat_sas7bdat_write.c",
+            ".\\src\\sas\\readstat_sas_rle.c",
+            ".\\src\\sas\\readstat_xport.c",
+            ".\\src\\sas\\readstat_xport_read.c",
+            ".\\src\\sas\\readstat_xport_write.c",
+            ".\\src\\spss\\readstat_por.c",
+            ".\\src\\spss\\readstat_por_parse.c",
+            ".\\src\\spss\\readstat_por_read.c",
+            ".\\src\\spss\\readstat_por_write.c",
+            ".\\src\\spss\\readstat_sav.c",
+            ".\\src\\spss\\readstat_sav_compress.c",
+            ".\\src\\spss\\readstat_sav_parse.c",
+            ".\\src\\spss\\readstat_sav_parse_timestamp.c",
+            ".\\src\\spss\\readstat_sav_read.c",
+            ".\\src\\spss\\readstat_sav_write.c",
+            ".\\src\\spss\\readstat_spss.c",
+            ".\\src\\spss\\readstat_spss_parse.c",
+            ".\\src\\spss\\readstat_zsav_compress.c",
+            ".\\src\\spss\\readstat_zsav_read.c",
+            ".\\src\\spss\\readstat_zsav_write.c",
+            ".\\src\\stata\\readstat_dta.c",
+            ".\\src\\stata\\readstat_dta_parse_timestamp.c",
+            ".\\src\\stata\\readstat_dta_read.c",
+            ".\\src\\stata\\readstat_dta_write.c"
         ]
     },
     "module_name": "pyreadstat.pyreadstat"
@@ -753,15 +754,15 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "pyreadstat/pyreadstat.pyx",
-  "pyreadstat/_readstat_parser.pxd",
+  "pyreadstat\\pyreadstat.pyx",
+  "pyreadstat\\_readstat_parser.pxd",
 };
 
 /*--- Type declarations ---*/
 struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container;
 struct __pyx_obj_10pyreadstat_10pyreadstat___pyx_scope_struct__set_value_labels;
 
-/* "_readstat_parser.pxd":21
+/* "_readstat_parser.pxd":22
  * # Definitions of enum types
  * 
  * ctypedef enum py_file_format:             # <<<<<<<<<<<<<<
@@ -775,7 +776,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_file_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_file_format __pyx_t_10pyreadstat_16_readstat_parser_py_file_format;
 
-/* "_readstat_parser.pxd":26
+/* "_readstat_parser.pxd":27
  *     FILE_FORMAT_STATA
  * 
  * ctypedef enum py_datetime_format:             # <<<<<<<<<<<<<<
@@ -790,7 +791,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format __pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format;
 
-/* "_readstat_parser.pxd":32
+/* "_readstat_parser.pxd":33
  *     DATE_FORMAT_TIME
  * 
  * ctypedef enum py_variable_format:             # <<<<<<<<<<<<<<
@@ -805,7 +806,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format;
 
-/* "_readstat_parser.pxd":40
+/* "_readstat_parser.pxd":41
  * # Definitions of extension types
  * 
  * cdef class data_container:             # <<<<<<<<<<<<<<
@@ -1260,7 +1261,7 @@ static const char __pyx_k_catalog_metadata_copy[] = "catalog_metadata_copy";
 static const char __pyx_k_pyreadstat_pyreadstat[] = "pyreadstat.pyreadstat";
 static const char __pyx_k_variable_value_labels[] = "variable_value_labels";
 static const char __pyx_k_dates_as_pandas_datetime[] = "dates_as_pandas_datetime";
-static const char __pyx_k_pyreadstat_pyreadstat_pyx[] = "pyreadstat/pyreadstat.pyx";
+static const char __pyx_k_pyreadstat_pyreadstat_pyx[] = "pyreadstat\\pyreadstat.pyx";
 static const char __pyx_k_set_value_labels_locals_lambda[] = "set_value_labels.<locals>.<lambda>";
 static PyObject *__pyx_n_s__2;
 static PyObject *__pyx_n_s_apply;
@@ -5652,7 +5653,7 @@ PyMODINIT_FUNC PyInit_pyreadstat(void)
   __pyx_type_10pyreadstat_10pyreadstat___pyx_scope_struct__set_value_labels.tp_print = 0;
   __pyx_ptype_10pyreadstat_10pyreadstat___pyx_scope_struct__set_value_labels = &__pyx_type_10pyreadstat_10pyreadstat___pyx_scope_struct__set_value_labels;
   /*--- Type import code ---*/
-  __pyx_ptype_10pyreadstat_16_readstat_parser_data_container = __Pyx_ImportType("pyreadstat._readstat_parser", "data_container", sizeof(struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container), 1); if (unlikely(!__pyx_ptype_10pyreadstat_16_readstat_parser_data_container)) __PYX_ERR(1, 40, __pyx_L1_error)
+  __pyx_ptype_10pyreadstat_16_readstat_parser_data_container = __Pyx_ImportType("pyreadstat._readstat_parser", "data_container", sizeof(struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container), 1); if (unlikely(!__pyx_ptype_10pyreadstat_16_readstat_parser_data_container)) __PYX_ERR(1, 41, __pyx_L1_error)
   /*--- Variable import code ---*/
   __pyx_t_1 = __Pyx_ImportModule("pyreadstat._readstat_parser"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
   if (__Pyx_ImportVoidPtr(__pyx_t_1, "sas_date_formats", (void **)&__pyx_vp_10pyreadstat_16_readstat_parser_sas_date_formats, "PyObject *") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -5798,7 +5799,7 @@ PyMODINIT_FUNC PyInit_pyreadstat(void)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "pyreadstat/pyreadstat.pyx":1
- * # cython: c_string_type=unicode, c_string_encoding=utf8             # <<<<<<<<<<<<<<
+ * # cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2             # <<<<<<<<<<<<<<
  * 
  * # #############################################################################
  */
