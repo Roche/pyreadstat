@@ -541,7 +541,7 @@ static readstat_error_t xport_process_row(xport_ctx_t *ctx, const char *row, siz
                     variable->storage_width >= XPORT_MIN_DOUBLE_SIZE) {
                 char full_value[8] = { 0 };
                 if (memcmp(&full_value[1], &row[pos+1], variable->storage_width - 1) == 0 &&
-                        (row[pos] == '_' || row[pos] == '.' || (row[pos] >= 'A' && row[pos] <= 'Z'))) {
+                        (row[pos] == '.' || sas_validate_tag(row[pos]) == READSTAT_OK)) {
                     if (row[pos] == '.') {
                         value.is_system_missing = 1;
                     } else {

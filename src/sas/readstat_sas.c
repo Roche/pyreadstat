@@ -408,3 +408,10 @@ readstat_error_t sas_validate_name(const char *name, size_t max_len) {
 readstat_error_t sas_validate_variable(readstat_variable_t *variable) {
     return sas_validate_name(readstat_variable_get_name(variable), 32);
 }
+
+readstat_error_t sas_validate_tag(char tag) {
+    if (tag == '_' || (tag >= 'A' && tag <= 'Z'))
+        return READSTAT_OK;
+
+    return READSTAT_ERROR_TAGGED_VALUE_IS_OUT_OF_RANGE;
+}

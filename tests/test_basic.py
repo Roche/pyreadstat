@@ -19,6 +19,7 @@ import unittest
 import os
 
 import pandas as pd
+import numpy as np
 
 
 class TestBasic(unittest.TestCase):
@@ -157,12 +158,12 @@ class TestBasic(unittest.TestCase):
 
         # discard dtime and arrange time
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"))
-        df_pandas_dta = self.df_pandas.drop(labels="dtime", axis=1)
-        df_dta = df.drop(labels="dtime", axis=1)
-        df_dta["mytime"] = [datetime.strptime(x, '%H:%M:%S').time() if x else float('nan') for x in df_dta["mytime"]]
-        self.assertTrue(df_dta.equals(df_pandas_dta))
-        self.assertTrue(meta.number_columns - 1 == len(df_pandas_dta.columns))
-        self.assertTrue(meta.number_rows == len(df_pandas_dta))
+        df_pandas = self.df_pandas.copy()
+        df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
+        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
 
     def test_dta_metaonly(self):
 
@@ -176,7 +177,9 @@ class TestBasic(unittest.TestCase):
 
     def test_dta_usecols(self):
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), usecols=self.usecols)
-        self.assertTrue(df.equals(self.df_usecols))
+        df_pandas = self.df_usecols.copy()
+        df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
+        self.assertTrue(df.equals(df_pandas))
         self.assertTrue(meta.number_columns == len(self.usecols))
         self.assertTrue(meta.column_names == self.usecols)
 
@@ -245,7 +248,6 @@ class TestBasic(unittest.TestCase):
 
     def test_zsav_formatted(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), apply_value_formats=True, formats_as_category=True)
-        #df.columns = self.df_pandas_formatted.columns
         self.assertTrue(df.equals(self.df_pandas_formatted))
         self.assertTrue(meta.number_columns == len(self.df_pandas_formatted.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas_formatted))
@@ -258,13 +260,24 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.column_names == self.usecols)
 
     def test_por(self):
-
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
-        df_pandas_por = self.df_pandas[["mychar", "mynum"]]
+        # dates, datetimes and timestamps are not translated but stay as integers, let's just drop them
+        df_pandas_por = self.df_pandas.drop(labels=["dtime", "mydate", "mytime"], axis=1)
         df.columns = [x.lower() for x in df.columns]
-        #df.columns = df_pandas_por.columns
+        df = df.drop(labels=["dtime", "mydate", "mytime"], axis=1)
         self.assertTrue(df.equals(df_pandas_por))
-        self.assertTrue(meta.number_columns == len(df_pandas_por.columns))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas_por))
+        self.assertTrue(len(meta.notes) > 0)
+
+    def test_por_formatted(self):
+        df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), apply_value_formats=True, formats_as_category=True)
+        # dates, datetimes and timestamps are not translated but stay as integers, let's just drop them
+        df_pandas_por = self.df_pandas_formatted.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        df.columns = [x.lower() for x in df.columns]
+        df = df.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        self.assertTrue(df.equals(df_pandas_por))
+        self.assertTrue(meta.number_columns == len(self.df_pandas_formatted.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_por))
         self.assertTrue(len(meta.notes) > 0)
 
@@ -287,9 +300,16 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(df_pandas_por.columns.values.tolist()))
 
     def test_sas_catalog_win(self):
-
+        """these sas7bdat and sasbcat where produced on windows, probably 32 bit"""
         dat = os.path.join(self.catalog_data_folder, "test_data_win.sas7bdat")
         cat = os.path.join(self.catalog_data_folder, "test_formats_win.sas7bcat")
+        df, meta = pyreadstat.read_sas7bdat(dat, catalog_file=cat)
+        self.assertTrue(df.equals(self.df_sas_format))
+
+    def test_sas_catalog_linux(self):
+        """these sas7bdat and sasbcat where produced on linux 64 bit"""
+        dat = os.path.join(self.catalog_data_folder, "test_data_linux.sas7bdat")
+        cat = os.path.join(self.catalog_data_folder, "test_formats_linux.sas7bcat")
         df, meta = pyreadstat.read_sas7bdat(dat, catalog_file=cat)
         self.assertTrue(df.equals(self.df_sas_format))
 

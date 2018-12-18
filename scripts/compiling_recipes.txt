@@ -1,3 +1,5 @@
+# Recipes to be run manually in the shell/command window
+
 # compile and install
 
 python3 setup.py install --user

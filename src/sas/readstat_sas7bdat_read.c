@@ -408,9 +408,10 @@ static readstat_error_t sas7bdat_handle_data_value(readstat_variable_t *variable
         if (isnan(dval)) {
             value.v.double_value = NAN;
             value.tag = ~((val >> 40) & 0xFF);
-            if (value.tag) {
+            if (sas_validate_tag(value.tag) == READSTAT_OK) {
                 value.is_tagged_missing = 1;
             } else {
+                value.tag = 0;
                 value.is_system_missing = 1;
             }
         } else {

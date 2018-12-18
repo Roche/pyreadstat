@@ -390,7 +390,7 @@ missing_user_values will appear in the metadata object, being a list with those 
 values.
  
 At the moment of writing these lines, this is not working for all sas7bdat files: it seems to be working for
-files produced on windows but not for files produced on unix, even files without user defined missing values will throw
+files produced on windows/32 bit but not for files produced on unix/64 bit, where even files without user defined missing values will throw
 errors. 
 
 Empty strings are still transtaled as empty strings and not as NaN.
@@ -429,10 +429,14 @@ For more information, please check the [Module documentation](https://ofajardo.g
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
 
 * Not able to read SAS compressed files. 
-* Not reading sas7bcat files produced on linux (windows are fine).
 * Not able to skip rows.
 * Not handling SPSS user defined missing values for character variables (numeric are fine).
-* Not handling correctly SAS user defined missing values: seems to always generate errors for files produced on unix.
+* Not handling correctly SAS user defined missing values: not detecting those for files produced on unix/64 bit.
+* Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
+  timestamps.
+
+In addition: **python 2.7 is not actively supported** If it works, we are happy about that. But if it does not, and the
+bug is specific for python 2.7 (cannot be reproduced in python 3), the issue is not going to be solved.
 
 
 ## Changelog

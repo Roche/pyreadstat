@@ -24,6 +24,11 @@
 #define POR_LINE_LENGTH         80
 #define POR_LABEL_NAME_PREFIX   "labels"
 
+#define MAX_FORMAT_TYPE       120
+#define MAX_FORMAT_WIDTH      100
+#define MAX_FORMAT_DECIMALS   100
+#define MAX_STRING_LENGTH   20000
+
 #define MAX_VARS    1000000
 #define MAX_WIDTH   1000000
 #define MAX_LINES   1000000
@@ -200,7 +205,7 @@ static readstat_error_t maybe_read_string(por_ctx_t *ctx, char *data, size_t len
         return retval;
     }
     
-    if (value < 0 || value > 20000 || isnan(value)) {
+    if (value < 0 || value > MAX_STRING_LENGTH || isnan(value)) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
@@ -328,17 +333,17 @@ static readstat_error_t read_variable_record(por_ctx_t *ctx) {
 
     for (i=0; i<sizeof(formats)/sizeof(spss_format_t *); i++) {
         spss_format_t *format = formats[i];
-        if ((retval = read_integer_in_range(ctx, 0, 100, &value)) != READSTAT_OK) {
+        if ((retval = read_integer_in_range(ctx, 0, MAX_FORMAT_TYPE, &value)) != READSTAT_OK) {
             goto cleanup;
         }
         format->type = value;
 
-        if ((retval = read_integer_in_range(ctx, 0, 100, &value)) != READSTAT_OK) {
+        if ((retval = read_integer_in_range(ctx, 0, MAX_FORMAT_WIDTH, &value)) != READSTAT_OK) {
             goto cleanup;
         }
         format->width = value;
 
-        if ((retval = read_integer_in_range(ctx, 0, 100, &value)) != READSTAT_OK) {
+        if ((retval = read_integer_in_range(ctx, 0, MAX_FORMAT_DECIMALS, &value)) != READSTAT_OK) {
             goto cleanup;
         }
         format->decimal_places = value;

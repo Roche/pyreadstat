@@ -19,6 +19,9 @@ typedef struct sas7bcat_ctx_s {
     int            u64;
     int            pad1;
     int            bswap;
+    int64_t        xlsr_size;
+    int64_t        xlsr_offset;
+    int64_t        xlsr_O_offset;
     int64_t        page_count;
     int64_t        page_size;
     int64_t        header_size;
@@ -102,9 +105,10 @@ static readstat_error_t sas7bcat_parse_value_labels(const char *value_start, siz
             double dval = NAN;
             if ((val | 0xFF0000000000) == 0xFFFFFFFFFFFF) {
                 value.tag = (val >> 40);
-                if (value.tag) {
+                if (sas_validate_tag(value.tag) == READSTAT_OK) {
                     value.is_tagged_missing = 1;
                 } else {
+                    value.tag = 0;
                     value.is_system_missing = 1;
                 }
             } else {
@@ -143,14 +147,22 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
     size_t pad = 0;
     int label_count_capacity = 0;
     int label_count_used = 0;
+    int payload_offset = 106;
     char name[4*32+1];
 
     if (data_size < 50)
         goto cleanup;
 
     pad = (data[2] & 0x08) ? 4 : 0; // might be 0x10, not sure
-    label_count_capacity = sas_read4(&data[38+pad], ctx->bswap);
-    label_count_used = sas_read4(&data[42+pad], ctx->bswap);
+    if (ctx->u64) {
+        label_count_capacity = sas_read4(&data[42+pad], ctx->bswap);
+        label_count_used = sas_read4(&data[50+pad], ctx->bswap);
+
+        payload_offset += 32;
+    } else {
+        label_count_capacity = sas_read4(&data[38+pad], ctx->bswap);
+        label_count_used = sas_read4(&data[42+pad], ctx->bswap);
+    }
 
     if ((retval = readstat_convert(name, sizeof(name), &data[8], 8, ctx->converter)) != READSTAT_OK)
         goto cleanup;
@@ -159,20 +171,20 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
         pad += 16;
     }
 
-    if ((data[2] & 0x80)) { // has long name
-        if (data_size < 106 + pad + 32)
+    if ((data[2] & 0x80) && !ctx->u64) { // has long name
+        if (data_size < payload_offset + pad + 32)
             goto cleanup;
 
-        retval = readstat_convert(name, sizeof(name), &data[106+pad], 32, ctx->converter);
+        retval = readstat_convert(name, sizeof(name), &data[payload_offset+pad], 32, ctx->converter);
         if (retval != READSTAT_OK)
             goto cleanup;
         pad += 32;
     }
 
-    if (data_size < 106 + pad)
+    if (data_size < payload_offset + pad)
         goto cleanup;
 
-    if ((retval = sas7bcat_parse_value_labels(&data[106+pad], data_size - 106 - pad, 
+    if ((retval = sas7bcat_parse_value_labels(&data[payload_offset+pad], data_size - payload_offset - pad,
                     label_count_used, label_count_capacity, name, ctx)) != READSTAT_OK)
         goto cleanup;
 
@@ -183,14 +195,23 @@ cleanup:
 static readstat_error_t sas7bcat_augment_index(const char *index, size_t len, sas7bcat_ctx_t *ctx) {
     const char *xlsr = index;
     readstat_error_t retval = READSTAT_OK;
-    while (xlsr + 212 <= index + len) {
+    while (xlsr + ctx->xlsr_size <= index + len) {
         if (memcmp(xlsr, "XLSR", 4) != 0) // some block pointers seem to have 8 bytes of extra padding
             xlsr += 8;
         if (memcmp(xlsr, "XLSR", 4) != 0)
             break;
 
-        if (xlsr[50+ctx->pad1] == 'O')
-            ctx->block_pointers[ctx->block_pointers_used++] = ((uint64_t)sas_read2(&xlsr[4], ctx->bswap) << 32) + sas_read2(&xlsr[8], ctx->bswap);
+        if (xlsr[ctx->xlsr_O_offset] == 'O') {
+            uint32_t page = 0, pos = 0;
+            if (ctx->u64) {
+                page = sas_read4(&xlsr[8], ctx->bswap);
+                pos = sas_read4(&xlsr[16], ctx->bswap);
+            } else {
+                page = sas_read2(&xlsr[4], ctx->bswap);
+                pos = sas_read2(&xlsr[8], ctx->bswap);
+            }
+            ctx->block_pointers[ctx->block_pointers_used++] = ((uint64_t)page << 32) + pos;
+        }
 
         if (ctx->block_pointers_used == ctx->block_pointers_capacity) {
             ctx->block_pointers = readstat_realloc(ctx->block_pointers, (ctx->block_pointers_capacity *= 2) * sizeof(uint64_t));
@@ -200,7 +221,7 @@ static readstat_error_t sas7bcat_augment_index(const char *index, size_t len, sa
             }
         }
 
-        xlsr += 212 + ctx->pad1;
+        xlsr += ctx->xlsr_size;
     }
 cleanup:
     return retval;
@@ -252,7 +273,11 @@ static int sas7bcat_block_size(int start_page, int start_page_pos, sas7bcat_ctx_
     int buffer_len = 0;
     int chain_link_len = 0;
 
-    char chain_link[16];
+    char chain_link[32];
+    int chain_link_header_len = 16;
+    if (ctx->u64) {
+        chain_link_header_len = 32;
+    }
 
     // calculate buffer size needed
     while (next_page > 0 && next_page_pos > 0 && next_page <= ctx->page_count && link_count++ < ctx->page_count) {
@@ -260,13 +285,20 @@ static int sas7bcat_block_size(int start_page, int start_page_pos, sas7bcat_ctx_
             retval = READSTAT_ERROR_SEEK;
             goto cleanup;
         }
-        if (io->read(chain_link, sizeof(chain_link), io->io_ctx) < sizeof(chain_link)) {
+        if (io->read(chain_link, chain_link_header_len, io->io_ctx) < chain_link_header_len) {
             retval = READSTAT_ERROR_READ;
             goto cleanup;
         }
-        next_page = sas_read4(&chain_link[0], ctx->bswap);
-        next_page_pos = sas_read2(&chain_link[4], ctx->bswap);
-        chain_link_len = sas_read2(&chain_link[6], ctx->bswap);
+
+        if (ctx->u64) {
+            next_page = sas_read4(&chain_link[0], ctx->bswap);
+            next_page_pos = sas_read2(&chain_link[8], ctx->bswap);
+            chain_link_len = sas_read2(&chain_link[10], ctx->bswap);
+        } else {
+            next_page = sas_read4(&chain_link[0], ctx->bswap);
+            next_page_pos = sas_read2(&chain_link[4], ctx->bswap);
+            chain_link_len = sas_read2(&chain_link[6], ctx->bswap);
+        }
 
         buffer_len += chain_link_len;
     }
@@ -289,20 +321,30 @@ static readstat_error_t sas7bcat_read_block(char *buffer, size_t buffer_len,
     int chain_link_len = 0;
     int buffer_offset = 0;
 
-    char chain_link[16];
+    char chain_link[32];
+    int chain_link_header_len = 16;
+    if (ctx->u64) {
+        chain_link_header_len = 32;
+    }
 
     while (next_page > 0 && next_page_pos > 0 && next_page <= ctx->page_count && link_count++ < ctx->page_count) {
         if (io->seek(ctx->header_size+(next_page-1)*ctx->page_size+next_page_pos, READSTAT_SEEK_SET, io->io_ctx) == -1) {
             retval = READSTAT_ERROR_SEEK;
             goto cleanup;
         }
-        if (io->read(chain_link, sizeof(chain_link), io->io_ctx) < sizeof(chain_link)) {
+        if (io->read(chain_link, chain_link_header_len, io->io_ctx) < chain_link_header_len) {
             retval = READSTAT_ERROR_READ;
             goto cleanup;
         }
-        next_page = sas_read4(&chain_link[0], ctx->bswap);
-        next_page_pos = sas_read2(&chain_link[4], ctx->bswap);
-        chain_link_len = sas_read2(&chain_link[6], ctx->bswap);
+        if (ctx->u64) {
+            next_page = sas_read4(&chain_link[0], ctx->bswap);
+            next_page_pos = sas_read2(&chain_link[8], ctx->bswap);
+            chain_link_len = sas_read2(&chain_link[10], ctx->bswap);
+        } else {
+            next_page = sas_read4(&chain_link[0], ctx->bswap);
+            next_page_pos = sas_read2(&chain_link[4], ctx->bswap);
+            chain_link_len = sas_read2(&chain_link[6], ctx->bswap);
+        }
         if (buffer_offset + chain_link_len > buffer_len) {
             retval = READSTAT_ERROR_PARSE;
             goto cleanup;
@@ -356,9 +398,13 @@ readstat_error_t readstat_parse_sas7bcat(readstat_parser_t *parser, const char *
         ctx->input_encoding = hinfo->encoding;
     }
 
+    ctx->xlsr_size = 212 + ctx->pad1;
+    ctx->xlsr_offset = 856 + 2 * ctx->pad1;
+    ctx->xlsr_O_offset = 50 + ctx->pad1;
     if (ctx->u64) {
-        retval = READSTAT_ERROR_PARSE;
-        goto cleanup;
+        ctx->xlsr_offset += 144;
+        ctx->xlsr_size += 72;
+        ctx->xlsr_O_offset += 24;
     }
 
     if (ctx->input_encoding && ctx->output_encoding && strcmp(ctx->input_encoding, ctx->output_encoding) != 0) {
@@ -406,7 +452,7 @@ readstat_error_t readstat_parse_sas7bcat(readstat_parser_t *parser, const char *
         goto cleanup;
     }
 
-    retval = sas7bcat_augment_index(&page[856+2*ctx->pad1], ctx->page_size - 856 - 2*ctx->pad1, ctx);
+    retval = sas7bcat_augment_index(&page[ctx->xlsr_offset], ctx->page_size - ctx->xlsr_offset, ctx);
     if (retval != READSTAT_OK)
         goto cleanup;
 

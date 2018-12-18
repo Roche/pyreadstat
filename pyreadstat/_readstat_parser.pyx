@@ -47,7 +47,7 @@ cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
 
 cdef list stata_datetime_formats = ["%tC", "%tc"]
 cdef list stata_date_formats = ["%td", "%d", "%tdD_m_Y", "%tdCCYY-NN-DD"]
-cdef list stata_time_formats = []
+cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
@@ -120,6 +120,12 @@ class ReadstatError(Exception):
     """
     pass
 
+class PyreadstatError(Exception):
+    """
+    Just defining a custom exception to raise when pyreadstat raises an exception.
+    """
+    pass
+
 
 cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format):
     """
@@ -167,6 +173,7 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     cdef object tdelta
     cdef int days
     cdef int secs
+    cdef double msecs
     cdef int usecs
     cdef object mydat
 
@@ -191,8 +198,10 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
             days = <int> (floor(tstamp / 86400000))
-            usecs = <int> ((tstamp % 86400000) * 1000 )
-            tdelta = timedelta_new(days, 0, usecs)
+            msecs = tstamp % 86400000
+            secs = <int> (msecs/1000)
+            usecs = <int> ((msecs % 1000) * 1000 )
+            tdelta = timedelta_new(days, secs, usecs)
             #tdelta = timedelta(milliseconds=tstamp)
         else:
             # tstamp in seconds
@@ -203,11 +212,20 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
         mydat = origin + tdelta
         return mydat
     elif var_format == DATE_FORMAT_TIME:
-        # tstamp in seconds
-        days = <int> (floor(tstamp / 86400))
-        secs = <int> (tstamp % 86400)
-        tdelta = timedelta_new(days, secs, 0)
-        #tdelta = timedelta(seconds=tstamp)
+        if file_format == FILE_FORMAT_STATA:
+            # tstamp is in millisecons
+            days = <int> (floor(tstamp / 86400000))
+            msecs = tstamp % 86400000
+            secs = <int> (msecs/1000)
+            usecs = <int> ((msecs % 1000) * 1000 )
+            tdelta = timedelta_new(days, secs, usecs)
+            #tdelta = timedelta(milliseconds=tstamp)
+        else:
+            # tstamp in seconds
+            days = <int> (floor(tstamp / 86400))
+            secs = <int> (tstamp % 86400)
+            tdelta = timedelta_new(days, secs, 0)
+            #tdelta = timedelta(seconds=tstamp)
         mydat = origin + tdelta
         return mydat.time()
 
@@ -271,7 +289,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
         py_float_value = <double> c_double_value
         pyformat = VAR_FORMAT_FLOAT
     else:
-        raise Exception("Unkown data type")
+        raise PyreadstatError("Unkown data type")
 
     # final transformation and storage
 
@@ -280,7 +298,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             result = py_str_value
         else:
             #str_byte_val = py_str_value.encode("UTF-8")
-            raise Exception("STRING type with value %s with date type" % py_str_value )
+            raise PyreadstatError("STRING type with value %s with date type" % py_str_value )
     elif pyformat == VAR_FORMAT_LONG:
         if var_format == DATE_FORMAT_NOTADATE:
             result = py_long_value
@@ -297,7 +315,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
-        raise Exception("Failed convert C to python value")
+        raise PyreadstatError("Failed convert C to python value")
 
     return result
 
@@ -323,7 +341,7 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     
     var_count = readstat_get_var_count(metadata)
     if var_count<0:
-        raise Exception("Failed to read number of variables")
+        raise PyreadstatError("Failed to read number of variables")
     obs_count = readstat_get_row_count(metadata)
     if obs_count <0:
         # if <0 it means the number of rows is not known, allocate 100 000
@@ -538,13 +556,13 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             # maybe it is something dependent on the version or operating system (windows vs linux generated files?)
             # As for now usernan is disabled for stata, as I have not been able to test it, enabled for SAS.
             missing_tag = <int> readstat_value_tag(value)
-            # In SAS missing values are A to Z or _
-            if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95:
+            # In SAS missing values are A to Z or _ in stata a to z
+            if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
                 dc.col_data[index][obs_index] =  chr(missing_tag)
                 dc.missing_user_values.add(chr(missing_tag))
             else:
-                msg = "Expecting missing tag value from 65(A) to 90(Z), got %d instead" % missing_tag
-                raise Exception(msg)
+                msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
+                raise PyreadstatError(msg)
 
     else:
         pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -608,7 +626,7 @@ cdef int handle_value_label(char *val_labels, readstat_value_t value, char *labe
         py_float_value = <double> c_double_value
         pyformat = VAR_FORMAT_FLOAT
     else:
-        raise Exception("Unkown data type")
+        raise PyreadstatError("Unkown data type")
 
     labels_raw = dc.labels_raw
     cur_dict = labels_raw.get(var_label)
@@ -624,7 +642,7 @@ cdef int handle_value_label(char *val_labels, readstat_value_t value, char *labe
     elif pyformat == VAR_FORMAT_MISSING:
         pass
     else:
-        raise Exception("Failed convert C to python value")
+        raise PyreadstatError("Failed convert C to python value")
 
     dc.labels_raw[var_label] = cur_dict
 
@@ -837,7 +855,7 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     elif file_format == FILE_FORMAT_STATA:
         origin = stata_origin
     else:
-        raise Exception("Unknown file format")
+        raise PyreadstatError("Unknown file format")
     
     data.origin = origin
 
