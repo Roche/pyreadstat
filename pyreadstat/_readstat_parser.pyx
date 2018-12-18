@@ -23,6 +23,7 @@ from libc.math cimport NAN, floor
 
 #from datetime import timedelta, datetime
 from collections import OrderedDict
+import os
 
 import pandas as pd
 #from pandas._libs import Timestamp
@@ -661,6 +662,26 @@ cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HAN
 
     return READSTAT_HANDLER_OK
 
+cdef int handle_open(const char *u8_path, void *io_ctx):
+    """
+    Special open handler for windows in order to be able to handle paths with international characters
+    Courtesy of Jonathon Love.
+    """
+    cdef int fd
+
+    path = u8_path.decode('utf-8')
+    if not os.path.isfile(path):
+        return -1
+
+    IF UNAME_SYSNAME == 'Windows':
+        cdef Py_ssize_t length
+        u16_path = PyUnicode_AsWideCharString(path, &length)
+        fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
+        assign_fd(io_ctx, fd)
+        return fd
+    ELSE:
+        return -1
+
 
 cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
     """
@@ -699,6 +720,11 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     retcode = readstat_set_variable_handler(parser, variable_handler)
     retcode = readstat_set_value_label_handler(parser, value_label_handler)
     retcode = readstat_set_note_handler(parser, note_handler)
+
+    IF UNAME_SYSNAME == 'Windows':  # custom file opener for windows *sigh*
+        readstat_set_open_handler(parser, handle_open)
+        readstat_set_seek_handler(parser, seek_fd)
+
     if not metaonly:
         retcode = readstat_set_value_handler(parser, value_handler)
 

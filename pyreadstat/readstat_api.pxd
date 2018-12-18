@@ -21,6 +21,9 @@ These are C definitions coming from the readstat API (readstat.h) plus some
 dependecies of that to the C standard library
 """
 
+cdef extern from "<sys/types.h>":
+    ctypedef long off_t
+
 cdef extern from "<stdint.h>" nogil:
 
     # 7.18.1 Integer types
@@ -45,6 +48,9 @@ cdef extern from "readstat.h":
         pass
         
     ctypedef struct readstat_metadata_t:
+        pass
+        
+    ctypedef enum readstat_io_flags_t:
         pass
     
     ctypedef enum readstat_error_t:
@@ -111,16 +117,23 @@ cdef extern from "readstat.h":
         READSTAT_ALIGNMENT_LEFT = 1,
         READSTAT_ALIGNMENT_CENTER,
         READSTAT_ALIGNMENT_RIGHT
+        
+
+    ctypedef off_t readstat_off_t
 
     cdef readstat_parser_t *readstat_parser_init()
     cdef void readstat_parser_free(readstat_parser_t *parser)
 
+    ctypedef int (*readstat_open_handler)(const char *path, void *io_ctx);
+    ctypedef readstat_off_t (*readstat_seek_handler)(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx);
     ctypedef int (*readstat_metadata_handler)(readstat_metadata_t *metadata, void *ctx);
     ctypedef int (*readstat_variable_handler)(int index, readstat_variable_t *variable, char *val_labels, void *ctx);
     ctypedef int (*readstat_value_handler)(int obs_index, readstat_variable_t *variable, readstat_value_t value, void *ctx);
     ctypedef int (*readstat_value_label_handler)(const char *val_labels, readstat_value_t value, const char *label, void *ctx);
     ctypedef int (*readstat_note_handler)(int note_index, const char *note, void *ctx);
 
+    cdef readstat_error_t readstat_set_open_handler(readstat_parser_t *parser, readstat_open_handler open_handler);
+    cdef readstat_error_t readstat_set_seek_handler(readstat_parser_t *parser, readstat_seek_handler seek_handler);
     cdef readstat_error_t readstat_set_metadata_handler(readstat_parser_t *parser, readstat_metadata_handler metadata_handler);
     cdef readstat_error_t readstat_set_note_handler(readstat_parser_t *parser, readstat_note_handler note_handler);
     cdef readstat_error_t readstat_set_variable_handler(readstat_parser_t *parser, readstat_variable_handler variable_handler)
