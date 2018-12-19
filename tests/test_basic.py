@@ -34,6 +34,7 @@ class TestBasic(unittest.TestCase):
         self.data_folder = os.path.join(self.parent_folder, "test_data")
         self.basic_data_folder = os.path.join(self.data_folder, "basic")
         self.catalog_data_folder = os.path.join(self.data_folder, "sas_catalog")
+        self.international_data_folder = os.path.join(self.data_folder, "ínternátionál")
 
         # basic
         pandas_csv = os.path.join(self.basic_data_folder, "sample.csv")
@@ -127,6 +128,15 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_usecols))
         self.assertTrue(meta.number_columns == len(self.usecols))
         self.assertTrue(meta.column_names == self.usecols)
+        
+    def test_sas7bdat_international(self):
+        """
+        On windows, paths with international characters are problematic. This is verifying that it is working as expected
+        """
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.international_data_folder, "sample.sas7bdat"))
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(self.df_pandas))
 
     def test_xport(self):
 

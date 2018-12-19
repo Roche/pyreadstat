@@ -669,13 +669,12 @@ cdef int handle_open(const char *u8_path, void *io_ctx):
     """
     cdef int fd
 
-    path = u8_path.decode('utf-8')
-    if not os.path.isfile(path):
+    if not os.path.isfile(u8_path):
         return -1
 
     IF UNAME_SYSNAME == 'Windows':
         cdef Py_ssize_t length
-        u16_path = PyUnicode_AsWideCharString(path, &length)
+        u16_path = PyUnicode_AsWideCharString(u8_path, &length)
         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
         assign_fd(io_ctx, fd)
         return fd
