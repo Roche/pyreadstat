@@ -720,7 +720,8 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     retcode = readstat_set_value_label_handler(parser, value_label_handler)
     retcode = readstat_set_note_handler(parser, note_handler)
 
-    IF UNAME_SYSNAME == 'Windows':  # custom file opener for windows *sigh*
+    #IF UNAME_SYSNAME == 'Windows':  # custom file opener for windows *sigh*
+    if os.name == "nt":
         readstat_set_open_handler(parser, handle_open)
         readstat_set_seek_handler(parser, seek_fd)
 
