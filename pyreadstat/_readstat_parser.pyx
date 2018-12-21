@@ -662,23 +662,26 @@ cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HAN
 
     return READSTAT_HANDLER_OK
 
-cdef int handle_open(const char *u8_path, void *io_ctx):
+cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_ABORT:
     """
     Special open handler for windows in order to be able to handle paths with international characters
     Courtesy of Jonathon Love.
     """
     cdef int fd
+    cdef Py_ssize_t length
 
     if not os.path.isfile(u8_path):
         return -1
 
-    IF UNAME_SYSNAME == 'Windows':
-        cdef Py_ssize_t length
+    #IF UNAME_SYSNAME == 'Windows':
+    if os.name == "nt":
+        
         u16_path = PyUnicode_AsWideCharString(u8_path, &length)
         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
         assign_fd(io_ctx, fd)
         return fd
-    ELSE:
+    #ELSE:
+    else:
         return -1
 
 
@@ -720,10 +723,10 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     retcode = readstat_set_value_label_handler(parser, value_label_handler)
     retcode = readstat_set_note_handler(parser, note_handler)
 
-    #IF UNAME_SYSNAME == 'Windows':  # custom file opener for windows *sigh*
+    # on windows we need a custom open handler in order to deal with internation characters in the path.
     if os.name == "nt":
-        readstat_set_open_handler(parser, handle_open)
-        readstat_set_seek_handler(parser, seek_fd)
+        open_handler = <readstat_open_handler> handle_open
+        readstat_set_open_handler(parser, open_handler)
 
     if not metaonly:
         retcode = readstat_set_value_handler(parser, value_handler)
