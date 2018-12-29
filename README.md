@@ -22,29 +22,29 @@ the original applications in this regard and for that reason writing is not supp
 ## Table of Contents
 
 * [Motivation](#motivation)
-  * [Dependencies](#dependencies)
-  * [Installation](#installation)
-    + [Using pip](#using-pip)
-    + [From the latest sources](#from-the-latest-sources)
-    + [Compiling on Windows and Mac](#compiling-on-windows-and-mac)
-    + [Basic Usage](#basic-usage)
-    + [Reading only the headers](#reading-only-the-headers)
-    + [Reading selected columns](#reading-selected-columns)
-    + [Reading value labels](#reading-value-labels)
-    + [Missing Values](#missing-values)
-      - [SPSS](#spss)
-      - [SAS](#sas)
-    + [Other options](#other-options)
-  * [Roadmap](#roadmap)
-  * [Known limitations](#known-limitations)
-  * [Python 2.7 support.](#python-27-support)
-  * [Change log](#change-log)
-  * [License](#license)
-  * [Contributing](#contributing)
-  * [People](#people)
+* [Dependencies](#dependencies)
+* [Installation](#installation)
+  + [Using pip](#using-pip)
+  + [From the latest sources](#from-the-latest-sources)
+  + [Compiling on Windows and Mac](#compiling-on-windows-and-mac
+* [Usage](#usage)
+  + [Basic Usage](#basic-usage)
+  + [Reading only the headers](#reading-only-the-headers)
+  + [Reading selected columns](#reading-selected-columns)
+  + [Reading value labels](#reading-value-labels)
+  + [Missing Values](#missing-values)
+    - [SPSS](#spss)
+    - [SAS](#sas)
++ [Other options](#other-options)
+* [Roadmap](#roadmap)
+* [Known limitations](#known-limitations)
+* [Python 2.7 support.](#python-27-support)
+* [Change log](#change-log)
+* [License](#license)
+* [Contributing](#contributing)
+* [People](#people)
 
 
-<a name="motivation"/>
 ## Motivation
 
 The original motivation came from reading sas7bdat files in python. That is already possible using either the (pure
@@ -91,7 +91,7 @@ some specific columns, and you want to do it quick. This package offers the poss
 it possible a very fast metadata scraping (Pandas read_sas can also do it if you pass the value iterator=True). 
 In addition it offers the capability to read sas7bcat files separately from the sas7bdat files.
 
-<a name="dependencies"/>
+
 ## Dependencies
 
 The module depends on pandas, which you normally have installed if you got Anaconda (highly recommended.) If creating
@@ -111,7 +111,7 @@ on mac)
 Readstat also depends on zlib; it was reported not to be installed on Lubuntu. If you face this problem intalling the 
 library solves it.
 
-<a name="instalation"/>
+
 ## Installation
 
 ### Using pip
@@ -174,8 +174,7 @@ conda install libiconv
 and then recompile again (be sure to delete any cache, if using pip do pip --no-cache-dir, if using setup.py remove
 the folder build, otherwise you may be installing the old compilation again).
 
-<a name="usage"/>
-##Usaqe
+## Usage
 
 ### Basic Usage
 
@@ -420,12 +419,12 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
-<a name="roadmap"/>
+
 ## Roadmap
 
 * Improvements in user defined missing values for SAS and STATA.
 
-<a name="known_limitations"/>
+
 ## Known limitations
 
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
@@ -437,7 +436,7 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
   
-<a name="py27"/>
+
 ## Python 2.7 support.
 
 Python 2.7 is not actively supported. If it works, we are happy about that. But if it does not, and the
@@ -449,18 +448,18 @@ if the path contains international (non-ascii) characters. As mentioned
 before this bug is not going to be repaired (There is not such issue on
 Python 3).
 
-<a name="changelog"/>
+
 ## Change log
 
 A log with the changes for each version can be found [here](https://github.com/Roche/pyreadstat/blob/master/change_log.md)
 
-<a name="license"/>
+
 ## License
 
 pyreadstat is distributed under Apache 2.0 license. Readstat is distributed under MIT license. See the License file for
 more information.
 
-<a name="contributing"/>
+
 ## Contributing
 
 Contributions are welcome! Those include corrections to the documentation, bugs reporting, testing, 
@@ -474,7 +473,6 @@ keep full compatibility with the original. In that way improvements in ReadStat 
 no effort. If you would like to propose new features involving changes in the ReadStat code, please submit a
 pull request to ReadStat first. 
 
-<a name="people"/>
 ## People
 
 Otto Fajardo - author, maintainer
