@@ -21,17 +21,27 @@ the original applications in this regard and for that reason writing is not supp
 
 ## Table of Contents
 
-[Motivation](#motivation)
-[Dependencies](#dependencies)
-[Instalation](#instalation)
-[Usage](#usage")
-[Roadmap](#roadmap)
-[Known Limitations](#known_limitations)
-[Python 2.7 support](#py27)
-[Change log](#changelog)
-[License](#license)
-[Contributing](#contributing)
-[People](#people)
+* [Motivation](#motivation)
+  * [Dependencies](#dependencies)
+  * [Installation](#installation)
+    + [Using pip](#using-pip)
+    + [From the latest sources](#from-the-latest-sources)
+    + [Compiling on Windows and Mac](#compiling-on-windows-and-mac)
+    + [Basic Usage](#basic-usage)
+    + [Reading only the headers](#reading-only-the-headers)
+    + [Reading selected columns](#reading-selected-columns)
+    + [Reading value labels](#reading-value-labels)
+    + [Missing Values](#missing-values)
+      - [SPSS](#spss)
+      - [SAS](#sas)
+    + [Other options](#other-options)
+  * [Roadmap](#roadmap)
+  * [Known limitations](#known-limitations)
+  * [Python 2.7 support.](#python-27-support)
+  * [Change log](#change-log)
+  * [License](#license)
+  * [Contributing](#contributing)
+  * [People](#people)
 
 
 <a name="motivation"/>
