@@ -19,7 +19,22 @@ Detailed documentation on all available methods is in the
 are not open. Do not use it for critical tasks such as reporting to the authorities. Pyreadstat is not meant to replace
 the original applications in this regard and for that reason writing is not supported.**  
 
+## Table of Contents
 
+[Motivation](#motivation)
+[Dependencies](#dependencies)
+[Instalation](#instalation)
+[Usage](#usage")
+[Roadmap](#roadmap)
+[Known Limitations](#known_limitations)
+[Python 2.7 support](#py27)
+[Change log](#changelog)
+[License](#license)
+[Contributing](#contributing)
+[People](#people)
+
+
+<a name="motivation"/>
 ## Motivation
 
 The original motivation came from reading sas7bdat files in python. That is already possible using either the (pure
@@ -66,7 +81,7 @@ some specific columns, and you want to do it quick. This package offers the poss
 it possible a very fast metadata scraping (Pandas read_sas can also do it if you pass the value iterator=True). 
 In addition it offers the capability to read sas7bcat files separately from the sas7bdat files.
 
-
+<a name="dependencies"/>
 ## Dependencies
 
 The module depends on pandas, which you normally have installed if you got Anaconda (highly recommended.) If creating
@@ -86,6 +101,7 @@ on mac)
 Readstat also depends on zlib; it was reported not to be installed on Lubuntu. If you face this problem intalling the 
 library solves it.
 
+<a name="instalation"/>
 ## Installation
 
 ### Using pip
@@ -148,7 +164,10 @@ conda install libiconv
 and then recompile again (be sure to delete any cache, if using pip do pip --no-cache-dir, if using setup.py remove
 the folder build, otherwise you may be installing the old compilation again).
 
-## Basic Usage
+<a name="usage"/>
+##Usaqe
+
+### Basic Usage
 
 Pass the path to a file to any of the functions provided by pyreadstat. It will return a pandas data frame and a metadata
 object. <br>
@@ -198,7 +217,8 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | set_catalog_to_sas  | enrich sas dataframe with catalog formats |
 | set_value_labels    | replace values by their labels |
 
-## Reading only the headers
+
+### Reading only the headers
 
 All functions accept a keyword argument "metadataonly" which by default is False. If True, then no data will be read, 
 but still both the metadata and the dataframe will be returned. The metadata will contain all fields as usual, but
@@ -211,7 +231,7 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', metadataonly=True)
 ```
 
-## Reading selected columns
+### Reading selected columns
 
 All functions accept a keyword "usecols" which should be a list of column names. Only the columns which names match those
 in the list will be imported (case sensitive). This decreases memory consumption and speeds up the process. Usecols must
@@ -224,7 +244,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variab
 
 ```
 
-## Reading value labels
+### Reading value labels
 
 For sas7bdat files, value labels are stored in separated sas7bcat files. You can use them in combination with the sas7bdat
 or read them separately.
@@ -276,7 +296,7 @@ df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=Fals
 df_enriched = pyreadstat.set_value_labels(df, meta, formats_as_category=True)
 ```
 
-## Missing Values
+### Missing Values
 
 There are two types of missing values: system and user defined. System are assigned by the program by default. User defined are 
 valid values that the user decided to give the meaning of missing in order to differentiate between several situations.For
@@ -288,7 +308,7 @@ etc.
 read with pyreadstat**. Notice that the only possible missing value in pandas is NaN (Not a Number) for both string and numeric
 variables, date, datetime and time variables have NaT (Not a Time).
 
-### SPSS 
+#### SPSS 
 
 In the case of SPSS sav files, the user can assign to a numeric variable either up to three discrete missing values or
 one range plus one discrete missing value. As mentioned by default all of these possiblities are translated into NaN, 
@@ -353,7 +373,7 @@ empty strings to nan very easily with pandas.
 
 For SPSS por files, 
 
-### SAS
+#### SAS
 
 In SAS the user can assign values from .A to .Z and ._ as missing values. As in SPSS, those are normally translated to
 NaN. However, using user_missing=True with read_sas7bdat will produce values from A to Z and _. In addition a variable
@@ -369,7 +389,7 @@ Empty strings are still transtaled as empty strings and not as NaN.
 User defined missing values are currently not supported for file types other than sas7bdat, at the moment.
 
 
-## Other options
+### Other options
 
 You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459) 
 
@@ -390,11 +410,12 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
+<a name="roadmap"/>
 ## Roadmap
 
 * Improvements in user defined missing values for SAS and STATA.
 
-
+<a name="known_limitations"/>
 ## Known limitations
 
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
@@ -406,6 +427,7 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
   
+<a name="py27"/>
 ## Python 2.7 support.
 
 Python 2.7 is not actively supported. If it works, we are happy about that. But if it does not, and the
@@ -417,16 +439,18 @@ if the path contains international (non-ascii) characters. As mentioned
 before this bug is not going to be repaired (There is not such issue on
 Python 3).
 
-
-## Changelog
+<a name="changelog"/>
+## Change log
 
 A log with the changes for each version can be found [here](https://github.com/Roche/pyreadstat/blob/master/change_log.md)
 
+<a name="license"/>
 ## License
 
 pyreadstat is distributed under Apache 2.0 license. Readstat is distributed under MIT license. See the License file for
 more information.
 
+<a name="contributing"/>
 ## Contributing
 
 Contributions are welcome! Those include corrections to the documentation, bugs reporting, testing, 
@@ -440,8 +464,10 @@ keep full compatibility with the original. In that way improvements in ReadStat 
 no effort. If you would like to propose new features involving changes in the ReadStat code, please submit a
 pull request to ReadStat first. 
 
+<a name="people"/>
 ## People
 
 Otto Fajardo - author, maintainer
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
+[Jonathon Love](https://jona.thon.love/) - contributor
 
