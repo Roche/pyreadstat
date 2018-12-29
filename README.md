@@ -12,6 +12,10 @@ meaning pyreadstat is a python equivalent to R Haven (but writing files is curre
 Detailed documentation on all available methods is in the 
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html)
 
+If you would like to read R RData and Rds files into python in an easy way,
+take a look to [pyreadr](https://github.com/ofajardo/pyreadr), a wrapper
+around the C library [librdata](https://github.com/WizardMac/librdata)
+
 
 **DISCLAIMER** 
 
@@ -476,6 +480,7 @@ pull request to ReadStat first.
 ## People
 
 Otto Fajardo - author, maintainer
+
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
 [Jonathon Love](https://jona.thon.love/) - contributor
 
