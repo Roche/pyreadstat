@@ -26,7 +26,7 @@ the original applications in this regard and for that reason writing is not supp
 * [Installation](#installation)
   + [Using pip](#using-pip)
   + [From the latest sources](#from-the-latest-sources)
-  + [Compiling on Windows and Mac](#compiling-on-windows-and-mac
+  + [Compiling on Windows and Mac](#compiling-on-windows-and-mac)
 * [Usage](#usage)
   + [Basic Usage](#basic-usage)
   + [Reading only the headers](#reading-only-the-headers)
