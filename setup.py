@@ -19,12 +19,29 @@ from distutils.core import setup, Extension
 import os
 import sys
 
-# To re-compile the pyx sources use the option --use-cython
-if '--use-cython' in sys.argv:
+PY_MAJOR_VERSION = sys.version_info[0]
+
+# If cython is there and version is good, use it.
+try:
+    import Cython
+    from Cython.Build import cythonize
+    cyver = int(Cython.__version__.split(".")[1])
+    if cyver < 28:
+        msg = "Cython version 0.28 or newer required"
+        raise Exception(msg)
     USE_CYTHON = True
-    sys.argv.remove('--use-cython')
-else:
+except:
     USE_CYTHON = False
+    if PY_MAJOR_VERSION < 3:
+        msg = "In order to compile with Python 2.7, please install Cython version > 0.28"
+        raise Exception(msg)
+
+# To re-compile the pyx sources use the option --use-cython
+#if '--use-cython' in sys.argv:
+#    USE_CYTHON = True
+#    sys.argv.remove('--use-cython')
+#else:
+#    USE_CYTHON = False
 ext = '.pyx' if USE_CYTHON else '.c'
 
 
@@ -93,8 +110,10 @@ for e in extensions:
     e.cython_directives = {"embedsignature": True}
 
 if USE_CYTHON:
-    from Cython.Build import cythonize
-    extensions = cythonize(extensions)
+    #from Cython.Build import cythonize
+    # let's use cython with force so that it always recompiles in case 
+    # somebody is switching between python 2 and 3
+    extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
 
 long_description = """ A Python package to read SAS
 (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into pandas data frames. It is a wrapper
@@ -106,7 +125,7 @@ short_description = "Reads SAS, SPSS and Stata files into pandas data frames."
 
 setup(
     name='pyreadstat',
-    version='0.2.1',
+    version='0.2.2',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -17,6 +18,7 @@
 from datetime import datetime
 import unittest
 import os
+import sys
 
 import pandas as pd
 import numpy as np
@@ -133,10 +135,12 @@ class TestBasic(unittest.TestCase):
         """
         On windows, paths with international characters are problematic. This is verifying that it is working as expected
         """
-        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.international_data_folder, "sample.sas7bdat"))
-        self.assertTrue(df.equals(self.df_pandas))
-        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
-        self.assertTrue(meta.number_rows == len(self.df_pandas))
+        # in addition, this works only in python 3
+        if sys.version_info[0]>2:
+            df, meta = pyreadstat.read_sas7bdat(os.path.join(self.international_data_folder, "sample.sas7bdat"))
+            self.assertTrue(df.equals(self.df_pandas))
+            self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+            self.assertTrue(meta.number_rows == len(self.df_pandas))
 
     def test_xport(self):
 

@@ -74,8 +74,10 @@ a new conda or virtual environment or if you don't have it in your base installa
 manually before using pyreadstat. Pandas is not selected as a dependency in the pip package, as that would install 
 pandas with pip and many people would prefer installing it with conda.
 
-In order to compile from source (necessary for linux and mac), you will need a C compiler (see installation). 
+In order to compile from source you will need a C compiler (see installation). 
 Only if you want to do changes to the cython source code, you will need cython (normally not necessary).
+If you want to compile for python 2.7, you will need cython (see python 2.7 support
+later).
 
 Readstat depends on the C library iconv to handle character encodings. On mac, the library is found on the system, but
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
@@ -100,41 +102,10 @@ If you are running on a machine without admin rights, and you want to install ag
 pip install pyreadstat --user
 ```
 
-Notice that at the moment we offer pre-compiled wheels for windows 64 bit and Python 3.5, 3.6 and 3.7. If not one of 
-these versions, or running on linux or mac, pip will attempt to compile the package. 
-
-### From a pre-compiled python wheel
-
-In this repository, look in the folder dist, we offer wheels for windows. If there is a wheel (.whl file) compatible 
-for your python version and operating system, download it and do:
-
-```
-pip install pyreadstat-0.1.7-cp36-cp36m-win_amd64.whl
-```
-
-the example file pyreadstat-0.1.7-cp36-cp36m-win_amd64.whl can be a different one depending on your python version and system.
-
-cp36-cp36m-win_amd64.whl means (C) Python 3.6 windows 64 bits and it has been tested both on win 7 and win 10 standard
-roche computers, with Anaconda Python installed (it has not been tested with plain python). We also provide wheels for
-python 3.5 and 3.7 on windows.
-
-If there is not a suitable wheel for your system, you have to compile the package from source (distribution).
-
-### From source distribution
-
-From this repository, in the folder dist, download the file pyreadstat-x.x.x.tar.gz where x.x.x is the version and do:
-
-```
-pip install pyreadstat-x.x.x.tar.gz
-```
-
-If you don't have admin privileges on the machine (for example on BEE) do:
-
-```
-pip install pyreadstat-x.x.x.tar.gz --user
-```
-
-You need a working C compiler.
+Notice that at the moment we offer pre-compiled wheels for windows, mac and 
+linux for Python 2.7, 3.5, 3.6 and 3.7. Python 2.7 does not work for
+widows (see later python 2.7 support). If there is no pre-compiled 
+wheel available, pip will attempt to compile the package. 
 
 ### From the latest sources
 
@@ -156,14 +127,14 @@ You can also install from the github repo directly (without cloning). Use the fl
 pip install git+https://github.com/Roche/pyreadstat.git
 ```
 
-You need a working C compiler.
+You need a working C compiler. If working in python 2.7 you will need
+cython version > 0.28 installed (see later Python 2.7 support). For python 3, cython
+is not necessary, but if installed it will be used.
 
-### Compiling on Windows
+### Compiling on Windows and Mac
 
 Compiling on linux is very easy, but on windows is a bit more challenging. 
 Some instructions are found [here](https://github.com/Roche/pyreadstat/blob/master/windows_compilation.md)
-
-### Compiling on Mac
 
 Compiling on mac is usually easy. Readstat depends however on the C library iconv to handle character encodings; while 
 on linux is part of gclib, on mac it is a separated shared library found on the system (h file is in /usr/include and shared
@@ -382,7 +353,7 @@ empty strings to nan very easily with pandas.
 
 For SPSS por files, 
 
-# SAS
+### SAS
 
 In SAS the user can assign values from .A to .Z and ._ as missing values. As in SPSS, those are normally translated to
 NaN. However, using user_missing=True with read_sas7bdat will produce values from A to Z and _. In addition a variable
@@ -421,7 +392,7 @@ For more information, please check the [Module documentation](https://ofajardo.g
 
 ## Roadmap
 
-* Conda recipe.
+* Improvements in user defined missing values for SAS and STATA.
 
 
 ## Known limitations
@@ -434,9 +405,17 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not handling correctly SAS user defined missing values: not detecting those for files produced on unix/64 bit.
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
+  
+## Python 2.7 support.
 
-In addition: **python 2.7 is not actively supported** If it works, we are happy about that. But if it does not, and the
+Python 2.7 is not actively supported. If it works, we are happy about that. But if it does not, and the
 bug is specific for python 2.7 (cannot be reproduced in python 3), the issue is not going to be solved.
+
+At the moment of writing this document Python 2.7 does not work for windows.
+It does work for Mac and Linux. In Mac and Linux, files cannot be opened
+if the path contains international (non-ascii) characters. As mentioned
+before this bug is not going to be repaired (There is not such issue on
+Python 3).
 
 
 ## Changelog

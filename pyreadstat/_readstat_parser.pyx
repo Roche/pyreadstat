@@ -667,21 +667,25 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
     Special open handler for windows in order to be able to handle paths with international characters
     Courtesy of Jonathon Love.
     """
-    cdef int fd
-    cdef Py_ssize_t length
+    IF PY_MAJOR_VERSION >2:
 
-    if not os.path.isfile(u8_path):
-        return -1
+        cdef int fd
+        cdef Py_ssize_t length
 
-    #IF UNAME_SYSNAME == 'Windows':
-    if os.name == "nt":
-        
-        u16_path = PyUnicode_AsWideCharString(u8_path, &length)
-        fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
-        assign_fd(io_ctx, fd)
-        return fd
-    #ELSE:
-    else:
+        if not os.path.isfile(u8_path):
+            return -1
+
+        #IF UNAME_SYSNAME == 'Windows':
+        if os.name == "nt":
+            
+            u16_path = PyUnicode_AsWideCharString(u8_path, &length)
+            fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
+            assign_fd(io_ctx, fd)
+            return fd
+        #ELSE:
+        else:
+            return -1
+    ELSE:
         return -1
 
 
@@ -724,9 +728,10 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     retcode = readstat_set_note_handler(parser, note_handler)
 
     # on windows we need a custom open handler in order to deal with internation characters in the path.
-    if os.name == "nt":
-        open_handler = <readstat_open_handler> handle_open
-        readstat_set_open_handler(parser, open_handler)
+    IF PY_MAJOR_VERSION >2:
+        if os.name == "nt":
+            open_handler = <readstat_open_handler> handle_open
+            readstat_set_open_handler(parser, open_handler)
 
     if not metaonly:
         retcode = readstat_set_value_handler(parser, value_handler)
