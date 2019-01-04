@@ -158,7 +158,7 @@ pip install git+https://github.com/Roche/pyreadstat.git
 ```
 
 You need a working C compiler. If working in python 2.7 you will need
-cython version > 0.28 installed (see later Python 2.7 support). For python 3, cython
+cython version >= 0.28 installed (see later Python 2.7 support). For python 3, cython
 is not necessary, but if installed it will be used.
 
 ### Compiling on Windows and Mac
