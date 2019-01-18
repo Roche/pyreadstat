@@ -482,5 +482,6 @@ pull request to ReadStat first.
 Otto Fajardo - author, maintainer
 
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
+
 [Jonathon Love](https://jona.thon.love/) - contributor
 
