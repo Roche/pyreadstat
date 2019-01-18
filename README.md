@@ -23,6 +23,31 @@ around the C library [librdata](https://github.com/WizardMac/librdata)
 are not open. Do not use it for critical tasks such as reporting to the authorities. Pyreadstat is not meant to replace
 the original applications in this regard and for that reason writing is not supported.**  
 
+## Table of Contents
+
+* [Motivation](#motivation)
+* [Dependencies](#dependencies)
+* [Installation](#installation)
+  + [Using pip](#using-pip)
+  + [From the latest sources](#from-the-latest-sources)
+  + [Compiling on Windows and Mac](#compiling-on-windows-and-mac)
+* [Usage](#usage)
+  + [Basic Usage](#basic-usage)
+  + [Reading only the headers](#reading-only-the-headers)
+  + [Reading selected columns](#reading-selected-columns)
+  + [Reading value labels](#reading-value-labels)
+  + [Missing Values](#missing-values)
+    - [SPSS](#spss)
+    - [SAS](#sas)
++ [Other options](#other-options)
+* [Roadmap](#roadmap)
+* [Known limitations](#known-limitations)
+* [Python 2.7 support.](#python-27-support)
+* [Change log](#change-log)
+* [License](#license)
+* [Contributing](#contributing)
+* [People](#people)
+
 
 ## Motivation
 
@@ -78,8 +103,10 @@ a new conda or virtual environment or if you don't have it in your base installa
 manually before using pyreadstat. Pandas is not selected as a dependency in the pip package, as that would install 
 pandas with pip and many people would prefer installing it with conda.
 
-In order to compile from source (necessary for linux and mac), you will need a C compiler (see installation). 
+In order to compile from source you will need a C compiler (see installation). 
 Only if you want to do changes to the cython source code, you will need cython (normally not necessary).
+If you want to compile for python 2.7, you will need cython (see python 2.7 support
+later).
 
 Readstat depends on the C library iconv to handle character encodings. On mac, the library is found on the system, but
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
@@ -87,6 +114,7 @@ on mac)
 
 Readstat also depends on zlib; it was reported not to be installed on Lubuntu. If you face this problem intalling the 
 library solves it.
+
 
 ## Installation
 
@@ -104,41 +132,10 @@ If you are running on a machine without admin rights, and you want to install ag
 pip install pyreadstat --user
 ```
 
-Notice that at the moment we offer pre-compiled wheels for windows 64 bit and Python 3.5, 3.6 and 3.7. If not one of 
-these versions, or running on linux or mac, pip will attempt to compile the package. 
-
-### From a pre-compiled python wheel
-
-In this repository, look in the folder dist, we offer wheels for windows. If there is a wheel (.whl file) compatible 
-for your python version and operating system, download it and do:
-
-```
-pip install pyreadstat-0.1.7-cp36-cp36m-win_amd64.whl
-```
-
-the example file pyreadstat-0.1.7-cp36-cp36m-win_amd64.whl can be a different one depending on your python version and system.
-
-cp36-cp36m-win_amd64.whl means (C) Python 3.6 windows 64 bits and it has been tested both on win 7 and win 10 standard
-roche computers, with Anaconda Python installed (it has not been tested with plain python). We also provide wheels for
-python 3.5 and 3.7 on windows.
-
-If there is not a suitable wheel for your system, you have to compile the package from source (distribution).
-
-### From source distribution
-
-From this repository, in the folder dist, download the file pyreadstat-x.x.x.tar.gz where x.x.x is the version and do:
-
-```
-pip install pyreadstat-x.x.x.tar.gz
-```
-
-If you don't have admin privileges on the machine (for example on BEE) do:
-
-```
-pip install pyreadstat-x.x.x.tar.gz --user
-```
-
-You need a working C compiler.
+Notice that at the moment we offer pre-compiled wheels for windows, mac and 
+linux for Python 2.7, 3.5, 3.6 and 3.7. Python 2.7 does not work for
+widows (see later python 2.7 support). If there is no pre-compiled 
+wheel available, pip will attempt to compile the package. 
 
 ### From the latest sources
 
@@ -160,14 +157,14 @@ You can also install from the github repo directly (without cloning). Use the fl
 pip install git+https://github.com/Roche/pyreadstat.git
 ```
 
-You need a working C compiler.
+You need a working C compiler. If working in python 2.7 you will need
+cython version >= 0.28 installed (see later Python 2.7 support). For python 3, cython
+is not necessary, but if installed it will be used.
 
-### Compiling on Windows
+### Compiling on Windows and Mac
 
 Compiling on linux is very easy, but on windows is a bit more challenging. 
 Some instructions are found [here](https://github.com/Roche/pyreadstat/blob/master/windows_compilation.md)
-
-### Compiling on Mac
 
 Compiling on mac is usually easy. Readstat depends however on the C library iconv to handle character encodings; while 
 on linux is part of gclib, on mac it is a separated shared library found on the system (h file is in /usr/include and shared
@@ -181,7 +178,9 @@ conda install libiconv
 and then recompile again (be sure to delete any cache, if using pip do pip --no-cache-dir, if using setup.py remove
 the folder build, otherwise you may be installing the old compilation again).
 
-## Basic Usage
+## Usage
+
+### Basic Usage
 
 Pass the path to a file to any of the functions provided by pyreadstat. It will return a pandas data frame and a metadata
 object. <br>
@@ -231,7 +230,8 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | set_catalog_to_sas  | enrich sas dataframe with catalog formats |
 | set_value_labels    | replace values by their labels |
 
-## Reading only the headers
+
+### Reading only the headers
 
 All functions accept a keyword argument "metadataonly" which by default is False. If True, then no data will be read, 
 but still both the metadata and the dataframe will be returned. The metadata will contain all fields as usual, but
@@ -244,7 +244,7 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', metadataonly=True)
 ```
 
-## Reading selected columns
+### Reading selected columns
 
 All functions accept a keyword "usecols" which should be a list of column names. Only the columns which names match those
 in the list will be imported (case sensitive). This decreases memory consumption and speeds up the process. Usecols must
@@ -257,7 +257,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variab
 
 ```
 
-## Reading value labels
+### Reading value labels
 
 For sas7bdat files, value labels are stored in separated sas7bcat files. You can use them in combination with the sas7bdat
 or read them separately.
@@ -309,7 +309,7 @@ df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=Fals
 df_enriched = pyreadstat.set_value_labels(df, meta, formats_as_category=True)
 ```
 
-## Missing Values
+### Missing Values
 
 There are two types of missing values: system and user defined. System are assigned by the program by default. User defined are 
 valid values that the user decided to give the meaning of missing in order to differentiate between several situations.For
@@ -321,7 +321,7 @@ etc.
 read with pyreadstat**. Notice that the only possible missing value in pandas is NaN (Not a Number) for both string and numeric
 variables, date, datetime and time variables have NaT (Not a Time).
 
-### SPSS 
+#### SPSS 
 
 In the case of SPSS sav files, the user can assign to a numeric variable either up to three discrete missing values or
 one range plus one discrete missing value. As mentioned by default all of these possiblities are translated into NaN, 
@@ -386,7 +386,7 @@ empty strings to nan very easily with pandas.
 
 For SPSS por files, 
 
-# SAS
+#### SAS
 
 In SAS the user can assign values from .A to .Z and ._ as missing values. As in SPSS, those are normally translated to
 NaN. However, using user_missing=True with read_sas7bdat will produce values from A to Z and _. In addition a variable
@@ -402,7 +402,7 @@ Empty strings are still transtaled as empty strings and not as NaN.
 User defined missing values are currently not supported for file types other than sas7bdat, at the moment.
 
 
-## Other options
+### Other options
 
 You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459) 
 
@@ -423,9 +423,10 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
+
 ## Roadmap
 
-* Conda recipe.
+* Improvements in user defined missing values for SAS and STATA.
 
 
 ## Known limitations
@@ -438,19 +439,30 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not handling correctly SAS user defined missing values: not detecting those for files produced on unix/64 bit.
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
+  
 
-In addition: **python 2.7 is not actively supported** If it works, we are happy about that. But if it does not, and the
+## Python 2.7 support.
+
+Python 2.7 is not actively supported. If it works, we are happy about that. But if it does not, and the
 bug is specific for python 2.7 (cannot be reproduced in python 3), the issue is not going to be solved.
 
+At the moment of writing this document Python 2.7 does not work for windows.
+It does work for Mac and Linux. In Mac and Linux, files cannot be opened
+if the path contains international (non-ascii) characters. As mentioned
+before this bug is not going to be repaired (There is not such issue on
+Python 3).
 
-## Changelog
+
+## Change log
 
 A log with the changes for each version can be found [here](https://github.com/Roche/pyreadstat/blob/master/change_log.md)
+
 
 ## License
 
 pyreadstat is distributed under Apache 2.0 license. Readstat is distributed under MIT license. See the License file for
 more information.
+
 
 ## Contributing
 
@@ -470,4 +482,6 @@ pull request to ReadStat first.
 Otto Fajardo - author, maintainer
 
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
+
+[Jonathon Love](https://jona.thon.love/) - contributor
 

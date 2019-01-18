@@ -15,6 +15,7 @@
 # limitations under the License.
 # #############################################################################
 
+from libc.stddef cimport wchar_t
 from readstat_api cimport *
 
 # Definitions of enum types
@@ -111,4 +112,28 @@ cdef list stata_date_formats
 cdef list stata_time_formats 
 cdef list stata_all_formats 
 cdef object stata_origin
-    
+
+# Stuff for opening files on windows in order to handle international characters
+# Courtesy of Jonathon Love
+# works only in python 3
+IF PY_MAJOR_VERSION >2:
+
+    cdef extern from "readstat_io_unistd.h":
+        cdef struct unistd_io_ctx_t "unistd_io_ctx_s":
+            pass
+            
+    cdef extern from "Python.h":
+        wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *)
+            
+    # these ones would make the c file produced by cython not portable between windows and unix
+    # therefore the conditional including of the libraries is handled in C
+    cdef extern from "conditional_includes.h":
+        int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode)
+        int _O_RDONLY
+        int _O_BINARY
+        int _SH_DENYRW  # Denies read and write access to a file.
+        int _SH_DENYWR  # Denies write access to a file.
+        int _SH_DENYRD  # Denies read access to a file.
+        int _SH_DENYNO
+        void assign_fd(void *io_ctx, int fd)
+        long seek_fd(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx)
