@@ -35,13 +35,15 @@ except:
     if PY_MAJOR_VERSION < 3:
         msg = "In order to compile with Python 2.7, please install Cython version > 0.28"
         raise Exception(msg)
+    if '--use-cython' in sys.argv:
+        raise
 
 # To re-compile the pyx sources use the option --use-cython
-#if '--use-cython' in sys.argv:
-#    USE_CYTHON = True
-#    sys.argv.remove('--use-cython')
-#else:
-#    USE_CYTHON = False
+if '--use-cython' in sys.argv:
+    if not USE_CYTHON:
+        raise Exception("--use-cython failed to set cython to be used!")
+    sys.argv.remove('--use-cython')
+
 ext = '.pyx' if USE_CYTHON else '.c'
 
 
@@ -125,7 +127,7 @@ short_description = "Reads SAS, SPSS and Stata files into pandas data frames."
 
 setup(
     name='pyreadstat',
-    version='0.2.2',
+    version='0.2.3',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

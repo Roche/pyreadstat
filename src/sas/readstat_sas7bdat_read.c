@@ -408,6 +408,18 @@ static readstat_error_t sas7bdat_handle_data_value(readstat_variable_t *variable
         if (isnan(dval)) {
             value.v.double_value = NAN;
             value.tag = ~((val >> 40) & 0xFF);
+            /* We accommodate two tag schemes. In the first, the tag is an ASCII
+             * code given by value.tag above. System missing is represented by
+             * an ASCII period. In the second scheme, (value.tag-2) is an
+             * offset from 'A', except when value.tag == 0, in which case it
+             * represents an underscore, or value.tag == 1, in which case it
+             * represents system-missing.
+             */
+            if (value.tag == 0) {
+                value.tag = '_';
+            } else if (value.tag >= 2 && value.tag < 28) {
+                value.tag = 'A' + (value.tag - 2);
+            }
             if (sas_validate_tag(value.tag) == READSTAT_OK) {
                 value.is_tagged_missing = 1;
             } else {

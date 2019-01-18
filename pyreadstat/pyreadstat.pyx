@@ -63,8 +63,7 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
         user_missing : bool, optional
             by default False, in this case user defined missing values are delivered as nan. If true, the missing values
             will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
-            to be able to interpret those values as missing. At the time of writing this, it does not work for all files
-            (maybe only for those produced on windows, but not on unix)
+            to be able to interpret those values as missing.
 
     Returns
     -------
@@ -146,7 +145,7 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
 
 
 def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None):
+             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False):
     r"""
     Read a STATA dta file
 
@@ -170,6 +169,10 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        user_missing : bool, optional
+            by default False, in this case user defined missing values are delivered as nan. If true, the missing values
+            will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
+            to be able to interpret those values as missing.
 
     Returns
     -------
@@ -188,6 +191,8 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         dates_as_pandas = 1
 
     cdef bint usernan = 0
+    if user_missing:
+        usernan = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly,
