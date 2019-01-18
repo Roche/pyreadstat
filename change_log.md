@@ -1,4 +1,4 @@
-# 0.2.2 (github 18.01.2018)
+# 0.2.2 (github 18.01.2019)
 * Implemented support for reading international characters in files.
 
 # 0.2.1 (github 18.12.2018, release tag)
