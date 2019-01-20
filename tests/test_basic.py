@@ -37,6 +37,8 @@ class TestBasic(unittest.TestCase):
         self.basic_data_folder = os.path.join(self.data_folder, "basic")
         self.catalog_data_folder = os.path.join(self.data_folder, "sas_catalog")
         self.international_data_folder = os.path.join(self.data_folder, "ínternátionál")
+        self.missing_data_folder = os.path.join(self.data_folder, "missing_data")
+
 
         # basic
         pandas_csv = os.path.join(self.basic_data_folder, "sample.csv")
@@ -338,7 +340,48 @@ class TestBasic(unittest.TestCase):
         sas_file = os.path.join(self.basic_data_folder, "dates.sas7bdat")
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file, dates_as_pandas_datetime=True)
         self.assertTrue(df_sas.equals(self.df_sas_dates_as_pandas))
-
+        
+    def test_sas_user_missing(self):
+        sas_file = os.path.join(self.missing_data_folder, "missing_test.sas7bdat")
+        cat_file = os.path.join(self.missing_data_folder, "missing_formats.sas7bcat")
+        unformatted_csv = os.path.join(self.missing_data_folder, "missing_unformatted.csv")
+        formatted_csv = os.path.join(self.missing_data_folder, "missing_sas_formatted.csv")
+        labeled_csv = os.path.join(self.missing_data_folder, "missing_sas_labeled.csv")
+        
+        df_sas, meta = pyreadstat.read_sas7bdat(sas_file)
+        df_csv = pd.read_csv(unformatted_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+        df_sas, meta = pyreadstat.read_sas7bdat(sas_file, user_missing=True)
+        df_csv = pd.read_csv(formatted_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+        df_sas, meta = pyreadstat.read_sas7bdat(sas_file,
+                            catalog_file=cat_file, user_missing=True,
+                            formats_as_category=False)
+        df_csv = pd.read_csv(labeled_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+    def test_dta_user_missing(self):
+        dta_file = os.path.join(self.missing_data_folder, "missing_test.dta")
+        unformatted_csv = os.path.join(self.missing_data_folder, "missing_unformatted.csv")
+        formatted_csv = os.path.join(self.missing_data_folder, "missing_dta_formatted.csv")
+        labeled_csv = os.path.join(self.missing_data_folder, "missing_dta_labeled.csv")
+        
+        df_sas, meta = pyreadstat.read_dta(dta_file)
+        df_csv = pd.read_csv(unformatted_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+        df_sas, meta = pyreadstat.read_dta(dta_file, user_missing=True)
+        df_csv = pd.read_csv(formatted_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+        df_sas, meta = pyreadstat.read_dta(dta_file,
+                            apply_value_formats=True, user_missing=True,
+                            formats_as_category=False)
+        df_csv = pd.read_csv(labeled_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
 
 if __name__ == '__main__':
 

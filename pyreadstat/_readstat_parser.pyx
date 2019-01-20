@@ -550,20 +550,14 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             dc.col_data[index][obs_index] = pyvalue
         elif readstat_value_is_tagged_missing(value):
             # SAS and Stata missing values
-            # In the case of SAS datasets sometimes it returns a number that translated to
-            # charater gives correctly the missing value (A, B, etc). But sometimes
-            # the numbers do not correlate to the missing character seen, for example,
-            # A gets translated to 2, B to 3 etc, while the true missing value . gets 1
-            # maybe it is something dependent on the version or operating system (windows vs linux generated files?)
-            # As for now usernan is disabled for stata, as I have not been able to test it, enabled for SAS.
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
-            if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
-                dc.col_data[index][obs_index] =  chr(missing_tag)
-                dc.missing_user_values.add(chr(missing_tag))
-            else:
-                msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
-                raise PyreadstatError(msg)
+            #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
+            dc.col_data[index][obs_index] =  chr(missing_tag)
+            dc.missing_user_values.add(chr(missing_tag))
+            #else:
+                #msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
+                #raise PyreadstatError(msg)
 
     else:
         pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -601,49 +595,57 @@ cdef int handle_value_label(char *val_labels, readstat_value_t value, char *labe
 
     cdef readstat_type_t value_type
     value_type = readstat_value_type(value)
-
-    if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:
-        c_str_value = readstat_string_value(value)
-        py_str_value = <str> c_str_value
-        pyformat = VAR_FORMAT_STRING
-    elif value_type == READSTAT_TYPE_INT8:
-        c_int8_value = readstat_int8_value(value)
-        py_long_value = <long> c_int8_value
-        pyformat = VAR_FORMAT_LONG
-    elif value_type == READSTAT_TYPE_INT16:
-        c_int16_value = readstat_int16_value(value)
-        py_long_value = <long> c_int16_value
-        pyformat = VAR_FORMAT_LONG
-    elif value_type == READSTAT_TYPE_INT32:
-        c_int32_value = readstat_int32_value(value)
-        py_long_value = <long> c_int32_value
-        pyformat = VAR_FORMAT_LONG
-    elif value_type == READSTAT_TYPE_FLOAT:
-        c_float_value = readstat_float_value(value)
-        py_float_value = <double> c_float_value
-        pyformat = VAR_FORMAT_FLOAT
-    elif value_type == READSTAT_TYPE_DOUBLE:
-        c_double_value = readstat_double_value(value);
-        py_float_value = <double> c_double_value
-        pyformat = VAR_FORMAT_FLOAT
-    else:
-        raise PyreadstatError("Unkown data type")
-
+    
     labels_raw = dc.labels_raw
     cur_dict = labels_raw.get(var_label)
     if not cur_dict:
         cur_dict = dict()
-
-    if pyformat == VAR_FORMAT_STRING:
-        cur_dict[py_str_value] = value_label_name
-    elif pyformat == VAR_FORMAT_LONG:
-        cur_dict[py_long_value] = value_label_name
-    elif pyformat == VAR_FORMAT_FLOAT:
-        cur_dict[py_float_value] = value_label_name
-    elif pyformat == VAR_FORMAT_MISSING:
-        pass
+    
+    if readstat_value_is_tagged_missing(value):
+        # SAS and Stata missing values
+        missing_tag = <int> readstat_value_tag(value)
+        # In SAS missing values are A to Z or _ in stata a to z
+        cur_dict[chr(missing_tag)] = value_label_name
     else:
-        raise PyreadstatError("Failed convert C to python value")
+
+        if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:
+            c_str_value = readstat_string_value(value)
+            py_str_value = <str> c_str_value
+            pyformat = VAR_FORMAT_STRING
+        elif value_type == READSTAT_TYPE_INT8:
+            c_int8_value = readstat_int8_value(value)
+            py_long_value = <long> c_int8_value
+            pyformat = VAR_FORMAT_LONG
+        elif value_type == READSTAT_TYPE_INT16:
+            c_int16_value = readstat_int16_value(value)
+            py_long_value = <long> c_int16_value
+            pyformat = VAR_FORMAT_LONG
+        elif value_type == READSTAT_TYPE_INT32:
+            c_int32_value = readstat_int32_value(value)
+            py_long_value = <long> c_int32_value
+            pyformat = VAR_FORMAT_LONG
+        elif value_type == READSTAT_TYPE_FLOAT:
+            c_float_value = readstat_float_value(value)
+            py_float_value = <double> c_float_value
+            pyformat = VAR_FORMAT_FLOAT
+        elif value_type == READSTAT_TYPE_DOUBLE:
+            c_double_value = readstat_double_value(value);
+            py_float_value = <double> c_double_value
+            pyformat = VAR_FORMAT_FLOAT
+        else:
+            raise PyreadstatError("Unkown data type")
+
+
+        if pyformat == VAR_FORMAT_STRING:
+            cur_dict[py_str_value] = value_label_name
+        elif pyformat == VAR_FORMAT_LONG:
+            cur_dict[py_long_value] = value_label_name
+        elif pyformat == VAR_FORMAT_FLOAT:
+            cur_dict[py_float_value] = value_label_name
+        elif pyformat == VAR_FORMAT_MISSING:
+            pass
+        else:
+            raise PyreadstatError("Failed convert C to python value")
 
     dc.labels_raw[var_label] = cur_dict
 

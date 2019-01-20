@@ -386,20 +386,24 @@ empty strings to nan very easily with pandas.
 
 For SPSS por files, 
 
-#### SAS
+#### SAS and STATA
 
-In SAS the user can assign values from .A to .Z and ._ as missing values. As in SPSS, those are normally translated to
-NaN. However, using user_missing=True with read_sas7bdat will produce values from A to Z and _. In addition a variable
+In SAS the user can assign values from .A to .Z and ._ as missing values. In Stata values from
+.a to .z. As in SPSS, those are normally translated to
+NaN. However, using user_missing=True with read_sas7bdat or read_dta
+will produce values from A to Z and _ for SAS and a to z for dta. In addition a variable
 missing_user_values will appear in the metadata object, being a list with those values that are user defined missing
 values.
  
-At the moment of writing these lines, this is not working for all sas7bdat files: it seems to be working for
-files produced on windows/32 bit but not for files produced on unix/64 bit, where even files without user defined missing values will throw
-errors. 
+The user may also assign a label to user defined missing values. In such 
+case passing the corresponding sas7bcat file to read_sas7bdat or using 
+the option apply_value_formats to read_dta will show those labels instead
+of the user defined missing value. 
 
 Empty strings are still transtaled as empty strings and not as NaN.
 
-User defined missing values are currently not supported for file types other than sas7bdat, at the moment.
+User defined missing values are currently not supported for file types other than sas7bdat,
+sas7bcat and dta at the moment.
 
 
 ### Other options
