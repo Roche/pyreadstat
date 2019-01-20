@@ -104,13 +104,7 @@ static readstat_error_t sas7bcat_parse_value_labels(const char *value_start, siz
             uint64_t val = sas_read8(&lbp1[22], bswap_doubles);
             double dval = NAN;
             if ((val | 0xFF0000000000) == 0xFFFFFFFFFFFF) {
-                value.tag = (val >> 40);
-                if (sas_validate_tag(value.tag) == READSTAT_OK) {
-                    value.is_tagged_missing = 1;
-                } else {
-                    value.tag = 0;
-                    value.is_system_missing = 1;
-                }
+                sas_assign_tag(&value, (val >> 40));
             } else {
                 memcpy(&dval, &val, 8);
                 dval *= -1.0;

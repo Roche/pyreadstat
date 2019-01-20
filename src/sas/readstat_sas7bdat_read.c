@@ -407,25 +407,7 @@ static readstat_error_t sas7bdat_handle_data_value(readstat_variable_t *variable
 
         if (isnan(dval)) {
             value.v.double_value = NAN;
-            value.tag = ~((val >> 40) & 0xFF);
-            /* We accommodate two tag schemes. In the first, the tag is an ASCII
-             * code given by value.tag above. System missing is represented by
-             * an ASCII period. In the second scheme, (value.tag-2) is an
-             * offset from 'A', except when value.tag == 0, in which case it
-             * represents an underscore, or value.tag == 1, in which case it
-             * represents system-missing.
-             */
-            if (value.tag == 0) {
-                value.tag = '_';
-            } else if (value.tag >= 2 && value.tag < 28) {
-                value.tag = 'A' + (value.tag - 2);
-            }
-            if (sas_validate_tag(value.tag) == READSTAT_OK) {
-                value.is_tagged_missing = 1;
-            } else {
-                value.tag = 0;
-                value.is_system_missing = 1;
-            }
+            sas_assign_tag(&value, ~((val >> 40) & 0xFF));
         } else {
             value.v.double_value = dval;
         }
@@ -617,8 +599,10 @@ static readstat_error_t sas7bdat_submit_columns(sas7bdat_ctx_t *ctx, int compres
             goto cleanup;
         }
     }
-    ctx->variables = readstat_calloc(ctx->column_count, sizeof(readstat_variable_t *));
-    if (ctx->variables == NULL) {
+    if (ctx->column_count == 0)
+        goto cleanup;
+
+    if ((ctx->variables = readstat_calloc(ctx->column_count, sizeof(readstat_variable_t *))) == NULL) {
         retval = READSTAT_ERROR_MALLOC;
         goto cleanup;
     }
