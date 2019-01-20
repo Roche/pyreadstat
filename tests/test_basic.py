@@ -382,6 +382,29 @@ class TestBasic(unittest.TestCase):
         df_csv = pd.read_csv(labeled_csv)
         self.assertTrue(df_sas.equals(df_csv))
         
+    def test_sav_user_missing(self):
+        sav_file = os.path.join(self.missing_data_folder, "missing_test.sav")
+        unformatted_csv = os.path.join(self.missing_data_folder, "missing_sav_unformatted.csv")
+        formatted_csv = os.path.join(self.missing_data_folder, "missing_sav_formatted.csv")
+        labeled_csv = os.path.join(self.missing_data_folder, "missing_sav_labeled.csv")
+        
+        df_sas, meta = pyreadstat.read_sav(sav_file)
+        df_csv = pd.read_csv(unformatted_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+        df_sas, meta = pyreadstat.read_sav(sav_file, user_missing=True)
+        df_csv = pd.read_csv(formatted_csv)
+        self.assertTrue(df_sas.equals(df_csv))
+        
+        df_sas, meta = pyreadstat.read_sav(sav_file,
+                            apply_value_formats=True, user_missing=True,
+                            formats_as_category=False)
+        df_sas['var1'] = df_sas['var1'].astype(str)
+        df_csv = pd.read_csv(labeled_csv)
+        print(type(df_sas['var1'][1]))
+        print(type(df_csv['var1'][1]))
+        self.assertTrue(df_sas.equals(df_csv))
+        
 
 if __name__ == '__main__':
 
