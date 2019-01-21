@@ -1,3 +1,10 @@
+# 0.2.3 
+* User defined values fixed for sas7bdat, implemented for sas7bcat and dta.
+* Readstat sources updated.
+
+# 0.2.2 (github 18.01.2019)
+* Implemented support for reading international characters in files.
+
 # 0.2.1 (github 18.12.2018, release tag)
 * Implemented user defined missing values for read_sas7bdat. Currently not working for 64 bit files.
 * Corrected datetime transformations for stata dta files, sample.dta updated

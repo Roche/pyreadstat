@@ -216,6 +216,9 @@ for their formatted version will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
+<li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
+will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
+to be able to interpret those values as missing.</li>
 </ul>
 </td>
 </tr>
@@ -322,8 +325,7 @@ iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 <li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
 will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
-to be able to interpret those values as missing. At the time of writing this, it does not work for all files
-(maybe only for those produced on windows, but not on unix)</li>
+to be able to interpret those values as missing.</li>
 </ul>
 </td>
 </tr>
