@@ -850,7 +850,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.original_variable_types = original_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
-    metadata.missing_user_values = list(data.missing_user_values)
+    metadata.missing_user_values = sorted(list(data.missing_user_values))
     metadata.variable_storage_width = data.variable_storage_width
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment

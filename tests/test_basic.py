@@ -355,6 +355,7 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file, user_missing=True)
         df_csv = pd.read_csv(formatted_csv)
         self.assertTrue(df_sas.equals(df_csv))
+        self.assertTrue(meta.missing_user_values == ['A', 'B', 'C', 'X', 'Y', 'Z', '_'])
         
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file,
                             catalog_file=cat_file, user_missing=True,
@@ -375,6 +376,7 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_dta(dta_file, user_missing=True)
         df_csv = pd.read_csv(formatted_csv)
         self.assertTrue(df_sas.equals(df_csv))
+        self.assertTrue(meta.missing_user_values == ['a', 'b', 'c', 'x', 'y', 'z'])
         
         df_sas, meta = pyreadstat.read_dta(dta_file,
                             apply_value_formats=True, user_missing=True,
