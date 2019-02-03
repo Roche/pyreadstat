@@ -419,6 +419,10 @@ df, meta = pyreadstat.read_dta("/path/to/file.dta", user_missing=True, apply_val
 
 Empty strings are still transtaled as empty strings and not as NaN.
 
+
+The information about what values are user missing is stored in the meta object, in the variable missing_user_values.
+This is a list listing all user defined missing values.
+
 User defined missing values are currently not supported for file types other than sas7bdat,
 sas7bcat and dta.
 
