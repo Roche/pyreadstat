@@ -415,3 +415,24 @@ readstat_error_t sas_validate_tag(char tag) {
 
     return READSTAT_ERROR_TAGGED_VALUE_IS_OUT_OF_RANGE;
 }
+
+void sas_assign_tag(readstat_value_t *value, uint8_t tag) {
+    /* We accommodate two tag schemes. In the first, the tag is an ASCII code
+     * given by uint8_t tag above. System missing is represented by an ASCII
+     * period. In the second scheme, (tag-2) is an offset from 'A', except when
+     * tag == 0, in which case it represents an underscore, or tag == 1, in
+     * which case it represents system-missing.
+     */
+    if (tag == 0) {
+        tag = '_';
+    } else if (tag >= 2 && tag < 28) {
+        tag = 'A' + (tag - 2);
+    }
+    if (sas_validate_tag(tag) == READSTAT_OK) {
+        value->tag = tag;
+        value->is_tagged_missing = 1;
+    } else {
+        value->tag = 0;
+        value->is_system_missing = 1;
+    }
+}

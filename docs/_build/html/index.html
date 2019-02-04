@@ -181,10 +181,9 @@ keys, ‘lo’ and ‘hi’ being the lower boundary and higher boundary for the
 lo and hi are the same, the two elements will always be present. This appears for SPSS (sav) files when using the
 option user_missing=True: user defined missing values appear not as nan but as their true value and this dictionary
 stores the information about which values are to be considered missing.</li>
-<li>missing_user_values: a list of character values (A to Z) representing user defined missing values in SAS and STATA.
-This appears when using user_missing=True in read_sas7bdat (not enabled for other file types at the moment). It does
-not always work: it seems that files written in windows are fine, while files written on unix throw errors, even if
-they do not have user defined missing values.</li>
+<li>missing_user_values: a list of character values (A to Z and _ for SAS, a to z for SATA) representing user defined
+missing values in SAS and STATA.
+This appears when using user_missing=True in read_sas7bdat or read_dta if user defined missing values are present.</li>
 <li>variable_alignment: a dict with keys being variable names and values being the display alignment: left, center, right or unknown</li>
 <li>variable_storage_width: a dict with keys being variable names and values being the storage width</li>
 <li>variable_display_width: a dict with keys being variable names and values being the display width</li>
@@ -216,6 +215,9 @@ for their formatted version will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
+<li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
+will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
+to be able to interpret those values as missing.</li>
 </ul>
 </td>
 </tr>
@@ -322,8 +324,7 @@ iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 <li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
 will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
-to be able to interpret those values as missing. At the time of writing this, it does not work for all files
-(maybe only for those produced on windows, but not on unix)</li>
+to be able to interpret those values as missing.</li>
 </ul>
 </td>
 </tr>

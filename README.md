@@ -38,7 +38,7 @@ the original applications in this regard and for that reason writing is not supp
   + [Reading value labels](#reading-value-labels)
   + [Missing Values](#missing-values)
     - [SPSS](#spss)
-    - [SAS](#sas)
+    - [SAS and STATA](#sas-and-stata)
 + [Other options](#other-options)
 * [Roadmap](#roadmap)
 * [Known limitations](#known-limitations)
@@ -386,20 +386,45 @@ empty strings to nan very easily with pandas.
 
 For SPSS por files, 
 
-#### SAS
+#### SAS and STATA
 
-In SAS the user can assign values from .A to .Z and ._ as missing values. As in SPSS, those are normally translated to
-NaN. However, using user_missing=True with read_sas7bdat will produce values from A to Z and _. In addition a variable
+In SAS the user can assign values from .A to .Z and ._ as user defined missing values. In Stata values from
+.a to .z. As in SPSS, those are normally translated to
+NaN. However, using user_missing=True with read_sas7bdat or read_dta
+will produce values from A to Z and _ for SAS and a to z for dta. In addition a variable
 missing_user_values will appear in the metadata object, being a list with those values that are user defined missing
 values.
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat("/path/to/file.sas7bdat", user_missing=True)
+
+df, meta = pyreadstat.read_dta("/path/to/file.dta", user_missing=True)
+```
  
-At the moment of writing these lines, this is not working for all sas7bdat files: it seems to be working for
-files produced on windows/32 bit but not for files produced on unix/64 bit, where even files without user defined missing values will throw
-errors. 
+The user may also assign a label to user defined missing values. In such 
+case passing the corresponding sas7bcat file to read_sas7bdat or using 
+the option apply_value_formats to read_dta will show those labels instead
+of the user defined missing value. 
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat("/path/to/file.sas7bdat", catalog_file="/path/to/file.sas7bcat", user_missing=True)
+
+df, meta = pyreadstat.read_dta("/path/to/file.dta", user_missing=True, apply_value_formats=True)
+
+```
 
 Empty strings are still transtaled as empty strings and not as NaN.
 
-User defined missing values are currently not supported for file types other than sas7bdat, at the moment.
+
+The information about what values are user missing is stored in the meta object, in the variable missing_user_values.
+This is a list listing all user defined missing values.
+
+User defined missing values are currently not supported for file types other than sas7bdat,
+sas7bcat and dta.
 
 
 ### Other options
@@ -426,7 +451,6 @@ For more information, please check the [Module documentation](https://ofajardo.g
 
 ## Roadmap
 
-* Improvements in user defined missing values for SAS and STATA.
 
 
 ## Known limitations
@@ -436,7 +460,6 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not able to read SAS compressed files. 
 * Not able to skip rows.
 * Not handling SPSS user defined missing values for character variables (numeric are fine).
-* Not handling correctly SAS user defined missing values: not detecting those for files produced on unix/64 bit.
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
   

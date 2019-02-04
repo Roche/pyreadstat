@@ -366,8 +366,7 @@ static readstat_error_t sav_read_variable_record(sav_ctx_t *ctx) {
     
 cleanup:
     if (retval != READSTAT_OK) {
-        if (info)
-            free(info);
+        spss_varinfo_free(info);
     }
 
     return retval;
