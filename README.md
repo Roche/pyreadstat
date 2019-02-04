@@ -29,6 +29,7 @@ the original applications in this regard and for that reason writing is not supp
 * [Dependencies](#dependencies)
 * [Installation](#installation)
   + [Using pip](#using-pip)
+  + [Using conda](#using-conda)
   + [From the latest sources](#from-the-latest-sources)
   + [Compiling on Windows and Mac](#compiling-on-windows-and-mac)
 * [Usage](#usage)
@@ -134,8 +135,18 @@ pip install pyreadstat --user
 
 Notice that at the moment we offer pre-compiled wheels for windows, mac and 
 linux for Python 2.7, 3.5, 3.6 and 3.7. Python 2.7 does not work for
-widows (see later python 2.7 support). If there is no pre-compiled 
+windows (see later python 2.7 support). If there is no pre-compiled 
 wheel available, pip will attempt to compile the package. 
+
+### Using conda
+
+The package is also available in [conda-forge](https://anaconda.org/conda-forge/pyreadstat) for windows, mac and linux 64 bit, python 3.6 and 3.7. only.
+
+In order to install:
+
+```
+conda install -c conda-forge pyreadstat 
+```
 
 ### From the latest sources
 
@@ -426,7 +437,6 @@ This is a list listing all user defined missing values.
 User defined missing values are currently not supported for file types other than sas7bdat,
 sas7bcat and dta.
 
-
 ### Other options
 
 You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459) 
@@ -451,7 +461,7 @@ For more information, please check the [Module documentation](https://ofajardo.g
 
 ## Roadmap
 
-
+* Include latest changes from Readstat when ready (string missing values, release tag). Once this is done the new version will be released here, on pypi and conda-forge.
 
 ## Known limitations
 
