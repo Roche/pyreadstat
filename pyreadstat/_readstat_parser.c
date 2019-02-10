@@ -7876,6 +7876,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   PyObject *__pyx_t_7 = NULL;
   PyObject *__pyx_t_8 = NULL;
   PyObject *(*__pyx_t_9)(PyObject *);
+  int __pyx_t_10;
   __Pyx_RefNannySetupContext("data_container_extract_metadata", 0);
 
   /* "pyreadstat/_readstat_parser.pyx":812
@@ -8459,7 +8460,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *     metadata.original_variable_types = original_types
  *     metadata.table_name = data.table_name             # <<<<<<<<<<<<<<
  *     metadata.missing_ranges = data.missing_ranges
- *     metadata.missing_user_values = list(data.missing_user_values)
+ *     metadata.missing_user_values = sorted(list(data.missing_user_values))
  */
   __pyx_t_3 = __pyx_v_data->table_name;
   __Pyx_INCREF(__pyx_t_3);
@@ -8470,7 +8471,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *     metadata.original_variable_types = original_types
  *     metadata.table_name = data.table_name
  *     metadata.missing_ranges = data.missing_ranges             # <<<<<<<<<<<<<<
- *     metadata.missing_user_values = list(data.missing_user_values)
+ *     metadata.missing_user_values = sorted(list(data.missing_user_values))
  *     metadata.variable_storage_width = data.variable_storage_width
  */
   __pyx_t_3 = __pyx_v_data->missing_ranges;
@@ -8481,18 +8482,24 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   /* "pyreadstat/_readstat_parser.pyx":853
  *     metadata.table_name = data.table_name
  *     metadata.missing_ranges = data.missing_ranges
- *     metadata.missing_user_values = list(data.missing_user_values)             # <<<<<<<<<<<<<<
+ *     metadata.missing_user_values = sorted(list(data.missing_user_values))             # <<<<<<<<<<<<<<
  *     metadata.variable_storage_width = data.variable_storage_width
  *     metadata.variable_display_width = data.variable_display_width
  */
-  __pyx_t_3 = PySequence_List(__pyx_v_data->missing_user_values); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 853, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = PySequence_List(__pyx_v_data->missing_user_values); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 853, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_7 = PySequence_List(__pyx_t_2); if (unlikely(!__pyx_t_7)) __PYX_ERR(1, 853, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_7);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_3 = ((PyObject*)__pyx_t_7);
+  __pyx_t_7 = 0;
+  __pyx_t_10 = PyList_Sort(__pyx_t_3); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(1, 853, __pyx_L1_error)
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_n_s_missing_user_values, __pyx_t_3) < 0) __PYX_ERR(1, 853, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "pyreadstat/_readstat_parser.pyx":854
  *     metadata.missing_ranges = data.missing_ranges
- *     metadata.missing_user_values = list(data.missing_user_values)
+ *     metadata.missing_user_values = sorted(list(data.missing_user_values))
  *     metadata.variable_storage_width = data.variable_storage_width             # <<<<<<<<<<<<<<
  *     metadata.variable_display_width = data.variable_display_width
  *     metadata.variable_alignment = data.variable_alignment
@@ -8503,7 +8510,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "pyreadstat/_readstat_parser.pyx":855
- *     metadata.missing_user_values = list(data.missing_user_values)
+ *     metadata.missing_user_values = sorted(list(data.missing_user_values))
  *     metadata.variable_storage_width = data.variable_storage_width
  *     metadata.variable_display_width = data.variable_display_width             # <<<<<<<<<<<<<<
  *     metadata.variable_alignment = data.variable_alignment
