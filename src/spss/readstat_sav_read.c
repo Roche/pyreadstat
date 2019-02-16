@@ -1174,6 +1174,11 @@ static readstat_error_t sav_parse_long_string_missing_values_record(const void *
         if (retval != READSTAT_OK)
             goto cleanup;
 
+        if (data_ptr == data_end) {
+            retval = READSTAT_ERROR_PARSE;
+            goto cleanup;
+        }
+
         char n_missing_values = *data_ptr++;
         if (n_missing_values < 1 || n_missing_values > 3) {
             retval = READSTAT_ERROR_PARSE;
