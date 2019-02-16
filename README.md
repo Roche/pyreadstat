@@ -394,7 +394,8 @@ SPSS sav files also support up to 3 discrete user defined missing values for non
 Pyreadstat is able to read those and the behavior is the same as for discrete
 numerical user defined missing values. That means those values will be 
 translated as NaN by default and to the correspoding string value if 
-user_missing is set to True. 
+user_missing is set to True. meta.missing_ranges will show the string
+value as well. 
 
 If the value in
 a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string. This
