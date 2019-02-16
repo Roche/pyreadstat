@@ -406,6 +406,16 @@ class TestBasic(unittest.TestCase):
         df_csv = pd.read_csv(labeled_csv)
         self.assertTrue(df_sas.equals(df_csv))
         
+    def test_sav_missing_char(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"))
+        mdf = pd.DataFrame([[np.nan], ["a"]], columns=["mychar"])
+        self.assertTrue(df.equals(mdf))
+        self.assertTrue(meta.missing_ranges == {})
+        df2, meta2 = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), user_missing=True)
+        mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
+        self.assertTrue(df2.equals(mdf2))
+        self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
+        
 
 if __name__ == '__main__':
 
