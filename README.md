@@ -516,5 +516,7 @@ Otto Fajardo - author, maintainer
 
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
 
-[Jonathon Love](https://jona.thon.love/) - contributor
+[Jonathon Love](https://jona.thon.love/) - contributor: open files with international characters.
+
+[benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888): improvements to documentation
 
