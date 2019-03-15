@@ -209,7 +209,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat')
 
 # done! let's see what we got
 print(df.head())
-print(meta.colum_names)
+print(meta.column_names)
 print(meta.column_labels)
 print(meta.number_rows)
 print(meta.number_columns)
