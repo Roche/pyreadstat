@@ -518,5 +518,5 @@ pull request to ReadStat first.
 
 [Jonathon Love](https://jona.thon.love/) - contributor: open files with international characters.
 
-[benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888): improvements to documentation
+[benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888), [drcjar](https://github.com/drcjar): improvements to documentation
 
