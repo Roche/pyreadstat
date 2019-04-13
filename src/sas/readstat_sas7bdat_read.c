@@ -379,8 +379,8 @@ static readstat_error_t sas7bdat_handle_data_value(readstat_variable_t *variable
         if (retval != READSTAT_OK) {
             if (ctx->handle.error) {
                 snprintf(ctx->error_buf, sizeof(ctx->error_buf),
-                        "ReadStat: Error converting string to specified encoding: %.*s",
-                        col_info->width, col_data);
+                        "ReadStat: Error converting string (row=%u, col=%u) to specified encoding: %.*s",
+                        ctx->parsed_row_count+1, col_info->index+1, col_info->width, col_data);
                 ctx->handle.error(ctx->error_buf, ctx->user_ctx);
             }
             goto cleanup;
