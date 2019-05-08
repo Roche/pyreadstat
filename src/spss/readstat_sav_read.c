@@ -845,6 +845,10 @@ static readstat_error_t sav_read_compressed_data(sav_ctx_t *ctx,
     }
 
     while (1) {
+        retval = sav_update_progress(ctx);
+        if (retval != READSTAT_OK)
+            goto done;
+
         buffer_used = io->read(buffer, sizeof(buffer), io->io_ctx);
         if (buffer_used == -1 || buffer_used == 0 || (buffer_used % 8) != 0)
             goto done;
@@ -1189,12 +1193,33 @@ static readstat_error_t sav_parse_long_string_missing_values_record(const void *
             spss_varinfo_t *info = ctx->varinfo[i];
             if (strcmp(var_name_buf, info->longname) == 0) {
                 info->n_missing_values = n_missing_values;
+
+                uint32_t var_name_len = 0;
+
+                if (data_ptr + sizeof(uint32_t) > data_end) {
+                    retval = READSTAT_ERROR_PARSE;
+                    goto cleanup;
+                }
+
+                memcpy(&var_name_len, data_ptr, sizeof(uint32_t));
+                if (ctx->bswap)
+                    var_name_len = byteswap4(var_name_len);
+
+                data_ptr += sizeof(uint32_t);
+
                 for (j=0; j<n_missing_values; j++) {
-                    retval = sav_read_pascal_string(info->missing_string_values[j],
+                    if (data_ptr + var_name_len > data_end) {
+                        retval = READSTAT_ERROR_PARSE;
+                        goto cleanup;
+                    }
+
+                    retval = readstat_convert(info->missing_string_values[j],
                             sizeof(info->missing_string_values[0]),
-                            &data_ptr, data_end - data_ptr, ctx);
+                            data_ptr, var_name_len, ctx->converter);
                     if (retval != READSTAT_OK)
                         goto cleanup;
+
+                    data_ptr += var_name_len;
                 }
                 break;
             }

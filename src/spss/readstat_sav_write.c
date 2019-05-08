@@ -1047,7 +1047,7 @@ static readstat_error_t sav_emit_long_string_missing_values_record(readstat_writ
             info_header.count += name_len;
             info_header.count += sizeof(int8_t); // # missing values
 
-            info_header.count += n_missing_values * (sizeof(int32_t) + 8); // value length
+            info_header.count += sizeof(int32_t) + 8 * n_missing_values; // value length
         }
     }
 
@@ -1091,18 +1091,18 @@ static readstat_error_t sav_emit_long_string_missing_values_record(readstat_writ
         if (retval != READSTAT_OK)
             goto cleanup;
 
+        uint32_t value_len = 8;
+        retval = readstat_write_bytes(writer, &value_len, sizeof(int32_t));
+        if (retval != READSTAT_OK)
+            goto cleanup;
+
         for (j=0; j<readstat_variable_get_missing_ranges_count(r_variable); j++) {
             readstat_value_t lo = readstat_variable_get_missing_range_lo(r_variable, j);
             readstat_value_t hi = readstat_variable_get_missing_range_hi(r_variable, j);
             const char *lo_string = readstat_string_value(lo);
             const char *hi_string = readstat_string_value(hi);
-            uint32_t value_len = 8;
 
             if (lo_string && hi_string && strcmp(lo_string, hi_string) == 0) {
-                retval = readstat_write_bytes(writer, &value_len, sizeof(int32_t));
-                if (retval != READSTAT_OK)
-                    goto cleanup;
-
                 retval = readstat_write_space_padded_string(writer, lo_string, value_len);
                 if (retval != READSTAT_OK)
                     goto cleanup;
