@@ -4,72 +4,73 @@
 {
     "distutils": {
         "depends": [
-            "pyreadstat/conditional_includes.h",
-            "src/readstat.h",
-            "src/readstat_io_unistd.h"
-        ],
+            "pyreadstat\\conditional_includes.h", 
+            "src\\readstat.h", 
+            "src\\readstat_io_unistd.h"
+        ], 
         "extra_compile_args": [
-            "-Ireadstat",
+            "-Ireadstat", 
             "-DHAVE_ZLIB=1"
-        ],
+        ], 
         "include_dirs": [
-            "./pyreadstat",
-            "src",
-            "src/stata",
-            "src/sas",
-            "src/spss",
-            "pyreadstat",
+            ".\\pyreadstat", 
+            "src", 
+            "src\\sas", 
+            "src\\spss", 
+            "src\\stata", 
+            "pyreadstat", 
             "."
-        ],
+        ], 
         "libraries": [
-            "m",
-            "z"
-        ],
-        "name": "pyreadstat.pyreadstat",
+            "m", 
+            "z", 
+            "iconv"
+        ], 
+        "name": "pyreadstat.pyreadstat", 
         "sources": [
-            "pyreadstat/pyreadstat.pyx",
-            "./src/readstat_error.c",
-            "./src/CKHashTable.c",
-            "./src/readstat_parser.c",
-            "./src/readstat_malloc.c",
-            "./src/readstat_value.c",
-            "./src/readstat_variable.c",
-            "./src/readstat_writer.c",
-            "./src/readstat_bits.c",
-            "./src/readstat_io_unistd.c",
-            "./src/readstat_metadata.c",
-            "./src/readstat_convert.c",
-            "./src/stata/readstat_dta_write.c",
-            "./src/stata/readstat_dta_parse_timestamp.c",
-            "./src/stata/readstat_dta_read.c",
-            "./src/stata/readstat_dta.c",
-            "./src/sas/readstat_xport_write.c",
-            "./src/sas/readstat_sas.c",
-            "./src/sas/readstat_sas7bdat_write.c",
-            "./src/sas/readstat_sas7bcat_write.c",
-            "./src/sas/readstat_xport.c",
-            "./src/sas/readstat_xport_read.c",
-            "./src/sas/readstat_sas7bdat_read.c",
-            "./src/sas/readstat_sas7bcat_read.c",
-            "./src/sas/ieee.c",
-            "./src/sas/readstat_sas_rle.c",
-            "./src/spss/readstat_por_parse.c",
-            "./src/spss/readstat_sav.c",
-            "./src/spss/readstat_por_read.c",
-            "./src/spss/readstat_por_write.c",
-            "./src/spss/readstat_por.c",
-            "./src/spss/readstat_zsav_write.c",
-            "./src/spss/readstat_sav_parse.c",
-            "./src/spss/readstat_zsav_read.c",
-            "./src/spss/readstat_sav_parse_timestamp.c",
-            "./src/spss/readstat_zsav_compress.c",
-            "./src/spss/readstat_sav_write.c",
-            "./src/spss/readstat_spss.c",
-            "./src/spss/readstat_sav_read.c",
-            "./src/spss/readstat_sav_compress.c",
-            "./src/spss/readstat_spss_parse.c"
+            "pyreadstat/pyreadstat.pyx", 
+            ".\\src\\CKHashTable.c", 
+            ".\\src\\readstat_bits.c", 
+            ".\\src\\readstat_convert.c", 
+            ".\\src\\readstat_error.c", 
+            ".\\src\\readstat_io_unistd.c", 
+            ".\\src\\readstat_malloc.c", 
+            ".\\src\\readstat_metadata.c", 
+            ".\\src\\readstat_parser.c", 
+            ".\\src\\readstat_value.c", 
+            ".\\src\\readstat_variable.c", 
+            ".\\src\\readstat_writer.c", 
+            ".\\src\\sas\\ieee.c", 
+            ".\\src\\sas\\readstat_sas.c", 
+            ".\\src\\sas\\readstat_sas7bcat_read.c", 
+            ".\\src\\sas\\readstat_sas7bcat_write.c", 
+            ".\\src\\sas\\readstat_sas7bdat_read.c", 
+            ".\\src\\sas\\readstat_sas7bdat_write.c", 
+            ".\\src\\sas\\readstat_sas_rle.c", 
+            ".\\src\\sas\\readstat_xport.c", 
+            ".\\src\\sas\\readstat_xport_read.c", 
+            ".\\src\\sas\\readstat_xport_write.c", 
+            ".\\src\\spss\\readstat_por.c", 
+            ".\\src\\spss\\readstat_por_parse.c", 
+            ".\\src\\spss\\readstat_por_read.c", 
+            ".\\src\\spss\\readstat_por_write.c", 
+            ".\\src\\spss\\readstat_sav.c", 
+            ".\\src\\spss\\readstat_sav_compress.c", 
+            ".\\src\\spss\\readstat_sav_parse.c", 
+            ".\\src\\spss\\readstat_sav_parse_timestamp.c", 
+            ".\\src\\spss\\readstat_sav_read.c", 
+            ".\\src\\spss\\readstat_sav_write.c", 
+            ".\\src\\spss\\readstat_spss.c", 
+            ".\\src\\spss\\readstat_spss_parse.c", 
+            ".\\src\\spss\\readstat_zsav_compress.c", 
+            ".\\src\\spss\\readstat_zsav_read.c", 
+            ".\\src\\spss\\readstat_zsav_write.c", 
+            ".\\src\\stata\\readstat_dta.c", 
+            ".\\src\\stata\\readstat_dta_parse_timestamp.c", 
+            ".\\src\\stata\\readstat_dta_read.c", 
+            ".\\src\\stata\\readstat_dta_write.c"
         ]
-    },
+    }, 
     "module_name": "pyreadstat.pyreadstat"
 }
 END: Cython Metadata */
@@ -686,8 +687,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include <stdint.h>
 #include "readstat.h"
 #include <stddef.h>
-#include "readstat_io_unistd.h"
-#include "conditional_includes.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -895,8 +894,8 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "pyreadstat/pyreadstat.pyx",
-  "pyreadstat/_readstat_parser.pxd",
+  "pyreadstat\\pyreadstat.pyx",
+  "pyreadstat\\_readstat_parser.pxd",
 };
 
 /*--- Type declarations ---*/
@@ -1508,7 +1507,7 @@ static const char __pyx_k_catalog_metadata_copy[] = "catalog_metadata_copy";
 static const char __pyx_k_pyreadstat_pyreadstat[] = "pyreadstat.pyreadstat";
 static const char __pyx_k_variable_value_labels[] = "variable_value_labels";
 static const char __pyx_k_dates_as_pandas_datetime[] = "dates_as_pandas_datetime";
-static const char __pyx_k_pyreadstat_pyreadstat_pyx[] = "pyreadstat/pyreadstat.pyx";
+static const char __pyx_k_pyreadstat_pyreadstat_pyx[] = "pyreadstat\\pyreadstat.pyx";
 static const char __pyx_k_set_value_labels_locals_lambda[] = "set_value_labels.<locals>.<lambda>";
 static PyObject *__pyx_n_s_;
 static PyObject *__pyx_n_s_apply;

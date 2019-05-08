@@ -4,72 +4,73 @@
 {
     "distutils": {
         "depends": [
-            "pyreadstat/conditional_includes.h",
-            "src/readstat.h",
-            "src/readstat_io_unistd.h"
-        ],
+            "pyreadstat\\conditional_includes.h", 
+            "src\\readstat.h", 
+            "src\\readstat_io_unistd.h"
+        ], 
         "extra_compile_args": [
-            "-Ireadstat",
+            "-Ireadstat", 
             "-DHAVE_ZLIB=1"
-        ],
+        ], 
         "include_dirs": [
-            "./pyreadstat",
-            "pyreadstat",
-            "src",
-            "src/stata",
-            "src/sas",
-            "src/spss",
+            ".\\pyreadstat", 
+            "pyreadstat", 
+            "src", 
+            "src\\sas", 
+            "src\\spss", 
+            "src\\stata", 
             "."
-        ],
+        ], 
         "libraries": [
-            "m",
-            "z"
-        ],
-        "name": "pyreadstat._readstat_parser",
+            "m", 
+            "z", 
+            "iconv"
+        ], 
+        "name": "pyreadstat._readstat_parser", 
         "sources": [
-            "pyreadstat/_readstat_parser.pyx",
-            "./src/readstat_error.c",
-            "./src/CKHashTable.c",
-            "./src/readstat_parser.c",
-            "./src/readstat_malloc.c",
-            "./src/readstat_value.c",
-            "./src/readstat_variable.c",
-            "./src/readstat_writer.c",
-            "./src/readstat_bits.c",
-            "./src/readstat_io_unistd.c",
-            "./src/readstat_metadata.c",
-            "./src/readstat_convert.c",
-            "./src/stata/readstat_dta_write.c",
-            "./src/stata/readstat_dta_parse_timestamp.c",
-            "./src/stata/readstat_dta_read.c",
-            "./src/stata/readstat_dta.c",
-            "./src/sas/readstat_xport_write.c",
-            "./src/sas/readstat_sas.c",
-            "./src/sas/readstat_sas7bdat_write.c",
-            "./src/sas/readstat_sas7bcat_write.c",
-            "./src/sas/readstat_xport.c",
-            "./src/sas/readstat_xport_read.c",
-            "./src/sas/readstat_sas7bdat_read.c",
-            "./src/sas/readstat_sas7bcat_read.c",
-            "./src/sas/ieee.c",
-            "./src/sas/readstat_sas_rle.c",
-            "./src/spss/readstat_por_parse.c",
-            "./src/spss/readstat_sav.c",
-            "./src/spss/readstat_por_read.c",
-            "./src/spss/readstat_por_write.c",
-            "./src/spss/readstat_por.c",
-            "./src/spss/readstat_zsav_write.c",
-            "./src/spss/readstat_sav_parse.c",
-            "./src/spss/readstat_zsav_read.c",
-            "./src/spss/readstat_sav_parse_timestamp.c",
-            "./src/spss/readstat_zsav_compress.c",
-            "./src/spss/readstat_sav_write.c",
-            "./src/spss/readstat_spss.c",
-            "./src/spss/readstat_sav_read.c",
-            "./src/spss/readstat_sav_compress.c",
-            "./src/spss/readstat_spss_parse.c"
+            "pyreadstat/_readstat_parser.pyx", 
+            ".\\src\\CKHashTable.c", 
+            ".\\src\\readstat_bits.c", 
+            ".\\src\\readstat_convert.c", 
+            ".\\src\\readstat_error.c", 
+            ".\\src\\readstat_io_unistd.c", 
+            ".\\src\\readstat_malloc.c", 
+            ".\\src\\readstat_metadata.c", 
+            ".\\src\\readstat_parser.c", 
+            ".\\src\\readstat_value.c", 
+            ".\\src\\readstat_variable.c", 
+            ".\\src\\readstat_writer.c", 
+            ".\\src\\sas\\ieee.c", 
+            ".\\src\\sas\\readstat_sas.c", 
+            ".\\src\\sas\\readstat_sas7bcat_read.c", 
+            ".\\src\\sas\\readstat_sas7bcat_write.c", 
+            ".\\src\\sas\\readstat_sas7bdat_read.c", 
+            ".\\src\\sas\\readstat_sas7bdat_write.c", 
+            ".\\src\\sas\\readstat_sas_rle.c", 
+            ".\\src\\sas\\readstat_xport.c", 
+            ".\\src\\sas\\readstat_xport_read.c", 
+            ".\\src\\sas\\readstat_xport_write.c", 
+            ".\\src\\spss\\readstat_por.c", 
+            ".\\src\\spss\\readstat_por_parse.c", 
+            ".\\src\\spss\\readstat_por_read.c", 
+            ".\\src\\spss\\readstat_por_write.c", 
+            ".\\src\\spss\\readstat_sav.c", 
+            ".\\src\\spss\\readstat_sav_compress.c", 
+            ".\\src\\spss\\readstat_sav_parse.c", 
+            ".\\src\\spss\\readstat_sav_parse_timestamp.c", 
+            ".\\src\\spss\\readstat_sav_read.c", 
+            ".\\src\\spss\\readstat_sav_write.c", 
+            ".\\src\\spss\\readstat_spss.c", 
+            ".\\src\\spss\\readstat_spss_parse.c", 
+            ".\\src\\spss\\readstat_zsav_compress.c", 
+            ".\\src\\spss\\readstat_zsav_read.c", 
+            ".\\src\\spss\\readstat_zsav_write.c", 
+            ".\\src\\stata\\readstat_dta.c", 
+            ".\\src\\stata\\readstat_dta_parse_timestamp.c", 
+            ".\\src\\stata\\readstat_dta_read.c", 
+            ".\\src\\stata\\readstat_dta_write.c"
         ]
-    },
+    }, 
     "module_name": "pyreadstat._readstat_parser"
 }
 END: Cython Metadata */
@@ -686,8 +687,6 @@ static CYTHON_INLINE float __PYX_NAN() {
 #include <sys/types.h>
 #include <stdint.h>
 #include "readstat.h"
-#include "readstat_io_unistd.h"
-#include "conditional_includes.h"
 #include <string.h>
 #include <stdio.h>
 #include "datetime.h"
@@ -900,7 +899,7 @@ static const char *__pyx_filename;
 
 static const char *__pyx_f[] = {
   "stringsource",
-  "pyreadstat/_readstat_parser.pyx",
+  "pyreadstat\\_readstat_parser.pyx",
   "datetime.pxd",
   "type.pxd",
 };
@@ -1275,22 +1274,6 @@ static PyObject* __Pyx_PyObject_CallMethod1(PyObject* obj, PyObject* method_name
 /* append.proto */
 static CYTHON_INLINE int __Pyx_PyObject_Append(PyObject* L, PyObject* x);
 
-/* IncludeStringH.proto */
-#include <string.h>
-
-/* BytesEquals.proto */
-static CYTHON_INLINE int __Pyx_PyBytes_Equals(PyObject* s1, PyObject* s2, int equals);
-
-/* UnicodeEquals.proto */
-static CYTHON_INLINE int __Pyx_PyUnicode_Equals(PyObject* s1, PyObject* s2, int equals);
-
-/* StrEquals.proto */
-#if PY_MAJOR_VERSION >= 3
-#define __Pyx_PyString_Equals __Pyx_PyUnicode_Equals
-#else
-#define __Pyx_PyString_Equals __Pyx_PyBytes_Equals
-#endif
-
 /* SliceObject.proto */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
         PyObject* obj, Py_ssize_t cstart, Py_ssize_t cstop,
@@ -1584,7 +1567,6 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *, 
 static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_pandas_dataframe(struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *); /*proto*/
 static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_metadata(struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *); /*proto*/
 static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(readstat_value_t, int, struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *); /*proto*/
-static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *, void *); /*proto*/
 #define __Pyx_MODULE_NAME "pyreadstat._readstat_parser"
 extern int __pyx_module_is_main_pyreadstat___readstat_parser;
 int __pyx_module_is_main_pyreadstat___readstat_parser = 0;
@@ -1596,7 +1578,6 @@ static PyObject *__pyx_builtin_chr;
 static const char __pyx_k_d[] = "%d";
 static const char __pyx_k_hi[] = "hi";
 static const char __pyx_k_lo[] = "lo";
-static const char __pyx_k_nt[] = "nt";
 static const char __pyx_k_os[] = "os";
 static const char __pyx_k_pd[] = "pd";
 static const char __pyx_k_tC[] = "%tC";
@@ -1613,8 +1594,7 @@ static const char __pyx_k_date[] = "date";
 static const char __pyx_k_init[] = "__init__";
 static const char __pyx_k_left[] = "left";
 static const char __pyx_k_main[] = "__main__";
-static const char __pyx_k_name[] = "name";
-static const char __pyx_k_path[] = "path";
+static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_self[] = "self";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_time[] = "time";
@@ -1640,9 +1620,7 @@ static const char __pyx_k_center[] = "center";
 static const char __pyx_k_encode[] = "encode";
 static const char __pyx_k_extend[] = "extend";
 static const char __pyx_k_import[] = "__import__";
-static const char __pyx_k_isfile[] = "isfile";
 static const char __pyx_k_module[] = "__module__";
-static const char __pyx_k_name_2[] = "__name__";
 static const char __pyx_k_pandas[] = "pandas";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_EDATE10[] = "EDATE10";
@@ -1718,7 +1696,7 @@ static const char __pyx_k_metadata_container___init[] = "metadata_container.__in
 static const char __pyx_k_pyreadstat__readstat_parser[] = "pyreadstat._readstat_parser";
 static const char __pyx_k_Just_defining_a_custom_exceptio[] = "\n    Just defining a custom exception to raise when readstat gives an error return code.\n    ";
 static const char __pyx_k_This_class_holds_metadata_we_wa[] = "\n    This class holds metadata we want to give back to python\n    ";
-static const char __pyx_k_pyreadstat__readstat_parser_pyx[] = "pyreadstat/_readstat_parser.pyx";
+static const char __pyx_k_pyreadstat__readstat_parser_pyx[] = "pyreadstat\\_readstat_parser.pyx";
 static const char __pyx_k_Failed_convert_C_to_python_value[] = "Failed convert C to python value";
 static const char __pyx_k_Failed_to_read_number_of_variabl[] = "Failed to read number of variables";
 static const char __pyx_k_STRING_type_with_value_s_with_da[] = "STRING type with value %s with date type";
@@ -1781,7 +1759,6 @@ static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_n_s_hi;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_init;
-static PyObject *__pyx_n_s_isfile;
 static PyObject *__pyx_n_s_items;
 static PyObject *__pyx_n_s_left;
 static PyObject *__pyx_n_s_lo;
@@ -1793,18 +1770,15 @@ static PyObject *__pyx_n_s_missing_ranges;
 static PyObject *__pyx_n_s_missing_user_values;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_name;
-static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
 static PyObject *__pyx_n_s_nominal;
 static PyObject *__pyx_n_s_notes;
-static PyObject *__pyx_n_s_nt;
 static PyObject *__pyx_n_s_number_columns;
 static PyObject *__pyx_n_s_number_rows;
 static PyObject *__pyx_n_s_ordinal;
 static PyObject *__pyx_n_s_original_variable_types;
 static PyObject *__pyx_n_s_os;
 static PyObject *__pyx_n_s_pandas;
-static PyObject *__pyx_n_s_path;
 static PyObject *__pyx_n_s_pd;
 static PyObject *__pyx_n_s_prepare;
 static PyObject *__pyx_n_s_pyreadstat__readstat_parser;
@@ -6942,153 +6916,20 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_note(CYTHON_UNUSED int
  *     Special open handler for windows in order to be able to handle paths with international characters
  */
 
-static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx_v_u8_path, void *__pyx_v_io_ctx) {
-  int __pyx_v_fd;
-  Py_ssize_t __pyx_v_length;
-  wchar_t *__pyx_v_u16_path;
+static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(CYTHON_UNUSED char const *__pyx_v_u8_path, CYTHON_UNUSED void *__pyx_v_io_ctx) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  int __pyx_t_5;
-  int __pyx_t_6;
   __Pyx_RefNannySetupContext("handle_open", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":679
- *         cdef Py_ssize_t length
- * 
- *         if not os.path.isfile(u8_path):             # <<<<<<<<<<<<<<
+  /* "pyreadstat/_readstat_parser.pyx":693
  *             return -1
- * 
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 679, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 679, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_isfile); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 679, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 679, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 679, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(1, 679, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = ((!__pyx_t_5) != 0);
-  if (__pyx_t_6) {
-
-    /* "pyreadstat/_readstat_parser.pyx":680
- * 
- *         if not os.path.isfile(u8_path):
- *             return -1             # <<<<<<<<<<<<<<
- * 
- *         #IF UNAME_SYSNAME == 'Windows':
- */
-    __pyx_r = -1;
-    goto __pyx_L0;
-
-    /* "pyreadstat/_readstat_parser.pyx":679
- *         cdef Py_ssize_t length
- * 
- *         if not os.path.isfile(u8_path):             # <<<<<<<<<<<<<<
- *             return -1
- * 
- */
-  }
-
-  /* "pyreadstat/_readstat_parser.pyx":683
- * 
- *         #IF UNAME_SYSNAME == 'Windows':
- *         if os.name == "nt":             # <<<<<<<<<<<<<<
- * 
- *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 683, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 683, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = (__Pyx_PyString_Equals(__pyx_t_2, __pyx_n_s_nt, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(1, 683, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (__pyx_t_6) {
-
-    /* "pyreadstat/_readstat_parser.pyx":685
- *         if os.name == "nt":
- * 
- *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)             # <<<<<<<<<<<<<<
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
- *             assign_fd(io_ctx, fd)
- */
-    __pyx_t_2 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 685, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_v_u16_path = PyUnicode_AsWideCharString(__pyx_t_2, (&__pyx_v_length));
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "pyreadstat/_readstat_parser.pyx":686
- * 
- *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)             # <<<<<<<<<<<<<<
- *             assign_fd(io_ctx, fd)
- *             return fd
- */
-    __pyx_v_fd = _wsopen(__pyx_v_u16_path, (_O_RDONLY | _O_BINARY), _SH_DENYRD, 0);
-
-    /* "pyreadstat/_readstat_parser.pyx":687
- *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
- *             assign_fd(io_ctx, fd)             # <<<<<<<<<<<<<<
- *             return fd
- *         #ELSE:
- */
-    assign_fd(__pyx_v_io_ctx, __pyx_v_fd);
-
-    /* "pyreadstat/_readstat_parser.pyx":688
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
- *             assign_fd(io_ctx, fd)
- *             return fd             # <<<<<<<<<<<<<<
- *         #ELSE:
- *         else:
- */
-    __pyx_r = __pyx_v_fd;
-    goto __pyx_L0;
-
-    /* "pyreadstat/_readstat_parser.pyx":683
- * 
- *         #IF UNAME_SYSNAME == 'Windows':
- *         if os.name == "nt":             # <<<<<<<<<<<<<<
- * 
- *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
- */
-  }
-
-  /* "pyreadstat/_readstat_parser.pyx":691
- *         #ELSE:
- *         else:
- *             return -1             # <<<<<<<<<<<<<<
  *     ELSE:
- *         return -1
+ *         return -1             # <<<<<<<<<<<<<<
+ * 
+ * 
  */
-  /*else*/ {
-    __pyx_r = -1;
-    goto __pyx_L0;
-  }
+  __pyx_r = -1;
+  goto __pyx_L0;
 
   /* "pyreadstat/_readstat_parser.pyx":669
  *     return READSTAT_HANDLER_OK
@@ -7099,13 +6940,6 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
  */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("pyreadstat._readstat_parser.handle_open", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = READSTAT_HANDLER_ABORT;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -7133,7 +6967,6 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   PyObject *__pyx_v_pyerr;
   int __pyx_v_metaonly;
   char *__pyx_v_err_readstat;
-  readstat_open_handler __pyx_v_open_handler;
   PyObject *__pyx_v_encoding_bytes = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -7252,49 +7085,6 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
  */
   __pyx_v_retcode = readstat_set_note_handler(__pyx_v_parser, __pyx_v_note_handler);
 
-  /* "pyreadstat/_readstat_parser.pyx":736
- *     # on windows we need a custom open handler in order to deal with internation characters in the path.
- *     IF PY_MAJOR_VERSION >2:
- *         if os.name == "nt":             # <<<<<<<<<<<<<<
- *             open_handler = <readstat_open_handler> handle_open
- *             readstat_set_open_handler(parser, open_handler)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 736, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_name); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 736, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_1 = (__Pyx_PyString_Equals(__pyx_t_3, __pyx_n_s_nt, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(1, 736, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (__pyx_t_1) {
-
-    /* "pyreadstat/_readstat_parser.pyx":737
- *     IF PY_MAJOR_VERSION >2:
- *         if os.name == "nt":
- *             open_handler = <readstat_open_handler> handle_open             # <<<<<<<<<<<<<<
- *             readstat_set_open_handler(parser, open_handler)
- * 
- */
-    __pyx_v_open_handler = ((readstat_open_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_open);
-
-    /* "pyreadstat/_readstat_parser.pyx":738
- *         if os.name == "nt":
- *             open_handler = <readstat_open_handler> handle_open
- *             readstat_set_open_handler(parser, open_handler)             # <<<<<<<<<<<<<<
- * 
- *     if not metaonly:
- */
-    (void)(readstat_set_open_handler(__pyx_v_parser, __pyx_v_open_handler));
-
-    /* "pyreadstat/_readstat_parser.pyx":736
- *     # on windows we need a custom open handler in order to deal with internation characters in the path.
- *     IF PY_MAJOR_VERSION >2:
- *         if os.name == "nt":             # <<<<<<<<<<<<<<
- *             open_handler = <readstat_open_handler> handle_open
- *             readstat_set_open_handler(parser, open_handler)
- */
-  }
-
   /* "pyreadstat/_readstat_parser.pyx":740
  *             readstat_set_open_handler(parser, open_handler)
  * 
@@ -7340,25 +7130,25 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
  *         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_data->user_encoding, __pyx_n_s_encode); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 745, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_data->user_encoding, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 745, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
       if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_4);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_2, function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_kp_s_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_s_utf_8);
+    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_s_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_s_utf_8);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 745, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_v_encoding_bytes = __pyx_t_3;
-    __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 745, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_v_encoding_bytes = __pyx_t_2;
+    __pyx_t_2 = 0;
 
     /* "pyreadstat/_readstat_parser.pyx":746
  *     if data.user_encoding:
@@ -7442,13 +7232,13 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
  *             raise ReadstatError(err_message)
  * 
  */
-      __pyx_t_3 = __Pyx_PyStr_FromString(__pyx_v_err_readstat); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 757, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __pyx_t_3;
-      __Pyx_INCREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_v_err_message = ((PyObject*)__pyx_t_2);
-      __pyx_t_2 = 0;
+      __pyx_t_2 = __Pyx_PyStr_FromString(__pyx_v_err_readstat); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 757, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_3 = __pyx_t_2;
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_v_err_message = ((PyObject*)__pyx_t_3);
+      __pyx_t_3 = 0;
 
       /* "pyreadstat/_readstat_parser.pyx":758
  *             err_readstat = readstat_error_message(error)
@@ -7457,25 +7247,25 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
  * 
  * 
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_ReadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 758, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_ReadstatError); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 758, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
       __pyx_t_4 = NULL;
-      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
         if (likely(__pyx_t_4)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
           __Pyx_INCREF(__pyx_t_4);
           __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_3, function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
         }
       }
-      __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_err_message) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_err_message);
+      __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_v_err_message) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_err_message);
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 758, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 758, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __PYX_ERR(1, 758, __pyx_L1_error)
 
       /* "pyreadstat/_readstat_parser.pyx":755
@@ -10326,7 +10116,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_hi, __pyx_k_hi, sizeof(__pyx_k_hi), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
-  {&__pyx_n_s_isfile, __pyx_k_isfile, sizeof(__pyx_k_isfile), 0, 0, 1, 1},
   {&__pyx_n_s_items, __pyx_k_items, sizeof(__pyx_k_items), 0, 0, 1, 1},
   {&__pyx_n_s_left, __pyx_k_left, sizeof(__pyx_k_left), 0, 0, 1, 1},
   {&__pyx_n_s_lo, __pyx_k_lo, sizeof(__pyx_k_lo), 0, 0, 1, 1},
@@ -10338,18 +10127,15 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_missing_user_values, __pyx_k_missing_user_values, sizeof(__pyx_k_missing_user_values), 0, 0, 1, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
-  {&__pyx_n_s_name_2, __pyx_k_name_2, sizeof(__pyx_k_name_2), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
   {&__pyx_n_s_nominal, __pyx_k_nominal, sizeof(__pyx_k_nominal), 0, 0, 1, 1},
   {&__pyx_n_s_notes, __pyx_k_notes, sizeof(__pyx_k_notes), 0, 0, 1, 1},
-  {&__pyx_n_s_nt, __pyx_k_nt, sizeof(__pyx_k_nt), 0, 0, 1, 1},
   {&__pyx_n_s_number_columns, __pyx_k_number_columns, sizeof(__pyx_k_number_columns), 0, 0, 1, 1},
   {&__pyx_n_s_number_rows, __pyx_k_number_rows, sizeof(__pyx_k_number_rows), 0, 0, 1, 1},
   {&__pyx_n_s_ordinal, __pyx_k_ordinal, sizeof(__pyx_k_ordinal), 0, 0, 1, 1},
   {&__pyx_n_s_original_variable_types, __pyx_k_original_variable_types, sizeof(__pyx_k_original_variable_types), 0, 0, 1, 1},
   {&__pyx_n_s_os, __pyx_k_os, sizeof(__pyx_k_os), 0, 0, 1, 1},
   {&__pyx_n_s_pandas, __pyx_k_pandas, sizeof(__pyx_k_pandas), 0, 0, 1, 1},
-  {&__pyx_n_s_path, __pyx_k_path, sizeof(__pyx_k_path), 0, 0, 1, 1},
   {&__pyx_n_s_pd, __pyx_k_pd, sizeof(__pyx_k_pd), 0, 0, 1, 1},
   {&__pyx_n_s_prepare, __pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 0, 1, 1},
   {&__pyx_n_s_pyreadstat__readstat_parser, __pyx_k_pyreadstat__readstat_parser, sizeof(__pyx_k_pyreadstat__readstat_parser), 0, 0, 1, 1},
@@ -10785,7 +10571,7 @@ if (!__Pyx_RefNanny) {
   if (__Pyx_init_sys_getdefaultencoding_params() < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   #endif
   if (__pyx_module_is_main_pyreadstat___readstat_parser) {
-    if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name_2, __pyx_n_s_main) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
+    if (PyObject_SetAttr(__pyx_m, __pyx_n_s_name, __pyx_n_s_main) < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   }
   #if PY_MAJOR_VERSION >= 3
   {
@@ -12248,155 +12034,6 @@ static CYTHON_INLINE int __Pyx_PyObject_Append(PyObject* L, PyObject* x) {
     return 0;
 }
 
-/* BytesEquals */
-static CYTHON_INLINE int __Pyx_PyBytes_Equals(PyObject* s1, PyObject* s2, int equals) {
-#if CYTHON_COMPILING_IN_PYPY
-    return PyObject_RichCompareBool(s1, s2, equals);
-#else
-    if (s1 == s2) {
-        return (equals == Py_EQ);
-    } else if (PyBytes_CheckExact(s1) & PyBytes_CheckExact(s2)) {
-        const char *ps1, *ps2;
-        Py_ssize_t length = PyBytes_GET_SIZE(s1);
-        if (length != PyBytes_GET_SIZE(s2))
-            return (equals == Py_NE);
-        ps1 = PyBytes_AS_STRING(s1);
-        ps2 = PyBytes_AS_STRING(s2);
-        if (ps1[0] != ps2[0]) {
-            return (equals == Py_NE);
-        } else if (length == 1) {
-            return (equals == Py_EQ);
-        } else {
-            int result;
-#if CYTHON_USE_UNICODE_INTERNALS
-            Py_hash_t hash1, hash2;
-            hash1 = ((PyBytesObject*)s1)->ob_shash;
-            hash2 = ((PyBytesObject*)s2)->ob_shash;
-            if (hash1 != hash2 && hash1 != -1 && hash2 != -1) {
-                return (equals == Py_NE);
-            }
-#endif
-            result = memcmp(ps1, ps2, (size_t)length);
-            return (equals == Py_EQ) ? (result == 0) : (result != 0);
-        }
-    } else if ((s1 == Py_None) & PyBytes_CheckExact(s2)) {
-        return (equals == Py_NE);
-    } else if ((s2 == Py_None) & PyBytes_CheckExact(s1)) {
-        return (equals == Py_NE);
-    } else {
-        int result;
-        PyObject* py_result = PyObject_RichCompare(s1, s2, equals);
-        if (!py_result)
-            return -1;
-        result = __Pyx_PyObject_IsTrue(py_result);
-        Py_DECREF(py_result);
-        return result;
-    }
-#endif
-}
-
-/* UnicodeEquals */
-static CYTHON_INLINE int __Pyx_PyUnicode_Equals(PyObject* s1, PyObject* s2, int equals) {
-#if CYTHON_COMPILING_IN_PYPY
-    return PyObject_RichCompareBool(s1, s2, equals);
-#else
-#if PY_MAJOR_VERSION < 3
-    PyObject* owned_ref = NULL;
-#endif
-    int s1_is_unicode, s2_is_unicode;
-    if (s1 == s2) {
-        goto return_eq;
-    }
-    s1_is_unicode = PyUnicode_CheckExact(s1);
-    s2_is_unicode = PyUnicode_CheckExact(s2);
-#if PY_MAJOR_VERSION < 3
-    if ((s1_is_unicode & (!s2_is_unicode)) && PyString_CheckExact(s2)) {
-        owned_ref = PyUnicode_FromObject(s2);
-        if (unlikely(!owned_ref))
-            return -1;
-        s2 = owned_ref;
-        s2_is_unicode = 1;
-    } else if ((s2_is_unicode & (!s1_is_unicode)) && PyString_CheckExact(s1)) {
-        owned_ref = PyUnicode_FromObject(s1);
-        if (unlikely(!owned_ref))
-            return -1;
-        s1 = owned_ref;
-        s1_is_unicode = 1;
-    } else if (((!s2_is_unicode) & (!s1_is_unicode))) {
-        return __Pyx_PyBytes_Equals(s1, s2, equals);
-    }
-#endif
-    if (s1_is_unicode & s2_is_unicode) {
-        Py_ssize_t length;
-        int kind;
-        void *data1, *data2;
-        if (unlikely(__Pyx_PyUnicode_READY(s1) < 0) || unlikely(__Pyx_PyUnicode_READY(s2) < 0))
-            return -1;
-        length = __Pyx_PyUnicode_GET_LENGTH(s1);
-        if (length != __Pyx_PyUnicode_GET_LENGTH(s2)) {
-            goto return_ne;
-        }
-#if CYTHON_USE_UNICODE_INTERNALS
-        {
-            Py_hash_t hash1, hash2;
-        #if CYTHON_PEP393_ENABLED
-            hash1 = ((PyASCIIObject*)s1)->hash;
-            hash2 = ((PyASCIIObject*)s2)->hash;
-        #else
-            hash1 = ((PyUnicodeObject*)s1)->hash;
-            hash2 = ((PyUnicodeObject*)s2)->hash;
-        #endif
-            if (hash1 != hash2 && hash1 != -1 && hash2 != -1) {
-                goto return_ne;
-            }
-        }
-#endif
-        kind = __Pyx_PyUnicode_KIND(s1);
-        if (kind != __Pyx_PyUnicode_KIND(s2)) {
-            goto return_ne;
-        }
-        data1 = __Pyx_PyUnicode_DATA(s1);
-        data2 = __Pyx_PyUnicode_DATA(s2);
-        if (__Pyx_PyUnicode_READ(kind, data1, 0) != __Pyx_PyUnicode_READ(kind, data2, 0)) {
-            goto return_ne;
-        } else if (length == 1) {
-            goto return_eq;
-        } else {
-            int result = memcmp(data1, data2, (size_t)(length * kind));
-            #if PY_MAJOR_VERSION < 3
-            Py_XDECREF(owned_ref);
-            #endif
-            return (equals == Py_EQ) ? (result == 0) : (result != 0);
-        }
-    } else if ((s1 == Py_None) & s2_is_unicode) {
-        goto return_ne;
-    } else if ((s2 == Py_None) & s1_is_unicode) {
-        goto return_ne;
-    } else {
-        int result;
-        PyObject* py_result = PyObject_RichCompare(s1, s2, equals);
-        #if PY_MAJOR_VERSION < 3
-        Py_XDECREF(owned_ref);
-        #endif
-        if (!py_result)
-            return -1;
-        result = __Pyx_PyObject_IsTrue(py_result);
-        Py_DECREF(py_result);
-        return result;
-    }
-return_eq:
-    #if PY_MAJOR_VERSION < 3
-    Py_XDECREF(owned_ref);
-    #endif
-    return (equals == Py_EQ);
-return_ne:
-    #if PY_MAJOR_VERSION < 3
-    Py_XDECREF(owned_ref);
-    #endif
-    return (equals == Py_NE);
-#endif
-}
-
 /* SliceObject */
 static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(PyObject* obj,
         Py_ssize_t cstart, Py_ssize_t cstop,
@@ -12709,7 +12346,7 @@ static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_nam
 static int __Pyx_setup_reduce_is_named(PyObject* meth, PyObject* name) {
   int ret;
   PyObject *name_attr;
-  name_attr = __Pyx_PyObject_GetAttrStr(meth, __pyx_n_s_name_2);
+  name_attr = __Pyx_PyObject_GetAttrStr(meth, __pyx_n_s_name);
   if (likely(name_attr)) {
       ret = PyObject_RichCompareBool(name_attr, name, Py_EQ);
   } else {
