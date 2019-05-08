@@ -390,12 +390,19 @@ print(meta.missing_ranges)
 >>> {'test_passed':[{'hi':2, 'lo':2}, {'hi':3, 'lo':3}]}
 ```
 
-For SPSS sav files user defined missing values for non numeric (character) variables is not supported. In addition, if the value in
+SPSS sav files also support up to 3 discrete user defined missing values for non numeric (character) variables.
+Pyreadstat is able to read those and the behavior is the same as for discrete
+numerical user defined missing values. That means those values will be 
+translated as NaN by default and to the correspoding string value if 
+user_missing is set to True. meta.missing_ranges will show the string
+value as well. 
+
+If the value in
 a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string. This
 is because the empty string is a valid character value in SPSS and pyreadstat preserves that property. You can convert
-empty strings to nan very easily with pandas. 
+empty strings to nan very easily with pandas if you think it is appropiate
+for your dataset.
 
-For SPSS por files, 
 
 #### SAS and STATA
 
@@ -439,7 +446,11 @@ sas7bcat and dta.
 
 ### Other options
 
-You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459) 
+You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459).
+This is absolutely necessary if you are handling old xport files with 
+non-ascii characters. Those files do not have stamped the encoding in the
+file itself, therefore the encoding must be set manually.
+ 
 
 ```python
 import pyreadstat
@@ -469,7 +480,6 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 
 * Not able to read SAS compressed files. 
 * Not able to skip rows.
-* Not handling SPSS user defined missing values for character variables (numeric are fine).
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
   

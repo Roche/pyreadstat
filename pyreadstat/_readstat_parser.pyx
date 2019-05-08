@@ -420,6 +420,8 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
         dc.n_vars -= 1
         return READSTAT_HANDLER_SKIP_VARIABLE
 
+    index = readstat_variable_get_index_after_skipping(variable)
+
     dc.col_names.append(col_name)
 
     # the name of the value label for the variable

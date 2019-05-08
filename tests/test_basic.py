@@ -242,6 +242,10 @@ class TestBasic(unittest.TestCase):
         df_user, meta_user = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample_missing.sav"), user_missing=True)
         self.assertTrue(df_user.equals(self.df_user_missing_sav))
         self.assertTrue(meta_user.missing_ranges['mynum'][0]=={'lo': 2000.0, 'hi': 3000.0})
+        # user missing with usecols
+        df_user, meta_user = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample_missing.sav"), user_missing=True, usecols=["mynum", "mylabl"])
+        df_sub = self.df_user_missing_sav[["mynum", "mylabl"]]
+        self.assertTrue(df_user.equals(df_sub))
 
     def test_zsav(self):
 
@@ -405,6 +409,16 @@ class TestBasic(unittest.TestCase):
         df_sas['var1'] = df_sas['var1'].astype(str)
         df_csv = pd.read_csv(labeled_csv)
         self.assertTrue(df_sas.equals(df_csv))
+        
+    def test_sav_missing_char(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"))
+        mdf = pd.DataFrame([[np.nan], ["a"]], columns=["mychar"])
+        self.assertTrue(df.equals(mdf))
+        self.assertTrue(meta.missing_ranges == {})
+        df2, meta2 = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), user_missing=True)
+        mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
+        self.assertTrue(df2.equals(mdf2))
+        self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
         
 
 if __name__ == '__main__':

@@ -1,3 +1,8 @@
+# 0.2.4 
+* encoding support for xpt files.
+* support for user defined missing character values in sav.
+* Updated Readstat Sources to Release 1.0
+
 # 0.2.3 (github 04.02.2019)
 * User defined values fixed for sas7bdat, implemented for sas7bcat and dta.
 * Readstat sources updated.

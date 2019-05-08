@@ -405,7 +405,7 @@ readstat_error_t sas_validate_name(const char *name, size_t max_len) {
     return READSTAT_OK;
 }
 
-readstat_error_t sas_validate_variable(readstat_variable_t *variable) {
+readstat_error_t sas_validate_variable(const readstat_variable_t *variable) {
     return sas_validate_name(readstat_variable_get_name(variable), 32);
 }
 
