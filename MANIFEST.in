@@ -1,2 +1,7 @@
 include *.h
 recursive-include src *.h
+recursive-include pyreadstat *.h
+include *.pyx
+recursive-include pyreadstat *.pyx
+include *.pxd
+recursive-include pyreadstat *.pxd
