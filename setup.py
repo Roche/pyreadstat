@@ -70,8 +70,7 @@ source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname 
 # libraries and data (in this case data are windows dlls)
 # altough these are win specific we want them to be in the source distribution
 # therefore we will always include them.
-data_folder = "win_libs/64bit/"
-data_files = [("",[data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
+data_files = []
 libraries=["m", "z"]
 # Windows
 if os.name == 'nt':
@@ -87,6 +86,7 @@ if os.name == 'nt':
               "Sorry!")
         sys.exit(1)
         data_folder = "win_libs/32bit/"
+        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     libraries.append("iconv")
 else:
     _platform = sys.platform
