@@ -1,6 +1,6 @@
 ---
 name: pyreadstat issue
-about: Describe this issue template's purpose here.
+about: report a bug, request features, etc.
 title: ''
 labels: ''
 assignees: ''
