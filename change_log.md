@@ -1,4 +1,8 @@
-# 0.2.4 
+# 0.2.5 (github, pypi and conda 09.05.2019)
+* Same as 0.2.4, just fixed issues in source distribution so that conda build 
+  succeeds.
+
+# 0.2.4 (github and pypi 08.05.2019)
 * encoding support for xpt files.
 * support for user defined missing character values in sav.
 * Updated Readstat Sources to Release 1.0

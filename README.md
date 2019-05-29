@@ -209,7 +209,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat')
 
 # done! let's see what we got
 print(df.head())
-print(meta.colum_names)
+print(meta.column_names)
 print(meta.column_labels)
 print(meta.number_rows)
 print(meta.number_columns)
@@ -340,7 +340,7 @@ but one can get those original values by passing the argument user_missing=True 
 
 ```python
 # user set with default missing values
-import pypreadstat
+import pyreadstat
 df, meta = pyreadstat.read_sav("/path/to/file.sav")
 print(df)
 >> test_passed
@@ -354,7 +354,7 @@ Now, reading the user defined missing values:
 
 ```python
 # user set with user defined missing values
-import pypreadstat
+import pyreadstat
 df, meta = pyreadstat.read_sav("/path/to/file.sav", user_missing=True)
 print(df)
 >> test_passed
@@ -367,7 +367,7 @@ print(df)
 As you see now instead o NaN the values 2 and 3 appear. In case the dataset had value labels, we could bring those in
 ```python
 # user set with user defined missing values and labels
-import pypreadstat
+import pyreadstat
 df, meta = pyreadstat.read_sav("/path/to/file.sav", user_missing=True, apply_value_formats=True)
 print(df)
 >> test_passed
@@ -384,7 +384,7 @@ as in the example, both boundaries are also present although the value is the sa
 
 ```python
 # user set with default missing values
-import pypreadstat
+import pyreadstat
 df, meta = pyreadstat.read_sav("/path/to/file.sav", user_missing=True, apply_value_formats=True)
 print(meta.missing_ranges)
 >>> {'test_passed':[{'hi':2, 'lo':2}, {'hi':3, 'lo':3}]}
@@ -522,9 +522,11 @@ pull request to ReadStat first.
 
 ## People
 
-Otto Fajardo - author, maintainer
+[Otto Fajardo](https://github.com/ofajardo) - author, maintainer
 
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
 
-[Jonathon Love](https://jona.thon.love/) - contributor
+[Jonathon Love](https://jona.thon.love/) - contributor: open files with international characters.
+
+[benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888), [drcjar](https://github.com/drcjar): improvements to documentation
 
