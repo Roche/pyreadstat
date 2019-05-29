@@ -1,3 +1,9 @@
+# 0.2.6 ()
+* MANIFEST.in changed so that windows dlls get into the source distribution, setup.py
+changed so that those get installed only on windows but not unix.
+* Implemented option disable_datetime_conversion for all reading functions in order
+to skip date/datetime and time object conversion.
+
 # 0.2.5 (github, pypi and conda 09.05.2019)
 * Same as 0.2.4, just fixed issues in source distribution so that conda build 
   succeeds.
