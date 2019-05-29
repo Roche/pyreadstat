@@ -75,6 +75,7 @@ cdef class data_container:
     cdef variable_display_width
     cdef variable_alignment
     cdef variable_measure
+    cdef bint no_datetime_conversion
 
 
 # definitions of functions
@@ -92,7 +93,8 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
 cdef object data_container_to_pandas_dataframe(data_container data)
 cdef object data_container_extract_metadata(data_container data)
 cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
-                           str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan)
+                           str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
+                           bint no_datetime_conversion)
 
 # definitions for stuff about dates
 cdef list sas_date_formats 

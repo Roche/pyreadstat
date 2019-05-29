@@ -218,6 +218,12 @@ iconv-compatible name</li>
 <li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
 will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
 to be able to interpret those values as missing.</li>
+<li><strong>disable_datetime_conversion</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+information about the original variable format stored in the metadata object in original_variable_types.
+Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+beyond that will rise an Overflow error in pyreadstat).</li>
 </ul>
 </td>
 </tr>
@@ -252,6 +258,12 @@ for their formatted version will be transformed into pandas categories.</li>
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
+<li><strong>disable_datetime_conversion</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+information about the original variable format stored in the metadata object in original_variable_types.
+Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+beyond that will rise an Overflow error in pyreadstat).</li>
 </ul>
 </td>
 </tr>
@@ -325,6 +337,12 @@ iconv-compatible name</li>
 <li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
 will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
 to be able to interpret those values as missing.</li>
+<li><strong>disable_datetime_conversion</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+information about the original variable format stored in the metadata object in original_variable_types.
+Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+beyond that will rise an Overflow error in pyreadstat).</li>
 </ul>
 </td>
 </tr>
@@ -363,7 +381,13 @@ iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
 <li><strong>user_missing</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False, in this case user defined missing values are delivered as nan. If true, the missing values
 will be deliver as is, and an extra piece of information will be set in the metadata (missing_ranges)
-to be able to interpret those values as missing</li>
+to be able to interpret those values as missing.</li>
+<li><strong>disable_datetime_conversion</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+information about the original variable format stored in the metadata object in original_variable_types.
+Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+beyond that will rise an Overflow error in pyreadstat).</li>
 </ul>
 </td>
 </tr>
@@ -394,6 +418,12 @@ metadata object. The data frame will be set with the correct column names but no
 <li><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</li>
 <li><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</li>
+<li><strong>disable_datetime_conversion</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+information about the original variable format stored in the metadata object in original_variable_types.
+Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+beyond that will rise an Overflow error in pyreadstat).</li>
 </ul>
 </td>
 </tr>

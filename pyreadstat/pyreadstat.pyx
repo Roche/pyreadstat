@@ -33,7 +33,8 @@ from copy import deepcopy
 # Parsing functions
 
 def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
-                  formats_as_category=True, str encoding=None, list usecols=None, user_missing=False):
+                  formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
+                  disable_datetime_conversion=False):
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
@@ -64,6 +65,13 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
             by default False, in this case user defined missing values are delivered as nan. If true, the missing values
             will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
             to be able to interpret those values as missing.
+        disable_datetime_conversion : bool, optional
+            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+            information about the original variable format stored in the metadata object in original_variable_types.
+            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+            beyond that will rise an Overflow error in pyreadstat).
 
     Returns
     -------
@@ -86,10 +94,14 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     cdef bint usernan = 0
     if user_missing:
         usernan = 1
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bdat, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion)
     metadata.file_format = "sas7bdat"
 
     if catalog_file:
@@ -99,7 +111,8 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     return data_frame, metadata
 
 
-def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None, list usecols=None):
+def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
+               list usecols=None, disable_datetime_conversion=False):
     r"""
     Read a SAS xport file.
 
@@ -117,6 +130,13 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        disable_datetime_conversion : bool, optional
+            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+            information about the original variable format stored in the metadata object in original_variable_types.
+            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+            beyond that will rise an Overflow error in pyreadstat).
 
     Returns
     -------
@@ -135,17 +155,22 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
         dates_as_pandas = 1
 
     cdef bint usernan = 0
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_xport, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion)
     metadata.file_format = "xport"
 
     return data_frame, metadata
 
 
 def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False):
+             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
+             disable_datetime_conversion=False):
     r"""
     Read a STATA dta file
 
@@ -173,6 +198,13 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             by default False, in this case user defined missing values are delivered as nan. If true, the missing values
             will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)
             to be able to interpret those values as missing.
+        disable_datetime_conversion : bool, optional
+            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+            information about the original variable format stored in the metadata object in original_variable_types.
+            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+            beyond that will rise an Overflow error in pyreadstat).
 
     Returns
     -------
@@ -193,10 +225,14 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint usernan = 0
     if user_missing:
         usernan = 1
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion)
     metadata.file_format = "dta"
 
     if apply_value_formats:
@@ -206,7 +242,8 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
 
 def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False):
+             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
+             disable_datetime_conversion=False):
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -233,7 +270,14 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         user_missing : bool, optional
             by default False, in this case user defined missing values are delivered as nan. If true, the missing values
             will be deliver as is, and an extra piece of information will be set in the metadata (missing_ranges)
-            to be able to interpret those values as missing
+            to be able to interpret those values as missing.
+        disable_datetime_conversion : bool, optional
+            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+            information about the original variable format stored in the metadata object in original_variable_types.
+            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+            beyond that will rise an Overflow error in pyreadstat).
 
     Returns
     -------
@@ -254,10 +298,14 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     cdef bint usernan = 0
     if user_missing:
         usernan = 1
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sav, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion)
     metadata.file_format = "sav/zsav"
 
     if apply_value_formats:
@@ -267,7 +315,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
 
 def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None):
+             formats_as_category=True, str encoding=None, list usecols=None, disable_datetime_conversion=False):
     r"""
     Read a SPSS por file
 
@@ -291,6 +339,13 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
+        disable_datetime_conversion : bool, optional
+            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
+            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
+            information about the original variable format stored in the metadata object in original_variable_types.
+            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
+            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
+            beyond that will rise an Overflow error in pyreadstat).
 
     Returns
     -------
@@ -309,10 +364,14 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         dates_as_pandas = 1
 
     cdef bint usernan = 0
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_por, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion)
     metadata.file_format = "por"
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
@@ -351,10 +410,11 @@ def read_sas7bcat(str filename_path, str encoding=None):
     cdef bint dates_as_pandas = 0
     cdef list usecols = None
     cdef bint usernan = 0
+    cdef bint no_datetime_conversion = 0
 
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bcat, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion)
     metadata.file_format = "sas7bcat"
 
     return data_frame, metadata

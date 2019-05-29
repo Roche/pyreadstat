@@ -90,6 +90,7 @@ cdef class data_container:
         self.variable_display_width = dict()
         self.variable_alignment = dict()
         self.variable_measure = dict()
+        self.no_datetime_conversion = 0
         
 class metadata_container:
     """
@@ -295,19 +296,19 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     # final transformation and storage
 
     if pyformat == VAR_FORMAT_STRING:
-        if var_format == DATE_FORMAT_NOTADATE:
+        if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_str_value
         else:
             #str_byte_val = py_str_value.encode("UTF-8")
             raise PyreadstatError("STRING type with value %s with date type" % py_str_value )
     elif pyformat == VAR_FORMAT_LONG:
-        if var_format == DATE_FORMAT_NOTADATE:
+        if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_long_value
         else:
             tstamp = <double> py_long_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
     elif pyformat == VAR_FORMAT_FLOAT:
-        if var_format == DATE_FORMAT_NOTADATE:
+        if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
         else:
             #tstamp = <int> py_float_value
@@ -862,7 +863,8 @@ cdef object data_container_extract_metadata(data_container data):
 
 
 cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
-                           str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan):
+                           str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
+                           bint no_datetime_conversion):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -902,6 +904,7 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
         data.use_cols = usecols
 
     data.usernan = usernan
+    data.no_datetime_conversion = no_datetime_conversion
     
     # go!
     run_readstat_parser(filename, data, parse_func)    
