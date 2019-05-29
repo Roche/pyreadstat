@@ -483,6 +483,19 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
   
+Converting data types from foreign applications into python some times also bring some limitations:
+
+* Pyreadstat transforms date, datetime and time like variables which are internally represented in the original application as 
+ numbers to python datetime objects. Python datetime objects are however limited in the range of dates they can represent
+ (for example the max year is 10,000), while in other applications it is possible (although probably an error in the data)
+ to have very high or very low dates. In this cases pyreadstat would raise an error:
+ 
+ ```
+ OverflowError: date value out of range
+ ```
+  
+  The workarounds to deal with this include using the keyword argument disable_datetime_conversion so that you will 
+  get numbers instead of datetime objects or skipping reading such columns with the argument usecols.
 
 ## Python 2.7 support.
 
