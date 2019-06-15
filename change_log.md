@@ -1,4 +1,4 @@
-# 0.2.6 ()
+# 0.2.6 (github, pypi, conda 15.06.2019)
 * MANIFEST.in changed so that windows dlls get into the source distribution, setup.py
 changed so that those get installed only on windows but not unix.
 * Implemented option disable_datetime_conversion for all reading functions in order
