@@ -8,7 +8,7 @@ py37=/c/Users/fajardoo/AppData/Local/conda/conda/envs/py37/python.exe
 py36=/c/Users/fajardoo/AppData/Local/conda/conda/envs/py36/python.exe
 py35=/c/Users/fajardoo/AppData/Local/conda/conda/envs/py35/python.exe
 py27=/c/Users/fajardoo/AppData/Local/conda/conda/envs/py27/python.exe
-build="setup.py sdist bdist_wheel"
+build="setup.py bdist_wheel"
 #####
 
 cd ..
