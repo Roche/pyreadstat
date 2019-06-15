@@ -76,7 +76,7 @@ libraries=["m", "z"]
 if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
     if is64bit:
-        pass
+        data_folder = "win_libs/64bit/"
     else:
         print("It seems you are using windows 32bit, you will need to find zlib1.dll and libiconv-2.dll from mingw 32 bits, "
               "(It is usually in the bin folder of mingw32 if you are using msys) "
@@ -86,7 +86,7 @@ if os.name == 'nt':
               "Sorry!")
         sys.exit(1)
         data_folder = "win_libs/32bit/"
-        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
+    data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     libraries.append("iconv")
 else:
     _platform = sys.platform

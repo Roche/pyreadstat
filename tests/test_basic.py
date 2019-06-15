@@ -159,7 +159,7 @@ class TestBasic(unittest.TestCase):
             self.assertTrue(meta.number_rows == len(self.df_pandas))
 
     def test_sas7bdat_nodates(self):
-        df, meta = pyreadstat.read_sas7bdat("test_data/basic/sample.sas7bdat", disable_datetime_conversion=True)
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), disable_datetime_conversion=True)
         self.assertTrue(df.equals(self.df_nodates_sastata))
 
     def test_xport(self):
@@ -189,7 +189,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.usecols))
 
     def test_xport_nodates(self):
-        df, meta = pyreadstat.read_xport("test_data/basic/sample.xpt", disable_datetime_conversion=True)
+        df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"), disable_datetime_conversion=True)
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.df_nodates_sastata))
 
@@ -223,7 +223,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.column_names == self.usecols)
 
     def test_dta_nodates(self):
-        df, meta = pyreadstat.read_dta("test_data/basic/sample.dta", disable_datetime_conversion=True)
+        df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder,"sample.dta"), disable_datetime_conversion=True)
         df_pandas = self.df_nodates_sastata
         df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
         df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
@@ -280,7 +280,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df_user.equals(df_sub))
 
     def test_sav_nodates(self):
-        df, meta = pyreadstat.read_sav("test_data/basic/sample.sav", disable_datetime_conversion=True)
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), disable_datetime_conversion=True)
         self.assertTrue(df.equals(self.df_nodates_spss))
         
     def test_zsav(self):
@@ -316,7 +316,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.column_names == self.usecols)
 
     def test_zsav_nodates(self):
-        df, meta = pyreadstat.read_sav("test_data/basic/sample.zsav", disable_datetime_conversion=True)
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), disable_datetime_conversion=True)
         self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_por(self):
@@ -360,7 +360,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(df_pandas_por.columns.values.tolist()))
 
     def test_por_nodates(self):
-        df, meta = pyreadstat.read_por("test_data/basic/sample.por", disable_datetime_conversion=True)
+        df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), disable_datetime_conversion=True)
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.df_nodates_spss))
 

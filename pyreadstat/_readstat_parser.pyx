@@ -737,6 +737,8 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
         if os.name == "nt":
             open_handler = <readstat_open_handler> handle_open
             readstat_set_open_handler(parser, open_handler)
+    ELSE:
+        raise PyreadstatError("Python 2 on windows not supported!")
 
     if not metaonly:
         retcode = readstat_set_value_handler(parser, value_handler)
