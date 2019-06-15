@@ -307,11 +307,14 @@ static readstat_error_t dta_validate_name_unreserved(const char *name) {
 static readstat_error_t dta_validate_name(const char *name, int unicode, size_t max_len) {
     readstat_error_t error = READSTAT_OK;
 
-    if ((error = dta_validate_name_chars(name, unicode)) != READSTAT_OK)
-        return error;
-
     if (strlen(name) > max_len)
         return READSTAT_ERROR_NAME_IS_TOO_LONG;
+
+    if (strlen(name) == 0)
+        return READSTAT_ERROR_NAME_IS_ZERO_LENGTH;
+
+    if ((error = dta_validate_name_chars(name, unicode)) != READSTAT_OK)
+        return error;
 
     return dta_validate_name_unreserved(name);
 }

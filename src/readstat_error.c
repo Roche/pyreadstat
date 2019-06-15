@@ -89,6 +89,9 @@ const char *readstat_error_message(readstat_error_t error_code) {
     if (error_code == READSTAT_ERROR_NAME_IS_TOO_LONG)
         return "A provided name is too long for the file format";
 
+    if (error_code == READSTAT_ERROR_NAME_IS_ZERO_LENGTH)
+        return "A provided name is blank or empty";
+
     if (error_code == READSTAT_ERROR_BAD_TIMESTAMP)
         return "The file's timestamp string is invalid";
 
