@@ -104,6 +104,20 @@ class TestBasic(unittest.TestCase):
                                     for x in df_user_missing_sav["mytime"]]
         self.df_user_missing_sav = df_user_missing_sav
 
+        # no dates
+        nodates_spss_csv = os.path.join(self.basic_data_folder, "sample_nodate_spss.csv")
+        df_nodates_spss = pd.read_csv(nodates_spss_csv)
+        df_nodates_spss["myord"] = df_nodates_spss["myord"].astype(float)
+        df_nodates_spss["mylabl"] = df_nodates_spss["mylabl"].astype(float)
+        self.df_nodates_spss = df_nodates_spss
+
+        nodates_sastata_csv = os.path.join(self.basic_data_folder, "sample_nodate_sas_stata.csv")
+        df_nodates_sastata = pd.read_csv(nodates_sastata_csv)
+        df_nodates_sastata["myord"] = df_nodates_sastata["myord"].astype(float)
+        df_nodates_sastata["mylabl"] = df_nodates_sastata["mylabl"].astype(float)
+        self.df_nodates_sastata = df_nodates_sastata
+        
+
     def setUp(self):
 
         # set paths
@@ -144,6 +158,10 @@ class TestBasic(unittest.TestCase):
             self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
             self.assertTrue(meta.number_rows == len(self.df_pandas))
 
+    def test_sas7bdat_nodates(self):
+        df, meta = pyreadstat.read_sas7bdat("test_data/basic/sample.sas7bdat", disable_datetime_conversion=True)
+        self.assertTrue(df.equals(self.df_nodates_sastata))
+
     def test_xport(self):
 
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"))
@@ -169,6 +187,11 @@ class TestBasic(unittest.TestCase):
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.df_usecols))
         self.assertTrue(meta.number_columns == len(self.usecols))
+
+    def test_xport_nodates(self):
+        df, meta = pyreadstat.read_xport("test_data/basic/sample.xpt", disable_datetime_conversion=True)
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(self.df_nodates_sastata))
 
     def test_dta(self):
 
@@ -198,6 +221,15 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(df_pandas))
         self.assertTrue(meta.number_columns == len(self.usecols))
         self.assertTrue(meta.column_names == self.usecols)
+
+    def test_dta_nodates(self):
+        df, meta = pyreadstat.read_dta("test_data/basic/sample.dta", disable_datetime_conversion=True)
+        df_pandas = self.df_nodates_sastata
+        df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
+        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
+        df_pandas["dtime"] = df_pandas["dtime"] * 1000
+        df_pandas["mytime"] = df_pandas["mytime"] * 1000
+        self.assertTrue(df.equals(df_pandas))
 
     def test_sav(self):
 
@@ -247,6 +279,10 @@ class TestBasic(unittest.TestCase):
         df_sub = self.df_user_missing_sav[["mynum", "mylabl"]]
         self.assertTrue(df_user.equals(df_sub))
 
+    def test_sav_nodates(self):
+        df, meta = pyreadstat.read_sav("test_data/basic/sample.sav", disable_datetime_conversion=True)
+        self.assertTrue(df.equals(self.df_nodates_spss))
+        
     def test_zsav(self):
 
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"))
@@ -278,6 +314,10 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_usecols))
         self.assertTrue(meta.number_columns == len(self.usecols))
         self.assertTrue(meta.column_names == self.usecols)
+
+    def test_zsav_nodates(self):
+        df, meta = pyreadstat.read_sav("test_data/basic/sample.zsav", disable_datetime_conversion=True)
+        self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_por(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
@@ -318,6 +358,11 @@ class TestBasic(unittest.TestCase):
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(df_pandas_por))
         self.assertTrue(meta.number_columns == len(df_pandas_por.columns.values.tolist()))
+
+    def test_por_nodates(self):
+        df, meta = pyreadstat.read_por("test_data/basic/sample.por", disable_datetime_conversion=True)
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_sas_catalog_win(self):
         """these sas7bdat and sasbcat where produced on windows, probably 32 bit"""
