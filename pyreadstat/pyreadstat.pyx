@@ -23,8 +23,10 @@
 from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
 from readstat_api cimport readstat_parse_por, readstat_parse_xport
 from readstat_api cimport readstat_parse_sas7bcat
+from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
 from _readstat_parser cimport py_file_format, run_conversion
-cimport _readstat_parser
+from _readstat_writer cimport run_write
+cimport _readstat_parser, _readstat_writer
 from copy import deepcopy
 
 
@@ -501,6 +503,10 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 
     return df_copy, metadata
 
+# Write API
 
+def write_sav(df, str dst_path, str file_label):
+
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label)
     
     

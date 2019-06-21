@@ -96,16 +96,22 @@ else:
 
 # Extensions
 extensions = [Extension("pyreadstat.pyreadstat",
-                sources=["pyreadstat/pyreadstat" + ext] + sources,
-                # this dot here is important for cython to find the pxd files
-                include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."],
-                libraries=libraries,
-                extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"] ),
+                    sources=["pyreadstat/pyreadstat" + ext] + sources,
+                    # this dot here is important for cython to find the pxd files
+                    include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."],
+                    libraries=libraries,
+                    extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"] ),
                 Extension("pyreadstat._readstat_parser",
-                sources=["pyreadstat/_readstat_parser" + ext] + sources,
-                include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."],
-                libraries=libraries,
-                extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"])]
+                    sources=["pyreadstat/_readstat_parser" + ext] + sources,
+                    include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."],
+                    libraries=libraries,
+                    extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"]),
+                Extension("pyreadstat._readstat_writer",
+                        sources=["pyreadstat/_readstat_writer" + ext] + sources,
+                        include_dirs=[source_dir_root] + source_dirs + ["pyreadstat", "."],
+                        libraries=libraries,
+                        extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"])
+              ]
 
 # By setting this compiler directive, cython will
 # embed signature information in docstrings. Sphinx then knows how to extract

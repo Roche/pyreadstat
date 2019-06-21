@@ -133,6 +133,8 @@ IF PY_MAJOR_VERSION >2:
         int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode)
         int _O_RDONLY
         int _O_BINARY
+        int _O_WRONLY
+        int _O_CREAT
         int _SH_DENYRW  # Denies read and write access to a file.
         int _SH_DENYWR  # Denies write access to a file.
         int _SH_DENYRD  # Denies read access to a file.
