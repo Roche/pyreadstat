@@ -505,8 +505,39 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 
 # Write API
 
-def write_sav(df, str dst_path, str file_label):
+def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None):
 
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label)
-    
-    
+    cdef int file_format_version = 2
+    if compress:
+        file_format_version = 3
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, file_format_version, note)
+
+def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=-1):
+
+    cdef int file_format_version = 119
+    if version > -1:
+        if version == 15:
+            version = 119
+        elif version == 14:
+            version = 118
+        elif version == 13:
+            version = 117
+        elif version == 12:
+            version = 115
+        elif version in {10, 11}:
+            version = 114
+        elif version in {8, 9}:
+            version = 113
+        else:
+            raise Exception("Version not supported")
+
+    cdef str note = ""
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version, note)
+
+def write_xport(df, str dst_path, str file_label="", list column_labels=None):
+
+    # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
+    cdef int file_format_version = 5
+
+    cdef str note = ""
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, file_format_version, note)

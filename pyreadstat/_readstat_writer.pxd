@@ -13,7 +13,8 @@ cdef extern from "conditional_includes.h":
     int O_TRUNC
     int open(const char *path, int oflag, int mode)
 
-cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label) except *
+cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
+                   int file_format_version, str note) except *
 
 ctypedef enum dst_file_format:
     FILE_FORMAT_SAS7BDAT
@@ -31,5 +32,4 @@ ctypedef enum pywriter_variable_type:
     PYWRITER_OBJECT
     PYWRITER_DATE
     PYWRITER_DATETIME
-    PYWRITER_DATETIMENS
     PYWRITER_TIME

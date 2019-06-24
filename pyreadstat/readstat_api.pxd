@@ -32,6 +32,7 @@ cdef extern from "<stdint.h>" nogil:
     ctypedef   signed short int16_t
     ctypedef   signed int   int32_t
     ctypedef   signed long  int64_t
+    ctypedef unsigned char  uint8_t
 
 cdef extern from '<unistd.h>':
         int close(int fd)
@@ -198,6 +199,10 @@ cdef extern from "readstat.h":
     cdef readstat_writer_t *readstat_writer_init()
     cdef readstat_error_t readstat_set_data_writer(readstat_writer_t *writer, readstat_data_writer data_writer)
     cdef readstat_error_t readstat_writer_set_file_label(readstat_writer_t *writer, const char *file_label);
+    cdef readstat_error_t readstat_writer_set_file_format_version(readstat_writer_t *writer, uint8_t file_format_version)
+
+    cdef void readstat_add_note(readstat_writer_t *writer, const char *note);
+
     cdef readstat_variable_t *readstat_add_variable(readstat_writer_t *writer, const char *name, readstat_type_t type,
         size_t storage_width)
 
