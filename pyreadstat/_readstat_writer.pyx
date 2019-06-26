@@ -1,4 +1,5 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: profile=True
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -19,6 +20,7 @@ from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
 
 import numpy as np
+#cimport numpy as np
 import pandas as pd
 import datetime
 try:
@@ -34,6 +36,7 @@ cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('
                np.int64, np.uint64, np.uint32, np.float}
 cdef set numeric_types = int_types.union(float_types)
 cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
+cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 
 
@@ -50,6 +53,7 @@ cdef double spss_offset_secs = 12219379200
 cdef double sas_offset_secs = 315619200
 cdef double spss_offset_days = 141428
 cdef double sas_offset_days = 3653
+cdef object date_0 = datetime.datetime(1970,1,1).date()
 
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *:
@@ -88,7 +92,7 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
 
     elif curtype == PYWRITER_DATE:
         if type(curval) == datetime.date:
-            days = curval - datetime.datetime(1970,1,1).date()
+            days = curval - date_0
             tstamp = days.days
             tstamp += offset_days
             if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
@@ -133,7 +137,31 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
 cdef int get_pandas_str_series_max_length(object series):
     """ For a pandas string series get the max length of the strings. Assumes there is no NaN among the elements. 
     """
-    return int(series.str.encode(encoding="utf-8").str.len().max())
+    values = series.values
+    cdef str val
+    cdef bytes temp
+    cdef int max_length = 0
+    cdef int curlen
+    for val in values:
+        temp = val.encode("utf-8")
+        curlen = len(temp)
+        if curlen > max_length:
+            max_length = curlen
+
+    return max_length
+
+    #return int(series.str.encode(encoding="utf-8").str.len().max())
+
+cdef int check_series_all_same_types(object series, object type_to_check):
+    """
+    1 if all elements in a series are of type type_to_check, 0 otherwise
+    """
+
+    values = series.values
+    for val in values:
+        if type(val) != type_to_check:
+            return 0
+    return 1
 
 
 cdef list get_pandas_column_types(object df):
@@ -148,6 +176,7 @@ cdef list get_pandas_column_types(object df):
     cdef list columns = df.columns.values.tolist()
 
     cdef list result = list()
+    cdef int equal
 
     for indx, (col_name, col_type) in enumerate(zip(columns, types)):
 
@@ -167,14 +196,16 @@ cdef list get_pandas_column_types(object df):
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
             result.append((PYWRITER_DATETIME, 0))
         elif col_type == np.object:
-            missing = pd.isna(curseries)
-            if np.any(missing):
+            #missing = pd.isna(curseries)
+            if np.any(pd.isna(curseries)):
                 col = curseries.dropna().reset_index(drop=True)
 
                 if len(col):
                     curtype = type(col[0])
-                    equal = col.apply(lambda x: type(x) == curtype)
-                    if not np.all(equal):
+                    equal = check_series_all_same_types(col, curtype)
+                    #equal = col.apply(lambda x: type(x) == curtype)
+                    #if not np.all(equal):
+                    if not equal:
                         max_length = get_pandas_str_series_max_length(col.astype(str))
                         result.append((PYWRITER_OBJECT, max_length))
                         continue
@@ -183,8 +214,10 @@ cdef list get_pandas_column_types(object df):
                     continue
             else:
                 curtype = type(curseries[0])
-                equal = curseries.apply(lambda x: type(x) == curtype)
-                if not np.all(equal):
+                equal = check_series_all_same_types(curseries, curtype)
+                #equal = curseries.apply(lambda x: type(x) == curtype)
+                #if not np.all(equal):
+                if not equal:
                     max_length = get_pandas_str_series_max_length(curseries.astype(str))
                     result.append((PYWRITER_OBJECT, max_length))
                     continue
@@ -274,6 +307,7 @@ cdef int close_file(int fd):
     else:
         return close(fd)
 
+from time import time
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name) except *:
@@ -311,6 +345,8 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef int row_indx
     cdef str curvalstr
     cdef double dtimelikeval
+    #cdef np.ndarray values
+    cdef object values
 
     # cdef bytes filename_bytes = filename_path.encode("utf-8")
     # cdef char *path = <char *> filename_bytes
@@ -319,7 +355,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     #     flags = _O_WRONLY | _O_CREAT | _O_BINARY
     # cdef int fd = open(path, flags, 0644)
     cdef int fd = open_file(filename_path)
-
+    #t0 = time()
     writer = readstat_writer_init()
 
     try:
@@ -348,7 +384,8 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             col_label_count = len(column_labels)
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")
-
+        #print("setup", time()-t0)
+        #t0 = time()
         for col_indx in range(col_count):
             curtype, max_length = col_types[col_indx]
             #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
@@ -363,7 +400,8 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                         raise PyreadstatError("Column labels must be strings")
                     cur_col_label = column_labels[col_indx].encode("utf-8")
                     readstat_variable_set_label(variable, cur_col_label)
-
+        #print("add variables", time()-t0)
+        #t0 = time()
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:
             check_exit_status(readstat_begin_writing_sas7bcat(writer, &fd))
@@ -385,9 +423,13 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
         for col_indx in range(col_count):
             tempvar = readstat_get_variable(writer, col_indx)
             check_exit_status(readstat_validate_variable(writer, tempvar))
-
+        #print("start writing", time()-t0)
+        #t0 = time()
         # inserting
-        for row_indx, row in df.iterrows():
+        values = df.values
+        #print("converting values", time()-t0)
+        #t0 = time()
+        for  row in values:
             check_exit_status(readstat_begin_row(writer))
 
             for col_indx in range(col_count):
@@ -420,12 +462,15 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             check_exit_status(readstat_end_row(writer))
 
         check_exit_status(readstat_end_writing(writer))
+        #print("inserting", time()-t0)
 
     except:
         raise
     finally:
+        #t0 = time()
         readstat_writer_free(writer)
         #close(fd)
         close_file(fd)
+        #print("cleaning", time()-t0)
 
     return 0

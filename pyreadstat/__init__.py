@@ -19,4 +19,4 @@ from .pyreadstat import write_sav, write_dta, write_xport
 from .pyreadstat import set_value_labels, set_catalog_to_sas
 from ._readstat_parser import ReadstatError, metadata_container
 
-__version__ = "0.2.6"
+__version__ = "0.2.7"

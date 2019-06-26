@@ -18,6 +18,7 @@ import setuptools
 from distutils.core import setup, Extension
 import os
 import sys
+#import numpy
 
 PY_MAJOR_VERSION = sys.version_info[0]
 
@@ -108,7 +109,7 @@ extensions = [Extension("pyreadstat.pyreadstat",
                     extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"]),
                 Extension("pyreadstat._readstat_writer",
                         sources=["pyreadstat/_readstat_writer" + ext] + sources,
-                        include_dirs=[source_dir_root] + source_dirs + ["pyreadstat", "."],
+                        include_dirs=[source_dir_root] + source_dirs + ["pyreadstat", "."],# + [numpy.get_include()],
                         libraries=libraries,
                         extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"])
               ]
@@ -125,17 +126,17 @@ if USE_CYTHON:
     # somebody is switching between python 2 and 3
     extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
 
-long_description = """ A Python package to read SAS
-(sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into pandas data frames. It is a wrapper
+long_description = """ A Python package to read and write SAS
+(sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas data frames. It is a wrapper
 around the C library readstat.<br>
 Please visit out project home page for more information:<br>
 https://github.com/Roche/pyreadstat"""
 
-short_description = "Reads SAS, SPSS and Stata files into pandas data frames."
+short_description = "Reads and Writes SAS, SPSS and Stata files into pandas data frames."
 
 setup(
     name='pyreadstat',
-    version='0.2.6',
+    version='0.2.7',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

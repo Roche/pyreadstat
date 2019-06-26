@@ -46,9 +46,6 @@ IF PY_MAJOR_VERSION >2:
     cdef extern from "Python.h":
             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
-cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
-                   int file_format_version, str note, str table_name) except *
-
 ctypedef enum dst_file_format:
     FILE_FORMAT_SAS7BDAT
     FILE_FORMAT_SAS7BCAT
@@ -66,3 +63,16 @@ ctypedef enum pywriter_variable_type:
     PYWRITER_DATE
     PYWRITER_DATETIME
     PYWRITER_TIME
+
+cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *
+cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, pywriter_variable_type curtype)
+cdef int get_pandas_str_series_max_length(object series)
+cdef int check_series_all_same_types(object series, object type_to_check)
+cdef list get_pandas_column_types(object df)
+cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx)
+cdef void check_exit_status(readstat_error_t retcode) except *
+cdef int open_file(str filename_path)
+cdef int close_file(int fd)
+
+cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
+                   int file_format_version, str note, str table_name) except *
