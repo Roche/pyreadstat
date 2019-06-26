@@ -208,6 +208,7 @@ cdef extern from "readstat.h":
 
     cdef void readstat_variable_set_label(readstat_variable_t *variable, const char *label)
     cdef void readstat_variable_set_format(readstat_variable_t *variable, const char *format);
+    cdef readstat_error_t readstat_writer_set_table_name(readstat_writer_t *writer, const char *table_name)
 
     cdef readstat_variable_t *readstat_get_variable(readstat_writer_t *writer, int index)
 
@@ -217,6 +218,9 @@ cdef extern from "readstat.h":
     cdef readstat_error_t readstat_begin_writing_sas7bdat(readstat_writer_t *writer, void *user_ctx, long row_count);
     cdef readstat_error_t readstat_begin_writing_sav(readstat_writer_t *writer, void *user_ctx, long row_count);
     cdef readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *user_ctx, long row_count);
+
+    cdef readstat_error_t readstat_validate_metadata(readstat_writer_t *writer)
+    cdef readstat_error_t readstat_validate_variable(readstat_writer_t *writer, const readstat_variable_t *variable)
 
     cdef readstat_error_t readstat_begin_row(readstat_writer_t *writer);
 

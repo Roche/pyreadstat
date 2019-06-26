@@ -1,3 +1,22 @@
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# #############################################################################
+# Copyright 2018 Hoffmann-La Roche
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# #############################################################################
+
+from libc.stddef cimport wchar_t
+
 from readstat_api cimport *
 #cdef int write_test()
 
@@ -6,15 +25,29 @@ cdef extern from "readstat_io_unistd.h":
         pass
 
 cdef extern from "conditional_includes.h":
+    int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode)
     int O_RDONLY
     int O_BINARY
     int O_WRONLY
     int O_CREAT
     int O_TRUNC
+    int _O_RDONLY
+    int _O_BINARY
+    int _O_WRONLY
+    int _O_CREAT
+    int _SH_DENYRW  # Denies read and write access to a file.
+    int _SH_DENYWR  # Denies write access to a file.
+    int _SH_DENYRD  # Denies read access to a file.
+    int _SH_DENYNO
     int open(const char *path, int oflag, int mode)
+    int _close(int fd)
+
+IF PY_MAJOR_VERSION >2:
+    cdef extern from "Python.h":
+            wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *)
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
-                   int file_format_version, str note) except *
+                   int file_format_version, str note, str table_name) except *
 
 ctypedef enum dst_file_format:
     FILE_FORMAT_SAS7BDAT
