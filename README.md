@@ -496,7 +496,7 @@ compress or not as zsav. write_dta can take a stata version. write_xport a name 
 
 ## Roadmap
 
-* Improve writing functions with capabilty to write value labels and user defined missing values.
+* Improve writing functions with capability to write value labels and user defined missing values.
 * Include latest releases from Readstat as the come out.
 
 ## Known limitations
