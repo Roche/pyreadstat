@@ -533,7 +533,7 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
     cdef table_name = ""
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, file_format_version, note, table_name)
 
-def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=-1):
+def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15):
     """
     Writes a pandas data frame to a STATA dta file
 
@@ -553,22 +553,20 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
 
     """
 
-    cdef int file_format_version = 119
-    if version >-1:
-        if version == 15:
-            version = 119
-        elif version == 14:
-            version = 118
-        elif version == 13:
-            version = 117
-        elif version == 12:
-            version = 115
-        elif version in {10, 11}:
-            version = 114
-        elif version in {8, 9}:
-            version = 113
-        else:
-            raise Exception("Version not supported")
+    if version == 15:
+        file_format_version = 119
+    elif version == 14:
+        file_format_version = 118
+    elif version == 13:
+        file_format_version = 117
+    elif version == 12:
+        file_format_version = 115
+    elif version in {10, 11}:
+        file_format_version = 114
+    elif version in {8, 9}:
+        file_format_version = 113
+    else:
+        raise Exception("Version not supported")
 
     cdef str note = ""
     cdef table_name = ""
