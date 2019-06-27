@@ -472,8 +472,8 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_write_basic(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         file_label = "basic write"
         file_note = "These are some notes"
@@ -488,8 +488,8 @@ class TestBasic(unittest.TestCase):
 
     def test_zsav_write_basic(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         file_label = "basic write"
         file_note = "These are some notes"
@@ -504,8 +504,8 @@ class TestBasic(unittest.TestCase):
 
     def test_dta_write_basic(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         df_pandas = self.df_pandas.copy()
         df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
@@ -526,8 +526,8 @@ class TestBasic(unittest.TestCase):
 
     def test_xport_write_basic(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         file_label = "basic write"
         table_name = "TEST"
@@ -544,8 +544,8 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_write_dates(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         path = os.path.join(self.write_folder, "dates_write.sav")
         pyreadstat.write_sav(self.df_sas_dates, path)
@@ -554,8 +554,8 @@ class TestBasic(unittest.TestCase):
 
     def test_zsav_write_dates(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         path = os.path.join(self.write_folder, "dates_write.sav")
         pyreadstat.write_sav(self.df_sas_dates, path, compress=True)
@@ -564,8 +564,8 @@ class TestBasic(unittest.TestCase):
 
     def test_dta_write_dates(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         path = os.path.join(self.write_folder, "dates_write.dta")
         pyreadstat.write_dta(self.df_sas_dates, path)
@@ -574,8 +574,8 @@ class TestBasic(unittest.TestCase):
 
     def test_xport_write_dates(self):
 
-        if sys.version_info[0] < 3:
-            return
+        #if sys.version_info[0] < 3:
+        #    return
 
         path = os.path.join(self.write_folder, "dates_write.xpt")
         pyreadstat.write_xport(self.df_sas_dates, path)

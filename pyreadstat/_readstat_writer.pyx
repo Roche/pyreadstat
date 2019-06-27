@@ -1,5 +1,5 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
-# cython: profile=True
+# ###cython: profile=True
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -23,11 +23,12 @@ import numpy as np
 #cimport numpy as np
 import pandas as pd
 import datetime
-try:
-    from datetime import timezone
-except: # not available on python 2
-    pass
-from libc.math cimport round
+import calendar
+IF PY_MAJOR_VERSION >2:
+    from datetime import timezone as _timezone
+ELSE: # not available on python 2
+    import pytz as _timezone
+from libc.math cimport round, NAN
 
 
 cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'), np.dtype('uint8'), np.dtype('uint16'),
@@ -44,12 +45,9 @@ cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRI
 cdef dict pandas_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
                                       PYWRITER_CHARACTER: READSTAT_TYPE_STRING, PYWRITER_LOGICAL: READSTAT_TYPE_INT32,
                                       PYWRITER_OBJECT: READSTAT_TYPE_STRING, PYWRITER_DATE: READSTAT_TYPE_DOUBLE,
-                                      PYWRITER_DATETIME: READSTAT_TYPE_DOUBLE, #PYWRITER_DATETIMENS: READSTAT_TYPE_DOUBLE,
-                                      PYWRITER_TIME: READSTAT_TYPE_DOUBLE}
+                                      PYWRITER_DATETIME: READSTAT_TYPE_DOUBLE, PYWRITER_TIME: READSTAT_TYPE_DOUBLE}
 
-#cdef double spss_offset_secs = -1 * (datetime.datetime(1582, 10, 14, 0, 0, 0, 0, tzinfo=timezone.utc).timestamp())
 cdef double spss_offset_secs = 12219379200
-#cdef double sas_offset_secs = -1 * (datetime.datetime(1960, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc).timestamp())
 cdef double sas_offset_secs = 315619200
 cdef double spss_offset_days = 141428
 cdef double sas_offset_days = 3653
@@ -76,7 +74,8 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
             curval = curval.asm8
 
         if type(curval) == datetime.datetime:
-            tstamp = curval.replace(tzinfo=timezone.utc).timestamp()
+            #tstamp = curval.replace(tzinfo=timezone.utc).timestamp() # works only in python 3
+            tstamp = calendar.timegm(curval.replace(tzinfo=_timezone.utc).timetuple())
         elif type(curval) == np.datetime64:
             if curval.dtype.name == "datetime64[ns]":
                 tstamp = round(<double>curval.astype(float)/1e9)
@@ -166,8 +165,10 @@ cdef int check_series_all_same_types(object series, object type_to_check):
 
 cdef list get_pandas_column_types(object df):
     """
-    From a pandas data frame, get a list with tuples column types as first element, max_length as second
-    max_lenght is the max length of a string or string representation of an object, 0 for numeric types
+    From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
+    as third.
+    max_lenght is the max length of a string or string representation of an object, 0 for numeric types. is_missing flags
+    wether the series has missing values (1) or not (0)
     """
 
     cdef int max_length
@@ -176,7 +177,7 @@ cdef list get_pandas_column_types(object df):
     cdef list columns = df.columns.values.tolist()
 
     cdef list result = list()
-    cdef int equal
+    cdef int equal, is_missing
 
     for indx, (col_name, col_type) in enumerate(zip(columns, types)):
 
@@ -186,20 +187,21 @@ cdef list get_pandas_column_types(object df):
         # recover original type for categories
         if type(col_type) is pd.core.dtypes.dtypes.CategoricalDtype:
             col_type = np.asarray(curseries).dtype
+
         if col_type in int_types:
-            result.append((PYWRITER_INTEGER, 0))
+            result.append((PYWRITER_INTEGER, 0,0))
         elif col_type in float_types:
-            result.append((PYWRITER_DOUBLE, 0))
+            result.append((PYWRITER_DOUBLE, 0,0))
         elif col_type == np.bool:
-            result.append((PYWRITER_LOGICAL, 0))
+            result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
-            result.append((PYWRITER_DATETIME, 0))
+            result.append((PYWRITER_DATETIME, 0,0))
         elif col_type == np.object:
-            #missing = pd.isna(curseries)
+            is_missing = 0
             if np.any(pd.isna(curseries)):
                 col = curseries.dropna().reset_index(drop=True)
-
+                is_missing = 1
                 if len(col):
                     curtype = type(col[0])
                     equal = check_series_all_same_types(col, curtype)
@@ -207,10 +209,10 @@ cdef list get_pandas_column_types(object df):
                     #if not np.all(equal):
                     if not equal:
                         max_length = get_pandas_str_series_max_length(col.astype(str))
-                        result.append((PYWRITER_OBJECT, max_length))
+                        result.append((PYWRITER_OBJECT, max_length, 1))
                         continue
                 else:
-                    result.append((PYWRITER_LOGICAL, 0))
+                    result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
             else:
                 curtype = type(curseries[0])
@@ -219,32 +221,35 @@ cdef list get_pandas_column_types(object df):
                 #if not np.all(equal):
                 if not equal:
                     max_length = get_pandas_str_series_max_length(curseries.astype(str))
-                    result.append((PYWRITER_OBJECT, max_length))
+                    result.append((PYWRITER_OBJECT, max_length, 0))
                     continue
 
             if curtype in int_types:
-                result.append((PYWRITER_INTEGER, 0))
+                result.append((PYWRITER_INTEGER, 0, is_missing))
             elif curtype in float_types:
-                result.append((PYWRITER_DOUBLE, 0))
+                result.append((PYWRITER_DOUBLE, 0, is_missing))
             elif curtype == np.bool:
-                result.append((PYWRITER_LOGICAL, 0))
+                result.append((PYWRITER_LOGICAL, 0, is_missing))
             elif curtype == str:
                 max_length = get_pandas_str_series_max_length(curseries)
-                result.append((PYWRITER_CHARACTER, max_length))
+                result.append((PYWRITER_CHARACTER, max_length, is_missing))
             elif curtype == datetime.date:
-                result.append((PYWRITER_DATE, 0))
+                result.append((PYWRITER_DATE, 0, is_missing))
             elif curtype == datetime.datetime:
-                result.append((PYWRITER_DATETIME, 0))
+                result.append((PYWRITER_DATETIME, 0, is_missing))
             elif curtype == datetime.time:
-                result.append((PYWRITER_TIME, 0))
+                result.append((PYWRITER_TIME, 0, is_missing))
             else:
                 max_length = get_pandas_str_series_max_length(curseries.astype(str))
-                result.append((PYWRITER_OBJECT, max_length))
+                result.append((PYWRITER_OBJECT, max_length, is_missing))
 
         else:
             # generic object
             max_length = get_pandas_str_series_max_length(curseries.astype(str))
-            result.append((PYWRITER_OBJECT, max_length))
+            is_missing = 0
+            if np.any(pd.isna(curseries)):
+                is_missing = 1
+            result.append((PYWRITER_OBJECT, max_length, is_missing))
     return result
 
 
@@ -290,14 +295,13 @@ cdef int open_file(str filename_path):
             fd = open(path, flags, 0644)
 
     ELSE:
-        return -1
-        # if os.name == "nt":
-        #     return -1
-        # else:
-        #     filename_bytes = filename_path.encode("utf-8")
-        #     path = <char *> filename_bytes
-        #     flags = O_WRONLY | O_CREAT | O_TRUNC
-        #     fd = open(path, flags, 0644)
+        if os.name == "nt":
+            return -1
+        else:
+            filename_bytes = filename_path.encode("utf-8")
+            path = <char *> filename_bytes
+            flags = O_WRONLY | O_CREAT | O_TRUNC
+            fd = open(path, flags, 0644)
 
     return fd
 
@@ -307,8 +311,6 @@ cdef int close_file(int fd):
     else:
         return close(fd)
 
-from time import time
-
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name) except *:
     """
@@ -316,8 +318,11 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     """
 
     IF PY_MAJOR_VERSION <3:
-        #if os.name == "nt":
-        raise PyreadstatError("Python 2 writing API not supported on python 2")
+        if os.name == "nt":
+            raise PyreadstatError("Writing API not supported on python 2 on windows")
+
+    if not isinstance(df, pd.DataFrame):
+        raise PyreadstatError("first argument must be a pandas data frame")
 
     cdef readstat_error_t retcode
     cdef char *err_readstat
@@ -348,14 +353,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     #cdef np.ndarray values
     cdef object values
 
-    # cdef bytes filename_bytes = filename_path.encode("utf-8")
-    # cdef char *path = <char *> filename_bytes
-    # cdef int flags = O_WRONLY | O_CREAT | O_TRUNC
-    # if os.name == "nt":
-    #     flags = _O_WRONLY | _O_CREAT | _O_BINARY
-    # cdef int fd = open(path, flags, 0644)
     cdef int fd = open_file(filename_path)
-    #t0 = time()
     writer = readstat_writer_init()
 
     try:
@@ -384,10 +382,9 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             col_label_count = len(column_labels)
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")
-        #print("setup", time()-t0)
-        #t0 = time()
+
         for col_indx in range(col_count):
-            curtype, max_length = col_types[col_indx]
+            curtype, max_length, _ = col_types[col_indx]
             #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
             #    max_length = 8
             variable = readstat_add_variable(writer, col_names[col_indx].encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
@@ -400,8 +397,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                         raise PyreadstatError("Column labels must be strings")
                     cur_col_label = column_labels[col_indx].encode("utf-8")
                     readstat_variable_set_label(variable, cur_col_label)
-        #print("add variables", time()-t0)
-        #t0 = time()
+
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:
             check_exit_status(readstat_begin_writing_sas7bcat(writer, &fd))
@@ -423,12 +419,10 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
         for col_indx in range(col_count):
             tempvar = readstat_get_variable(writer, col_indx)
             check_exit_status(readstat_validate_variable(writer, tempvar))
-        #print("start writing", time()-t0)
-        #t0 = time()
+
         # inserting
         values = df.values
-        #print("converting values", time()-t0)
-        #t0 = time()
+
         for  row in values:
             check_exit_status(readstat_begin_row(writer))
 
@@ -436,11 +430,13 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
 
                 tempvar = readstat_get_variable(writer, col_indx)
                 curval = row[col_indx]
-
-                if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
-                    check_exit_status(readstat_insert_missing_value(writer, tempvar))
-                    continue
                 curtype = col_types[col_indx][0]
+                is_missing = col_types[col_indx][2]
+
+                if is_missing:
+                    if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
+                        check_exit_status(readstat_insert_missing_value(writer, tempvar))
+                        continue
 
                 if curtype == PYWRITER_DOUBLE:
                     check_exit_status(readstat_insert_double_value(writer, tempvar, <double>curval))
@@ -462,15 +458,11 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             check_exit_status(readstat_end_row(writer))
 
         check_exit_status(readstat_end_writing(writer))
-        #print("inserting", time()-t0)
 
     except:
         raise
     finally:
-        #t0 = time()
         readstat_writer_free(writer)
-        #close(fd)
         close_file(fd)
-        #print("cleaning", time()-t0)
 
     return 0

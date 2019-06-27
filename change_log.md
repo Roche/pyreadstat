@@ -1,3 +1,6 @@
+# 0.2.7 (github, pypi, conda )
+* added writing capability.
+
 # 0.2.6 (github, pypi, conda 15.06.2019)
 * MANIFEST.in changed so that windows dlls get into the source distribution, setup.py
 changed so that those get installed only on windows but not unix.
