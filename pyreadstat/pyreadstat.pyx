@@ -23,8 +23,10 @@
 from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
 from readstat_api cimport readstat_parse_por, readstat_parse_xport
 from readstat_api cimport readstat_parse_sas7bcat
+from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
 from _readstat_parser cimport py_file_format, run_conversion
-cimport _readstat_parser
+from _readstat_writer cimport run_write
+cimport _readstat_parser, _readstat_writer
 from copy import deepcopy
 
 
@@ -501,6 +503,98 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 
     return df_copy, metadata
 
+# Write API
 
-    
-    
+def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None):
+    """
+    Writes a pandas data frame to a SPSS sav or zsav file.
+
+    Parameters
+    ----------
+    df : pandas data frame
+        pandas data frame to write to sav or zsav
+    dst_path : str
+        full path to the result sav or zsav file
+    file_label : str, optional
+        a label for the file
+    column_labels : list, optional
+        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
+        labels must be represented by None.
+    compress : boolean, optional
+        if true a zsav will be written, by default False, a sav is written
+    note : str, optional
+        a note to add to the file
+
+    """
+
+    cdef int file_format_version = 2
+    if compress:
+        file_format_version = 3
+    cdef table_name = ""
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, file_format_version, note, table_name)
+
+def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15):
+    """
+    Writes a pandas data frame to a STATA dta file
+
+    Parameters
+    ----------
+    df : pandas data frame
+        pandas data frame to write to sav or zsav
+    dst_path : str
+        full path to the result sav or zsav file
+    file_label : str, optional
+        a label for the file
+    column_labels : list, optional
+        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
+        labels must be represented by None.
+    version : int, optional
+        dta file version, supported from 8 to 15, default is 15
+
+    """
+
+    if version == 15:
+        file_format_version = 119
+    elif version == 14:
+        file_format_version = 118
+    elif version == 13:
+        file_format_version = 117
+    elif version == 12:
+        file_format_version = 115
+    elif version in {10, 11}:
+        file_format_version = 114
+    elif version in {8, 9}:
+        file_format_version = 113
+    else:
+        raise Exception("Version not supported")
+
+    cdef str note = ""
+    cdef table_name = ""
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version, note, table_name)
+
+def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None):
+    """
+    Writes a pandas data frame to a SAS Xport (xpt) file.
+    Only XPORT version 5 is supported. (files written in version 8 cannot be opened in SAS).
+
+    Parameters
+    ----------
+    df : pandas data frame
+        pandas data frame to write to sav or zsav
+    dst_path : str
+        full path to the result sav or zsav file
+    file_label : str, optional
+        a label for the file
+    column_labels : list, optional
+        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
+        labels must be represented by None.
+    table_name : str, optional
+        name of the dataset, by default DATASET
+
+    """
+
+    # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
+    cdef int file_format_version = 5
+
+    cdef str note = ""
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, file_format_version, note, table_name)

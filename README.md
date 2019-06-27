@@ -1,13 +1,13 @@
 # pyreadstat
 
-A python package to read sas (sas7bdat, sas7bcat, xport), spps (sav, zsav, por) and stata (dta) data files into 
-pandas dataframes.
+A python package to read and write sas (sas7bdat, sas7bcat, xport), spps (sav, zsav, por) and stata (dta) data files 
+into/from pandas dataframes.
 <br> 
 
 This module is a wrapper around the excellent [Readstat](https://github.com/WizardMac/ReadStat) C library by 
 [Evan Miller](https://www.evanmiller.org/). Readstat is the library used in the back of the R library 
 [Haven](https://github.com/tidyverse/haven), 
-meaning pyreadstat is a python equivalent to R Haven (but writing files is currently not supported.)
+meaning pyreadstat is a python equivalent to R Haven.
 
 Detailed documentation on all available methods is in the 
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html)
@@ -21,7 +21,7 @@ around the C library [librdata](https://github.com/WizardMac/librdata)
 
 **Pyreadstat is not a validated package. The results may have inaccuracies deriving from the fact most of the data formats
 are not open. Do not use it for critical tasks such as reporting to the authorities. Pyreadstat is not meant to replace
-the original applications in this regard and for that reason writing is not supported.**  
+the original applications in this regard.**  
 
 ## Table of Contents
 
@@ -140,7 +140,8 @@ wheel available, pip will attempt to compile the package.
 
 ### Using conda
 
-The package is also available in [conda-forge](https://anaconda.org/conda-forge/pyreadstat) for windows, mac and linux 64 bit, python 3.6 and 3.7. only.
+The package is also available in [conda-forge](https://anaconda.org/conda-forge/pyreadstat) for windows, mac and linux 
+64 bit, python 3.6 and 3.7. only.
 
 In order to install:
 
@@ -170,7 +171,7 @@ pip install git+https://github.com/Roche/pyreadstat.git
 
 You need a working C compiler. If working in python 2.7 you will need
 cython version >= 0.28 installed (see later Python 2.7 support). For python 3, cython
-is not necessary, but if installed it will be used.
+is not necessary if compiling on unix, but if installed it will be used.
 
 ### Compiling on Windows and Mac
 
@@ -240,6 +241,9 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | read_por            | read SPSS por files  |
 | set_catalog_to_sas  | enrich sas dataframe with catalog formats |
 | set_value_labels    | replace values by their labels |
+| write_sav           | write SPSS sav and zsav files |
+| write_dta           | write STATA dta files |
+| write_xport         | write SAS Xport (XPT) files |
 
 
 ### Reading only the headers
@@ -469,10 +473,31 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
+### Writing files
+
+Pyreadstat can write STATA (dta), SPSS (sav and zsav, por currently nor supported) and SAS (Xport, sas7bdat and sas7bcat
+currently not supported) files from pandas data frames.
+
+write functions take as first argument a pandas data frame (other data structures are not supported), as a second argument
+the path to the destination file. Optionally you can also pass a file label and a list with column labels.
+
+```python
+import pandas as pd
+import pyreadstat
+
+df = pd.DataFrame([[1,2.0,"a"],[3,4.0,"b"]], columns=["v1", "v2", "v3"])
+column_labels = ["Variable 1", "Variable 2", "Variable 3"]
+pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_labels=column_labels)
+```
+
+Some special arguments are available depending on the function. write_sav can take also notes as string and wheter to
+compress or not as zsav. write_dta can take a stata version. write_xport a name for the dataset. See the 
+[Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 ## Roadmap
 
-* Include latest changes from Readstat when ready (string missing values, release tag). Once this is done the new version will be released here, on pypi and conda-forge.
+* Improve writing functions with capability to write value labels and user defined missing values.
+* Include latest releases from Readstat as the come out.
 
 ## Known limitations
 
@@ -482,6 +507,8 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not able to skip rows.
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
+* Cannot write SAS sas7bdat and xport version 8 (version 5 is supported). Those files can be written but not read in 
+SAS and therefore are not supported in pyreadstat. SPSS por files can also not be written at the moment.
   
 Converting data types from foreign applications into python some times also bring some limitations:
 

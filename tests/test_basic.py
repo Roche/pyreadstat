@@ -38,6 +38,9 @@ class TestBasic(unittest.TestCase):
         self.catalog_data_folder = os.path.join(self.data_folder, "sas_catalog")
         self.international_data_folder = os.path.join(self.data_folder, "ínternátionál")
         self.missing_data_folder = os.path.join(self.data_folder, "missing_data")
+        self.write_folder = os.path.join(self.data_folder, "write")
+        if not os.path.isdir(self.write_folder):
+            os.makedirs(self.write_folder)
 
 
         # basic
@@ -464,6 +467,120 @@ class TestBasic(unittest.TestCase):
         mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
         self.assertTrue(df2.equals(mdf2))
         self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
+
+    # writing: none of this works on python 2
+
+    def test_sav_write_basic(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        file_label = "basic write"
+        file_note = "These are some notes"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "basic_write.sav")
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note)
+        df, meta = pyreadstat.read_sav(path)
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        self.assertEqual(meta.notes[0], file_note)
+
+    def test_zsav_write_basic(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        file_label = "basic write"
+        file_note = "These are some notes"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "basic_write.zsav")
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, compress=True, note=file_note)
+        df, meta = pyreadstat.read_sav(path)
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        self.assertEqual(meta.notes[0], file_note)
+
+    def test_dta_write_basic(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        df_pandas = self.df_pandas.copy()
+        df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
+        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int32)
+
+        file_label = "basic write"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "basic_write.dta")
+        pyreadstat.write_dta(df_pandas, path, file_label=file_label, column_labels=col_labels, version=12)
+        df, meta = pyreadstat.read_dta(path)
+
+        df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
+        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
+
+        self.assertTrue(df.equals(df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+
+    def test_xport_write_basic(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        file_label = "basic write"
+        table_name = "TEST"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "write.xpt")
+        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name)
+        df, meta = pyreadstat.read_xport(path)
+        df.columns = [x.lower() for x in df.columns]
+
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        self.assertEqual(table_name, meta.table_name)
+
+    def test_sav_write_dates(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        path = os.path.join(self.write_folder, "dates_write.sav")
+        pyreadstat.write_sav(self.df_sas_dates, path)
+        df, meta = pyreadstat.read_sav(path)
+        self.assertTrue(df.equals(self.df_sas_dates))
+
+    def test_zsav_write_dates(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        path = os.path.join(self.write_folder, "dates_write.sav")
+        pyreadstat.write_sav(self.df_sas_dates, path, compress=True)
+        df, meta = pyreadstat.read_sav(path)
+        self.assertTrue(df.equals(self.df_sas_dates))
+
+    def test_dta_write_dates(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        path = os.path.join(self.write_folder, "dates_write.dta")
+        pyreadstat.write_dta(self.df_sas_dates, path)
+        df, meta = pyreadstat.read_dta(path)
+        self.assertTrue(df.equals(self.df_sas_dates))
+
+    def test_xport_write_dates(self):
+
+        #if sys.version_info[0] < 3:
+        #    return
+
+        path = os.path.join(self.write_folder, "dates_write.xpt")
+        pyreadstat.write_xport(self.df_sas_dates, path)
+        df, meta = pyreadstat.read_xport(path)
+        self.assertTrue(df.equals(self.df_sas_dates))
         
 
 if __name__ == '__main__':

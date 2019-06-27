@@ -32,6 +32,11 @@ cdef extern from "<stdint.h>" nogil:
     ctypedef   signed short int16_t
     ctypedef   signed int   int32_t
     ctypedef   signed long  int64_t
+    ctypedef unsigned char  uint8_t
+
+cdef extern from '<unistd.h>':
+        int close(int fd)
+        ssize_t write(int fd, const void *buf, size_t nbyte)
     
 
 cdef extern from "readstat.h":
@@ -185,3 +190,51 @@ cdef extern from "readstat.h":
     double readstat_double_value(readstat_value_t value);
 
     char *readstat_error_message(readstat_error_t error_code);
+
+    # Write API
+    ctypedef struct readstat_writer_t
+    ctypedef ssize_t (*readstat_data_writer)(const void *data, size_t len, void *ctx)
+    ctypedef struct readstat_string_ref_t
+
+    cdef readstat_writer_t *readstat_writer_init()
+    cdef readstat_error_t readstat_set_data_writer(readstat_writer_t *writer, readstat_data_writer data_writer)
+    cdef readstat_error_t readstat_writer_set_file_label(readstat_writer_t *writer, const char *file_label);
+    cdef readstat_error_t readstat_writer_set_file_format_version(readstat_writer_t *writer, uint8_t file_format_version)
+
+    cdef void readstat_add_note(readstat_writer_t *writer, const char *note);
+
+    cdef readstat_variable_t *readstat_add_variable(readstat_writer_t *writer, const char *name, readstat_type_t type,
+        size_t storage_width)
+
+    cdef void readstat_variable_set_label(readstat_variable_t *variable, const char *label)
+    cdef void readstat_variable_set_format(readstat_variable_t *variable, const char *format);
+    cdef readstat_error_t readstat_writer_set_table_name(readstat_writer_t *writer, const char *table_name)
+
+    cdef readstat_variable_t *readstat_get_variable(readstat_writer_t *writer, int index)
+
+    cdef readstat_error_t readstat_begin_writing_dta(readstat_writer_t *writer, void *user_ctx, long row_count);
+    cdef readstat_error_t readstat_begin_writing_por(readstat_writer_t *writer, void *user_ctx, long row_count);
+    cdef readstat_error_t readstat_begin_writing_sas7bcat(readstat_writer_t *writer, void *user_ctx);
+    cdef readstat_error_t readstat_begin_writing_sas7bdat(readstat_writer_t *writer, void *user_ctx, long row_count);
+    cdef readstat_error_t readstat_begin_writing_sav(readstat_writer_t *writer, void *user_ctx, long row_count);
+    cdef readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *user_ctx, long row_count);
+
+    cdef readstat_error_t readstat_validate_metadata(readstat_writer_t *writer)
+    cdef readstat_error_t readstat_validate_variable(readstat_writer_t *writer, const readstat_variable_t *variable)
+
+    cdef readstat_error_t readstat_begin_row(readstat_writer_t *writer);
+
+    cdef readstat_error_t readstat_insert_int8_value(readstat_writer_t *writer, const readstat_variable_t *variable, int8_t value);
+    cdef readstat_error_t readstat_insert_int16_value(readstat_writer_t *writer, const readstat_variable_t *variable, int16_t value);
+    cdef readstat_error_t readstat_insert_int32_value(readstat_writer_t *writer, const readstat_variable_t *variable, int32_t value);
+    cdef readstat_error_t readstat_insert_float_value(readstat_writer_t *writer, const readstat_variable_t *variable, float value);
+    cdef readstat_error_t readstat_insert_double_value(readstat_writer_t *writer, const readstat_variable_t *variable, double value);
+    cdef readstat_error_t readstat_insert_string_value(readstat_writer_t *writer, const readstat_variable_t *variable, const char *value);
+    cdef readstat_error_t readstat_insert_string_ref(readstat_writer_t *writer, const readstat_variable_t *variable, readstat_string_ref_t *ref);
+    cdef readstat_error_t readstat_insert_missing_value(readstat_writer_t *writer, const readstat_variable_t *variable);
+    cdef readstat_error_t readstat_insert_tagged_missing_value(readstat_writer_t *writer, const readstat_variable_t *variable, char tag);
+
+    cdef readstat_error_t readstat_end_row(readstat_writer_t *writer);
+
+    cdef readstat_error_t readstat_end_writing(readstat_writer_t *writer);
+    cdef void readstat_writer_free(readstat_writer_t *writer);
