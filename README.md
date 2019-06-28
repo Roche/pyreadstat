@@ -34,6 +34,8 @@ the original applications in this regard.**
   + [Compiling on Windows and Mac](#compiling-on-windows-and-mac)
 * [Usage](#usage)
   + [Basic Usage](#basic-usage)
+    - [Reading Files](#reading-files)
+    - [Writing Files](#writing-files)
   + [Reading only the headers](#reading-only-the-headers)
   + [Reading selected columns](#reading-selected-columns)
   + [Reading value labels](#reading-value-labels)
@@ -41,7 +43,6 @@ the original applications in this regard.**
     - [SPSS](#spss)
     - [SAS and STATA](#sas-and-stata)
   + [Other options](#other-options)
-  + [Writing Files](#writing-files)
 * [Roadmap](#roadmap)
 * [Known limitations](#known-limitations)
 * [Python 2.7 support.](#python-27-support)
@@ -195,6 +196,8 @@ the folder build, otherwise you may be installing the old compilation again).
 
 ### Basic Usage
 
+#### Reading files
+
 Pass the path to a file to any of the functions provided by pyreadstat. It will return a pandas data frame and a metadata
 object. <br>
 The dataframe uses the column names. The metadata object contains the column names, column labels, number_rows, 
@@ -228,6 +231,27 @@ df.columns = meta.column_labels
 # to go back to column names
 df.columns = meta.column_names
 ```
+
+#### Writing files
+
+Pyreadstat can write STATA (dta), SPSS (sav and zsav, por currently nor supported) and SAS (Xport, sas7bdat and sas7bcat
+currently not supported) files from pandas data frames.
+
+write functions take as first argument a pandas data frame (other data structures are not supported), as a second argument
+the path to the destination file. Optionally you can also pass a file label and a list with column labels.
+
+```python
+import pandas as pd
+import pyreadstat
+
+df = pd.DataFrame([[1,2.0,"a"],[3,4.0,"b"]], columns=["v1", "v2", "v3"])
+column_labels = ["Variable 1", "Variable 2", "Variable 3"]
+pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_labels=column_labels)
+```
+
+Some special arguments are available depending on the function. write_sav can take also notes as string and wheter to
+compress or not as zsav. write_dta can take a stata version. write_xport a name for the dataset. See the 
+[Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 Here there is a relation of all functions available. 
 You can also check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
@@ -368,7 +392,6 @@ meta2.value_labels
 {'$A': {'1': 'Male', '2': 'Female'}, '$B': {'2': 'Female', '1': 'Male'}} 
 
 ```
-
 
 
 ### Missing Values
@@ -523,26 +546,6 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
-### Writing files
-
-Pyreadstat can write STATA (dta), SPSS (sav and zsav, por currently nor supported) and SAS (Xport, sas7bdat and sas7bcat
-currently not supported) files from pandas data frames.
-
-write functions take as first argument a pandas data frame (other data structures are not supported), as a second argument
-the path to the destination file. Optionally you can also pass a file label and a list with column labels.
-
-```python
-import pandas as pd
-import pyreadstat
-
-df = pd.DataFrame([[1,2.0,"a"],[3,4.0,"b"]], columns=["v1", "v2", "v3"])
-column_labels = ["Variable 1", "Variable 2", "Variable 3"]
-pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_labels=column_labels)
-```
-
-Some special arguments are available depending on the function. write_sav can take also notes as string and wheter to
-compress or not as zsav. write_dta can take a stata version. write_xport a name for the dataset. See the 
-[Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 ## Roadmap
 
