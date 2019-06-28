@@ -132,7 +132,7 @@ around the C library readstat.<br>
 Please visit out project home page for more information:<br>
 https://github.com/Roche/pyreadstat"""
 
-short_description = "Reads and Writes SAS, SPSS and Stata files into pandas data frames."
+short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas data frames."
 
 setup(
     name='pyreadstat',

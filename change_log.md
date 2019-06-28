@@ -1,4 +1,4 @@
-# 0.2.7 (github, pypi, conda )
+# 0.2.7 (github, pypi, conda 27.06.2019)
 * added writing capability.
 
 # 0.2.6 (github, pypi, conda 15.06.2019)

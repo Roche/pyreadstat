@@ -467,10 +467,10 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
     Parameters
     ----------
         sas_dataframe : pandas dataframe
-            resulting from parsing a sas file
-        sas_metadata : dictionary
-            resulting from parsing a sas file
-        catalog_metadata : dictionary
+            resulting from parsing a sas7bdat file
+        sas_metadata : pyreadstat metadata object
+            resulting from parsing a sas7bdat file
+        catalog_metadata : pyreadstat metadata object
             resulting from parsing a sas7bcat (catalog) file
         formats_as_category : bool, optional
             defaults to True. If True the variables having formats will be transformed into pandas categories.

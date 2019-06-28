@@ -40,7 +40,8 @@ the original applications in this regard.**
   + [Missing Values](#missing-values)
     - [SPSS](#spss)
     - [SAS and STATA](#sas-and-stata)
-+ [Other options](#other-options)
+  + [Other options](#other-options)
+  + [Writing Files](#writing-files)
 * [Roadmap](#roadmap)
 * [Known limitations](#known-limitations)
 * [Python 2.7 support.](#python-27-support)
@@ -243,7 +244,7 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | set_value_labels    | replace values by their labels |
 | write_sav           | write SPSS sav and zsav files |
 | write_dta           | write STATA dta files |
-| write_xport         | write SAS Xport (XPT) files |
+| write_xport         | write SAS Xport (XPT) files version 5 |
 
 
 ### Reading only the headers
@@ -323,6 +324,52 @@ df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=Fals
 # now let's add them to a second copy
 df_enriched = pyreadstat.set_value_labels(df, meta, formats_as_category=True)
 ```
+
+Internally each variable is associated with a label set. This information is stored in meta.variable_to_label. Each
+label set contains a map of the actual value in the variable to the label, this informtion is stored in 
+meta.variable_value_labels. By combining both you can get a dictionary of variable names to a dictionary of actual 
+values to labels. 
+
+For SPSS and STATA:
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sav("test_data/basic/sample.sav")
+# the variables mylabl and myord are associated to the label sets labels0 and labels1 respectively
+print(meta.variable_to_label)
+#{'mylabl': 'labels0', 'myord': 'labels1'}
+
+# labels0 and labels1 contain a dictionary of actual value to label
+print(meta.value_labels)
+#{'labels0': {1.0: 'Male', 2.0: 'Female'}, 'labels1': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+
+# both things have been joined by pyreadstat for convienent use
+print(meta.variable_value_labels)
+#{'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+
+```
+
+SAS is very similar except that meta.variable_to_label comes from the sas7bdat file and meta.value_labels comes from the
+sas7bcat file. That means if you read a sas7bdat file and a sas7bcat file togheter meta.variable_value_labels will be
+filled in. If you read only the sas7bdat file only meta.variable_to_label will be available and if you read the 
+sas7bcat file only meta.value_labels will be available. If you read a sas7bdat file and there are no associated label
+sets, SAS will assign by default the variable format as label sets.
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat("test_data/sas_catalog/test_data_linux.sas7bdat")
+meta.variable_to_label
+{'SEXA': '$A', 'SEXB': '$B'}
+
+df2, meta2 = pyreadstat.read_sas7bcat("test_data/sas_catalog/test_formats_linux.sas7bcat")
+meta2.value_labels
+{'$A': {'1': 'Male', '2': 'Female'}, '$B': {'2': 'Female', '1': 'Male'}} 
+
+```
+
+
 
 ### Missing Values
 
@@ -423,6 +470,9 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat("/path/to/file.sas7bdat", user_missing=True)
 
 df, meta = pyreadstat.read_dta("/path/to/file.dta", user_missing=True)
+
+print(meta.missing_user_values)
+
 ```
  
 The user may also assign a label to user defined missing values. In such 
