@@ -252,6 +252,54 @@ cdef list get_pandas_column_types(object df):
             result.append((PYWRITER_OBJECT, max_length, is_missing))
     return result
 
+cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value_labels, str labelset_name,
+                        pywriter_variable_type curpytype, dst_file_format file_format, str variable_name) except *:
+
+    cdef readstat_label_set_t *label_set
+    cdef readstat_type_t curtype
+    cdef double double_val
+    
+    curtype = pandas_to_readstat_types[curpytype]
+    label_set = readstat_add_label_set(writer, curtype, labelset_name.encode("utf-8"))
+
+    for value, label in value_labels.items():
+
+        if type(label) != str:
+            msg = "variable_value_labels: type of Label %s in variable %s must be string" % (str(label), variable_name)
+            raise PyreadstatError(msg)
+
+        if curpytype == PYWRITER_DOUBLE:
+            if type(value) not in numeric_types:
+                msg = "variable_value_labels: type of Value %s in variable %s must be numeric" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            readstat_label_double_value(label_set, value, label.encode("utf-8"))
+
+        elif curpytype == PYWRITER_INTEGER:
+            if type(value) not in int_types:
+                msg = "variable_value_labels: type of Value %s in variable %s must be int" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            readstat_label_int32_value(label_set, value, label.encode("utf-8"))
+
+        elif curpytype == PYWRITER_LOGICAL:
+            if type(value) != bool and (value != 0 and value != 1):
+                msg = "variable_value_labels: type of Value %s in variable %s must be boolean or be 1 or 0" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            readstat_label_int32_value(label_set, int(value), label.encode("utf-8"))
+
+        elif curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT:
+            value = str(value)
+            readstat_label_string_value(label_set, value.encode("utf-8"), label.encode("utf-8"))
+
+        elif curpytype in (PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME):
+            if type(value) not in nat_types:
+                msg = "variable_value_labels: type of Value %s in variable %s must match the type of the column in pandas and be of type date, datetime or time" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            double_val = convert_datetimelike_to_number(file_format, curpytype, value) 
+            readstat_label_double_value(label_set, double_val, label.encode("utf-8"))
+
+    #void readstat_label_tagged_value(readstat_label_set_t *label_set, char tag, const char *label);
+    return label_set
+
 
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
     """
@@ -312,7 +360,7 @@ cdef int close_file(int fd):
         return close(fd)
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
-                   int file_format_version, str note, str table_name) except *:
+                   int file_format_version, str note, str table_name, dict variable_value_labels) except *:
     """
     main entry point for writing all formats
     """
@@ -337,6 +385,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef list col_types = get_pandas_column_types(df)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
+    cdef dict col_names_to_types = {k:v[0] for k,v in zip(col_names, col_types)}
 
     cdef readstat_variable_t *variable
     cdef pywriter_variable_type curtype
@@ -352,6 +401,9 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef double dtimelikeval
     #cdef np.ndarray values
     cdef object values
+    cdef dict value_labels
+    cdef int lblset_cnt = 0
+    cdef readstat_label_set_t *label_set
 
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()
@@ -382,12 +434,13 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             col_label_count = len(column_labels)
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")
-
+     
         for col_indx in range(col_count):
             curtype, max_length, _ = col_types[col_indx]
             #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
             #    max_length = 8
-            variable = readstat_add_variable(writer, col_names[col_indx].encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
+            variable_name = col_names[col_indx]
+            variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
             if curtype in pyrwriter_datetimelike_types:
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
                 readstat_variable_set_format(variable, curformat)
@@ -397,6 +450,15 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                         raise PyreadstatError("Column labels must be strings")
                     cur_col_label = column_labels[col_indx].encode("utf-8")
                     readstat_variable_set_label(variable, cur_col_label)
+            if variable_value_labels:
+                value_labels = variable_value_labels.get(variable_name)
+                if value_labels:
+                    labelset_name = variable_name + str(lblset_cnt)
+                    lblset_cnt += 1
+                    label_set = set_value_label(writer, value_labels, labelset_name,
+                        col_names_to_types[variable_name], file_format, variable_name)
+                    readstat_variable_set_label_set(variable, label_set);
+
 
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:

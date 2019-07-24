@@ -505,7 +505,8 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 
 # Write API
 
-def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None):
+def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
+                dict variable_value_labels=None):
     """
     Writes a pandas data frame to a SPSS sav or zsav file.
 
@@ -524,6 +525,10 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
         if true a zsav will be written, by default False, a sav is written
     note : str, optional
         a note to add to the file
+    variable_value_labels : dict, optional
+        value labels, a dictionary with key variable name and value a dictionary with key values and
+        values labels. Variable names must match variable names in the dataframe otherwise will be
+        ignored. Value types must match the type of the column in the dataframe.
 
     """
 
@@ -531,9 +536,9 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
     if compress:
         file_format_version = 3
     cdef table_name = ""
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, file_format_version, note, table_name)
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, file_format_version, note, table_name, variable_value_labels)
 
-def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15):
+def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15, dict variable_value_labels=None):
     """
     Writes a pandas data frame to a STATA dta file
 
@@ -550,6 +555,10 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
         labels must be represented by None.
     version : int, optional
         dta file version, supported from 8 to 15, default is 15
+    variable_value_labels : dict, optional
+        value labels, a dictionary with key variable name and value a dictionary with key values and
+        values labels. Variable names must match variable names in the dataframe otherwise will be
+        ignored. Value types must match the type of the column in the dataframe.
 
     """
 
@@ -570,7 +579,7 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
 
     cdef str note = ""
     cdef table_name = ""
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version, note, table_name)
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version, note, table_name, variable_value_labels)
 
 def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None):
     """
@@ -595,6 +604,6 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
 
     # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
     cdef int file_format_version = 5
-
+    cdef dict variable_value_labels=None
     cdef str note = ""
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, file_format_version, note, table_name)
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, file_format_version, note, table_name, variable_value_labels)

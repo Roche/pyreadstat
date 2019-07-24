@@ -75,4 +75,4 @@ cdef int open_file(str filename_path)
 cdef int close_file(int fd)
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
-                   int file_format_version, str note, str table_name) except *
+                   int file_format_version, str note, str table_name, dict variable_value_labels) except *

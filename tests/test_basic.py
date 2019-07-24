@@ -472,40 +472,35 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_write_basic(self):
 
-        #if sys.version_info[0] < 3:
-        #    return
-
         file_label = "basic write"
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
         path = os.path.join(self.write_folder, "basic_write.sav")
-        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note)
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, variable_value_labels=variable_value_labels)
         df, meta = pyreadstat.read_sav(path)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertEqual(meta.notes[0], file_note)
+        self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_zsav_write_basic(self):
 
-        #if sys.version_info[0] < 3:
-        #    return
-
         file_label = "basic write"
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
         path = os.path.join(self.write_folder, "basic_write.zsav")
-        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, compress=True, note=file_note)
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, compress=True, note=file_note, variable_value_labels=variable_value_labels)
         df, meta = pyreadstat.read_sav(path)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertEqual(meta.notes[0], file_note)
+        self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_dta_write_basic(self):
-
-        #if sys.version_info[0] < 3:
-        #    return
 
         df_pandas = self.df_pandas.copy()
         df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
@@ -513,8 +508,9 @@ class TestBasic(unittest.TestCase):
 
         file_label = "basic write"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        variable_value_labels = {'mylabl': {1: 'Male', 2: 'Female'}, 'myord': {1: 'low', 2: 'medium', 3: 'high'}}
         path = os.path.join(self.write_folder, "basic_write.dta")
-        pyreadstat.write_dta(df_pandas, path, file_label=file_label, column_labels=col_labels, version=12)
+        pyreadstat.write_dta(df_pandas, path, file_label=file_label, column_labels=col_labels, version=12, variable_value_labels=variable_value_labels)
         df, meta = pyreadstat.read_dta(path)
 
         df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
@@ -523,11 +519,9 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
+        self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_xport_write_basic(self):
-
-        #if sys.version_info[0] < 3:
-        #    return
 
         file_label = "basic write"
         table_name = "TEST"
