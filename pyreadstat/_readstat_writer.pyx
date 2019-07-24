@@ -372,6 +372,12 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     if not isinstance(df, pd.DataFrame):
         raise PyreadstatError("first argument must be a pandas data frame")
 
+    if variable_value_labels:
+        for k,v in variable_value_labels.items():
+            if type(v) != dict:
+                msg = "variable_value_labels: value for key %s must be dict, got %s" % (k, str(type(v)))
+                raise PyreadstatError(msg)
+
     cdef readstat_error_t retcode
     cdef char *err_readstat
     cdef str err_message
