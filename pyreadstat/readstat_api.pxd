@@ -219,6 +219,11 @@ cdef extern from "readstat.h":
     cdef void readstat_variable_set_measure(readstat_variable_t *variable, readstat_measure_t measure);
     cdef void readstat_variable_set_alignment(readstat_variable_t *variable, readstat_alignment_t alignment);
     cdef void readstat_variable_set_display_width(readstat_variable_t *variable, int display_width);
+    cdef readstat_error_t readstat_variable_add_missing_double_value(readstat_variable_t *variable, double value);
+    cdef readstat_error_t readstat_variable_add_missing_double_range(readstat_variable_t *variable, double lo, double hi);
+    cdef readstat_error_t readstat_variable_add_missing_string_value(readstat_variable_t *variable, const char *value);
+    cdef readstat_error_t readstat_variable_add_missing_string_range(readstat_variable_t *variable, const char *lo, const char *hi);
+
     cdef readstat_error_t readstat_writer_set_table_name(readstat_writer_t *writer, const char *table_name)
 
     cdef readstat_variable_t *readstat_get_variable(readstat_writer_t *writer, int index)

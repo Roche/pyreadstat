@@ -476,9 +476,11 @@ class TestBasic(unittest.TestCase):
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
         variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+        missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
         path = os.path.join(self.write_folder, "basic_write.sav")
-        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, variable_value_labels=variable_value_labels)
-        df, meta = pyreadstat.read_sav(path)
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
+            variable_value_labels=variable_value_labels, missing_ranges=missing_ranges)
+        df, meta = pyreadstat.read_sav(path, user_missing=True)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
@@ -491,9 +493,11 @@ class TestBasic(unittest.TestCase):
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
         variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+        missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
         path = os.path.join(self.write_folder, "basic_write.zsav")
-        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, compress=True, note=file_note, variable_value_labels=variable_value_labels)
-        df, meta = pyreadstat.read_sav(path)
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, compress=True, note=file_note,
+                     variable_value_labels=variable_value_labels, missing_ranges=missing_ranges)
+        df, meta = pyreadstat.read_sav(path, user_missing=True)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)

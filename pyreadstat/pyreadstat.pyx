@@ -506,7 +506,7 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 # Write API
 
 def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
-                dict variable_value_labels=None):
+                dict variable_value_labels=None, dict missing_ranges=None):
     """
     Writes a pandas data frame to a SPSS sav or zsav file.
 
@@ -529,14 +529,22 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
         value labels, a dictionary with key variable name and value a dictionary with key values and
         values labels. Variable names must match variable names in the dataframe otherwise will be
         ignored. Value types must match the type of the column in the dataframe.
-
+    missing_ranges : dict, optional
+        user defined missing values. Must be a dictionary with keys as variable names matching variable
+        names in the dataframe. The values must be a list. Each element in that list can either be
+        either a discrete numeric or string value (max 3 per variable) or a dictionary with keys 'hi' and 'lo' to
+        indicate the upper and lower range for numeric values (max 1 range value + 1 discrete value per
+        variable). hi and lo may also be the same value in which case it will be interpreted as a discrete
+        missing value.
+        For this to be effective, values in the dataframe must be the same as reported here and not NaN.
     """
 
     cdef int file_format_version = 2
     if compress:
         file_format_version = 3
     cdef table_name = ""
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, file_format_version, note, table_name, variable_value_labels)
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
+        file_format_version, note, table_name, variable_value_labels, missing_ranges)
 
 def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15, dict variable_value_labels=None):
     """
@@ -578,8 +586,10 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
         raise Exception("Version not supported")
 
     cdef str note = ""
-    cdef table_name = ""
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version, note, table_name, variable_value_labels)
+    cdef str table_name = ""
+    cdef dict missing_ranges = None
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
+     note, table_name, variable_value_labels, missing_ranges)
 
 def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None):
     """
@@ -606,4 +616,6 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
     cdef int file_format_version = 5
     cdef dict variable_value_labels=None
     cdef str note = ""
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, file_format_version, note, table_name, variable_value_labels)
+    cdef dict missing_ranges = None
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
+        file_format_version, note, table_name, variable_value_labels, missing_ranges)

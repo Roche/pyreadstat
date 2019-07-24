@@ -300,6 +300,70 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
     #void readstat_label_tagged_value(readstat_label_set_t *label_set, char tag, const char *label);
     return label_set
 
+cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) except *:
+    """
+    Adding missing ranges, this happens for SPSS
+    """
+
+    cdef int range_values = 0
+    cdef int discrete_values = 0
+    cdef int discrete_strings = 0
+
+    for cur_range in cur_ranges:
+        if isinstance(cur_range, dict):
+            hi = cur_range.get("hi")
+            lo = cur_range.get("lo")
+            if hi is None or lo is None:
+                msg = "dictionaries in missing_ranges must have the keys hi and lo"
+                raise PyreadstatError(msg)
+            if type(hi) in numeric_types  and type(lo) in numeric_types:
+                if hi == lo:
+                    check_exit_status(readstat_variable_add_missing_double_value(variable, hi))
+                    discrete_values += 1
+                else:
+                    check_exit_status(readstat_variable_add_missing_double_range(variable, lo, hi))
+                    range_values += 1
+            elif type(hi) == str and type(lo) == str:
+                if hi == lo:
+                    if len(hi) > 8:
+                        msg = "missing_ranges: string values length must not be larger than 8"
+                        raise PyreadstatError(msg)
+                    check_exit_status(readstat_variable_add_missing_string_value(variable, hi))
+                    discrete_strings += 1
+                else:
+                    #check_exit_status(readstat_variable_add_missing_string_range(variable, lo, hi))
+                    msg = "missing_ranges: hi and lo values must be both the same for string type"
+                    raise PyreadstatError(msg)
+            else:
+                msg = "missing_ranges: hi and lo values must be both either of numeric or string type"
+                raise PyreadstatError(msg)
+        else:
+            if type(cur_range) in numeric_types:
+                check_exit_status(readstat_variable_add_missing_double_value(variable, cur_range))
+                discrete_values += 1
+            elif type(cur_range) == str:
+                if len(cur_range) > 8:
+                        msg = "missing_ranges: string values length must not be larger than 8"
+                        raise PyreadstatError(msg)
+                check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))
+                discrete_strings += 1
+            else:
+                msg = "missing_ranges: values must be both either of numeric or string type"
+                raise PyreadstatError(msg)
+               
+        if discrete_strings > 3:
+            msg = "missing_ranges: max 3 string values per variable allowed"
+            raise PyreadstatError(msg)
+        if range_values:
+            if range_values > 1:
+                msg = "missing_ranges: max 1 range value per variable allowed"
+                raise PyreadstatError(msg)
+            if discrete_values > 1:
+                msg = "missing_ranges: max 1 discrete numeric value if combined with 1 range value per variable allowed"
+                raise PyreadstatError(msg)
+        if discrete_values >3:
+            msg = "missing_ranges: max 3 discrete numeric values per variable allowed"
+            raise PyreadstatError(msg)
 
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
     """
@@ -360,7 +424,8 @@ cdef int close_file(int fd):
         return close(fd)
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
-                   int file_format_version, str note, str table_name, dict variable_value_labels) except *:
+                   int file_format_version, str note, str table_name, dict variable_value_labels, 
+                   dict missing_ranges) except *:
     """
     main entry point for writing all formats
     """
@@ -463,8 +528,14 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                     lblset_cnt += 1
                     label_set = set_value_label(writer, value_labels, labelset_name,
                         col_names_to_types[variable_name], file_format, variable_name)
-                    readstat_variable_set_label_set(variable, label_set);
-
+                    readstat_variable_set_label_set(variable, label_set)
+                if missing_ranges:
+                    cur_ranges = missing_ranges.get(variable_name)
+                    if cur_ranges:
+                        if not isinstance(cur_ranges, list):
+                            msg = "missing_ranges: values in dictionary must be list"
+                            raise PyreadstatError(msg)
+                        add_missing_ranges(cur_ranges, variable)
 
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:
