@@ -30,7 +30,6 @@
     int _SH_DENYWR; 
     int _SH_DENYRD;
     int _SH_DENYNO;
-    void assign_fd(void *io_ctx, int fd){};
-    int _close(int fd){};
+    int _close(int fd){ return 0; };
     
 #endif
