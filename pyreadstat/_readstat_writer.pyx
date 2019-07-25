@@ -261,6 +261,9 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
 cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value_labels, str labelset_name,
                         pywriter_variable_type curpytype, dst_file_format file_format, str variable_name, 
                         list user_missing_tags) except *:
+    """
+    Sets value labels for normal values and also tagged missing values (user defined missing for stata and sas)
+    """
 
     cdef readstat_label_set_t *label_set
     cdef readstat_type_t curtype
@@ -313,12 +316,12 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
             double_val = convert_datetimelike_to_number(file_format, curpytype, value) 
             readstat_label_double_value(label_set, double_val, label.encode("utf-8"))
 
-    #void readstat_label_tagged_value(readstat_label_set_t *label_set, char tag, const char *label);
     return label_set
 
 cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) except *:
     """
-    Adding missing ranges, this happens for SPSS
+    Adding missing ranges, user defined missing discrete values both numeric and character,
+     this happens for SPSS
     """
 
     cdef int range_values = 0
@@ -381,6 +384,52 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
             msg = "missing_ranges: max 3 discrete numeric values per variable allowed"
             raise PyreadstatError(msg)
 
+cdef void set_variable_alignment(readstat_variable_t *variable, str alignment_str, str var_name) except *:
+    """
+    Sets the variable alignment, ineffective on SPSS, STATA and XPORT (what about SAS7bdat?)
+    """
+
+    cdef readstat_alignment_t alignment
+
+    if alignment_str == "right":
+        alignment = READSTAT_ALIGNMENT_RIGHT
+    elif alignment_str == "left":
+        alignment = READSTAT_ALIGNMENT_LEFT
+    elif alignment_str == "center":
+        alignment = READSTAT_ALIGNMENT_CENTER
+    else:
+        msg = "alignment for variable %s must be either RIGHT, CENTER or LEFT, got %s instead" % (var_name, alignment_str)
+        raise PyreadstatError(msg)
+
+    readstat_variable_set_alignment(variable, alignment)
+
+cdef void set_variable_display_width(readstat_variable_t *variable, int display_width, str var_name) except *:
+    """
+    Sets the variable display width (SPSS). Not effective on STATA. (what about SAS7BDAT?)
+    """
+
+    readstat_variable_set_display_width(variable, display_width)
+
+cdef void set_variable_measure(readstat_variable_t *variable, str measure_str, str var_name) except *:
+    """
+    sets the variable measure type (SPSS). Not effective on STATA.
+    """
+
+    cdef readstat_measure_t measure
+
+    if measure_str == "nominal":
+        measure = READSTAT_MEASURE_NOMINAL
+    elif measure_str == "ordinal":
+        measure = READSTAT_MEASURE_ORDINAL
+    elif measure_str == "scale":
+        measure = READSTAT_MEASURE_SCALE
+    else:
+        msg = "measure for variable %s must be either nominal, ordinal or scale, got %s instead" % (var_name, measure_str)
+        raise PyreadstatError(msg)
+
+    readstat_variable_set_measure(variable, measure);
+
+
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
     """
     for the writer an explicit function to write must be defined 
@@ -441,9 +490,12 @@ cdef int close_file(int fd):
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
-                   dict missing_ranges, dict missing_user_values) except *:
+                   dict missing_ranges, dict missing_user_values, dict variable_alignment,
+                   dict variable_display_width, dict variable_measure) except *:
     """
-    main entry point for writing all formats
+    main entry point for writing all formats. Some parameters are specific for certain file type
+    and are even incompatible between them. This function relies on the caller to select the right
+    combination of parameters, not checking them otherwise.
     """
 
     IF PY_MAJOR_VERSION <3:
@@ -570,6 +622,20 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                             msg = "missing_ranges: values in dictionary must be list"
                             raise PyreadstatError(msg)
                         add_missing_ranges(cur_ranges, variable)
+                if variable_alignment:
+                    # At the moment this is ineffective for sav and dta (the function runs but in
+                    # the resulting file all alignments are still unknown)
+                    cur_alignment = variable_alignment.get(variable_name)
+                    if cur_alignment:
+                        set_variable_alignment(variable, cur_alignment, variable_name)
+                if variable_display_width:
+                    cur_display_width = variable_display_width.get(variable_name)
+                    if cur_display_width:
+                        set_variable_display_width(variable, cur_display_width, variable_name)
+                if variable_measure:
+                    cur_measure = variable_measure.get(variable_name)
+                    if cur_measure:
+                        set_variable_measure(variable, cur_measure, variable_name)
 
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:

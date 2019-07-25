@@ -39,9 +39,8 @@ object contains the following fields:
     lo and hi are the same, the two elements will always be present. This appears for SPSS (sav) files when using the
     option user_missing=True: user defined missing values appear not as nan but as their true value and this dictionary
     stores the information about which values are to be considered missing.
-  * missing_user_values: a list of character values (A to Z and _ for SAS, a to z for SATA) representing user defined
-    missing values in SAS and STATA.
-    This appears when using user_missing=True in read_sas7bdat or read_dta if user defined missing values are present.
+  * missing_user_values: a dict with keys being variable names. Values are a list of character values (A to Z and _ for SAS, a to z for SATA) representing user defined
+    missing values in SAS and STATA. This appears when using user_missing=True in read_sas7bdat or read_dta if user defined missing values are present.
   * variable_alignment: a dict with keys being variable names and values being the display alignment: left, center, right or unknown
   * variable_storage_width: a dict with keys being variable names and values being the storage width
   * variable_display_width: a dict with keys being variable names and values being the display width

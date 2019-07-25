@@ -506,7 +506,8 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 # Write API
 
 def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
-                dict variable_value_labels=None, dict missing_ranges=None):
+                dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
+                dict variable_measure=None):
     """
     Writes a pandas data frame to a SPSS sav or zsav file.
 
@@ -537,6 +538,12 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
         variable). hi and lo may also be the same value in which case it will be interpreted as a discrete
         missing value.
         For this to be effective, values in the dataframe must be the same as reported here and not NaN.
+    variable_display_width : dict, optional
+        set the display width for variables. Must be a dictonary with keys being variable names and
+        values being integers.
+    variable_measure: dict, optional
+        sets the measure type for a variable. Must be a dictionary with keys being variable names and
+        values being strings one of "nominal", "ordinal" or "scale".
     """
 
     cdef int file_format_version = 2
@@ -544,8 +551,11 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
         file_format_version = 3
     cdef table_name = ""
     cdef dict missing_user_values = None
+    cdef dict variable_alignment = None
+    
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
-        file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values)
+        file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
+        variable_alignment, variable_display_width, variable_measure)
 
 def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15, 
             dict variable_value_labels=None, dict missing_user_values=None):
@@ -569,7 +579,10 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
         value labels, a dictionary with key variable name and value a dictionary with key values and
         values labels. Variable names must match variable names in the dataframe otherwise will be
         ignored. Value types must match the type of the column in the dataframe.
-
+    missing_user_values : dict, optional
+        user defined missing values for numeric variables. Must be a dictionary with keys being variable
+        names and values being a list of missing values. Missing values must be a single character
+        between a and z.
     """
 
     if version == 15:
@@ -590,8 +603,13 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
     cdef str note = ""
     cdef str table_name = ""
     cdef dict missing_ranges = None
+    cdef dict variable_alignment = None
+    cdef dict variable_display_width = None
+    cdef dict variable_measure = None
+
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
-     note, table_name, variable_value_labels, missing_ranges, missing_user_values)
+     note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
+     variable_display_width, variable_measure)
 
 def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None):
     """
@@ -620,5 +638,9 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
     cdef str note = ""
     cdef dict missing_ranges = None
     cdef dict missing_user_values = None
+    cdef dict variable_alignment = None
+    cdef dict variable_display_width = None
+    cdef dict variable_measure = None
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
-        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values)
+        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
+        variable_alignment,variable_display_width, variable_measure)
