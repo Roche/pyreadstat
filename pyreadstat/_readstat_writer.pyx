@@ -39,9 +39,7 @@ cdef set numeric_types = int_types.union(float_types)
 cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
-
-
-
+cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 cdef dict pandas_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
                                       PYWRITER_CHARACTER: READSTAT_TYPE_STRING, PYWRITER_LOGICAL: READSTAT_TYPE_INT32,
                                       PYWRITER_OBJECT: READSTAT_TYPE_STRING, PYWRITER_DATE: READSTAT_TYPE_DOUBLE,
@@ -52,6 +50,9 @@ cdef double sas_offset_secs = 315619200
 cdef double spss_offset_days = 141428
 cdef double sas_offset_days = 3653
 cdef object date_0 = datetime.datetime(1970,1,1).date()
+
+cdef valid_user_missing_sas = [chr(x) for x in range(ord("A"), ord("Z")+1)] + ["_"]
+cdef valid_user_missing_stata = [chr(x) for x in range(ord("a"), ord("z")+1)]
 
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *:
@@ -163,7 +164,7 @@ cdef int check_series_all_same_types(object series, object type_to_check):
     return 1
 
 
-cdef list get_pandas_column_types(object df):
+cdef list get_pandas_column_types(object df, list missing_user_values):
     """
     From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
     as third.
@@ -203,6 +204,11 @@ cdef list get_pandas_column_types(object df):
                 col = curseries.dropna().reset_index(drop=True)
                 is_missing = 1
                 if len(col):
+                    if missing_user_values:
+                        col = col[~col.isin(missing_user_values)].reset_index(drop=True)
+                        if not len(col):
+                            msg = "Variable %s has only values listed in missing_user_values or NaNs, not possible to determine if it is a numeric variable with user defined missing values or a string variable with no user defined missing values" % col_name
+                            raise PyreadstatError(msg)
                     curtype = type(col[0])
                     equal = check_series_all_same_types(col, curtype)
                     #equal = col.apply(lambda x: type(x) == curtype)
@@ -215,6 +221,12 @@ cdef list get_pandas_column_types(object df):
                     result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
             else:
+                if missing_user_values:
+                    curseries = curseries[~curseries.isin(missing_user_values)].reset_index(drop=True)
+                    if not len(curseries):
+                        msg = "Variable %s has only values listed in missing_user_values or NaNs, not possible to determine if it is a numeric variable with user defined missing values or a string variable with no user defined missing values" % col_name
+                        raise PyreadstatError(msg)
+                
                 curtype = type(curseries[0])
                 equal = check_series_all_same_types(curseries, curtype)
                 #equal = curseries.apply(lambda x: type(x) == curtype)
@@ -425,7 +437,7 @@ cdef int close_file(int fd):
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
-                   dict missing_ranges) except *:
+                   dict missing_ranges, list missing_user_values) except *:
     """
     main entry point for writing all formats
     """
@@ -443,6 +455,17 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 msg = "variable_value_labels: value for key %s must be dict, got %s" % (k, str(type(v)))
                 raise PyreadstatError(msg)
 
+    if missing_user_values:
+        if file_format == FILE_FORMAT_DTA:
+            valid_user_missing = valid_user_missing_stata
+        elif file_format == FILE_FORMAT_SAS7BDAT or file_format == FILE_FORMAT_SAS7BCAT:
+            valid_user_missing = valid_user_missing_sas
+        for val in missing_user_values:
+            if val not in valid_user_missing:
+                msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
+                raise PyreadstatError(msg)
+
+
     cdef readstat_error_t retcode
     cdef char *err_readstat
     cdef str err_message
@@ -453,7 +476,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
-    cdef list col_types = get_pandas_column_types(df)
+    cdef list col_types = get_pandas_column_types(df, missing_user_values)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
     cdef dict col_names_to_types = {k:v[0] for k,v in zip(col_names, col_types)}
@@ -575,6 +598,11 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 if is_missing:
                     if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
+                        continue
+
+                if missing_user_values and curtype in pywriter_numeric_types:
+                    if curval in missing_user_values:
+                        check_exit_status(readstat_insert_tagged_missing_value(writer, tempvar, ord(curval)))
                         continue
 
                 if curtype == PYWRITER_DOUBLE:

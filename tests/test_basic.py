@@ -525,6 +525,23 @@ class TestBasic(unittest.TestCase):
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
+    def test_dta_write_user_missing(self):
+
+
+        #formatted_csv = os.path.join(self.missing_data_folder, "missing_dta_formatted.csv")
+        #labeled_csv = os.path.join(self.missing_data_folder, "missing_dta_labeled.csv")
+        
+        df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
+
+        missing_user_values = ['a']
+        path = os.path.join(self.write_folder, "user_missing_write.dta")
+        pyreadstat.write_dta(df_csv, path, version=12, missing_user_values=missing_user_values)
+        
+        df_dta, meta = pyreadstat.read_dta(path, user_missing=True)
+        self.assertTrue(df_csv.equals(df_dta))
+        self.assertListEqual(meta.missing_user_values, missing_user_values)
+        
+
     def test_xport_write_basic(self):
 
         file_label = "basic write"
