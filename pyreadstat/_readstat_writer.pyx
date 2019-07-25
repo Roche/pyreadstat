@@ -164,7 +164,7 @@ cdef int check_series_all_same_types(object series, object type_to_check):
     return 1
 
 
-cdef list get_pandas_column_types(object df, list missing_user_values):
+cdef list get_pandas_column_types(object df, dict missing_user_values):
     """
     From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
     as third.
@@ -184,6 +184,9 @@ cdef list get_pandas_column_types(object df, list missing_user_values):
 
         max_length = 0
         curseries = df.iloc[:, indx]
+        curuser_missing = None
+        if missing_user_values:
+            curuser_missing = missing_user_values.get(col_name)
 
         # recover original type for categories
         if type(col_type) is pd.core.dtypes.dtypes.CategoricalDtype:
@@ -200,15 +203,12 @@ cdef list get_pandas_column_types(object df, list missing_user_values):
             result.append((PYWRITER_DATETIME, 0,0))
         elif col_type == np.object:
             is_missing = 0
+            if curuser_missing:
+                curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
             if np.any(pd.isna(curseries)):
                 col = curseries.dropna().reset_index(drop=True)
                 is_missing = 1
                 if len(col):
-                    if missing_user_values:
-                        col = col[~col.isin(missing_user_values)].reset_index(drop=True)
-                        if not len(col):
-                            msg = "Variable %s has only values listed in missing_user_values or NaNs, not possible to determine if it is a numeric variable with user defined missing values or a string variable with no user defined missing values" % col_name
-                            raise PyreadstatError(msg)
                     curtype = type(col[0])
                     equal = check_series_all_same_types(col, curtype)
                     #equal = col.apply(lambda x: type(x) == curtype)
@@ -220,13 +220,7 @@ cdef list get_pandas_column_types(object df, list missing_user_values):
                 else:
                     result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
-            else:
-                if missing_user_values:
-                    curseries = curseries[~curseries.isin(missing_user_values)].reset_index(drop=True)
-                    if not len(curseries):
-                        msg = "Variable %s has only values listed in missing_user_values or NaNs, not possible to determine if it is a numeric variable with user defined missing values or a string variable with no user defined missing values" % col_name
-                        raise PyreadstatError(msg)
-                
+            else:                
                 curtype = type(curseries[0])
                 equal = check_series_all_same_types(curseries, curtype)
                 #equal = curseries.apply(lambda x: type(x) == curtype)
@@ -437,7 +431,7 @@ cdef int close_file(int fd):
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
-                   dict missing_ranges, list missing_user_values) except *:
+                   dict missing_ranges, dict missing_user_values) except *:
     """
     main entry point for writing all formats
     """
@@ -460,10 +454,14 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             valid_user_missing = valid_user_missing_stata
         elif file_format == FILE_FORMAT_SAS7BDAT or file_format == FILE_FORMAT_SAS7BCAT:
             valid_user_missing = valid_user_missing_sas
-        for val in missing_user_values:
-            if val not in valid_user_missing:
-                msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
+        for key, missing_values in missing_user_values.items():
+            if not isinstance(missing_values, list):
+                msg = "missing_user_values: values in dictionary must be list"
                 raise PyreadstatError(msg)
+            for val in missing_values:
+                if val not in valid_user_missing:
+                    msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
+                    raise PyreadstatError(msg)
 
 
     cdef readstat_error_t retcode
@@ -594,14 +592,17 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 curval = row[col_indx]
                 curtype = col_types[col_indx][0]
                 is_missing = col_types[col_indx][2]
+                curuser_missing = None
+                if missing_user_values:
+                    curuser_missing = missing_user_values.get(col_names[col_indx])
 
                 if is_missing:
                     if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue
 
-                if missing_user_values and curtype in pywriter_numeric_types:
-                    if curval in missing_user_values:
+                if curuser_missing and curtype in pywriter_numeric_types:
+                    if curval in curuser_missing:
                         check_exit_status(readstat_insert_tagged_missing_value(writer, tempvar, ord(curval)))
                         continue
 

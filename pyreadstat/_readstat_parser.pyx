@@ -85,7 +85,7 @@ cdef class data_container:
         self.use_cols = list()
         self.usernan = 0
         self.missing_ranges = dict()
-        self.missing_user_values = set()
+        self.missing_user_values = dict()
         self.variable_storage_width = dict()
         self.variable_display_width = dict()
         self.variable_alignment = dict()
@@ -109,7 +109,7 @@ class metadata_container:
         self.original_variable_types = dict()
         self.table_name = None
         self.missing_ranges = dict()
-        self.missing_user_values = list()
+        self.missing_user_values = dict()
         self.variable_storage_width = dict()
         self.variable_display_width = dict()
         self.variable_alignment = dict()
@@ -523,6 +523,7 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef int missing_tag
 
     cdef object pyvalue
+    cdef set curset
     
     # extract variables we need from data container
     dc = <data_container> ctx
@@ -557,7 +558,12 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             # In SAS missing values are A to Z or _ in stata a to z
             #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
             dc.col_data[index][obs_index] =  chr(missing_tag)
-            dc.missing_user_values.add(chr(missing_tag))
+            curset = dc.missing_user_values.get(index)
+            if curset is None:
+                curset = set()
+            curset.add(chr(missing_tag))
+            dc.missing_user_values[index] = curset
+            #dc.missing_user_values.add(chr(missing_tag))
             #else:
                 #msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
                 #raise PyreadstatError(msg)
@@ -845,6 +851,10 @@ cdef object data_container_extract_metadata(data_container data):
         cur_type = data.col_formats_original[indx]
         original_types[cur_col] = cur_type
 
+    for indx, curset in data.missing_user_values.items():
+        cur_col = data.col_names[indx]
+        metadata.missing_user_values[cur_col] = sorted(list(curset))    
+
     metadata.notes = data.notes
     metadata.column_names = data.col_names
     metadata.column_labels = data.col_labels
@@ -856,7 +866,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.original_variable_types = original_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
-    metadata.missing_user_values = sorted(list(data.missing_user_values))
+    #metadata.missing_user_values = sorted(list(data.missing_user_values))
     metadata.variable_storage_width = data.variable_storage_width
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment

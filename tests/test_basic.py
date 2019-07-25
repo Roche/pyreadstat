@@ -407,8 +407,10 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file, user_missing=True)
         df_csv = pd.read_csv(formatted_csv)
         self.assertTrue(df_sas.equals(df_csv))
-        self.assertTrue(meta.missing_user_values == ['A', 'B', 'C', 'X', 'Y', 'Z', '_'])
-        
+        missing_user_values = {'var1':['A'],'var2': ['B'], 'var3':['C'], 'var4':['X'], 'var5':['Y'], 
+        'var6':['Z'], 'var7':['_']}
+        self.assertDictEqual(meta.missing_user_values, missing_user_values)
+
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file,
                             catalog_file=cat_file, user_missing=True,
                             formats_as_category=False)
@@ -428,7 +430,8 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_dta(dta_file, user_missing=True)
         df_csv = pd.read_csv(formatted_csv)
         self.assertTrue(df_sas.equals(df_csv))
-        self.assertTrue(meta.missing_user_values == ['a', 'b', 'c', 'x', 'y', 'z'])
+        missing_user_values = {'var1':['a'],'var2': ['b'], 'var3':['c'], 'var4':['x'], 'var5':['y'], 'var6':['z']}
+        self.assertDictEqual(meta.missing_user_values, missing_user_values)
         
         df_sas, meta = pyreadstat.read_dta(dta_file,
                             apply_value_formats=True, user_missing=True,
@@ -533,13 +536,13 @@ class TestBasic(unittest.TestCase):
         
         df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
 
-        missing_user_values = ['a']
+        missing_user_values = {'Var1': ['a']}
         path = os.path.join(self.write_folder, "user_missing_write.dta")
         pyreadstat.write_dta(df_csv, path, version=12, missing_user_values=missing_user_values)
         
         df_dta, meta = pyreadstat.read_dta(path, user_missing=True)
         self.assertTrue(df_csv.equals(df_dta))
-        self.assertListEqual(meta.missing_user_values, missing_user_values)
+        self.assertDictEqual(meta.missing_user_values, missing_user_values)
         
 
     def test_xport_write_basic(self):

@@ -543,12 +543,12 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
     if compress:
         file_format_version = 3
     cdef table_name = ""
-    cdef list missing_user_values = None
+    cdef dict missing_user_values = None
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values)
 
 def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15, 
-            dict variable_value_labels=None, list missing_user_values=None):
+            dict variable_value_labels=None, dict missing_user_values=None):
     """
     Writes a pandas data frame to a STATA dta file
 
@@ -619,6 +619,6 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
     cdef dict variable_value_labels=None
     cdef str note = ""
     cdef dict missing_ranges = None
-    cdef list missing_user_values = None
+    cdef dict missing_user_values = None
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values)
