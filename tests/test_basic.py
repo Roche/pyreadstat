@@ -535,15 +535,19 @@ class TestBasic(unittest.TestCase):
         #labeled_csv = os.path.join(self.missing_data_folder, "missing_dta_labeled.csv")
         
         df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
+        df_csv2 = pd.DataFrame([[3,"a"],["labeled","b"]], columns=["Var1", "Var2"])
 
         missing_user_values = {'Var1': ['a']}
+        variable_value_labels = {'Var1':{'a':'labeled'}}
         path = os.path.join(self.write_folder, "user_missing_write.dta")
-        pyreadstat.write_dta(df_csv, path, version=12, missing_user_values=missing_user_values)
+        pyreadstat.write_dta(df_csv, path, version=12, missing_user_values=missing_user_values, variable_value_labels=variable_value_labels)
         
         df_dta, meta = pyreadstat.read_dta(path, user_missing=True)
         self.assertTrue(df_csv.equals(df_dta))
         self.assertDictEqual(meta.missing_user_values, missing_user_values)
         
+        df_dta2, meta2 = pyreadstat.read_dta(path, user_missing=True, apply_value_formats=True, formats_as_category=False)
+        self.assertTrue(df_csv2.equals(df_dta2))
 
     def test_xport_write_basic(self):
 

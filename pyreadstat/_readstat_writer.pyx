@@ -259,7 +259,8 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
     return result
 
 cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value_labels, str labelset_name,
-                        pywriter_variable_type curpytype, dst_file_format file_format, str variable_name) except *:
+                        pywriter_variable_type curpytype, dst_file_format file_format, str variable_name, 
+                        list user_missing_tags) except *:
 
     cdef readstat_label_set_t *label_set
     cdef readstat_type_t curtype
@@ -273,6 +274,15 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
         if type(label) != str:
             msg = "variable_value_labels: type of Label %s in variable %s must be string" % (str(label), variable_name)
             raise PyreadstatError(msg)
+
+        if user_missing_tags and value in user_missing_tags:
+            if curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT:
+                msg = "missing_user_values not allowed for character variable %s" % variable_name
+                raise PyreadstatError(msg)
+            
+            readstat_label_tagged_value(label_set, ord(value), label.encode("utf-8"))
+            continue
+
 
         if curpytype == PYWRITER_DOUBLE:
             if type(value) not in numeric_types:
@@ -547,8 +557,11 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 if value_labels:
                     labelset_name = variable_name + str(lblset_cnt)
                     lblset_cnt += 1
+                    curuser_missing = None
+                    if missing_user_values:
+                        curuser_missing = missing_user_values.get(variable_name)
                     label_set = set_value_label(writer, value_labels, labelset_name,
-                        col_names_to_types[variable_name], file_format, variable_name)
+                        col_names_to_types[variable_name], file_format, variable_name, curuser_missing)
                     readstat_variable_set_label_set(variable, label_set)
                 if missing_ranges:
                     cur_ranges = missing_ranges.get(variable_name)
