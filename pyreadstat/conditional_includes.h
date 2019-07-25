@@ -20,7 +20,7 @@
 
     //int open(const char *path, int oflag, int mode);
     //int close(int fd);
-    int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode){};
+    int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode){ return 0; };
     int _O_RDONLY;
     int _O_BINARY;
     int _O_WRONLY;
