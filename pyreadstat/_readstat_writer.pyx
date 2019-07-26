@@ -397,8 +397,10 @@ cdef void set_variable_alignment(readstat_variable_t *variable, str alignment_st
         alignment = READSTAT_ALIGNMENT_LEFT
     elif alignment_str == "center":
         alignment = READSTAT_ALIGNMENT_CENTER
+    elif alignment_str == "unknown":
+        alignment = READSTAT_ALIGNMENT_UNKNOWN
     else:
-        msg = "alignment for variable %s must be either RIGHT, CENTER or LEFT, got %s instead" % (var_name, alignment_str)
+        msg = "alignment for variable %s must be either right, center, left or unknown got %s instead" % (var_name, alignment_str)
         raise PyreadstatError(msg)
 
     readstat_variable_set_alignment(variable, alignment)
@@ -423,8 +425,10 @@ cdef void set_variable_measure(readstat_variable_t *variable, str measure_str, s
         measure = READSTAT_MEASURE_ORDINAL
     elif measure_str == "scale":
         measure = READSTAT_MEASURE_SCALE
+    elif measure_str == "unknown":
+        measure = READSTAT_MEASURE_UNKNOWN
     else:
-        msg = "measure for variable %s must be either nominal, ordinal or scale, got %s instead" % (var_name, measure_str)
+        msg = "measure for variable %s must be either nominal, ordinal, scale or unknown got %s instead" % (var_name, measure_str)
         raise PyreadstatError(msg)
 
     readstat_variable_set_measure(variable, measure);

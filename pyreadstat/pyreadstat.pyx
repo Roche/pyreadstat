@@ -543,7 +543,7 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
         values being integers.
     variable_measure: dict, optional
         sets the measure type for a variable. Must be a dictionary with keys being variable names and
-        values being strings one of "nominal", "ordinal" or "scale".
+        values being strings one of "nominal", "ordinal", "scale" or "unknown" (default).
     """
 
     cdef int file_format_version = 2
