@@ -347,7 +347,7 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                     if len(hi) > 8:
                         msg = "missing_ranges: string values length must not be larger than 8"
                         raise PyreadstatError(msg)
-                    check_exit_status(readstat_variable_add_missing_string_value(variable, hi))
+                    check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))
                     discrete_strings += 1
                 else:
                     #check_exit_status(readstat_variable_add_missing_string_range(variable, lo, hi))
@@ -364,7 +364,7 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                 if len(cur_range) > 8:
                         msg = "missing_ranges: string values length must not be larger than 8"
                         raise PyreadstatError(msg)
-                check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))
+                check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))
                 discrete_strings += 1
             else:
                 msg = "missing_ranges: values must be both either of numeric or string type"
