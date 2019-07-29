@@ -22,6 +22,9 @@ import sys
 
 PY_MAJOR_VERSION = sys.version_info[0]
 
+if PY_MAJOR_VERSION < 3 and os.name == 'nt':
+    raise Exception("Python 2 is not supported on Windows.")
+
 # If cython is there and version is good, use it.
 try:
     import Cython
