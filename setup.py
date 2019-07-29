@@ -91,6 +91,7 @@ else:
         libraries.append("iconv")
 
 # Extensions
+sources.sort()
 extensions = [Extension("pyreadstat.pyreadstat",
                     sources=["pyreadstat/pyreadstat" + ext] + sources,
                     # this dot here is important for cython to find the pxd files
