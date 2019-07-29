@@ -19,6 +19,7 @@ object contains the following fields:
   * notes: notes or documents (text annotations) attached to the file if any (spss and stata).
   * column_names : a list with the names of the columns.
   * column_labels : a list with the column labels, if any.
+  * column_names_to_labels : a dictionary with column_names as keys and column_labels as values
   * file_encoding : a string with the file encoding, may be empty
   * number_columns : an int with the number of columns
   * number_rows : an int with the number of rows. If metadataonly option was used, it may

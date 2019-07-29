@@ -99,6 +99,7 @@ class metadata_container:
     def __init__(self):
         self.column_names = list()
         self.column_labels = list()
+        self.column_names_to_labels = dict()
         self.file_encoding = None
         self.number_columns = None
         self.number_rows = None
@@ -858,6 +859,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.notes = data.notes
     metadata.column_names = data.col_names
     metadata.column_labels = data.col_labels
+    metadata.column_names_to_labels = {k:v for k,v in zip(data.col_names, data.col_labels)}
     metadata.file_encoding = data.file_encoding
     metadata.file_label = data.file_label
     metadata.variable_value_labels = variable_value_labels
