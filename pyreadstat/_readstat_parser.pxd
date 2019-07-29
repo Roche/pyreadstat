@@ -70,7 +70,7 @@ cdef class data_container:
     cdef list use_cols
     cdef bint usernan
     cdef dict missing_ranges
-    cdef set missing_user_values
+    cdef dict missing_user_values
     cdef dict variable_storage_width
     cdef variable_display_width
     cdef variable_alignment

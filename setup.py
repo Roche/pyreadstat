@@ -78,16 +78,11 @@ if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
     if is64bit:
         data_folder = "win_libs/64bit/"
+        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     else:
-        print("It seems you are using windows 32bit, you will need to find zlib1.dll and libiconv-2.dll from mingw 32 bits, "
-              "(It is usually in the bin folder of mingw32 if you are using msys) "
-              "put it in the folder win_libs/32bit, remove the sys.exit in the setup.py file and try again. "
-              "Or maybe the dlls in the 64 bit folder work for 32 bit as well ... couldn't try as I don't have access to"
-              "a 32 bit machine. "
-              "Sorry!")
-        sys.exit(1)
         data_folder = "win_libs/32bit/"
-    data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
+        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
+    #data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     libraries.append("iconv")
 else:
     _platform = sys.platform
@@ -96,6 +91,7 @@ else:
         libraries.append("iconv")
 
 # Extensions
+sources.sort()
 extensions = [Extension("pyreadstat.pyreadstat",
                     sources=["pyreadstat/pyreadstat" + ext] + sources,
                     # this dot here is important for cython to find the pxd files
@@ -136,7 +132,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='0.2.7',
+    version='0.2.8',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

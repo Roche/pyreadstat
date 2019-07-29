@@ -1,3 +1,8 @@
+# 0.2.8 (github, pypi, conda )
+* write user defined missing values, value labels for spss and stata
+* write variable_display_width and variable_measure for spss
+* breaking change: missing_user_values is now dict instead of set both for reading and writing.
+
 # 0.2.7 (github, pypi, conda 27.06.2019)
 * added writing capability.
 

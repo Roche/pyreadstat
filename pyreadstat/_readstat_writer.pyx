@@ -39,9 +39,7 @@ cdef set numeric_types = int_types.union(float_types)
 cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
-
-
-
+cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 cdef dict pandas_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
                                       PYWRITER_CHARACTER: READSTAT_TYPE_STRING, PYWRITER_LOGICAL: READSTAT_TYPE_INT32,
                                       PYWRITER_OBJECT: READSTAT_TYPE_STRING, PYWRITER_DATE: READSTAT_TYPE_DOUBLE,
@@ -52,6 +50,9 @@ cdef double sas_offset_secs = 315619200
 cdef double spss_offset_days = 141428
 cdef double sas_offset_days = 3653
 cdef object date_0 = datetime.datetime(1970,1,1).date()
+
+cdef valid_user_missing_sas = [chr(x) for x in range(ord("A"), ord("Z")+1)] + ["_"]
+cdef valid_user_missing_stata = [chr(x) for x in range(ord("a"), ord("z")+1)]
 
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *:
@@ -163,7 +164,7 @@ cdef int check_series_all_same_types(object series, object type_to_check):
     return 1
 
 
-cdef list get_pandas_column_types(object df):
+cdef list get_pandas_column_types(object df, dict missing_user_values):
     """
     From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
     as third.
@@ -183,6 +184,9 @@ cdef list get_pandas_column_types(object df):
 
         max_length = 0
         curseries = df.iloc[:, indx]
+        curuser_missing = None
+        if missing_user_values:
+            curuser_missing = missing_user_values.get(col_name)
 
         # recover original type for categories
         if type(col_type) is pd.core.dtypes.dtypes.CategoricalDtype:
@@ -199,6 +203,8 @@ cdef list get_pandas_column_types(object df):
             result.append((PYWRITER_DATETIME, 0,0))
         elif col_type == np.object:
             is_missing = 0
+            if curuser_missing:
+                curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
             if np.any(pd.isna(curseries)):
                 col = curseries.dropna().reset_index(drop=True)
                 is_missing = 1
@@ -214,7 +220,7 @@ cdef list get_pandas_column_types(object df):
                 else:
                     result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
-            else:
+            else:                
                 curtype = type(curseries[0])
                 equal = check_series_all_same_types(curseries, curtype)
                 #equal = curseries.apply(lambda x: type(x) == curtype)
@@ -251,6 +257,181 @@ cdef list get_pandas_column_types(object df):
                 is_missing = 1
             result.append((PYWRITER_OBJECT, max_length, is_missing))
     return result
+
+cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value_labels, str labelset_name,
+                        pywriter_variable_type curpytype, dst_file_format file_format, str variable_name, 
+                        list user_missing_tags) except *:
+    """
+    Sets value labels for normal values and also tagged missing values (user defined missing for stata and sas)
+    """
+
+    cdef readstat_label_set_t *label_set
+    cdef readstat_type_t curtype
+    cdef double double_val
+    
+    curtype = pandas_to_readstat_types[curpytype]
+    label_set = readstat_add_label_set(writer, curtype, labelset_name.encode("utf-8"))
+
+    for value, label in value_labels.items():
+
+        if type(label) != str:
+            msg = "variable_value_labels: type of Label %s in variable %s must be string" % (str(label), variable_name)
+            raise PyreadstatError(msg)
+
+        if user_missing_tags and value in user_missing_tags:
+            if curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT:
+                msg = "missing_user_values not allowed for character variable %s" % variable_name
+                raise PyreadstatError(msg)
+            
+            readstat_label_tagged_value(label_set, ord(value), label.encode("utf-8"))
+            continue
+
+
+        if curpytype == PYWRITER_DOUBLE:
+            if type(value) not in numeric_types:
+                msg = "variable_value_labels: type of Value %s in variable %s must be numeric" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            readstat_label_double_value(label_set, value, label.encode("utf-8"))
+
+        elif curpytype == PYWRITER_INTEGER:
+            if type(value) not in int_types:
+                msg = "variable_value_labels: type of Value %s in variable %s must be int" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            readstat_label_int32_value(label_set, value, label.encode("utf-8"))
+
+        elif curpytype == PYWRITER_LOGICAL:
+            if type(value) != bool and (value != 0 and value != 1):
+                msg = "variable_value_labels: type of Value %s in variable %s must be boolean or be 1 or 0" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            readstat_label_int32_value(label_set, int(value), label.encode("utf-8"))
+
+        elif curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT:
+            value = str(value)
+            readstat_label_string_value(label_set, value.encode("utf-8"), label.encode("utf-8"))
+
+        elif curpytype in (PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME):
+            if type(value) not in nat_types:
+                msg = "variable_value_labels: type of Value %s in variable %s must match the type of the column in pandas and be of type date, datetime or time" % (str(value), variable_name)
+                raise PyreadstatError(msg)
+            double_val = convert_datetimelike_to_number(file_format, curpytype, value) 
+            readstat_label_double_value(label_set, double_val, label.encode("utf-8"))
+
+    return label_set
+
+cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) except *:
+    """
+    Adding missing ranges, user defined missing discrete values both numeric and character,
+     this happens for SPSS
+    """
+
+    cdef int range_values = 0
+    cdef int discrete_values = 0
+    cdef int discrete_strings = 0
+
+    for cur_range in cur_ranges:
+        if isinstance(cur_range, dict):
+            hi = cur_range.get("hi")
+            lo = cur_range.get("lo")
+            if hi is None or lo is None:
+                msg = "dictionaries in missing_ranges must have the keys hi and lo"
+                raise PyreadstatError(msg)
+            if type(hi) in numeric_types  and type(lo) in numeric_types:
+                if hi == lo:
+                    check_exit_status(readstat_variable_add_missing_double_value(variable, hi))
+                    discrete_values += 1
+                else:
+                    check_exit_status(readstat_variable_add_missing_double_range(variable, lo, hi))
+                    range_values += 1
+            elif type(hi) == str and type(lo) == str:
+                if hi == lo:
+                    if len(hi) > 8:
+                        msg = "missing_ranges: string values length must not be larger than 8"
+                        raise PyreadstatError(msg)
+                    check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))
+                    discrete_strings += 1
+                else:
+                    #check_exit_status(readstat_variable_add_missing_string_range(variable, lo, hi))
+                    msg = "missing_ranges: hi and lo values must be both the same for string type"
+                    raise PyreadstatError(msg)
+            else:
+                msg = "missing_ranges: hi and lo values must be both either of numeric or string type"
+                raise PyreadstatError(msg)
+        else:
+            if type(cur_range) in numeric_types:
+                check_exit_status(readstat_variable_add_missing_double_value(variable, cur_range))
+                discrete_values += 1
+            elif type(cur_range) == str:
+                if len(cur_range) > 8:
+                        msg = "missing_ranges: string values length must not be larger than 8"
+                        raise PyreadstatError(msg)
+                check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))
+                discrete_strings += 1
+            else:
+                msg = "missing_ranges: values must be both either of numeric or string type"
+                raise PyreadstatError(msg)
+               
+        if discrete_strings > 3:
+            msg = "missing_ranges: max 3 string values per variable allowed"
+            raise PyreadstatError(msg)
+        if range_values:
+            if range_values > 1:
+                msg = "missing_ranges: max 1 range value per variable allowed"
+                raise PyreadstatError(msg)
+            if discrete_values > 1:
+                msg = "missing_ranges: max 1 discrete numeric value if combined with 1 range value per variable allowed"
+                raise PyreadstatError(msg)
+        if discrete_values >3:
+            msg = "missing_ranges: max 3 discrete numeric values per variable allowed"
+            raise PyreadstatError(msg)
+
+cdef void set_variable_alignment(readstat_variable_t *variable, str alignment_str, str var_name) except *:
+    """
+    Sets the variable alignment, ineffective on SPSS, STATA and XPORT (what about SAS7bdat?)
+    """
+
+    cdef readstat_alignment_t alignment
+
+    if alignment_str == "right":
+        alignment = READSTAT_ALIGNMENT_RIGHT
+    elif alignment_str == "left":
+        alignment = READSTAT_ALIGNMENT_LEFT
+    elif alignment_str == "center":
+        alignment = READSTAT_ALIGNMENT_CENTER
+    elif alignment_str == "unknown":
+        alignment = READSTAT_ALIGNMENT_UNKNOWN
+    else:
+        msg = "alignment for variable %s must be either right, center, left or unknown got %s instead" % (var_name, alignment_str)
+        raise PyreadstatError(msg)
+
+    readstat_variable_set_alignment(variable, alignment)
+
+cdef void set_variable_display_width(readstat_variable_t *variable, int display_width, str var_name) except *:
+    """
+    Sets the variable display width (SPSS). Not effective on STATA. (what about SAS7BDAT?)
+    """
+
+    readstat_variable_set_display_width(variable, display_width)
+
+cdef void set_variable_measure(readstat_variable_t *variable, str measure_str, str var_name) except *:
+    """
+    sets the variable measure type (SPSS). Not effective on STATA.
+    """
+
+    cdef readstat_measure_t measure
+
+    if measure_str == "nominal":
+        measure = READSTAT_MEASURE_NOMINAL
+    elif measure_str == "ordinal":
+        measure = READSTAT_MEASURE_ORDINAL
+    elif measure_str == "scale":
+        measure = READSTAT_MEASURE_SCALE
+    elif measure_str == "unknown":
+        measure = READSTAT_MEASURE_UNKNOWN
+    else:
+        msg = "measure for variable %s must be either nominal, ordinal, scale or unknown got %s instead" % (var_name, measure_str)
+        raise PyreadstatError(msg)
+
+    readstat_variable_set_measure(variable, measure);
 
 
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
@@ -312,9 +493,13 @@ cdef int close_file(int fd):
         return close(fd)
 
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
-                   int file_format_version, str note, str table_name) except *:
+                   int file_format_version, str note, str table_name, dict variable_value_labels, 
+                   dict missing_ranges, dict missing_user_values, dict variable_alignment,
+                   dict variable_display_width, dict variable_measure) except *:
     """
-    main entry point for writing all formats
+    main entry point for writing all formats. Some parameters are specific for certain file type
+    and are even incompatible between them. This function relies on the caller to select the right
+    combination of parameters, not checking them otherwise.
     """
 
     IF PY_MAJOR_VERSION <3:
@@ -323,6 +508,27 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
 
     if not isinstance(df, pd.DataFrame):
         raise PyreadstatError("first argument must be a pandas data frame")
+
+    if variable_value_labels:
+        for k,v in variable_value_labels.items():
+            if type(v) != dict:
+                msg = "variable_value_labels: value for key %s must be dict, got %s" % (k, str(type(v)))
+                raise PyreadstatError(msg)
+
+    if missing_user_values:
+        if file_format == FILE_FORMAT_DTA:
+            valid_user_missing = valid_user_missing_stata
+        elif file_format == FILE_FORMAT_SAS7BDAT or file_format == FILE_FORMAT_SAS7BCAT:
+            valid_user_missing = valid_user_missing_sas
+        for key, missing_values in missing_user_values.items():
+            if not isinstance(missing_values, list):
+                msg = "missing_user_values: values in dictionary must be list"
+                raise PyreadstatError(msg)
+            for val in missing_values:
+                if val not in valid_user_missing:
+                    msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
+                    raise PyreadstatError(msg)
+
 
     cdef readstat_error_t retcode
     cdef char *err_readstat
@@ -334,9 +540,10 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
-    cdef list col_types = get_pandas_column_types(df)
+    cdef list col_types = get_pandas_column_types(df, missing_user_values)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
+    cdef dict col_names_to_types = {k:v[0] for k,v in zip(col_names, col_types)}
 
     cdef readstat_variable_t *variable
     cdef pywriter_variable_type curtype
@@ -352,6 +559,9 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef double dtimelikeval
     #cdef np.ndarray values
     cdef object values
+    cdef dict value_labels
+    cdef int lblset_cnt = 0
+    cdef readstat_label_set_t *label_set
 
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()
@@ -382,12 +592,13 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             col_label_count = len(column_labels)
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")
-
+     
         for col_indx in range(col_count):
             curtype, max_length, _ = col_types[col_indx]
             #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
             #    max_length = 8
-            variable = readstat_add_variable(writer, col_names[col_indx].encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
+            variable_name = col_names[col_indx]
+            variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
             if curtype in pyrwriter_datetimelike_types:
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
                 readstat_variable_set_format(variable, curformat)
@@ -397,6 +608,38 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                         raise PyreadstatError("Column labels must be strings")
                     cur_col_label = column_labels[col_indx].encode("utf-8")
                     readstat_variable_set_label(variable, cur_col_label)
+            if variable_value_labels:
+                value_labels = variable_value_labels.get(variable_name)
+                if value_labels:
+                    labelset_name = variable_name + str(lblset_cnt)
+                    lblset_cnt += 1
+                    curuser_missing = None
+                    if missing_user_values:
+                        curuser_missing = missing_user_values.get(variable_name)
+                    label_set = set_value_label(writer, value_labels, labelset_name,
+                        col_names_to_types[variable_name], file_format, variable_name, curuser_missing)
+                    readstat_variable_set_label_set(variable, label_set)
+                if missing_ranges:
+                    cur_ranges = missing_ranges.get(variable_name)
+                    if cur_ranges:
+                        if not isinstance(cur_ranges, list):
+                            msg = "missing_ranges: values in dictionary must be list"
+                            raise PyreadstatError(msg)
+                        add_missing_ranges(cur_ranges, variable)
+                if variable_alignment:
+                    # At the moment this is ineffective for sav and dta (the function runs but in
+                    # the resulting file all alignments are still unknown)
+                    cur_alignment = variable_alignment.get(variable_name)
+                    if cur_alignment:
+                        set_variable_alignment(variable, cur_alignment, variable_name)
+                if variable_display_width:
+                    cur_display_width = variable_display_width.get(variable_name)
+                    if cur_display_width:
+                        set_variable_display_width(variable, cur_display_width, variable_name)
+                if variable_measure:
+                    cur_measure = variable_measure.get(variable_name)
+                    if cur_measure:
+                        set_variable_measure(variable, cur_measure, variable_name)
 
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:
@@ -432,10 +675,18 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 curval = row[col_indx]
                 curtype = col_types[col_indx][0]
                 is_missing = col_types[col_indx][2]
+                curuser_missing = None
+                if missing_user_values:
+                    curuser_missing = missing_user_values.get(col_names[col_indx])
 
                 if is_missing:
                     if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
+                        continue
+
+                if curuser_missing and curtype in pywriter_numeric_types:
+                    if curval in curuser_missing:
+                        check_exit_status(readstat_insert_tagged_missing_value(writer, tempvar, ord(curval)))
                         continue
 
                 if curtype == PYWRITER_DOUBLE:

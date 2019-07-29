@@ -36,13 +36,19 @@ the original applications in this regard.**
   + [Basic Usage](#basic-usage)
     - [Reading Files](#reading-files)
     - [Writing Files](#writing-files)
-  + [Reading only the headers](#reading-only-the-headers)
-  + [Reading selected columns](#reading-selected-columns)
-  + [Reading value labels](#reading-value-labels)
-  + [Missing Values](#missing-values)
-    - [SPSS](#spss)
-    - [SAS and STATA](#sas-and-stata)
-  + [Other options](#other-options)
+  + [More reading options](#more-reading-options)
+    - [Reading only the headers](#reading-only-the-headers)
+    - [Reading selected columns](#reading-selected-columns)
+    - [Reading value labels](#reading-value-labels)
+    - [Missing Values](#missing-values)
+      + [SPSS](#spss)
+      + [SAS and STATA](#sas-and-stata)
+    - [Other options](#other-options)
+  + [More writing options](#more-writing-options)
+    - [File specific options](#file-specific-options)
+    - [Writing value labels](#writing-value-labels)
+    - [Writing user defined missing values](writing-user-defined-missing-values)
+    - [Variable type conversion](variable-type-conversion)
 * [Roadmap](#roadmap)
 * [Known limitations](#known-limitations)
 * [Python 2.7 support.](#python-27-support)
@@ -113,9 +119,7 @@ later).
 
 Readstat depends on the C library iconv to handle character encodings. On mac, the library is found on the system, but
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
-on mac)
-
-Readstat also depends on zlib; it was reported not to be installed on Lubuntu. If you face this problem intalling the 
+on mac). Readstat also depends on zlib; it was reported not to be installed by default on Lubuntu. If you face this problem intalling the 
 library solves it.
 
 
@@ -138,7 +142,7 @@ pip install pyreadstat --user
 Notice that at the moment we offer pre-compiled wheels for windows, mac and 
 linux for Python 2.7, 3.5, 3.6 and 3.7. Python 2.7 does not work for
 windows (see later python 2.7 support). If there is no pre-compiled 
-wheel available, pip will attempt to compile the package. 
+wheel available, pip will attempt to compile the source code. 
 
 ### Using conda
 
@@ -177,7 +181,7 @@ is not necessary if compiling on unix, but if installed it will be used.
 
 ### Compiling on Windows and Mac
 
-Compiling on linux is very easy, but on windows is a bit more challenging. 
+Compiling on linux is very easy, but on windows you need some extra preparation. 
 Some instructions are found [here](https://github.com/Roche/pyreadstat/blob/master/windows_compilation.md)
 
 Compiling on mac is usually easy. Readstat depends however on the C library iconv to handle character encodings; while 
@@ -216,6 +220,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat')
 print(df.head())
 print(meta.column_names)
 print(meta.column_labels)
+print(meta.column_names_to_labels)
 print(meta.number_rows)
 print(meta.number_columns)
 print(meta.file_label)
@@ -249,8 +254,9 @@ column_labels = ["Variable 1", "Variable 2", "Variable 3"]
 pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_labels=column_labels)
 ```
 
-Some special arguments are available depending on the function. write_sav can take also notes as string and wheter to
-compress or not as zsav. write_dta can take a stata version. write_xport a name for the dataset. See the 
+Some special arguments are available depending on the function. write_sav can take also notes as string, wheter to
+compress or not as zsav, variable display widths and variable measures. write_dta can take a stata version. 
+write_xport a name for the dataset. User defined missing values and value labels are also supported. See the 
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 Here there is a relation of all functions available. 
@@ -271,7 +277,9 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | write_xport         | write SAS Xport (XPT) files version 5 |
 
 
-### Reading only the headers
+### More reading options
+
+#### Reading only the headers
 
 All functions accept a keyword argument "metadataonly" which by default is False. If True, then no data will be read, 
 but still both the metadata and the dataframe will be returned. The metadata will contain all fields as usual, but
@@ -284,7 +292,7 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', metadataonly=True)
 ```
 
-### Reading selected columns
+#### Reading selected columns
 
 All functions accept a keyword "usecols" which should be a list of column names. Only the columns which names match those
 in the list will be imported (case sensitive). This decreases memory consumption and speeds up the process. Usecols must
@@ -297,7 +305,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variab
 
 ```
 
-### Reading value labels
+#### Reading value labels
 
 For sas7bdat files, value labels are stored in separated sas7bcat files. You can use them in combination with the sas7bdat
 or read them separately.
@@ -394,7 +402,7 @@ meta2.value_labels
 ```
 
 
-### Missing Values
+#### Missing Values
 
 There are two types of missing values: system and user defined. System are assigned by the program by default. User defined are 
 valid values that the user decided to give the meaning of missing in order to differentiate between several situations.For
@@ -406,7 +414,7 @@ etc.
 read with pyreadstat**. Notice that the only possible missing value in pandas is NaN (Not a Number) for both string and numeric
 variables, date, datetime and time variables have NaT (Not a Time).
 
-#### SPSS 
+##### SPSS 
 
 In the case of SPSS sav files, the user can assign to a numeric variable either up to three discrete missing values or
 one range plus one discrete missing value. As mentioned by default all of these possiblities are translated into NaN, 
@@ -478,7 +486,7 @@ empty strings to nan very easily with pandas if you think it is appropiate
 for your dataset.
 
 
-#### SAS and STATA
+##### SAS and STATA
 
 In SAS the user can assign values from .A to .Z and ._ as user defined missing values. In Stata values from
 .a to .z. As in SPSS, those are normally translated to
@@ -521,7 +529,7 @@ This is a list listing all user defined missing values.
 User defined missing values are currently not supported for file types other than sas7bdat,
 sas7bcat and dta.
 
-### Other options
+#### Other options
 
 You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459).
 This is absolutely necessary if you are handling old xport files with 
@@ -546,10 +554,90 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
+### More writing options
+
+#### File specific options
+
+Some special arguments are available depending on the function. write_sav can take also notes as string, wheter to
+compress or not as zsav, variable display widths and variable measures. write_dta can take a stata version. 
+write_xport a name for the dataset. See the 
+[Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
+
+#### Writing value labels
+
+The argument variable_value_labels can be passed to write_sav and write_dta to write value labels. This argument must be a 
+dictionary where keys are variable names (names must match column names in the pandas data frame). Values are another dictionary where
+keys are the value present in the dataframe and values are the labels (strings).
+
+```python
+import pandas as pd
+import pyreadstat
+df = pd.DataFrame([[1,1],[2,2],[1,3]], columns=['mylabl', 'myord'])
+variable_value_labels = {'mylabl': {1: 'Male', 2: 'Female'}, 'myord': {1: 'low', 2: 'medium', 3: 'high'}}
+path = "/path/to/somefile.sav"
+pyreadstat.write_sav(df, path, variable_value_labels=variable_value_labels)
+```
+
+#### Writing user defined missing values
+
+##### SPSS
+
+The argument missing_ranges can be passed to write_sav to write user defined missing values. 
+This argument be a dictionary with keys as variable names matching variable
+names in the dataframe. The values must be a list. Each element in that list can either be
+either a discrete numeric or string value (max 3 per variable) or a dictionary with keys 'hi' and 'lo' to
+indicate the upper and lower range for numeric values (max 1 range value + 1 discrete value per
+variable). hi and lo may also be the same value in which case it will be interpreted as a discrete
+missing value. For this to be effective, values in the dataframe must be the same as reported here and not NaN.
+
+```python
+import pandas as pd
+import pyreadstat
+df = pd.DataFrame([["a",1],["c",2],["c",3]], columns=['mychar', 'myord'])
+missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
+path = "/path/to/somefile.sav"
+pyreadstat.write_sav(df, path, missing_ranges=missing_ranges)
+``` 
+
+##### STATA
+
+The argument missing_user_values can be passed to write_dta to write user defined missing values only for numeric variables. 
+This argument be a dictionary with keys as variable names matching variable
+names in the dataframe. The values must be a list of missing values, valid values are single character strings
+between a and z. Optionally a value label can also be attached to those missing values using variable_value_labels.
+
+```python
+import pandas as pd
+import pyreadstat
+df = pd.DataFrame([["a", 1],[2.2, 2],[3.3, "b"]], columns=['Var1', 'Var2'])
+variable_value_labels = {'Var1':{'a':'a missing value'}
+missing_ranges = {'Var1':['a'], 'Var2': ['b']}
+path = "/path/to/somefile.sav"
+pyreadstat.write_sav(df, path, missing_ranges=missing_ranges, variable_value_labels=variable_value_labels)
+``` 
+
+#### Variable type conversion
+
+The following rules are used in order to convert from pandas/numpy/python types to the target file types:
+
+| Python Type         | Converted Type    |
+| ------------------- | --------- |
+| np.int32 or lower   | integer (stata), numeric (spss, sas) |
+| int, np.int64, np.float  | double (stata), numeric (spss, sas)   |
+| str                 | character |
+| bool                | integer (stata), numeric (spss, sas) |
+| datetime, date, time | numeric with datetime/date/time formatting |
+| category            | depends on the original dtype |
+| any other object    | character |
+| column all missing  | integer (stata), numeric (spss, sas)   |
+| column with mixed types | character |
+
+Columns with mixed types are translated to character. This does not apply to column
+cotaining np.nan, where the missing values are correctly translated. It also does not apply to columns with
+user defined missing values in stata/sas where characters (a to z, A to Z, _) will be recorded as numeric.
 
 ## Roadmap
 
-* Improve writing functions with capability to write value labels and user defined missing values.
 * Include latest releases from Readstat as the come out.
 
 ## Known limitations
@@ -624,4 +712,6 @@ pull request to ReadStat first.
 [Clemens Brunner](https://github.com/cbrnr) - integration with pandas.read_spss
 
 [benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888), [drcjar](https://github.com/drcjar): improvements to documentation
+
+[bmwiedemann](https://github.com/bmwiedemann), [toddrme2178 ](https://github.com/toddrme2178): improvements to source code
 
