@@ -701,7 +701,7 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         return -1
 
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
+cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *:
     """
     Runs the parsing of the file by readstat library
     """
@@ -755,6 +755,12 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     if data.user_encoding:
         encoding_bytes = data.user_encoding.encode("utf-8")
         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
+
+    if row_limit:
+        retcode = readstat_set_row_limit(parser, row_limit)
+    
+    if row_offset:
+        retcode = readstat_set_row_offset(parser, row_offset)
 
     # parse!
     error = parse_func(parser, filename, ctx);
@@ -879,7 +885,7 @@ cdef object data_container_extract_metadata(data_container data):
 
 cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion):
+                           bint no_datetime_conversion, long row_limit, long row_offset):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -922,7 +928,7 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     data.no_datetime_conversion = no_datetime_conversion
     
     # go!
-    run_readstat_parser(filename, data, parse_func)    
+    run_readstat_parser(filename, data, parse_func, row_limit, row_offset)    
     data_frame = data_container_to_pandas_dataframe(data)
     metadata = data_container_extract_metadata(data)
 
