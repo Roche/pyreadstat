@@ -638,7 +638,7 @@ user defined missing values in stata/sas where characters (a to z, A to Z, _) wi
 
 ## Roadmap
 
-* Include latest releases from Readstat as the come out.
+* Include latest releases from Readstat as they come out.
 
 ## Known limitations
 
