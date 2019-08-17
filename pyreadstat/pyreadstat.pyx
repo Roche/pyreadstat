@@ -36,7 +36,7 @@ from copy import deepcopy
 
 def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
                   formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
-                  disable_datetime_conversion=False, row_limit=0, row_offset=0):
+                  disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
@@ -114,7 +114,7 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
 
 
 def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
-               list usecols=None, disable_datetime_conversion=False, row_limit=0, row_offset=0):
+               list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SAS xport file.
 
@@ -172,7 +172,7 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
 
 def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, row_limit=0, row_offset=0):
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a STATA dta file
 
@@ -245,7 +245,7 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
 def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, row_limit=0, row_offset=0):
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -317,7 +317,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
 
 def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, disable_datetime_conversion=False, row_limit=0, row_offset=0):
+             formats_as_category=True, str encoding=None, list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SPSS por file
 
