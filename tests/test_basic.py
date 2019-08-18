@@ -540,7 +540,20 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df2.equals(mdf2))
         self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
 
-    # writing: none of this works on python 2
+    # read in chunks
+
+    def test_chunk_reader(self):
+
+        fpath = "test_data/basic/sample.sas7bdat"
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 2, offset=1, limit=2, disable_datetime_conversion=True)
+        
+        for df, meta in reader:
+            pass
+        
+        currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
+        self.assertTrue(df.equals(currow))
+
+    # writing
 
     def test_sav_write_basic(self):
 

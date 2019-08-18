@@ -74,6 +74,10 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
             Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
             there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
             beyond that will rise an Overflow error in pyreadstat).
+        row_limit : int, optional
+            maximum number of rows to read. The default is 0 meaning unlimited.
+        row_offset : int, optional
+            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
 
     Returns
     -------
@@ -139,6 +143,10 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
             Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
             there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
             beyond that will rise an Overflow error in pyreadstat).
+        row_limit : int, optional
+            maximum number of rows to read. The default is 0 meaning unlimited.
+        row_offset : int, optional
+            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
 
     Returns
     -------
@@ -207,6 +215,10 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
             there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
             beyond that will rise an Overflow error in pyreadstat).
+        row_limit : int, optional
+            maximum number of rows to read. The default is 0 meaning unlimited.
+        row_offset : int, optional
+            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
 
     Returns
     -------
@@ -280,6 +292,10 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
             there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
             beyond that will rise an Overflow error in pyreadstat).
+        row_limit : int, optional
+            maximum number of rows to read. The default is 0 meaning unlimited.
+        row_offset : int, optional
+            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
 
     Returns
     -------
@@ -348,6 +364,10 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
             there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
             beyond that will rise an Overflow error in pyreadstat).
+        row_limit : int, optional
+            maximum number of rows to read. The default is 0 meaning unlimited.
+        row_offset : int, optional
+            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
 
     Returns
     -------
@@ -504,6 +524,57 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
         metadata = deepcopy(sas_metadata)
 
     return df_copy, metadata
+
+# convenience functions to read in chunks
+
+def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, limit=0, **kwargs):
+    """
+    Returns a generator that will allow to read a file in chunks.
+
+    Parameters
+    ----------
+        read_function : pyreadstat function
+            a pyreadstat reading function
+        file_path : string
+            path to the file to be read
+        chunksize : integer, optional
+            size of the chunks to read
+        offset : integer, optional
+            start reading the file after certain number of rows
+        limit : integer, optional
+            stop reading the file after certain number of rows, will be added to offset
+        kwargs : dict, optional
+            any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.
+
+    Yields
+    -------
+        data_frame : pandas dataframe
+            a pandas data frame with the data (no data in this case, so will be empty)
+        metadata :
+            object with metadata. The member value_labels is the one that contains the formats.
+            Look at the documentation for more information.
+
+        it : generator
+            A generator that reads the file in chunks.
+    """
+    
+    if "row_offset" in kwargs:
+        _ = kwargs.pop("row_offset")
+
+    if "row_limit" in kwargs:
+        _ = kwargs.pop("row_limit")
+
+    maxrow = offset + chunksize
+    limit = offset + limit
+    df = [0]
+    while len(df):
+        if limit and maxrow > limit:
+            break
+        df, meta = read_function(file_path, row_offset=offset, row_limit=chunksize, **kwargs)
+        if len(df):
+            yield df, meta
+            offset += chunksize
+            maxrow += chunksize
 
 # Write API
 

@@ -39,6 +39,7 @@ the original applications in this regard.**
   + [More reading options](#more-reading-options)
     - [Reading only the headers](#reading-only-the-headers)
     - [Reading selected columns](#reading-selected-columns)
+    - [Reading rows in chunks](#reading-rows-in-chunks)
     - [Reading value labels](#reading-value-labels)
     - [Missing Values](#missing-values)
       + [SPSS](#spss)
@@ -272,6 +273,7 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | read_por            | read SPSS por files  |
 | set_catalog_to_sas  | enrich sas dataframe with catalog formats |
 | set_value_labels    | replace values by their labels |
+| read_file_in_chunks | generator to read files in chunks |
 | write_sav           | write SPSS sav and zsav files |
 | write_dta           | write STATA dta files |
 | write_xport         | write SAS Xport (XPT) files version 5 |
@@ -303,6 +305,36 @@ import pyreadstat
 
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variable1", "variable2"])
 
+```
+
+#### Reading rows in chunks
+
+Reading large files with hundred of thouseds of rows can be challenging due to memory restrictions. In such cases, it may be helpful
+to read the files in chunks. 
+
+Every reading function has two arguments row_limit and row_offset that help achieving this. row_offset makes to skip a number of rows before
+start reading. row_limit makes to stop after a number of rows are read. Combining both you can read the file in chunks. 
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat("/path/to/file.sas7bdat", row_offset=1, row_limit=1)
+# df will contain only the second row of the file
+```
+
+Pyreadstat also has a convienence function read_file_in_chunks, which returns a generator that helps you to iterate through the file in
+chunks. This function takes as first argument a pyreadstat reading function and a second argument a path to a file. Optionally you can
+change the size of the chunks with chunksize (default to 100000), and also add an offset and limit. You can use any keyword argument 
+you wish to pass to the pyreadstat reading function.
+
+```python
+import pyreadstat
+fpath = "path/to/file.sas7bdat"
+reader = read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 10, offset=2, limit=100, disable_datetime_conversion=True)
+
+for df, meta in reader:
+    print(df) # df will contain 10 rows except for the last one
+    # do some cool calculations here for the chunk
 ```
 
 #### Reading value labels
