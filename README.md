@@ -313,7 +313,7 @@ Reading large files with hundred of thouseds of rows can be challenging due to m
 to read the files in chunks. 
 
 Every reading function has two arguments row_limit and row_offset that help achieving this. row_offset makes to skip a number of rows before
-start reading. row_limit makes to stop after a number of rows are read. Combining both you can read the file in chunks. 
+start reading. row_limit makes to stop after a number of rows are read. Combining both you can read the file in chunks inside or outside a loop.
 
 ```python
 import pyreadstat

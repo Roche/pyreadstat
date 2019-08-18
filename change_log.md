@@ -1,3 +1,7 @@
+# 0.2.9 (github, pypi conda)
+* implemented ability to read files in chunks
+* Readstat sources updated to release 1.1.0
+
 # 0.2.8 (github, pypi, conda 30.07.2019)
 * write user defined missing values, value labels for spss and stata
 * write variable_display_width and variable_measure for spss
