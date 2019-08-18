@@ -677,7 +677,6 @@ user defined missing values in stata/sas where characters (a to z, A to Z, _) wi
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
 
 * Not able to read SAS compressed files. 
-* Not able to skip rows.
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
 * Cannot write SAS sas7bdat and xport version 8 (version 5 is supported). Those files can be written but not read in 
