@@ -717,3 +717,34 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
         variable_alignment,variable_display_width, variable_measure)
+
+def write_por(df, str dst_path, str file_label="", list column_labels=None):
+    """
+    Writes a pandas data frame to a SPSS POR file.
+
+    Parameters
+    ----------
+    df : pandas data frame
+        pandas data frame to write to sav or zsav
+    dst_path : str
+        full path to the result sav or zsav file
+    file_label : str, optional
+        a label for the file
+    column_labels : list, optional
+        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
+        labels must be represented by None.
+    """
+
+    # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
+    cdef str note=None
+    cdef int file_format_version = 0
+    cdef dict variable_value_labels=None
+    cdef dict missing_ranges = None
+    cdef dict missing_user_values = None
+    cdef dict variable_alignment = None
+    cdef dict variable_display_width = None
+    cdef dict variable_measure = None
+    cdef str table_name = ""
+    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
+        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
+        variable_alignment,variable_display_width, variable_measure)

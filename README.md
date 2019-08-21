@@ -275,6 +275,7 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | set_value_labels    | replace values by their labels |
 | read_file_in_chunks | generator to read files in chunks |
 | write_sav           | write SPSS sav and zsav files |
+| write_por           | write SPSS Portable (POR) files |
 | write_dta           | write STATA dta files |
 | write_xport         | write SAS Xport (XPT) files version 5 |
 
@@ -330,7 +331,7 @@ you wish to pass to the pyreadstat reading function.
 ```python
 import pyreadstat
 fpath = "path/to/file.sas7bdat"
-reader = read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 10, offset=2, limit=100, disable_datetime_conversion=True)
+reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 10, offset=2, limit=100, disable_datetime_conversion=True)
 
 for df, meta in reader:
     print(df) # df will contain 10 rows except for the last one
@@ -680,7 +681,7 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as 
   timestamps.
 * Cannot write SAS sas7bdat and xport version 8 (version 5 is supported). Those files can be written but not read in 
-SAS and therefore are not supported in pyreadstat. SPSS por files can also not be written at the moment.
+SAS and therefore are not supported in pyreadstat.
   
 Converting data types from foreign applications into python some times also bring some limitations:
 

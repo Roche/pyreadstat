@@ -653,6 +653,21 @@ class TestBasic(unittest.TestCase):
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertEqual(table_name, meta.table_name)
 
+    def test_por_write_basic(self):
+
+        file_label = "basic write"
+        #file_note = "These are some notes"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "write.por")
+        pyreadstat.write_por(self.df_pandas, path, file_label=file_label, column_labels=col_labels) #, note=file_note)
+        df, meta = pyreadstat.read_por(path)
+        df.columns = [x.lower() for x in df.columns]
+
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        #self.assertEqual(meta.notes[0], file_note)
+
     def test_sav_write_dates(self):
 
         #if sys.version_info[0] < 3:

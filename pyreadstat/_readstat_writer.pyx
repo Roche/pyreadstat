@@ -540,6 +540,8 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
+    if file_format == FILE_FORMAT_POR:
+        col_names = [x.upper() for x in col_names]
     cdef list col_types = get_pandas_column_types(df, missing_user_values)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
