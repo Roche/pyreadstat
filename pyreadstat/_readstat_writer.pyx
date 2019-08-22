@@ -18,6 +18,7 @@
 import os
 from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
+from _readstat_parser cimport check_exit_status
 
 import numpy as np
 #cimport numpy as np
@@ -442,7 +443,7 @@ cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
     fd = (<int *>ctx)[0]
     return write(fd, data, _len)
 
-cdef void check_exit_status(readstat_error_t retcode) except *:
+cdef void _check_exit_status(readstat_error_t retcode) except *:
     """
     transforms a readstat exit status to a python error if status is not READSTAT OK
     """

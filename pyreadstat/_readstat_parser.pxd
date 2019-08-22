@@ -89,6 +89,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
 cdef int handle_value_label(char *val_labels, readstat_value_t value, char *label, void *ctx) except READSTAT_HANDLER_ABORT
 cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HANDLER_ABORT
 
+cdef void check_exit_status(readstat_error_t retcode) except *
+
 cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *
 cdef object data_container_to_pandas_dataframe(data_container data)
 cdef object data_container_extract_metadata(data_container data)
