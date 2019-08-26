@@ -544,7 +544,7 @@ class TestBasic(unittest.TestCase):
 
     def test_chunk_reader(self):
 
-        fpath = "test_data/basic/sample.sas7bdat"
+        fpath = os.path.join(self.basic_data_folder, "sample.sas7bdat")
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 2, offset=1, limit=2, disable_datetime_conversion=True)
         
         for df, meta in reader:
