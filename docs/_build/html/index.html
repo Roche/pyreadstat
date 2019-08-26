@@ -223,6 +223,8 @@ information about the original variable format stored in the metadata object in 
 Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
 there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
 beyond that will rise an Overflow error in pyreadstat).</p></li>
+<li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
+<li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -231,6 +233,32 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
 </ul>
 </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.read_file_in_chunks">
+<code class="sig-prename descclassname">pyreadstat.pyreadstat.</code><code class="sig-name descname">read_file_in_chunks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_in_chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a generator that will allow to read a file in chunks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>read_function</strong> (<em>pyreadstat function</em>) – a pyreadstat reading function</p></li>
+<li><p><strong>file_path</strong> (<em>string</em>) – path to the file to be read</p></li>
+<li><p><strong>chunksize</strong> (<em>integer</em><em>, </em><em>optional</em>) – size of the chunks to read</p></li>
+<li><p><strong>offset</strong> (<em>integer</em><em>, </em><em>optional</em>) – start reading the file after certain number of rows</p></li>
+<li><p><strong>limit</strong> (<em>integer</em><em>, </em><em>optional</em>) – stop reading the file after certain number of rows, will be added to offset</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Yields</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data (no data in this case, so will be empty)</p></li>
+<li><p><em>metadata</em> – object with metadata. The member value_labels is the one that contains the formats.
+Look at the documentation for more information.</p></li>
+<li><p><strong>it</strong> (<em>generator</em>) – A generator that reads the file in chunks.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -259,6 +287,8 @@ information about the original variable format stored in the metadata object in 
 Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
 there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
 beyond that will rise an Overflow error in pyreadstat).</p></li>
+<li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
+<li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -330,6 +360,8 @@ information about the original variable format stored in the metadata object in 
 Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
 there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
 beyond that will rise an Overflow error in pyreadstat).</p></li>
+<li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
+<li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -371,6 +403,8 @@ information about the original variable format stored in the metadata object in 
 Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
 there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
 beyond that will rise an Overflow error in pyreadstat).</p></li>
+<li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
+<li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -403,6 +437,8 @@ information about the original variable format stored in the metadata object in 
 Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where
 there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates
 beyond that will rise an Overflow error in pyreadstat).</p></li>
+<li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
+<li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -484,6 +520,23 @@ ignored. Value types must match the type of the column in the dataframe.</p></li
 <li><p><strong>missing_user_values</strong> (<em>dict</em><em>, </em><em>optional</em>) – user defined missing values for numeric variables. Must be a dictionary with keys being variable
 names and values being a list of missing values. Missing values must be a single character
 between a and z.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyreadstat.pyreadstat.write_por">
+<code class="sig-prename descclassname">pyreadstat.pyreadstat.</code><code class="sig-name descname">write_por</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_por" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a pandas data frame to a SPSS POR file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
+<li><p><strong>dst_path</strong> (<em>str</em>) – full path to the result sav or zsav file</p></li>
+<li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
+<li><p><strong>column_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – list of labels for columns (variables), must be the same length as the number of columns. Variables with no
+labels must be represented by None.</p></li>
 </ul>
 </dd>
 </dl>

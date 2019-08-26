@@ -701,7 +701,20 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         return -1
 
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
+cdef void check_exit_status(readstat_error_t retcode) except *:
+    """
+    transforms a readstat exit status to a python error if status is not READSTAT OK
+    """
+
+    cdef char * err_readstat
+    cdef str err_message
+    if retcode != READSTAT_OK:
+        err_readstat = readstat_error_message(retcode)
+        err_message = <str> err_readstat
+        raise ReadstatError(err_message)
+
+
+cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *:
     """
     Runs the parsing of the file by readstat library
     """
@@ -715,7 +728,6 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     cdef readstat_note_handler note_handler
 
     cdef void *ctx
-    cdef int retcode
     cdef str err_message
     cdef PyObject *pyerr
     cdef bint metaonly
@@ -726,7 +738,7 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     ctx = <void *>data
     
     #readstat_error_t error = READSTAT_OK;
-    parser = readstat_parser_init();
+    parser = readstat_parser_init()
     metadata_handler = <readstat_metadata_handler> handle_metadata
     variable_handler = <readstat_variable_handler> handle_variable
     value_handler = <readstat_value_handler> handle_value
@@ -734,10 +746,10 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     note_handler = <readstat_note_handler> handle_note
     
     
-    retcode = readstat_set_metadata_handler(parser, metadata_handler)
-    retcode = readstat_set_variable_handler(parser, variable_handler)
-    retcode = readstat_set_value_label_handler(parser, value_label_handler)
-    retcode = readstat_set_note_handler(parser, note_handler)
+    check_exit_status(readstat_set_metadata_handler(parser, metadata_handler))
+    check_exit_status(readstat_set_variable_handler(parser, variable_handler))
+    check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))
+    check_exit_status(readstat_set_note_handler(parser, note_handler))
 
     # on windows we need a custom open handler in order to deal with internation characters in the path.
     IF PY_MAJOR_VERSION >2:
@@ -749,12 +761,18 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
             raise PyreadstatError("Python 2 on windows not supported!")
 
     if not metaonly:
-        retcode = readstat_set_value_handler(parser, value_handler)
+        check_exit_status(readstat_set_value_handler(parser, value_handler))
 
     # if the user set the encoding manually
     if data.user_encoding:
         encoding_bytes = data.user_encoding.encode("utf-8")
         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
+
+    if row_limit:
+        check_exit_status(readstat_set_row_limit(parser, row_limit))
+    
+    if row_offset:
+        check_exit_status(readstat_set_row_offset(parser, row_offset))
 
     # parse!
     error = parse_func(parser, filename, ctx);
@@ -763,10 +781,7 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     # if not, make sure that the return from parse_func is OK, if not print
     pyerr = PyErr_Occurred()
     if <void *>pyerr == NULL:
-        if error != READSTAT_OK:
-            err_readstat = readstat_error_message(error)
-            err_message = <str> err_readstat
-            raise ReadstatError(err_message)
+        check_exit_status(error)
         
 
 cdef object data_container_to_pandas_dataframe(data_container data):
@@ -879,7 +894,7 @@ cdef object data_container_extract_metadata(data_container data):
 
 cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion):
+                           bint no_datetime_conversion, long row_limit, long row_offset):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -922,7 +937,7 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     data.no_datetime_conversion = no_datetime_conversion
     
     # go!
-    run_readstat_parser(filename, data, parse_func)    
+    run_readstat_parser(filename, data, parse_func, row_limit, row_offset)    
     data_frame = data_container_to_pandas_dataframe(data)
     metadata = data_container_extract_metadata(data)
 

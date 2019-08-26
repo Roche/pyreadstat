@@ -174,6 +174,9 @@ cdef extern from "readstat.h":
     cdef readstat_value_t readstat_variable_get_missing_range_hi(const readstat_variable_t *variable, int i);
 
     cdef readstat_type_t readstat_value_type(readstat_value_t value);
+
+    cdef readstat_error_t readstat_set_row_limit(readstat_parser_t *parser, long row_limit);
+    cdef readstat_error_t readstat_set_row_offset(readstat_parser_t *parser, long row_offset);
     
     cdef readstat_error_t readstat_parse_dta(readstat_parser_t *parser, const char *path, void *user_ctx);
     cdef readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path, void *user_ctx);

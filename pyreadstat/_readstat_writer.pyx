@@ -18,6 +18,7 @@
 import os
 from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
+from _readstat_parser cimport check_exit_status
 
 import numpy as np
 #cimport numpy as np
@@ -442,7 +443,7 @@ cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
     fd = (<int *>ctx)[0]
     return write(fd, data, _len)
 
-cdef void check_exit_status(readstat_error_t retcode) except *:
+cdef void _check_exit_status(readstat_error_t retcode) except *:
     """
     transforms a readstat exit status to a python error if status is not READSTAT OK
     """
@@ -540,6 +541,8 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
+    if file_format == FILE_FORMAT_POR:
+        col_names = [x.upper() for x in col_names]
     cdef list col_types = get_pandas_column_types(df, missing_user_values)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)

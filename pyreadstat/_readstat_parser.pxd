@@ -89,12 +89,14 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
 cdef int handle_value_label(char *val_labels, readstat_value_t value, char *label, void *ctx) except READSTAT_HANDLER_ABORT
 cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HANDLER_ABORT
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *
+cdef void check_exit_status(readstat_error_t retcode) except *
+
+cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *
 cdef object data_container_to_pandas_dataframe(data_container data)
 cdef object data_container_extract_metadata(data_container data)
 cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion)
+                           bint no_datetime_conversion, long row_limit, long row_offset)
 
 # definitions for stuff about dates
 cdef list sas_date_formats 

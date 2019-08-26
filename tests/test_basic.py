@@ -165,6 +165,15 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), disable_datetime_conversion=True)
         self.assertTrue(df.equals(self.df_nodates_sastata))
 
+    def test_sas7bdat_chunk(self):
+
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), row_limit = 2, row_offset =1)
+        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
+
     def test_xport(self):
 
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"))
@@ -195,6 +204,16 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"), disable_datetime_conversion=True)
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.df_nodates_sastata))
+
+    def test_xport_chunks(self):
+
+        df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"), row_limit = 2, row_offset =1)
+        df.columns = [x.lower() for x in df.columns]
+        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
 
     def test_dta(self):
 
@@ -233,6 +252,18 @@ class TestBasic(unittest.TestCase):
         df_pandas["dtime"] = df_pandas["dtime"] * 1000
         df_pandas["mytime"] = df_pandas["mytime"] * 1000
         self.assertTrue(df.equals(df_pandas))
+
+    def test_dta_chunks(self):
+
+        # discard dtime and arrange time
+        df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), row_limit = 2, row_offset =1)
+        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
+        df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
+        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
 
     def test_sav(self):
 
@@ -285,6 +316,19 @@ class TestBasic(unittest.TestCase):
     def test_sav_nodates(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), disable_datetime_conversion=True)
         self.assertTrue(df.equals(self.df_nodates_spss))
+
+    def test_sav_chunks(self):
+
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), row_limit = 2, row_offset =1)
+        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
+        self.assertTrue(len(meta.notes)>0)
+        self.assertTrue(meta.variable_display_width["mychar"]==9)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         
     def test_zsav(self):
 
@@ -321,6 +365,19 @@ class TestBasic(unittest.TestCase):
     def test_zsav_nodates(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), disable_datetime_conversion=True)
         self.assertTrue(df.equals(self.df_nodates_spss))
+
+    def test_zsav_chunks(self):
+
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), row_limit = 2, row_offset =1)
+        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
+        self.assertTrue(len(meta.notes)>0)
+        self.assertTrue(meta.variable_display_width["mychar"]==9)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_measure["mychar"]=="nominal")
 
     def test_por(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
@@ -366,6 +423,18 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), disable_datetime_conversion=True)
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.df_nodates_spss))
+
+    def test_por_chunks(self):
+        df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), row_limit = 2, row_offset =1)
+        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        # dates, datetimes and timestamps are not translated but stay as integers, let's just drop them
+        df_pandas_por = df_pandas.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        df.columns = [x.lower() for x in df.columns]
+        df = df.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        self.assertTrue(df.equals(df_pandas_por))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas_por))
+        self.assertTrue(len(meta.notes) > 0)
 
     def test_sas_catalog_win(self):
         """these sas7bdat and sasbcat where produced on windows, probably 32 bit"""
@@ -471,7 +540,20 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df2.equals(mdf2))
         self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
 
-    # writing: none of this works on python 2
+    # read in chunks
+
+    def test_chunk_reader(self):
+
+        fpath = "test_data/basic/sample.sas7bdat"
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 2, offset=1, limit=2, disable_datetime_conversion=True)
+        
+        for df, meta in reader:
+            pass
+        
+        currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
+        self.assertTrue(df.equals(currow))
+
+    # writing
 
     def test_sav_write_basic(self):
 
@@ -570,6 +652,21 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertEqual(table_name, meta.table_name)
+
+    def test_por_write_basic(self):
+
+        file_label = "basic write"
+        #file_note = "These are some notes"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "write.por")
+        pyreadstat.write_por(self.df_pandas, path, file_label=file_label, column_labels=col_labels) #, note=file_note)
+        df, meta = pyreadstat.read_por(path)
+        df.columns = [x.lower() for x in df.columns]
+
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        #self.assertEqual(meta.notes[0], file_note)
 
     def test_sav_write_dates(self):
 
