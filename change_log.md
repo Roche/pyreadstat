@@ -1,4 +1,4 @@
-# 0.2.9 (github 26.08.2019, pypi conda)
+# 0.2.9 (github 26.08.2019, pypi and conda 27.08.2019)
 * implemented ability to read files in chunks
 * implemented write_por
 * Readstat sources updated to release 1.1.0
