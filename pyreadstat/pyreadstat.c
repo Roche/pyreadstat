@@ -1751,6 +1751,7 @@ static const char __pyx_k_file_path[] = "file_path";
 static const char __pyx_k_row_limit[] = "row_limit";
 static const char __pyx_k_var_label[] = "var_label";
 static const char __pyx_k_write_dta[] = "write_dta";
+static const char __pyx_k_write_por[] = "write_por";
 static const char __pyx_k_write_sav[] = "write_sav";
 static const char __pyx_k_data_frame[] = "data_frame";
 static const char __pyx_k_file_label[] = "file_label";
@@ -1890,6 +1891,7 @@ static PyObject *__pyx_n_s_variable_to_label;
 static PyObject *__pyx_n_s_variable_value_labels;
 static PyObject *__pyx_n_s_version;
 static PyObject *__pyx_n_s_write_dta;
+static PyObject *__pyx_n_s_write_por;
 static PyObject *__pyx_n_s_write_sav;
 static PyObject *__pyx_n_s_write_xport;
 static PyObject *__pyx_n_s_xport;
@@ -1906,6 +1908,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_16read_file_in_chunks(CYTHON
 static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_19write_sav(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_df, PyObject *__pyx_v_dst_path, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels, PyObject *__pyx_v_compress, PyObject *__pyx_v_note, PyObject *__pyx_v_variable_value_labels, PyObject *__pyx_v_missing_ranges, PyObject *__pyx_v_variable_display_width, PyObject *__pyx_v_variable_measure); /* proto */
 static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_21write_dta(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_df, PyObject *__pyx_v_dst_path, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels, int __pyx_v_version, PyObject *__pyx_v_variable_value_labels, PyObject *__pyx_v_missing_user_values); /* proto */
 static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_df, PyObject *__pyx_v_dst_path, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels, PyObject *__pyx_v_table_name); /* proto */
+static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_25write_por(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_df, PyObject *__pyx_v_dst_path, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels); /* proto */
 static PyObject *__pyx_tp_new_10pyreadstat_10pyreadstat___pyx_scope_struct__set_value_labels(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_10pyreadstat_10pyreadstat___pyx_scope_struct_1_read_file_in_chunks(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop = {0, &__pyx_n_s_pop, 0, 0, 0};
@@ -1925,6 +1928,7 @@ static PyObject *__pyx_tuple__21;
 static PyObject *__pyx_tuple__22;
 static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_tuple__26;
+static PyObject *__pyx_tuple__28;
 static PyObject *__pyx_codeobj__6;
 static PyObject *__pyx_codeobj__8;
 static PyObject *__pyx_codeobj__10;
@@ -1936,6 +1940,7 @@ static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__23;
 static PyObject *__pyx_codeobj__25;
 static PyObject *__pyx_codeobj__27;
+static PyObject *__pyx_codeobj__29;
 /* Late includes */
 
 /* "pyreadstat/pyreadstat.pyx":37
@@ -7453,7 +7458,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_21write_dta(CYTHON_UNUSED Py
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_xport(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_23write_xport[] = "\n    Writes a pandas data frame to a SAS Xport (xpt) file.\n    Only XPORT version 5 is supported. (files written in version 8 cannot be opened in SAS).\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    table_name : str, optional\n        name of the dataset, by default DATASET\n\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_23write_xport[] = "\n    Writes a pandas data frame to a SAS Xport (xpt) file.\n    Only XPORT version 5 is supported (files written in version 8 cannot be opened in SAS).\n    If no table_name is specified the dataset has by default the name DATASET (take it into account if\n    reading the file from SAS.)\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    table_name : str, optional\n        name of the dataset, by default DATASET\n\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_24write_xport = {"write_xport", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_24write_xport, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_23write_xport};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_xport(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_df = 0;
@@ -7576,7 +7581,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("write_xport", 0);
 
-  /* "pyreadstat/pyreadstat.pyx":709
+  /* "pyreadstat/pyreadstat.pyx":711
  * 
  *     # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
  *     cdef int file_format_version = 5             # <<<<<<<<<<<<<<
@@ -7585,7 +7590,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
  */
   __pyx_v_file_format_version = 5;
 
-  /* "pyreadstat/pyreadstat.pyx":710
+  /* "pyreadstat/pyreadstat.pyx":712
  *     # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
  *     cdef int file_format_version = 5
  *     cdef dict variable_value_labels=None             # <<<<<<<<<<<<<<
@@ -7595,7 +7600,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(Py_None);
   __pyx_v_variable_value_labels = ((PyObject*)Py_None);
 
-  /* "pyreadstat/pyreadstat.pyx":711
+  /* "pyreadstat/pyreadstat.pyx":713
  *     cdef int file_format_version = 5
  *     cdef dict variable_value_labels=None
  *     cdef str note = ""             # <<<<<<<<<<<<<<
@@ -7605,7 +7610,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(__pyx_kp_s__2);
   __pyx_v_note = __pyx_kp_s__2;
 
-  /* "pyreadstat/pyreadstat.pyx":712
+  /* "pyreadstat/pyreadstat.pyx":714
  *     cdef dict variable_value_labels=None
  *     cdef str note = ""
  *     cdef dict missing_ranges = None             # <<<<<<<<<<<<<<
@@ -7615,7 +7620,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(Py_None);
   __pyx_v_missing_ranges = ((PyObject*)Py_None);
 
-  /* "pyreadstat/pyreadstat.pyx":713
+  /* "pyreadstat/pyreadstat.pyx":715
  *     cdef str note = ""
  *     cdef dict missing_ranges = None
  *     cdef dict missing_user_values = None             # <<<<<<<<<<<<<<
@@ -7625,7 +7630,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(Py_None);
   __pyx_v_missing_user_values = ((PyObject*)Py_None);
 
-  /* "pyreadstat/pyreadstat.pyx":714
+  /* "pyreadstat/pyreadstat.pyx":716
  *     cdef dict missing_ranges = None
  *     cdef dict missing_user_values = None
  *     cdef dict variable_alignment = None             # <<<<<<<<<<<<<<
@@ -7635,7 +7640,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(Py_None);
   __pyx_v_variable_alignment = ((PyObject*)Py_None);
 
-  /* "pyreadstat/pyreadstat.pyx":715
+  /* "pyreadstat/pyreadstat.pyx":717
  *     cdef dict missing_user_values = None
  *     cdef dict variable_alignment = None
  *     cdef dict variable_display_width = None             # <<<<<<<<<<<<<<
@@ -7645,7 +7650,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(Py_None);
   __pyx_v_variable_display_width = ((PyObject*)Py_None);
 
-  /* "pyreadstat/pyreadstat.pyx":716
+  /* "pyreadstat/pyreadstat.pyx":718
  *     cdef dict variable_alignment = None
  *     cdef dict variable_display_width = None
  *     cdef dict variable_measure = None             # <<<<<<<<<<<<<<
@@ -7655,14 +7660,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_INCREF(Py_None);
   __pyx_v_variable_measure = ((PyObject*)Py_None);
 
-  /* "pyreadstat/pyreadstat.pyx":717
+  /* "pyreadstat/pyreadstat.pyx":719
  *     cdef dict variable_display_width = None
  *     cdef dict variable_measure = None
  *     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels,             # <<<<<<<<<<<<<<
  *         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
  *         variable_alignment,variable_display_width, variable_measure)
  */
-  __pyx_f_10pyreadstat_16_readstat_writer_run_write(__pyx_v_df, __pyx_v_dst_path, __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_XPORT, __pyx_v_file_label, __pyx_v_column_labels, __pyx_v_file_format_version, __pyx_v_note, __pyx_v_table_name, __pyx_v_variable_value_labels, __pyx_v_missing_ranges, __pyx_v_missing_user_values, __pyx_v_variable_alignment, __pyx_v_variable_display_width, __pyx_v_variable_measure); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 717, __pyx_L1_error)
+  __pyx_f_10pyreadstat_16_readstat_writer_run_write(__pyx_v_df, __pyx_v_dst_path, __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_XPORT, __pyx_v_file_label, __pyx_v_column_labels, __pyx_v_file_format_version, __pyx_v_note, __pyx_v_table_name, __pyx_v_variable_value_labels, __pyx_v_missing_ranges, __pyx_v_missing_user_values, __pyx_v_variable_alignment, __pyx_v_variable_display_width, __pyx_v_variable_measure); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 719, __pyx_L1_error)
 
   /* "pyreadstat/pyreadstat.pyx":687
  *      variable_display_width, variable_measure)
@@ -7686,6 +7691,252 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_xport(CYTHON_UNUSED 
   __Pyx_XDECREF(__pyx_v_variable_alignment);
   __Pyx_XDECREF(__pyx_v_variable_display_width);
   __Pyx_XDECREF(__pyx_v_variable_measure);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pyreadstat/pyreadstat.pyx":723
+ *         variable_alignment,variable_display_width, variable_measure)
+ * 
+ * def write_por(df, str dst_path, str file_label="", list column_labels=None):             # <<<<<<<<<<<<<<
+ *     """
+ *     Writes a pandas data frame to a SPSS POR file.
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_por(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_10pyreadstat_10pyreadstat_25write_por[] = "\n    Writes a pandas data frame to a SPSS POR file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    ";
+static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_26write_por = {"write_por", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_26write_por, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_25write_por};
+static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_por(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_df = 0;
+  PyObject *__pyx_v_dst_path = 0;
+  PyObject *__pyx_v_file_label = 0;
+  PyObject *__pyx_v_column_labels = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("write_por (wrapper)", 0);
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_df,&__pyx_n_s_dst_path,&__pyx_n_s_file_label,&__pyx_n_s_column_labels,0};
+    PyObject* values[4] = {0,0,0,0};
+    values[2] = ((PyObject*)__pyx_kp_s__2);
+    values[3] = ((PyObject*)Py_None);
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        CYTHON_FALLTHROUGH;
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_df)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        CYTHON_FALLTHROUGH;
+        case  1:
+        if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_dst_path)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("write_por", 0, 2, 4, 1); __PYX_ERR(0, 723, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  2:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_file_label);
+          if (value) { values[2] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  3:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_column_labels);
+          if (value) { values[3] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "write_por") < 0)) __PYX_ERR(0, 723, __pyx_L3_error)
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
+        CYTHON_FALLTHROUGH;
+        case  3: values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
+        CYTHON_FALLTHROUGH;
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_df = values[0];
+    __pyx_v_dst_path = ((PyObject*)values[1]);
+    __pyx_v_file_label = ((PyObject*)values[2]);
+    __pyx_v_column_labels = ((PyObject*)values[3]);
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("write_por", 0, 2, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 723, __pyx_L3_error)
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("pyreadstat.pyreadstat.write_por", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dst_path), (&PyString_Type), 1, "dst_path", 1))) __PYX_ERR(0, 723, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_label), (&PyString_Type), 1, "file_label", 1))) __PYX_ERR(0, 723, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_column_labels), (&PyList_Type), 1, "column_labels", 1))) __PYX_ERR(0, 723, __pyx_L1_error)
+  __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_25write_por(__pyx_self, __pyx_v_df, __pyx_v_dst_path, __pyx_v_file_label, __pyx_v_column_labels);
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_25write_por(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_df, PyObject *__pyx_v_dst_path, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels) {
+  PyObject *__pyx_v_note = 0;
+  int __pyx_v_file_format_version;
+  PyObject *__pyx_v_variable_value_labels = 0;
+  PyObject *__pyx_v_missing_ranges = 0;
+  PyObject *__pyx_v_missing_user_values = 0;
+  PyObject *__pyx_v_variable_alignment = 0;
+  PyObject *__pyx_v_variable_display_width = 0;
+  PyObject *__pyx_v_variable_measure = 0;
+  PyObject *__pyx_v_table_name = 0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("write_por", 0);
+
+  /* "pyreadstat/pyreadstat.pyx":741
+ * 
+ *     # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
+ *     cdef str note=None             # <<<<<<<<<<<<<<
+ *     cdef int file_format_version = 0
+ *     cdef dict variable_value_labels=None
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_note = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":742
+ *     # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
+ *     cdef str note=None
+ *     cdef int file_format_version = 0             # <<<<<<<<<<<<<<
+ *     cdef dict variable_value_labels=None
+ *     cdef dict missing_ranges = None
+ */
+  __pyx_v_file_format_version = 0;
+
+  /* "pyreadstat/pyreadstat.pyx":743
+ *     cdef str note=None
+ *     cdef int file_format_version = 0
+ *     cdef dict variable_value_labels=None             # <<<<<<<<<<<<<<
+ *     cdef dict missing_ranges = None
+ *     cdef dict missing_user_values = None
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_variable_value_labels = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":744
+ *     cdef int file_format_version = 0
+ *     cdef dict variable_value_labels=None
+ *     cdef dict missing_ranges = None             # <<<<<<<<<<<<<<
+ *     cdef dict missing_user_values = None
+ *     cdef dict variable_alignment = None
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_missing_ranges = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":745
+ *     cdef dict variable_value_labels=None
+ *     cdef dict missing_ranges = None
+ *     cdef dict missing_user_values = None             # <<<<<<<<<<<<<<
+ *     cdef dict variable_alignment = None
+ *     cdef dict variable_display_width = None
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_missing_user_values = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":746
+ *     cdef dict missing_ranges = None
+ *     cdef dict missing_user_values = None
+ *     cdef dict variable_alignment = None             # <<<<<<<<<<<<<<
+ *     cdef dict variable_display_width = None
+ *     cdef dict variable_measure = None
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_variable_alignment = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":747
+ *     cdef dict missing_user_values = None
+ *     cdef dict variable_alignment = None
+ *     cdef dict variable_display_width = None             # <<<<<<<<<<<<<<
+ *     cdef dict variable_measure = None
+ *     cdef str table_name = ""
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_variable_display_width = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":748
+ *     cdef dict variable_alignment = None
+ *     cdef dict variable_display_width = None
+ *     cdef dict variable_measure = None             # <<<<<<<<<<<<<<
+ *     cdef str table_name = ""
+ *     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
+ */
+  __Pyx_INCREF(Py_None);
+  __pyx_v_variable_measure = ((PyObject*)Py_None);
+
+  /* "pyreadstat/pyreadstat.pyx":749
+ *     cdef dict variable_display_width = None
+ *     cdef dict variable_measure = None
+ *     cdef str table_name = ""             # <<<<<<<<<<<<<<
+ *     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
+ *         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
+ */
+  __Pyx_INCREF(__pyx_kp_s__2);
+  __pyx_v_table_name = __pyx_kp_s__2;
+
+  /* "pyreadstat/pyreadstat.pyx":750
+ *     cdef dict variable_measure = None
+ *     cdef str table_name = ""
+ *     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,             # <<<<<<<<<<<<<<
+ *         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
+ *         variable_alignment,variable_display_width, variable_measure)
+ */
+  __pyx_f_10pyreadstat_16_readstat_writer_run_write(__pyx_v_df, __pyx_v_dst_path, __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_POR, __pyx_v_file_label, __pyx_v_column_labels, __pyx_v_file_format_version, __pyx_v_note, __pyx_v_table_name, __pyx_v_variable_value_labels, __pyx_v_missing_ranges, __pyx_v_missing_user_values, __pyx_v_variable_alignment, __pyx_v_variable_display_width, __pyx_v_variable_measure); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 750, __pyx_L1_error)
+
+  /* "pyreadstat/pyreadstat.pyx":723
+ *         variable_alignment,variable_display_width, variable_measure)
+ * 
+ * def write_por(df, str dst_path, str file_label="", list column_labels=None):             # <<<<<<<<<<<<<<
+ *     """
+ *     Writes a pandas data frame to a SPSS POR file.
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pyreadstat.pyreadstat.write_por", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_note);
+  __Pyx_XDECREF(__pyx_v_variable_value_labels);
+  __Pyx_XDECREF(__pyx_v_missing_ranges);
+  __Pyx_XDECREF(__pyx_v_missing_user_values);
+  __Pyx_XDECREF(__pyx_v_variable_alignment);
+  __Pyx_XDECREF(__pyx_v_variable_display_width);
+  __Pyx_XDECREF(__pyx_v_variable_measure);
+  __Pyx_XDECREF(__pyx_v_table_name);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
@@ -8072,6 +8323,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_variable_value_labels, __pyx_k_variable_value_labels, sizeof(__pyx_k_variable_value_labels), 0, 0, 1, 1},
   {&__pyx_n_s_version, __pyx_k_version, sizeof(__pyx_k_version), 0, 0, 1, 1},
   {&__pyx_n_s_write_dta, __pyx_k_write_dta, sizeof(__pyx_k_write_dta), 0, 0, 1, 1},
+  {&__pyx_n_s_write_por, __pyx_k_write_por, sizeof(__pyx_k_write_por), 0, 0, 1, 1},
   {&__pyx_n_s_write_sav, __pyx_k_write_sav, sizeof(__pyx_k_write_sav), 0, 0, 1, 1},
   {&__pyx_n_s_write_xport, __pyx_k_write_xport, sizeof(__pyx_k_write_xport), 0, 0, 1, 1},
   {&__pyx_n_s_xport, __pyx_k_xport, sizeof(__pyx_k_xport), 0, 0, 1, 1},
@@ -8239,6 +8491,18 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__26);
   __Pyx_GIVEREF(__pyx_tuple__26);
   __pyx_codeobj__27 = (PyObject*)__Pyx_PyCode_New(5, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__26, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyreadstat_pyreadstat_pyx, __pyx_n_s_write_xport, 687, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__27)) __PYX_ERR(0, 687, __pyx_L1_error)
+
+  /* "pyreadstat/pyreadstat.pyx":723
+ *         variable_alignment,variable_display_width, variable_measure)
+ * 
+ * def write_por(df, str dst_path, str file_label="", list column_labels=None):             # <<<<<<<<<<<<<<
+ *     """
+ *     Writes a pandas data frame to a SPSS POR file.
+ */
+  __pyx_tuple__28 = PyTuple_Pack(13, __pyx_n_s_df, __pyx_n_s_dst_path, __pyx_n_s_file_label, __pyx_n_s_column_labels, __pyx_n_s_note, __pyx_n_s_file_format_version, __pyx_n_s_variable_value_labels, __pyx_n_s_missing_ranges, __pyx_n_s_missing_user_values, __pyx_n_s_variable_alignment, __pyx_n_s_variable_display_width, __pyx_n_s_variable_measure, __pyx_n_s_table_name); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 723, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__28);
+  __Pyx_GIVEREF(__pyx_tuple__28);
+  __pyx_codeobj__29 = (PyObject*)__Pyx_PyCode_New(4, 0, 13, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__28, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pyreadstat_pyreadstat_pyx, __pyx_n_s_write_por, 723, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__29)) __PYX_ERR(0, 723, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -8745,6 +9009,18 @@ if (!__Pyx_RefNanny) {
   __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_10pyreadstat_10pyreadstat_24write_xport, NULL, __pyx_n_s_pyreadstat_pyreadstat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 687, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_write_xport, __pyx_t_2) < 0) __PYX_ERR(0, 687, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+  /* "pyreadstat/pyreadstat.pyx":723
+ *         variable_alignment,variable_display_width, variable_measure)
+ * 
+ * def write_por(df, str dst_path, str file_label="", list column_labels=None):             # <<<<<<<<<<<<<<
+ *     """
+ *     Writes a pandas data frame to a SPSS POR file.
+ */
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_10pyreadstat_10pyreadstat_26write_por, NULL, __pyx_n_s_pyreadstat_pyreadstat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 723, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_write_por, __pyx_t_2) < 0) __PYX_ERR(0, 723, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "pyreadstat/pyreadstat.pyx":1

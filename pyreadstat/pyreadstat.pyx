@@ -687,7 +687,9 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
 def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None):
     """
     Writes a pandas data frame to a SAS Xport (xpt) file.
-    Only XPORT version 5 is supported. (files written in version 8 cannot be opened in SAS).
+    Only XPORT version 5 is supported (files written in version 8 cannot be opened in SAS).
+    If no table_name is specified the dataset has by default the name DATASET (take it into account if
+    reading the file from SAS.)
 
     Parameters
     ----------

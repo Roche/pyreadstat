@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 0.1.2 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 0.2.9 documentation</title>
   
 
   
@@ -579,7 +579,9 @@ values being strings one of “nominal”, “ordinal”, “scale” or “unkn
 <dt id="pyreadstat.pyreadstat.write_xport">
 <code class="sig-prename descclassname">pyreadstat.pyreadstat.</code><code class="sig-name descname">write_xport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_xport" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a pandas data frame to a SAS Xport (xpt) file.
-Only XPORT version 5 is supported. (files written in version 8 cannot be opened in SAS).</p>
+Only XPORT version 5 is supported (files written in version 8 cannot be opened in SAS).
+If no table_name is specified the dataset has by default the name DATASET (take it into account if
+reading the file from SAS.)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
