@@ -1,8 +1,5 @@
 # Compiling pyreadstat on windows
 
-This is not a task for the faint of heart! This recipe has worked for me, but there is no guarantee
-that will work for others, and that will work in the future! 
-
 ## Context
 
 Python extensions can be compiled in two ways: using Microsoft Visual Studio with a version matching that of your 
@@ -13,12 +10,44 @@ Since Python 3.5, the recommended way is using Visual Studio, as Microsoft intro
 not 100% compatible with MINGW, actually it is recommended not to use mingw 
 (see [this](https://stevedower.id.au/blog/building-for-python-3-5/) and [this](https://github.com/cython/cython/wiki/CythonExtensionsOnWindows)). 
 However, Readstat (the library that pyreadstat wraps) is written in a way that depends on Posix (unix) libraries, 
-and therefore cannot be compiled with Visual Studio. I tried, got a lot of errors, fix them, to get more errors, 
-fix them, got more errors, until at some point I realize I would be rewriting readstat which is not the goal of the
-wrapper. Therefore, one must compile with MINGW. Since it is not recommended, there are going to be unexpected errors,
-which solution are not always evident (at least by googling it).
+and therefore cannot be compiled with Visual Studio, therefore, one must compile with MINGW. 
 
-## The process
+Initially I compiled using purely Msys2/MingW64. This approach however requires lot of manual tweaking (see later) and is not
+compatible with CI services such as appveyor. Now I am using m2w64-toolchain which is a conda package that makes the
+process much easier and is compatible with Appveyor.
+
+## Using m2w64-toolchain
+
+pre-requisite:
+
+* Install Anaconda or Miniconda and prepare the environment: run these commands on the Anaconda prompt and/or activate the conda 
+environment properly
+
+```
+conda install setuptools pandas wheel pip libpython cython
+conda install -c msys2 m2w64-toolchain
+```
+
+* compilation:
+
+```
+# set mingw32 as compiler
+python setup.py config --compiler=mingw32
+# Create a wheel. 
+python setup.py bdist_wheel 
+# install the wheel
+pip install --pre --no-index --find-links dist/ pyreadstat
+# run tests (optional)
+python.exe tests\test_basic.py
+```
+
+
+## Using only Msys2/MingW64 (old)
+
+Current Python versions do not support compiling with MingW64 out of the box anymore. Since it is not the recommended way,
+there are going to be unexpected errors, which solution are not always evident (at least by googling it). Here a recipe that
+did work for me in the past for several months until I changed the process to use m2w64-toolchain. There is no guarantee
+tough that this will continue to work in the future.
 
 1.	First we need to install MinGW. In the Readstat page, in the [windows specific notes](https://github.com/WizardMac/ReadStat#windows-specific-notes) 
 says we should download it from [here](http://www.msys2.org/), we do and follow the instructions (basically install and
@@ -131,14 +160,26 @@ mingw could not find the runtime, which probably means once we provide the same 
 Build_ext inplace will work, but it wont be possible to import the library because two dlls may be missing, you could
  add them directly to the folder where you compiled, see additional notes.
 
-### Additional notes:
+## Additional notes:
+
+### Old process (msys only)
 
 1.	Iconv had to be added to setup.py to the list of needed libraries to compile the extensions. This was not needed on
  linux but on windows is necessary.
-2.	On windows, it was necessary to add zlib.dll and libiconv.dll to the [package](https://docs.python.org/3/distutils/setupscript.html).
+2.	On windows, it was necessary to add zlib1.dll and libiconv-2.dll to the [package](https://docs.python.org/3/distutils/setupscript.html).
  Those dlls I got from the mingw bin directory (C:\msys64\mingw64\bin), and now are in the win_libs directory. If you
-  copy paste them next to the pyd files, it will also work.
+ compile usig build_ext --inplace and then
+  copy paste the dlls next to the pyd files, you will be able to import pyreadstat.
 3.	When trying to import the library, if the error dll cannot be found appears, the program [dependency walker](http://www.dependencywalker.com/)
 will help discovering which one is missing. Simply run the program, load the pyd file and it will show you. Many windows
  ones cannot be resolved, but those are typically in the Anaconda installation, so those should not be problematic.
+
+### New process (m2w64-toolchain)
+
+1. Dependency Walker does not work well anymore on Windows 10. Use [this one](https://github.com/lucasg/Dependencies) instead.
+A very handy program is also [ListDlls](https://docs.microsoft.com/en-us/sysinternals/downloads/listdlls) that will list all dlls loaded by a 
+process. This one however will not work if the dll is missing, so it helps only locating good loaded dlls.
+2. During the update to the new process I also added compilation for 32 bit. zlib1.dll and libiconv-2.dll I got from the conda packages
+zlib and iconv. The compilation introduces also a dependency to two extra dlls coming from the m2w64-toolchain, zlib and iconv also
+depend on them so they have to be added. Interestingly this dependency does not exists for 64 bit.
 

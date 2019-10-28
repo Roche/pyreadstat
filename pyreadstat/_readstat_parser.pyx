@@ -40,8 +40,8 @@ cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_f
 #sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
-cdef list spss_datetime_formats = ["DATETIME", 'DATETIME20', 'DATETIME23.2']
-cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE", 'EDATE10']
+cdef list spss_datetime_formats = ["DATETIME", 'DATETIME20', 'DATETIME23.2', "DATETIME8"]
+cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE", 'EDATE10', 'DATE8']
 cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
@@ -85,7 +85,7 @@ cdef class data_container:
         self.use_cols = list()
         self.usernan = 0
         self.missing_ranges = dict()
-        self.missing_user_values = set()
+        self.missing_user_values = dict()
         self.variable_storage_width = dict()
         self.variable_display_width = dict()
         self.variable_alignment = dict()
@@ -99,6 +99,7 @@ class metadata_container:
     def __init__(self):
         self.column_names = list()
         self.column_labels = list()
+        self.column_names_to_labels = dict()
         self.file_encoding = None
         self.number_columns = None
         self.number_rows = None
@@ -109,7 +110,7 @@ class metadata_container:
         self.original_variable_types = dict()
         self.table_name = None
         self.missing_ranges = dict()
-        self.missing_user_values = list()
+        self.missing_user_values = dict()
         self.variable_storage_width = dict()
         self.variable_display_width = dict()
         self.variable_alignment = dict()
@@ -523,6 +524,7 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef int missing_tag
 
     cdef object pyvalue
+    cdef set curset
     
     # extract variables we need from data container
     dc = <data_container> ctx
@@ -557,7 +559,12 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             # In SAS missing values are A to Z or _ in stata a to z
             #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
             dc.col_data[index][obs_index] =  chr(missing_tag)
-            dc.missing_user_values.add(chr(missing_tag))
+            curset = dc.missing_user_values.get(index)
+            if curset is None:
+                curset = set()
+            curset.add(chr(missing_tag))
+            dc.missing_user_values[index] = curset
+            #dc.missing_user_values.add(chr(missing_tag))
             #else:
                 #msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
                 #raise PyreadstatError(msg)
@@ -694,7 +701,20 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         return -1
 
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *)) except *:
+cdef void check_exit_status(readstat_error_t retcode) except *:
+    """
+    transforms a readstat exit status to a python error if status is not READSTAT OK
+    """
+
+    cdef char * err_readstat
+    cdef str err_message
+    if retcode != READSTAT_OK:
+        err_readstat = readstat_error_message(retcode)
+        err_message = <str> err_readstat
+        raise ReadstatError(err_message)
+
+
+cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *:
     """
     Runs the parsing of the file by readstat library
     """
@@ -708,7 +728,6 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     cdef readstat_note_handler note_handler
 
     cdef void *ctx
-    cdef int retcode
     cdef str err_message
     cdef PyObject *pyerr
     cdef bint metaonly
@@ -719,7 +738,7 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     ctx = <void *>data
     
     #readstat_error_t error = READSTAT_OK;
-    parser = readstat_parser_init();
+    parser = readstat_parser_init()
     metadata_handler = <readstat_metadata_handler> handle_metadata
     variable_handler = <readstat_variable_handler> handle_variable
     value_handler = <readstat_value_handler> handle_value
@@ -727,10 +746,10 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     note_handler = <readstat_note_handler> handle_note
     
     
-    retcode = readstat_set_metadata_handler(parser, metadata_handler)
-    retcode = readstat_set_variable_handler(parser, variable_handler)
-    retcode = readstat_set_value_label_handler(parser, value_label_handler)
-    retcode = readstat_set_note_handler(parser, note_handler)
+    check_exit_status(readstat_set_metadata_handler(parser, metadata_handler))
+    check_exit_status(readstat_set_variable_handler(parser, variable_handler))
+    check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))
+    check_exit_status(readstat_set_note_handler(parser, note_handler))
 
     # on windows we need a custom open handler in order to deal with internation characters in the path.
     IF PY_MAJOR_VERSION >2:
@@ -742,12 +761,18 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
             raise PyreadstatError("Python 2 on windows not supported!")
 
     if not metaonly:
-        retcode = readstat_set_value_handler(parser, value_handler)
+        check_exit_status(readstat_set_value_handler(parser, value_handler))
 
     # if the user set the encoding manually
     if data.user_encoding:
         encoding_bytes = data.user_encoding.encode("utf-8")
         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
+
+    if row_limit:
+        check_exit_status(readstat_set_row_limit(parser, row_limit))
+    
+    if row_offset:
+        check_exit_status(readstat_set_row_offset(parser, row_offset))
 
     # parse!
     error = parse_func(parser, filename, ctx);
@@ -756,10 +781,7 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     # if not, make sure that the return from parse_func is OK, if not print
     pyerr = PyErr_Occurred()
     if <void *>pyerr == NULL:
-        if error != READSTAT_OK:
-            err_readstat = readstat_error_message(error)
-            err_message = <str> err_readstat
-            raise ReadstatError(err_message)
+        check_exit_status(error)
         
 
 cdef object data_container_to_pandas_dataframe(data_container data):
@@ -845,9 +867,14 @@ cdef object data_container_extract_metadata(data_container data):
         cur_type = data.col_formats_original[indx]
         original_types[cur_col] = cur_type
 
+    for indx, curset in data.missing_user_values.items():
+        cur_col = data.col_names[indx]
+        metadata.missing_user_values[cur_col] = sorted(list(curset))    
+
     metadata.notes = data.notes
     metadata.column_names = data.col_names
     metadata.column_labels = data.col_labels
+    metadata.column_names_to_labels = {k:v for k,v in zip(data.col_names, data.col_labels)}
     metadata.file_encoding = data.file_encoding
     metadata.file_label = data.file_label
     metadata.variable_value_labels = variable_value_labels
@@ -856,7 +883,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.original_variable_types = original_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
-    metadata.missing_user_values = sorted(list(data.missing_user_values))
+    #metadata.missing_user_values = sorted(list(data.missing_user_values))
     metadata.variable_storage_width = data.variable_storage_width
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment
@@ -867,7 +894,7 @@ cdef object data_container_extract_metadata(data_container data):
 
 cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion):
+                           bint no_datetime_conversion, long row_limit, long row_offset):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -910,7 +937,7 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     data.no_datetime_conversion = no_datetime_conversion
     
     # go!
-    run_readstat_parser(filename, data, parse_func)    
+    run_readstat_parser(filename, data, parse_func, row_limit, row_offset)    
     data_frame = data_container_to_pandas_dataframe(data)
     metadata = data_container_extract_metadata(data)
 

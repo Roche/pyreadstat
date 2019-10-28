@@ -8,7 +8,10 @@ import re
 
 script_folder = os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
 sys.path.insert(0, script_folder)
+sys.path.insert(1,os.path.join(script_folder, "docs"))
+
 import pyreadstat
+import conf
 
 pyreadstat_version = pyreadstat.__version__
 
@@ -18,9 +21,11 @@ with open(os.path.join(script_folder, "setup.py")) as h:
 raw = re.findall("version=\'.*?\'", content)
 setup_version = raw[0].replace("version=", "")
 setup_version = setup_version.replace("'", "")
-print("testing if versions match")
+print("testing if module and setup versions match")
 assert(pyreadstat_version == setup_version)
-print("versions match!")
+print("testing if documentation and setup versions match")
+assert(conf.release == setup_version)
+print("all versions match!")
 
 
 

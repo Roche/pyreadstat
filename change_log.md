@@ -1,4 +1,22 @@
-# 0.2.6 ()
+# 0.2.9 (github 26.08.2019, pypi and conda 27.08.2019)
+* implemented ability to read files in chunks
+* implemented write_por
+* Readstat sources updated to release 1.1.0
+
+# 0.2.8 (github, pypi, conda 30.07.2019)
+* write user defined missing values, value labels for spss and stata
+* write variable_display_width and variable_measure for spss
+* breaking change: missing_user_values is now dict instead of set both for reading and writing.
+* windows wheels build with appveyor + m2w64-toolchain. Wheels for python 2.7 not produced 
+  anymore, instead setup.py raises an error if trying to compile with 2.7 on windows so that
+  pip will raise this error when trying to install from source distribution.
+* column_names_to_labels: new member in metadata object, a dict of column names to labels
+* setup.py: ordering source files to make the compilation reproducible
+
+# 0.2.7 (github, pypi, conda 27.06.2019)
+* added writing capability.
+
+# 0.2.6 (github, pypi, conda 15.06.2019)
 * MANIFEST.in changed so that windows dlls get into the source distribution, setup.py
 changed so that those get installed only on windows but not unix.
 * Implemented option disable_datetime_conversion for all reading functions in order
