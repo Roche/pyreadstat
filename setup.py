@@ -154,5 +154,6 @@ setup(
     ],
     ext_modules=extensions,
     packages=["pyreadstat"],
-    data_files=data_files
+    data_files=data_files,
+    install_requires=['pandas'],
 )
