@@ -538,7 +538,6 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                     msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
                     raise PyreadstatError(msg)
 
-
     cdef readstat_error_t retcode
     cdef char *err_readstat
     cdef str err_message
@@ -574,6 +573,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
 
+    filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()
 
