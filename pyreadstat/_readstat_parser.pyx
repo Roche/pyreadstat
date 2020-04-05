@@ -904,12 +904,13 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     cdef char * filename    
     cdef data_container data
     cdef object origin
-   
-    filename_path = os.path.expanduser(filename_path)
-    if not os.path.isfile(filename_path):
-        raise PyreadstatError("File {0} does not exist!".format(filename_path))
 
     filename_bytes = filename_path.encode("utf-8")
+   
+    filename_bytes = os.path.expanduser(filename_bytes)
+    if not os.path.isfile(filename_bytes):
+        raise PyreadstatError("File {0} does not exist!".format(filename_path))
+
     filename = <char *> filename_bytes
     
     data = data_container()
