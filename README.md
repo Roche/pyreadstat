@@ -138,7 +138,7 @@ pip install pyreadstat --user
 ```
 
 Notice that at the moment we offer pre-compiled wheels for windows, mac and
-linux for Python 2.7, 3.5, 3.6, 3.7 and 3.8. Python 2.7 does not work for
+linux for Python 2.7, 3.6, 3.7 and 3.8. Python 2.7 does not work for
 windows (see later python 2.7 support). If there is no pre-compiled
 wheel available, pip will attempt to compile the source code.
 
