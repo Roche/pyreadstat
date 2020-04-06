@@ -1,8 +1,13 @@
-# 0.3.0 (github, pypi and conda )
-* Updated Readstat to Release 1.1.2, this will fix #3
+# 0.3.1 (github, pypi and conda 20200406
+* Updated Readstat to commit a71b4e80dae729e236d63d42066e79ca646cd23b (on dev)
+* Updated Readstat update fixes #3
+
+# 0.3.0 (github, pypi and conda 20200406)
+* Updated Readstat to Release 1.1.2, this did not fix #3
 * added capacity to read and write files with paths starting with tilde
 * added pandas as dependency > 0.24.0
 * copying windows dlls inside pyreadstat folder in site-packages 
+
 # 0.2.9 (github 26.08.2019, pypi and conda 27.08.2019)
 * implemented ability to read files in chunks
 * implemented write_por
