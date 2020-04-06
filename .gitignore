@@ -7,3 +7,6 @@
 *.so
 /pyreadstat.egg-info
 /dist2
+.DS_Store
+dist/
+test_data/write/

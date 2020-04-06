@@ -25,7 +25,7 @@ readstat_error_t sav_parse_time(const char *data, size_t len, struct tm *timesta
             temp_val = 10 * temp_val + (fc - '0');
         }
 
-        integer2 = [0-9]{2} >{ temp_val = 0; } $incr_val;
+        integer2 = ( " " %{ temp_val = 0; } | [0-9] ${ temp_val = fc - '0'; } ) [0-9] $incr_val;
 
         hour = integer2 %{ timestamp->tm_hour = temp_val; };
 

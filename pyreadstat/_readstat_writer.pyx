@@ -34,9 +34,10 @@ from libc.math cimport round, NAN
 
 cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'), np.dtype('uint8'), np.dtype('uint16'),
              np.int32, np.int16, np.int8, np.uint8, np.uint16}
+cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
 cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
-               np.int64, np.uint64, np.uint32, np.float}
-cdef set numeric_types = int_types.union(float_types)
+               np.int64, np.uint64, np.uint32, np.float, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype()}
+cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
 cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
@@ -196,17 +197,21 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
         if col_type in int_types:
             result.append((PYWRITER_INTEGER, 0,0))
         elif col_type in float_types:
+            # if there is a NaN, that's a valid double value, no need to handle specially as missing
             result.append((PYWRITER_DOUBLE, 0,0))
         elif col_type == np.bool:
             result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
             result.append((PYWRITER_DATETIME, 0,0))
-        elif col_type == np.object:
+        elif col_type == np.object or col_type in int_mixed_types:
             is_missing = 0
             if curuser_missing:
                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
             if np.any(pd.isna(curseries)):
+                if col_type in int_mixed_types:
+                    result.append((PYWRITER_INTEGER, 0, 1))
+                    continue
                 col = curseries.dropna().reset_index(drop=True)
                 is_missing = 1
                 if len(col):
@@ -221,7 +226,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 else:
                     result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
-            else:                
+            else:
+                if col_type in int_mixed_types:
+                    result.append((PYWRITER_INTEGER, 0, 0))
+                    continue
                 curtype = type(curseries[0])
                 equal = check_series_all_same_types(curseries, curtype)
                 #equal = curseries.apply(lambda x: type(x) == curtype)
@@ -530,7 +538,6 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                     msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
                     raise PyreadstatError(msg)
 
-
     cdef readstat_error_t retcode
     cdef char *err_readstat
     cdef str err_message
@@ -566,6 +573,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
 
+    filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()
 

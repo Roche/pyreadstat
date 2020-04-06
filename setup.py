@@ -79,12 +79,13 @@ libraries=["m", "z"]
 # Windows
 if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
+    win_install_dir = "Lib/site-packages/pyreadstat"
     if is64bit:
         data_folder = "win_libs/64bit/"
-        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
+        data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     else:
         data_folder = "win_libs/32bit/"
-        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
+        data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
     #data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     libraries.append("iconv")
 else:
@@ -135,7 +136,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='0.2.9',
+    version='0.3.0',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",
@@ -154,5 +155,6 @@ setup(
     ],
     ext_modules=extensions,
     packages=["pyreadstat"],
-    data_files=data_files
+    data_files=data_files,
+    install_requires=['pandas>0.24.0'],
 )

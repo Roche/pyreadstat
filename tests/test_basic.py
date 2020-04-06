@@ -19,6 +19,7 @@ from datetime import datetime
 import unittest
 import os
 import sys
+import shutil
 
 import pandas as pd
 import numpy as np
@@ -329,7 +330,17 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.variable_display_width["mychar"]==9)
         self.assertTrue(meta.variable_storage_width["mychar"] == 8)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
+    
+    def test_sav_expand(self):
         
+        src = os.path.join(self.basic_data_folder, "sample.sav")
+        dst = "~/sample.sav"
+        shutil.copyfile(src, os.path.expanduser(dst))
+        df, meta = pyreadstat.read_sav(dst)
+        os.remove(os.path.expanduser(dst))
+        self.assertTrue(df.equals(self.df_pandas))
+
+       
     def test_zsav(self):
 
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"))
@@ -578,6 +589,29 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.variable_display_width['mychar'], variable_display_width['mychar'])
         #self.assertDictEqual(meta.variable_alignment, variable_alignment)
         self.assertEqual(meta.variable_measure["mychar"], variable_measure["mychar"])
+
+    def test_sav_write_basic_expanduser(self):
+
+        file_label = "basic write"
+        file_note = "These are some notes"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+        missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
+        #variable_alignment = {'mychar':"center", 'myord':"right"}
+        variable_display_width = {'mychar':20}
+        variable_measure = {"mychar": "nominal"}
+        path = "~/sav_expand.sav" 
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
+            variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
+            variable_measure=variable_measure) #, variable_alignment=variable_alignment)
+        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        try:
+            os.remove(os.path.expanduser(path))
+        except:
+            pass
+        self.assertTrue(df.equals(self.df_pandas))
+
+
 
     def test_zsav_write_basic(self):
 
