@@ -69,7 +69,10 @@ readstat_error_t sav_parse_date(const char *data, size_t len, struct tm *timesta
     int temp_val = 0;
     %%{
         action incr_val {
-            temp_val = 10 * temp_val + (fc - '0');
+            char digit = (fc - '0');
+            if (digit >= 0 && digit <= 9) {
+                temp_val = 10 * temp_val + digit;
+            }
         }
 
         action save_year {
@@ -80,7 +83,8 @@ readstat_error_t sav_parse_date(const char *data, size_t len, struct tm *timesta
             }
         }
 
-        integer2 = [0-9]{2} >{ temp_val = 0; } $incr_val;
+        # some files in the wild use space padding instead of 0 padding
+        integer2 = [0-9 ]{2} >{ temp_val = 0; } $incr_val;
 
         day = integer2 %{ timestamp->tm_mday = temp_val; };
 
@@ -100,7 +104,8 @@ readstat_error_t sav_parse_date(const char *data, size_t len, struct tm *timesta
             ("Nov" | "NOV") %{ timestamp->tm_mon = 10; } |
             ("Dec" | "DEC") %{ timestamp->tm_mon = 11; };
 
-        main := day " " month " " year;
+        # somebody is outputting dash separators
+        main := day [ \-] month [ \-] year;
 
         write init;
         write exec;
