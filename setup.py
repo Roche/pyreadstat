@@ -79,12 +79,13 @@ libraries=["m", "z"]
 # Windows
 if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
+    win_install_dir = "Lib/site-packages/pyreadstat"
     if is64bit:
         data_folder = "win_libs/64bit/"
-        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
+        data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     else:
         data_folder = "win_libs/32bit/"
-        data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
+        data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
     #data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
     libraries.append("iconv")
 else:
@@ -155,5 +156,5 @@ setup(
     ext_modules=extensions,
     packages=["pyreadstat"],
     data_files=data_files,
-    install_requires=['pandas'],
+    install_requires=['pandas>0.24.0'],
 )
