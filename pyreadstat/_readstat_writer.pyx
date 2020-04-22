@@ -557,8 +557,16 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
+
+    for variable_name in col_names:
+        if type(variable_name) != str:
+                raise PyreadstatError("variable name %s is of type %s and it must be str (not starting with numbers!)" % (variable_name, str(type(variable_name))))
+        if not variable_name[0].isalpha():
+            raise PyreadstatError("variable name %s starts with an illegal (non-alphabetic) character" % variable_name)
+
     if file_format == FILE_FORMAT_POR:
         col_names = [x.upper() for x in col_names]
+
     cdef list col_types = get_pandas_column_types(df, missing_user_values)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
@@ -618,10 +626,6 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
             #    max_length = 8
             variable_name = col_names[col_indx]
-            if type(variable_name) != str:
-                raise PyreadstatError("variable name %s is of type %s and it must be str (not starting with numbers!)" % (variable_name, str(type(variable_name))))
-            if not variable_name[0].isalpha():
-                raise PyreadstatError("variable name %s starts with an illegal (non-alphabetic) character" % variable_name)
             variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
             if curtype in pyrwriter_datetimelike_types:
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
