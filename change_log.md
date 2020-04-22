@@ -1,3 +1,6 @@
+# 0.3.2 (github, pypi and conda 20200422)
+* fixed bug when writing string columns with missing values (#54)
+
 # 0.3.1 (github, pypi and conda 20200406
 * Updated Readstat to commit a71b4e80dae729e236d63d42066e79ca646cd23b (on dev)
 * Updated Readstat update fixes #3

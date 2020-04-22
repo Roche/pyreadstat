@@ -246,7 +246,11 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             elif curtype == np.bool:
                 result.append((PYWRITER_LOGICAL, 0, is_missing))
             elif curtype == str:
-                max_length = get_pandas_str_series_max_length(curseries)
+                if is_missing:
+                    col = curseries.dropna().reset_index(drop=True)
+                    max_length = get_pandas_str_series_max_length(col)
+                else:
+                    max_length = get_pandas_str_series_max_length(curseries)
                 result.append((PYWRITER_CHARACTER, max_length, is_missing))
             elif curtype == datetime.date:
                 result.append((PYWRITER_DATE, 0, is_missing))
@@ -255,7 +259,12 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             elif curtype == datetime.time:
                 result.append((PYWRITER_TIME, 0, is_missing))
             else:
-                max_length = get_pandas_str_series_max_length(curseries.astype(str))
+                curseries = curseries.astype(str)
+                if is_missing:
+                    col = curseries.dropna().reset_index(drop=True)
+                    max_length = get_pandas_str_series_max_length(col.astype(str))
+                else:
+                    max_length = get_pandas_str_series_max_length(curseries.astype(str))
                 result.append((PYWRITER_OBJECT, max_length, is_missing))
 
         else:
