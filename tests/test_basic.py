@@ -15,7 +15,7 @@
 # limitations under the License.
 # #############################################################################
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import unittest
 import os
 import sys
@@ -120,7 +120,9 @@ class TestBasic(unittest.TestCase):
         df_nodates_sastata["myord"] = df_nodates_sastata["myord"].astype(float)
         df_nodates_sastata["mylabl"] = df_nodates_sastata["mylabl"].astype(float)
         self.df_nodates_sastata = df_nodates_sastata
-        
+
+        # character column with nan and object column with nan (object pyreadstat writer doesn't know what to do with)
+        self.df_charnan = pd.DataFrame([[0,np.nan,np.nan],[1,"test", timedelta]], columns = ["integer", "string", "object"])
 
     def setUp(self):
 
@@ -717,7 +719,7 @@ class TestBasic(unittest.TestCase):
         #if sys.version_info[0] < 3:
         #    return
 
-        path = os.path.join(self.write_folder, "dates_write.sav")
+        path = os.path.join(self.write_folder, "dates_write_zsav.sav")
         pyreadstat.write_sav(self.df_sas_dates, path, compress=True)
         df, meta = pyreadstat.read_sav(path)
         self.assertTrue(df.equals(self.df_sas_dates))
@@ -741,7 +743,62 @@ class TestBasic(unittest.TestCase):
         pyreadstat.write_xport(self.df_sas_dates, path)
         df, meta = pyreadstat.read_xport(path)
         self.assertTrue(df.equals(self.df_sas_dates))
-        
+
+    def test_sav_write_charnan(self):
+        path = os.path.join(self.write_folder, "charnan.sav")
+        pyreadstat.write_sav(self.df_charnan, path)
+        df, meta = pyreadstat.read_sav(path)
+        df2 = self.df_charnan
+        df2.iloc[0,1] = ""
+        df2.iloc[0,2] = ""
+        df2['integer'] = df2["integer"].astype(float)
+        df2['object'] = df2['object'].astype(str)
+        self.assertTrue(df2.equals(df))
+
+    def test_zsav_write_charnan(self):
+        path = os.path.join(self.write_folder, "charnan_zsav.sav")
+        pyreadstat.write_sav(self.df_charnan, path, compress=True)
+        df, meta = pyreadstat.read_sav(path)
+        df2 = self.df_charnan
+        df2.iloc[0,1] = ""
+        df2.iloc[0,2] = ""
+        df2['integer'] = df2["integer"].astype(float)
+        df2['object'] = df2['object'].astype(str)
+        self.assertTrue(df2.equals(df))
+
+    def test_xport_write_charnan(self):
+        path = os.path.join(self.write_folder, "charnan.xpt")
+        pyreadstat.write_xport(self.df_charnan, path)
+        df, meta = pyreadstat.read_xport(path)
+        df2 = self.df_charnan
+        df2.iloc[0,1] = ""
+        df2.iloc[0,2] = ""
+        df2['integer'] = df2["integer"].astype(float)
+        df2['object'] = df2['object'].astype(str)
+        self.assertTrue(df2.equals(df))
+
+    def test_por_write_charnan(self):
+        path = os.path.join(self.write_folder, "charnan_zsav.por")
+        pyreadstat.write_por(self.df_charnan, path)
+        df, meta = pyreadstat.read_por(path)
+        df.columns = [x.lower() for x in df.columns]
+        df2 = self.df_charnan
+        df2.iloc[0,1] = ""
+        df2.iloc[0,2] = ""
+        df2['integer'] = df2["integer"].astype(float)
+        df2['object'] = df2['object'].astype(str)
+        self.assertTrue(df2.equals(df))
+
+    def test_dta_write_charnan(self):
+        path = os.path.join(self.write_folder, "charnan.dta")
+        pyreadstat.write_dta(self.df_charnan, path)
+        df, meta = pyreadstat.read_dta(path)
+        df2 = self.df_charnan
+        df2.iloc[0,1] = ""
+        df2.iloc[0,2] = ""
+        df2['integer'] = df2["integer"].astype(float)
+        df2['object'] = df2['object'].astype(str)
+        self.assertTrue(df2.equals(df))
 
 if __name__ == '__main__':
 

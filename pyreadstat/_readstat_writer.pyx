@@ -246,7 +246,11 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             elif curtype == np.bool:
                 result.append((PYWRITER_LOGICAL, 0, is_missing))
             elif curtype == str:
-                max_length = get_pandas_str_series_max_length(curseries)
+                if is_missing:
+                    col = curseries.dropna().reset_index(drop=True)
+                    max_length = get_pandas_str_series_max_length(col)
+                else:
+                    max_length = get_pandas_str_series_max_length(curseries)
                 result.append((PYWRITER_CHARACTER, max_length, is_missing))
             elif curtype == datetime.date:
                 result.append((PYWRITER_DATE, 0, is_missing))
@@ -255,7 +259,12 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             elif curtype == datetime.time:
                 result.append((PYWRITER_TIME, 0, is_missing))
             else:
-                max_length = get_pandas_str_series_max_length(curseries.astype(str))
+                curseries = curseries.astype(str)
+                if is_missing:
+                    col = curseries.dropna().reset_index(drop=True)
+                    max_length = get_pandas_str_series_max_length(col.astype(str))
+                else:
+                    max_length = get_pandas_str_series_max_length(curseries.astype(str))
                 result.append((PYWRITER_OBJECT, max_length, is_missing))
 
         else:
@@ -609,6 +618,10 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
             #    max_length = 8
             variable_name = col_names[col_indx]
+            if type(variable_name) != str:
+                raise PyreadstatError("variable name %s is of type %s and it must be str (not starting with numbers!)" % (variable_name, str(type(variable_name))))
+            if not variable_name[0].isalpha():
+                raise PyreadstatError("variable name %s starts with an illegal (non-alphabetic) character" % variable_name)
             variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
             if curtype in pyrwriter_datetimelike_types:
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
