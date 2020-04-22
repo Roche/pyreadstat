@@ -123,7 +123,6 @@ class TestBasic(unittest.TestCase):
 
         # character column with nan and object column with nan (object pyreadstat writer doesn't know what to do with)
         self.df_charnan = pd.DataFrame([[0,np.nan,np.nan],[1,"test", timedelta]], columns = ["integer", "string", "object"])
-        
 
     def setUp(self):
 
