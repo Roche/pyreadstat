@@ -474,9 +474,10 @@ def set_value_labels(dataframe, metadata, formats_as_category=True):
         for var_name, label_name in metadata.variable_to_label.items():
             labels = metadata.value_labels.get(label_name)
             if labels:
-                df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
-                if formats_as_category:
-                    df_copy[var_name] = df_copy[var_name].astype("category")
+                if var_name in df_copy.columns:
+                    df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
+                    if formats_as_category:
+                        df_copy[var_name] = df_copy[var_name].astype("category")
 
     return df_copy
 
