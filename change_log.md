@@ -1,3 +1,6 @@
+# 0.3.3 (github, pypi and conda 20200424)
+* added capability to set_value_labels to handle subset of dataframes, solves #58
+
 # 0.3.2 (github, pypi and conda 20200422)
 * fixed bug when writing string columns with missing values (#54 and #55)
 

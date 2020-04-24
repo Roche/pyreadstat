@@ -800,6 +800,18 @@ class TestBasic(unittest.TestCase):
         df2['object'] = df2['object'].astype(str)
         self.assertTrue(df2.equals(df))
 
+    def test_set_value_labels(self):
+
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
+        df_formatted = pyreadstat.set_value_labels(df, meta, formats_as_category=True)
+        #df.columns = self.df_pandas_formatted.columns
+        self.assertTrue(df_formatted.equals(self.df_pandas_formatted))
+        # partial
+        sub1_raw = df[['myord']]
+        sub1 = pyreadstat.set_value_labels(sub1_raw, meta, formats_as_category=True)
+        sub2 = self.df_pandas_formatted[['myord']]
+        self.assertTrue(sub1.equals(sub2))
+
 if __name__ == '__main__':
 
     import sys
