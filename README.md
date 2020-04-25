@@ -742,4 +742,6 @@ pull request to ReadStat first.
 
 [benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888), [drcjar](https://github.com/drcjar): improvements to documentation
 
+[alchemyst](https://github.com/alchemyst): improvements to docstrings
+
 [bmwiedemann](https://github.com/bmwiedemann), [toddrme2178 ](https://github.com/toddrme2178): improvements to source code
