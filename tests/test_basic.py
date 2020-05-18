@@ -811,6 +811,21 @@ class TestBasic(unittest.TestCase):
         sub1 = pyreadstat.set_value_labels(sub1_raw, meta, formats_as_category=True)
         sub2 = self.df_pandas_formatted[['myord']]
         self.assertTrue(sub1.equals(sub2))
+        
+    def test_update_delete_file(self):
+    
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
+        dst_path = path = os.path.join(self.write_folder, "update_test.sav")
+        pyreadstat.write_sav(df, dst_path, variable_value_labels = meta.variable_value_labels)
+        # update
+        meta.variable_value_labels.update({'mylabl':{1.0:"Gents", 2.0:"Ladies"}})
+        pyreadstat.write_sav(df, dst_path, variable_value_labels = meta.variable_value_labels)
+        df2, meta2 = pyreadstat.read_sav(dst_path)
+        print(meta2.variable_value_labels)
+        print(meta.variable_value_labels)
+        #self.assertDictEqual(meta2.variable_value_labels, meta.variable_value_labels)
+        os.remove(dst_path)
+        
 
 if __name__ == '__main__':
 
