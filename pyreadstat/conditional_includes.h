@@ -8,6 +8,7 @@
     #include <fcntl.h>
     #include <share.h>
     #include <io.h>
+    #include <sys/stat.h>
     
     // Stuff for handling paths with international characters on windows
     void assign_fd(void *io_ctx, int fd) { ((unistd_io_ctx_t*)io_ctx)->fd = fd; }
@@ -30,6 +31,8 @@
     int _SH_DENYWR; 
     int _SH_DENYRD;
     int _SH_DENYNO;
+    int _S_IWRITE;
+    int _S_IREAD;
     void assign_fd(void *io_ctx, int fd){};
     int _close(int fd){ return 0; };
     
