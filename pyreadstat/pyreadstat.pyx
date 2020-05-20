@@ -197,7 +197,7 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             by default False. If true it will change values in the dataframe for they value labels in the metadata,
             if any appropiate are found.
         formats_as_category : bool, optional
-            by default True. Takes effect only if apply_value_formtas is True. If True, variables with values changed
+            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
             for their formatted version will be transformed into pandas categories.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -274,7 +274,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             by default False. If true it will change values in the dataframe for they value labels in the metadata,
             if any appropiate are found.
         formats_as_category : bool, optional
-            by default True. Takes effect only if apply_value_formtas is True. If True, variables with values changed
+            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
             for their formatted version will be transformed into pandas categories.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -350,7 +350,7 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
             by default False. If true it will change values in the dataframe for they value labels in the metadata,
             if any appropiate are found.
         formats_as_category : bool, optional
-            by default True. Takes effect only if apply_value_formtas is True. If True, variables with values changed
+            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
             for their formatted version will be transformed into pandas categories.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
