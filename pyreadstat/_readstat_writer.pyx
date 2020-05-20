@@ -486,7 +486,7 @@ cdef int open_file(str filename_path):
         if os.name == "nt":
             u16_path = PyUnicode_AsWideCharString(filename_path, &length)
             flags = _O_WRONLY | _O_CREAT | _O_BINARY
-            fd = _wsopen(u16_path, flags, _SH_DENYRD, 0)
+            fd = _wsopen(u16_path, flags, _SH_DENYRD, _S_IREAD | _S_IWRITE)
         else:
             filename_bytes = filename_path.encode("utf-8")
             path = <char *> filename_bytes

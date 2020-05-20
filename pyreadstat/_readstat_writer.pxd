@@ -39,6 +39,8 @@ cdef extern from "conditional_includes.h":
     int _SH_DENYWR  # Denies write access to a file.
     int _SH_DENYRD  # Denies read access to a file.
     int _SH_DENYNO
+    int _S_IWRITE
+    int _S_IREAD
     int open(const char *path, int oflag, int mode)
     int _close(int fd)
 
