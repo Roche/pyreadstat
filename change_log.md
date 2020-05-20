@@ -1,3 +1,8 @@
+# 0.3.4 (github, pypi and conda 20200520)
+* corrected bug when writing and updating files fixes #17
+* updated Readstat source to commit 3a53c088cb622f10a02723bbfd9b91d316995aab: better error message when the
+  file is not a spss file
+
 # 0.3.3 (github, pypi and conda 20200424)
 * added capability to set_value_labels to handle subset of dataframes, solves #58
 
