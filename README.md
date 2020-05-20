@@ -736,7 +736,7 @@ pull request to ReadStat first.
 
 [Matthew Brett](http://matthew.dynevor.org/) - contributor [python wheels](https://github.com/MacPython/pyreadstat-wheels)
 
-[Jonathon Love](https://jona.thon.love/) - contributor: open files with international characters.
+[Jonathon Love](https://jona.thon.love/) - contributor: open files with international characters. Function to open files for writing.
 
 [Clemens Brunner](https://github.com/cbrnr) - integration with pandas.read_spss
 
