@@ -607,10 +607,7 @@ class TestBasic(unittest.TestCase):
             variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
             variable_measure=variable_measure) #, variable_alignment=variable_alignment)
         df, meta = pyreadstat.read_sav(path, user_missing=True)
-        try:
-            os.remove(os.path.expanduser(path))
-        except:
-            pass
+        os.remove(os.path.expanduser(path))
         self.assertTrue(df.equals(self.df_pandas))
 
 
@@ -821,9 +818,7 @@ class TestBasic(unittest.TestCase):
         meta.variable_value_labels.update({'mylabl':{1.0:"Gents", 2.0:"Ladies"}})
         pyreadstat.write_sav(df, dst_path, variable_value_labels = meta.variable_value_labels)
         df2, meta2 = pyreadstat.read_sav(dst_path)
-        print(meta2.variable_value_labels)
-        print(meta.variable_value_labels)
-        #self.assertDictEqual(meta2.variable_value_labels, meta.variable_value_labels)
+        self.assertDictEqual(meta2.variable_value_labels, meta.variable_value_labels)
         os.remove(dst_path)
         
 
