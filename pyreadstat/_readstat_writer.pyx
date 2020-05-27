@@ -560,9 +560,11 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
 
     for variable_name in col_names:
         if type(variable_name) != str:
-                raise PyreadstatError("variable name %s is of type %s and it must be str (not starting with numbers!)" % (variable_name, str(type(variable_name))))
+                raise PyreadstatError("variable name '%s' is of type %s and it must be str (not starting with numbers!)" % (variable_name, str(type(variable_name))))
         if not variable_name[0].isalpha():
-            raise PyreadstatError("variable name %s starts with an illegal (non-alphabetic) character" % variable_name)
+            raise PyreadstatError("variable name '%s' starts with an illegal (non-alphabetic) character: '%s' (ordinal %s)" % (variable_name, variable_name[0], ord(variable_name[0])))
+        if " " in variable_name:
+            raise PyreadstatError("variable name '%s' contains a space, which is not allowed" % variable_name)
 
     if file_format == FILE_FORMAT_POR:
         col_names = [x.upper() for x in col_names]
