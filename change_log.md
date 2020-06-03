@@ -1,3 +1,7 @@
+# 0.3.5 (github, pypi and conda )
+* improved error messages when column names have spaces
+* updated readstat to a412595aff9ad4b2b03797528eb3bf419b4e2150
+
 # 0.3.4 (github, pypi and conda 20200520)
 * corrected bug when writing and updating files fixes #17
 * updated Readstat source to commit 3a53c088cb622f10a02723bbfd9b91d316995aab: better error message when the
