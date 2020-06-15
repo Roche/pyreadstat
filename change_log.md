@@ -1,3 +1,9 @@
+# 1.0.0 (github, pypi and conda 20200616)
+* improved error messages when column names have spaces
+* updated readstat to release 1.1.3: improved support for columns with
+  utf-8 characters.
+* bumped version to first stable release as the library looks stable
+
 # 0.3.4 (github, pypi and conda 20200520)
 * corrected bug when writing and updating files fixes #17
 * updated Readstat source to commit 3a53c088cb622f10a02723bbfd9b91d316995aab: better error message when the

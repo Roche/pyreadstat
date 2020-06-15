@@ -124,15 +124,11 @@ readstat_error_t sav_parse_long_variable_names_record(void *data, int count, sav
             temp_val[str_len] = '\0';
         }
 
-        non_ascii_character = ( # UTF-8 byte sequences
-                0xC0..0xDF 0x80..0xBF | 
-                0xE0..0xEF (0x80..0xBF){2} |
-                0xF0..0xF7 (0x80..0xBF){3}
-                );
+        non_ascii_byte = (0xC0..0xDF | 0x80..0xBF | 0xE0..0xEF | 0xF0..0xF7); # UTF-8 byte sequences (might be incomplete)
         
-        key = ( ( non_ascii_character | [A-Z@] ) ( non_ascii_character | [A-Z0-9@#$_\.] ){0,7} ) >{ str_start = fpc; } %{ str_len = fpc - str_start; };
+        key = ( ( non_ascii_byte | [A-Z@] ) ( non_ascii_byte | [A-Z0-9@#$_\.] ){0,7} ) >{ str_start = fpc; } %{ str_len = fpc - str_start; };
         
-        value = ( non_ascii_character | print ){1,64} >{ str_start = fpc; } %{ str_len = fpc - str_start; };
+        value = ( non_ascii_byte | print ){1,64} >{ str_start = fpc; } %{ str_len = fpc - str_start; };
         
         keyval = ( key %copy_key "=" value %copy_value ) %set_long_name;
         
@@ -232,13 +228,9 @@ readstat_error_t sav_parse_very_long_string_record(void *data, int count, sav_ct
             }
         }
         
-        non_ascii_character = ( # UTF-8 byte sequences
-                0xC0..0xDF 0x80..0xBF | 
-                0xE0..0xEF (0x80..0xBF){2} |
-                0xF0..0xF7 (0x80..0xBF){3}
-                );
+        non_ascii_byte = (0xC0..0xDF | 0x80..0xBF | 0xE0..0xEF | 0xF0..0xF7); # UTF-8 byte sequences (might be incomplete)
 
-        key = ( ( non_ascii_character | [A-Z@] ) ( non_ascii_character | [A-Z0-9@#$_\.] ){0,7} ) >{ str_start = fpc; } %{ str_len = fpc - str_start; };
+        key = ( ( non_ascii_byte | [A-Z@] ) ( non_ascii_byte | [A-Z0-9@#$_\.] ){0,7} ) >{ str_start = fpc; } %{ str_len = fpc - str_start; };
         
         value = [0-9]+ >{ temp_val = 0; } $incr_val;
         
