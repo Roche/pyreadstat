@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 #include "../readstat.h"
+#include "../readstat_iconv.h"
+#include "../readstat_convert.h"
 #include "readstat_spss.h"
 #include "readstat_spss_parse.h"
 
@@ -145,7 +147,8 @@ readstat_missingness_t spss_missingness_for_info(spss_varinfo_t *info) {
     return missingness;
 }
 
-readstat_variable_t *spss_init_variable_for_info(spss_varinfo_t *info, int index_after_skipping) {
+readstat_variable_t *spss_init_variable_for_info(spss_varinfo_t *info, int index_after_skipping,
+        iconv_t converter) {
     readstat_variable_t *variable = calloc(1, sizeof(readstat_variable_t));
 
     variable->index = info->index;
@@ -158,9 +161,11 @@ readstat_variable_t *spss_init_variable_for_info(spss_varinfo_t *info, int index
     }
 
     if (info->longname[0]) {
-        snprintf(variable->name, sizeof(variable->name), "%s", info->longname);
+        readstat_convert(variable->name, sizeof(variable->name),
+                info->longname, sizeof(info->longname), converter);
     } else {
-        snprintf(variable->name, sizeof(variable->name), "%s", info->name);
+        readstat_convert(variable->name, sizeof(variable->name),
+                info->name, sizeof(info->name), converter);
     }
     if (info->label) {
         snprintf(variable->label, sizeof(variable->label), "%s", info->label);
