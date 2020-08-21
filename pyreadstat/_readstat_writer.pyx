@@ -203,7 +203,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
-            result.append((PYWRITER_DATETIME, 0,0))
+            if np.any(pd.isna(curseries)):
+                result.append((PYWRITER_DATETIME, 0,1))
+            else:
+                result.append((PYWRITER_DATETIME, 0,0))
         elif col_type == np.object or col_type in int_mixed_types:
             is_missing = 0
             if curuser_missing:
@@ -708,9 +711,10 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 curuser_missing = None
                 if missing_user_values:
                     curuser_missing = missing_user_values.get(col_names[col_indx])
-
+                
                 if is_missing:
-                    if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
+                    #if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
+                    if pd.isna(curval):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue
 

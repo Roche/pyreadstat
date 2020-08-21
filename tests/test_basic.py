@@ -82,10 +82,12 @@ class TestBasic(unittest.TestCase):
         df_dates1["time"] = pd.to_datetime(df_dates1["time"])
         df_dates1["time"] = df_dates1["time"].apply(lambda x: x.time())
         self.df_sas_dates_as_pandas = df_dates1
+        #self.df_sas_dates_as_pandas2 = self.df_sas_dates_as_pandas.append(pd.DataFrame([[pd.NaT, pd.NaT, np.NaN]],columns=["date", "dtime", "time"]), ignore_index=True)
 
         df_dates2 = df_dates1.copy()
         df_dates2["date"] = df_dates2["date"].apply(lambda x: x.date())
         self.df_sas_dates = df_dates2
+        self.df_sas_dates2 = self.df_sas_dates.append(pd.DataFrame([[np.NaN, pd.NaT, np.NaN]],columns=["date", "dtime", "time"]), ignore_index=True)
 
         # missing data
         pandas_missing_sav_csv = os.path.join(self.basic_data_folder, "sample_missing.csv")
@@ -703,28 +705,19 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_write_dates(self):
 
-        #if sys.version_info[0] < 3:
-        #    return
-
         path = os.path.join(self.write_folder, "dates_write.sav")
-        pyreadstat.write_sav(self.df_sas_dates, path)
+        pyreadstat.write_sav(self.df_sas_dates2, path)
         df, meta = pyreadstat.read_sav(path)
-        self.assertTrue(df.equals(self.df_sas_dates))
+        self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_zsav_write_dates(self):
 
-        #if sys.version_info[0] < 3:
-        #    return
-
         path = os.path.join(self.write_folder, "dates_write_zsav.sav")
-        pyreadstat.write_sav(self.df_sas_dates, path, compress=True)
+        pyreadstat.write_sav(self.df_sas_dates2, path, compress=True)
         df, meta = pyreadstat.read_sav(path)
-        self.assertTrue(df.equals(self.df_sas_dates))
+        self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_dta_write_dates(self):
-
-        #if sys.version_info[0] < 3:
-        #    return
 
         path = os.path.join(self.write_folder, "dates_write.dta")
         pyreadstat.write_dta(self.df_sas_dates, path)
@@ -733,13 +726,10 @@ class TestBasic(unittest.TestCase):
 
     def test_xport_write_dates(self):
 
-        #if sys.version_info[0] < 3:
-        #    return
-
         path = os.path.join(self.write_folder, "dates_write.xpt")
-        pyreadstat.write_xport(self.df_sas_dates, path)
+        pyreadstat.write_xport(self.df_sas_dates2, path)
         df, meta = pyreadstat.read_xport(path)
-        self.assertTrue(df.equals(self.df_sas_dates))
+        self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_sav_write_charnan(self):
         path = os.path.join(self.write_folder, "charnan.sav")
