@@ -1,5 +1,6 @@
 # 1.0.2 (github, pypi and conda ...)
 * fixes writing files with NaT values, partially fixes issue #69
+* fixes #70: variable_measures not set when writing sav files
 
 # 1.0.1 (github, pypi and conda 20200819)
 * updated readstat to commit f867d75af24cb5ca355befc8607e3a9ff1898f15, 
