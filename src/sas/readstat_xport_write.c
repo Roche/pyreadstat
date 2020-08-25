@@ -87,9 +87,11 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
         readstat_variable_t *variable = readstat_get_variable(writer, i);
         size_t width = xport_variable_width(variable->type, variable->user_width);
         xport_namestr_t namestr = { 
-            .nvar0 = i,
+            .nvar0 = i+1,
             .nlng = width,
-            .npos = offset
+            .npos = offset,
+            .niform = "        ",
+            .nform = "        "
         };
         if (readstat_variable_get_type_class(variable) == READSTAT_TYPE_CLASS_STRING) {
             namestr.ntype = SAS_COLUMN_TYPE_CHR;

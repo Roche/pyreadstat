@@ -126,6 +126,9 @@ class TestBasic(unittest.TestCase):
         # character column with nan and object column with nan (object pyreadstat writer doesn't know what to do with)
         self.df_charnan = pd.DataFrame([[0,np.nan,np.nan],[1,"test", timedelta]], columns = ["integer", "string", "object"])
 
+        # xport files v5 vs v8
+        self.xptv5v8 = pd.DataFrame([[float(x)] for x in range(1,11)], columns=["i"])
+
     def setUp(self):
 
         # set paths
@@ -186,6 +189,17 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
+
+    def test_xport_v5(self):
+
+        df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt5"))
+        df.columns = [x.lower() for x in df.columns]
+        self.assertTrue(df.equals(self.xptv5v8))
+
+    def test_xport_v8(self):
+
+        df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt8"))
+        self.assertTrue(df.equals(self.xptv5v8))
 
     def test_xport_metaonly(self):
 
@@ -673,13 +687,28 @@ class TestBasic(unittest.TestCase):
         df_dta2, meta2 = pyreadstat.read_dta(path, user_missing=True, apply_value_formats=True, formats_as_category=False)
         self.assertTrue(df_csv2.equals(df_dta2))
 
-    def test_xport_write_basic(self):
+    def test_xport_write_basic_v8(self):
 
         file_label = "basic write"
         table_name = "TEST"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
         path = os.path.join(self.write_folder, "write.xpt")
-        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name)
+        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name, file_format_version=8)
+        df, meta = pyreadstat.read_xport(path)
+        df.columns = [x.lower() for x in df.columns]
+
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        self.assertEqual(table_name, meta.table_name)
+
+    def test_xport_write_basic_v5(self):
+
+        file_label = "basic write"
+        table_name = "TEST"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        path = os.path.join(self.write_folder, "write.xpt")
+        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name, file_format_version=5)
         df, meta = pyreadstat.read_xport(path)
         df.columns = [x.lower() for x in df.columns]
 
@@ -802,7 +831,7 @@ class TestBasic(unittest.TestCase):
     def test_update_delete_file(self):
     
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
-        dst_path = path = os.path.join(self.write_folder, "update_test.sav")
+        dst_path = os.path.join(self.write_folder, "update_test.sav")
         pyreadstat.write_sav(df, dst_path, variable_value_labels = meta.variable_value_labels)
         # update
         meta.variable_value_labels.update({'mylabl':{1.0:"Gents", 2.0:"Ladies"}})
@@ -810,6 +839,37 @@ class TestBasic(unittest.TestCase):
         df2, meta2 = pyreadstat.read_sav(dst_path)
         self.assertDictEqual(meta2.variable_value_labels, meta.variable_value_labels)
         os.remove(dst_path)
+
+    def test_xport_write_dates2_v8(self):
+        # this sas7bdat file has features that are not compatible with v5
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "dates_xpt.sas7bdat"))
+        dst_path = os.path.join(self.write_folder, "dates_xptv8.xpt")
+        pyreadstat.write_xport(df, dst_path, file_format_version=8)
+        df2, meta2 = pyreadstat.read_xport(dst_path)
+        self.assertTrue(df.equals(df2))
+
+    def test_xport_dates2_v8(self):
+        # this sas7bdat file has features that are not compatible with v5
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "dates_xpt.sas7bdat"))
+        # this xpt file was written in SAS from the sas7bdat file
+        df2, meta2 = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "dates_xpt_v8.xpt"))
+        print("\n")
+        print(df.head())
+        print(df2.head())
+        # this is failing at the moment the reason is readstat is not reading column names correctly and repeating some
+        #self.assertTrue(df.equals(df2))
+
+
+    def test_sav_international_utf8_char_value(self):
+        # a file that has a value with international characters and the file is coded in utf-8
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "tegulu.sav"))
+        self.assertTrue(df.iloc[0,1] == "నేను గతంలో వాడిన బ")
+
+    def test_sav_international_varname(self):
+        # a file with a varname with international characters
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "hebrews.sav"))
+        self.assertTrue(df.columns[0] == "ותק_ב")
+        
         
 
 if __name__ == '__main__':

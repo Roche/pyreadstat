@@ -685,12 +685,12 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
      note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
      variable_display_width, variable_measure)
 
-def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None):
+def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8):
     """
     Writes a pandas data frame to a SAS Xport (xpt) file.
-    Only XPORT version 5 is supported (files written in version 8 cannot be opened in SAS).
     If no table_name is specified the dataset has by default the name DATASET (take it into account if
     reading the file from SAS.)
+    Versions 5 and 8 are supported, default is 8.
 
     Parameters
     ----------
@@ -705,12 +705,12 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
         labels must be represented by None.
     table_name : str, optional
         name of the dataset, by default DATASET
+    file_format_version : int, optional
+        XPORT file version, either 8 or 5, default is 8
 
     """
 
-    # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
-    cdef int file_format_version = 5
-    cdef dict variable_value_labels=None
+    cdef dict variable_value_labels = None
     cdef str note = ""
     cdef dict missing_ranges = None
     cdef dict missing_user_values = None

@@ -62,6 +62,13 @@ static readstat_charset_entry_t _charset_table[] = {
     { .code = 66,    .name = "WINDOWS-1256" },
     { .code = 67,    .name = "WINDOWS-1257" },
     { .code = 68,    .name = "WINDOWS-1258" },
+    { .code = 69,    .name = "MACROMAN" },
+    { .code = 70,    .name = "MACARABIC" },
+    { .code = 71,    .name = "MACHEBREW" },
+    { .code = 72,    .name = "MACGREEEK" },
+    { .code = 73,    .name = "MACTHAI" },
+    { .code = 75,    .name = "MACTURKISH" },
+    { .code = 76,    .name = "MACUKRAINE" },
     { .code = 119,   .name = "EUC-TW" },
     { .code = 123,   .name = "BIG-5" },
     { .code = 125,   .name = "GB18030" }, // "euc-cn" in SAS

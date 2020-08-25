@@ -197,8 +197,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
         if col_type in int_types:
             result.append((PYWRITER_INTEGER, 0,0))
         elif col_type in float_types:
-            # if there is a NaN, that's a valid double value, no need to handle specially as missing
-            result.append((PYWRITER_DOUBLE, 0,0))
+            if np.any(pd.isna(curseries)):
+                result.append((PYWRITER_DOUBLE, 0, 1))
+            else:
+                result.append((PYWRITER_DOUBLE, 0, 0))
         elif col_type == np.bool:
             result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
