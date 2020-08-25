@@ -274,7 +274,7 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | write_sav           | write SPSS sav and zsav files |
 | write_por           | write SPSS Portable (POR) files |
 | write_dta           | write STATA dta files |
-| write_xport         | write SAS Xport (XPT) files version 5 |
+| write_xport         | write SAS Xport (XPT) files version 8 and 5 |
 
 
 ### More reading options
@@ -664,7 +664,7 @@ The following rules are used in order to convert from pandas/numpy/python types 
 
 Columns with mixed types are translated to character. This does not apply to column
 cotaining np.nan, where the missing values are correctly translated. It also does not apply to columns with
-user defined missing values in stata/sas where characters (a to z, A to Z, _) will be recorded as numeric.
+user defined missing values in stata/sas where characters (a to z, A to Z, \_) will be recorded as numeric.
 
 ## Roadmap
 
@@ -677,7 +677,7 @@ pyreadstat builds on top of Readstat and therefore inherits its limitations. Cur
 * Not able to read SAS compressed files.
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as
   timestamps.
-* Cannot write SAS sas7bdat and xport version 8 (version 5 is supported). Those files can be written but not read in
+* Cannot write SAS sas7bdat. Those files can be written but not read in
 SAS and therefore are not supported in pyreadstat.
 
 Converting data types from foreign applications into python some times also bring some limitations:
