@@ -282,8 +282,12 @@ static readstat_error_t xport_construct_format(char *dst, size_t dst_len,
         const char *src, size_t src_len, int width, int decimals) {
     char format[4*src_len+1];
     readstat_error_t retval = readstat_convert(format, sizeof(format), src, src_len, NULL);
+    if (retval != READSTAT_OK)
+        return retval;
 
-    if (decimals) {
+    if (!format[0]) {
+        snprintf(dst, dst_len, "");
+    } else if (decimals) {
         snprintf(dst, dst_len, "%s%d.%d",
                 format, width, decimals);
     } else if (width) {
