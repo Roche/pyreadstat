@@ -120,15 +120,15 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
     if curtype == PYWRITER_DATE:
         if file_format == FILE_FORMAT_DTA:
             return "%td"
-        elif file_format == FILE_FORMAT_SAV:
-            return "DATE11"
+        #elif file_format == FILE_FORMAT_SAV:
+        #    return "DATE11"
         else:
             return "DATE"
     elif curtype == PYWRITER_DATETIME:
         if file_format == FILE_FORMAT_DTA:
             return "%tc"
-        elif file_format == FILE_FORMAT_SAV:
-            return "DATETIME20"
+        #elif file_format == FILE_FORMAT_SAV:
+        #    return "DATETIME20"
         else:
             return "DATETIME"
     elif curtype == PYWRITER_TIME:

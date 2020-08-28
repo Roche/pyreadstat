@@ -2763,17 +2763,17 @@ static char *__pyx_f_10pyreadstat_16_readstat_writer_get_datetimelike_format_for
  *     if curtype == PYWRITER_DATE:
  *         if file_format == FILE_FORMAT_DTA:             # <<<<<<<<<<<<<<
  *             return "%td"
- *         elif file_format == FILE_FORMAT_SAV:
+ *         #elif file_format == FILE_FORMAT_SAV:
  */
-    switch (__pyx_v_file_format) {
-      case __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_DTA:
+    __pyx_t_1 = ((__pyx_v_file_format == __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_DTA) != 0);
+    if (__pyx_t_1) {
 
       /* "pyreadstat/_readstat_writer.pyx":122
  *     if curtype == PYWRITER_DATE:
  *         if file_format == FILE_FORMAT_DTA:
  *             return "%td"             # <<<<<<<<<<<<<<
- *         elif file_format == FILE_FORMAT_SAV:
- *             return "DATE11"
+ *         #elif file_format == FILE_FORMAT_SAV:
+ *         #    return "DATE11"
  */
       __pyx_r = ((char *)"%td");
       goto __pyx_L0;
@@ -2783,41 +2783,20 @@ static char *__pyx_f_10pyreadstat_16_readstat_writer_get_datetimelike_format_for
  *     if curtype == PYWRITER_DATE:
  *         if file_format == FILE_FORMAT_DTA:             # <<<<<<<<<<<<<<
  *             return "%td"
- *         elif file_format == FILE_FORMAT_SAV:
+ *         #elif file_format == FILE_FORMAT_SAV:
  */
-      break;
-      case __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_SAV:
+    }
 
-      /* "pyreadstat/_readstat_writer.pyx":124
- *             return "%td"
- *         elif file_format == FILE_FORMAT_SAV:
- *             return "DATE11"             # <<<<<<<<<<<<<<
- *         else:
- *             return "DATE"
- */
-      __pyx_r = ((char *)"DATE11");
-      goto __pyx_L0;
-
-      /* "pyreadstat/_readstat_writer.pyx":123
- *         if file_format == FILE_FORMAT_DTA:
- *             return "%td"
- *         elif file_format == FILE_FORMAT_SAV:             # <<<<<<<<<<<<<<
- *             return "DATE11"
- *         else:
- */
-      break;
-      default:
-
-      /* "pyreadstat/_readstat_writer.pyx":126
- *             return "DATE11"
+    /* "pyreadstat/_readstat_writer.pyx":126
+ *         #    return "DATE11"
  *         else:
  *             return "DATE"             # <<<<<<<<<<<<<<
  *     elif curtype == PYWRITER_DATETIME:
  *         if file_format == FILE_FORMAT_DTA:
  */
+    /*else*/ {
       __pyx_r = ((char *)"DATE");
       goto __pyx_L0;
-      break;
     }
 
     /* "pyreadstat/_readstat_writer.pyx":120
@@ -2835,17 +2814,17 @@ static char *__pyx_f_10pyreadstat_16_readstat_writer_get_datetimelike_format_for
  *     elif curtype == PYWRITER_DATETIME:
  *         if file_format == FILE_FORMAT_DTA:             # <<<<<<<<<<<<<<
  *             return "%tc"
- *         elif file_format == FILE_FORMAT_SAV:
+ *         #elif file_format == FILE_FORMAT_SAV:
  */
-    switch (__pyx_v_file_format) {
-      case __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_DTA:
+    __pyx_t_1 = ((__pyx_v_file_format == __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_DTA) != 0);
+    if (__pyx_t_1) {
 
       /* "pyreadstat/_readstat_writer.pyx":129
  *     elif curtype == PYWRITER_DATETIME:
  *         if file_format == FILE_FORMAT_DTA:
  *             return "%tc"             # <<<<<<<<<<<<<<
- *         elif file_format == FILE_FORMAT_SAV:
- *             return "DATETIME20"
+ *         #elif file_format == FILE_FORMAT_SAV:
+ *         #    return "DATETIME20"
  */
       __pyx_r = ((char *)"%tc");
       goto __pyx_L0;
@@ -2855,41 +2834,20 @@ static char *__pyx_f_10pyreadstat_16_readstat_writer_get_datetimelike_format_for
  *     elif curtype == PYWRITER_DATETIME:
  *         if file_format == FILE_FORMAT_DTA:             # <<<<<<<<<<<<<<
  *             return "%tc"
- *         elif file_format == FILE_FORMAT_SAV:
+ *         #elif file_format == FILE_FORMAT_SAV:
  */
-      break;
-      case __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_SAV:
+    }
 
-      /* "pyreadstat/_readstat_writer.pyx":131
- *             return "%tc"
- *         elif file_format == FILE_FORMAT_SAV:
- *             return "DATETIME20"             # <<<<<<<<<<<<<<
- *         else:
- *             return "DATETIME"
- */
-      __pyx_r = ((char *)"DATETIME20");
-      goto __pyx_L0;
-
-      /* "pyreadstat/_readstat_writer.pyx":130
- *         if file_format == FILE_FORMAT_DTA:
- *             return "%tc"
- *         elif file_format == FILE_FORMAT_SAV:             # <<<<<<<<<<<<<<
- *             return "DATETIME20"
- *         else:
- */
-      break;
-      default:
-
-      /* "pyreadstat/_readstat_writer.pyx":133
- *             return "DATETIME20"
+    /* "pyreadstat/_readstat_writer.pyx":133
+ *         #    return "DATETIME20"
  *         else:
  *             return "DATETIME"             # <<<<<<<<<<<<<<
  *     elif curtype == PYWRITER_TIME:
  *         if file_format == FILE_FORMAT_DTA:
  */
+    /*else*/ {
       __pyx_r = ((char *)"DATETIME");
       goto __pyx_L0;
-      break;
     }
 
     /* "pyreadstat/_readstat_writer.pyx":127
