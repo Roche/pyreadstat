@@ -141,6 +141,13 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
 
+    def test_sas7bdat_bincompressed(self):
+
+        df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample_bincompressed.sas7bdat"))
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(self.df_pandas))
+
     def test_sas7bdat_metaonly(self):
 
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"))
@@ -853,9 +860,6 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "dates_xpt.sas7bdat"))
         # this xpt file was written in SAS from the sas7bdat file
         df2, meta2 = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "dates_xpt_v8.xpt"))
-        print("\n")
-        print(df.head())
-        print(df2.head())
         # this is failing at the moment the reason is readstat is not reading column names correctly and repeating some
         #self.assertTrue(df.equals(df2))
 
