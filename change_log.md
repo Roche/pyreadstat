@@ -3,7 +3,7 @@
 * fixes writing XPT files v8 that can be read in SAS. Reading XPT v8 improved.
 * fixes writing files with NaT values, partially fixes issue #69
 * fixes #70: variable_measures not set when writing sav files
-* updated Readstat to commit b44d62c2a664bc8b83673508423c282f66fb6903 on dev
+* updated Readstat to commit fb764ea086839fc9ed0269b37360a6077d7715a1 on dev
 
 # 1.0.1 (github, pypi and conda 20200819)
 * updated readstat to commit f867d75af24cb5ca355befc8607e3a9ff1898f15, 
