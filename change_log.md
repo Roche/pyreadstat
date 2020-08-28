@@ -1,4 +1,7 @@
 # 1.0.2 (github, pypi and conda ...)
+* Changed SPSS datetime and date formats to DATETIME20 and DATE 11 instead
+  of DATETIME and DATE. That makes the files readable both in SPSS and PSPP,
+  solves issue #69.
 * added support for binary compressed sas7bdat files
 * fixes writing XPT files v8 that can be read in SAS. Reading XPT v8 improved.
 * fixes writing files with NaT values, partially fixes issue #69
