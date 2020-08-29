@@ -193,7 +193,7 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
             }
 
             if (has_long_format) {
-                uint16_t labeldef[5] = { i, name_len, format_len, format_len, label_len };
+                uint16_t labeldef[5] = { i+1, name_len, format_len, format_len, label_len };
 
                 if (machine_is_little_endian()) {
                     labeldef[0] = byteswap2(labeldef[0]);
@@ -224,7 +224,7 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
                     goto cleanup;
 
             } else if (has_long_label) {
-                uint16_t labeldef[3] = { i, name_len, label_len };
+                uint16_t labeldef[3] = { i+1, name_len, label_len };
 
                 if (machine_is_little_endian()) {
                     labeldef[0] = byteswap2(labeldef[0]);

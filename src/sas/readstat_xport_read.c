@@ -321,14 +321,14 @@ static readstat_error_t xport_read_labels_v8(xport_ctx_t *ctx, int label_count) 
             label_len = labeldef[2];
         }
 
-        if (index >= ctx->var_count) {
+        if (index > ctx->var_count || index == 0) {
             retval = READSTAT_ERROR_PARSE;
             goto cleanup;
         }
 
         char name[name_len+1];
         char label[label_len+1];
-        readstat_variable_t *variable = ctx->variables[index];
+        readstat_variable_t *variable = ctx->variables[index-1];
 
         if (read_bytes(ctx, name, name_len) != name_len ||
                 read_bytes(ctx, label, label_len) != label_len) {
@@ -384,7 +384,7 @@ static readstat_error_t xport_read_labels_v9(xport_ctx_t *ctx, int label_count) 
             label_len = labeldef[4];
         }
 
-        if (index >= ctx->var_count) {
+        if (index > ctx->var_count || index == 0) {
             retval = READSTAT_ERROR_PARSE;
             goto cleanup;
         }
@@ -394,7 +394,7 @@ static readstat_error_t xport_read_labels_v9(xport_ctx_t *ctx, int label_count) 
         char informat[informat_len+1];
         char label[label_len+1];
 
-        readstat_variable_t *variable = ctx->variables[index];
+        readstat_variable_t *variable = ctx->variables[index-1];
 
         if (read_bytes(ctx, name, name_len) != name_len ||
                 read_bytes(ctx, format, format_len) != format_len ||
@@ -509,7 +509,7 @@ static readstat_error_t xport_read_variables(xport_ctx_t *ctx) {
     for (i=0; i<ctx->var_count; i++) {
         readstat_variable_t *variable = ctx->variables[i];
         variable->index_after_skipping = index_after_skipping;
-        
+
         int cb_retval = READSTAT_HANDLER_OK;
         if (ctx->handle.variable) {
             cb_retval = ctx->handle.variable(i, variable, variable->format, ctx->user_ctx);

@@ -882,9 +882,7 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "dates_xpt.sas7bdat"))
         # this xpt file was written in SAS from the sas7bdat file
         df2, meta2 = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "dates_xpt_v8.xpt"))
-        # this is failing at the moment the reason is readstat is not reading column names correctly and repeating some
-        #self.assertTrue(df.equals(df2))
-
+        self.assertTrue(df.equals(df2))
 
     def test_sav_international_utf8_char_value(self):
         # a file that has a value with international characters and the file is coded in utf-8
