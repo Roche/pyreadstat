@@ -674,11 +674,12 @@ user defined missing values in stata/sas where characters (a to z, A to Z, \_) w
 
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
 
-* Not able to read SAS compressed files.
+* XPT files v8 with labels are not read correctly (see [here](https://github.com/WizardMac/ReadStat/issues/208))
+* Cannot read sas7bdat dataset labels (see [here](https://github.com/WizardMac/ReadStat/issues/180))
 * Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as
-  timestamps.
+  timestamps. (see [here](https://github.com/WizardMac/ReadStat/issues/160))
 * Cannot write SAS sas7bdat. Those files can be written but not read in
-SAS and therefore are not supported in pyreadstat.
+SAS and therefore are not supported in pyreadstat. (see [here](https://github.com/WizardMac/ReadStat/issues/98))
 
 Converting data types from foreign applications into python some times also bring some limitations:
 

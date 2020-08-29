@@ -286,7 +286,7 @@ static readstat_error_t xport_construct_format(char *dst, size_t dst_len,
         return retval;
 
     if (!format[0]) {
-        snprintf(dst, dst_len, "");
+        *dst = '\0';
     } else if (decimals) {
         snprintf(dst, dst_len, "%s%d.%d",
                 format, width, decimals);

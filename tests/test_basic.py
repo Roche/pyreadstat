@@ -129,6 +129,28 @@ class TestBasic(unittest.TestCase):
         # xport files v5 vs v8
         self.xptv5v8 = pd.DataFrame([[float(x)] for x in range(1,11)], columns=["i"])
 
+        # long string
+
+        self.df_longstr = pd.DataFrame({
+                "v1": {
+                    "10001": """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac pretium sem. Fusce aliquet
+                    augue rhoncus consequat pulvinar. In est ex, porta congue diam sed, laoreet suscipit purus. Phasellus mollis
+                    lobortis tellus at vehicula. Etiam egestas augue id massa bibendum volutpat id et ipsum. Praesent ut lorem
+                    rhoncus, pharetra risus sed, pharetra sem. In pulvinar egestas erat, id condimentum tortor tempus sed. Duis
+                    ornare lacus ut ligula congue, non convallis urna dignissim. Etiam vehicula turpis sit amet nisi finibus
+                    laoreet. Duis molestie consequat nulla, non lobortis est tempus sit amet. Quisque elit est,
+                    congue non commodo vitae, porttitor ac erat. """,
+                    "10002": "fgsdghshsgh",
+                    "10003": "gsfdgsdg",
+                },
+                "v2": {
+                    "10001": "gsfdgsfdgsfg",
+                    "10002": "fgsdghshsgh",
+                    "10003": "gsfdgsdg",
+                },
+
+            })
+
     def setUp(self):
 
         # set paths
@@ -873,6 +895,13 @@ class TestBasic(unittest.TestCase):
         # a file with a varname with international characters
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "hebrews.sav"))
         self.assertTrue(df.columns[0] == "ותק_ב")
+
+    def test_sav_write_longstr(self):
+        path = os.path.join(self.write_folder, "longstr.sav")
+        pyreadstat.write_sav(self.df_longstr, path, variable_display_width={"v1": 1000})
+        df, meta = pyreadstat.read_sav(path)
+        self.assertTrue(meta.variable_display_width['v1']==1000)
+        self.assertTrue(len(df.iloc[0,0])==781)
         
         
 
