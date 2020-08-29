@@ -883,6 +883,7 @@ class TestBasic(unittest.TestCase):
         # this xpt file was written in SAS from the sas7bdat file
         df2, meta2 = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "dates_xpt_v8.xpt"))
         self.assertTrue(df.equals(df2))
+        self.assertListEqual(meta.column_labels, meta2.column_labels)
 
     def test_sav_international_utf8_char_value(self):
         # a file that has a value with international characters and the file is coded in utf-8
