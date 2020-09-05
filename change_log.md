@@ -1,3 +1,13 @@
+# 1.0.2 (github, pypi and conda ...)
+* Updated default widths for DATE and DATETIME formats (from Readstat src). That makes the files readable both in SPSS and PSPP,
+  solves issue #69.
+* added support for binary compressed sas7bdat files
+* fixes writing XPT files v8 that can be read in SAS. Reading XPT v8 improved.
+* fixes writing files with NaT values.
+* fixes #72: variable display width with long strings.
+* fixes #70: variable_measures not set when writing sav files
+* updated Readstat to commit 02562413ded25e920b96bbbfc4d87ed062aacec8, version 1.1.4
+
 # 1.0.1 (github, pypi and conda 20200819)
 * updated readstat to commit f867d75af24cb5ca355befc8607e3a9ff1898f15, 
   fixes issue #67

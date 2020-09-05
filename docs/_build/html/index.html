@@ -1,15 +1,18 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.1 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.2 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
 
   
   
@@ -17,7 +20,9 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,10 +34,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
@@ -48,7 +49,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> pyreadstat
+            <a href="#" class="icon icon-home" alt="Documentation Home"> pyreadstat
           
 
           
@@ -71,6 +72,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -89,6 +91,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -127,7 +130,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
         
       <li>Welcome to pyreadstat’s documentation!</li>
     
@@ -579,9 +582,9 @@ values being strings one of “nominal”, “ordinal”, “scale” or “unkn
 <dt id="pyreadstat.pyreadstat.write_xport">
 <code class="sig-prename descclassname">pyreadstat.pyreadstat.</code><code class="sig-name descname">write_xport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_xport" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes a pandas data frame to a SAS Xport (xpt) file.
-Only XPORT version 5 is supported (files written in version 8 cannot be opened in SAS).
 If no table_name is specified the dataset has by default the name DATASET (take it into account if
-reading the file from SAS.)</p>
+reading the file from SAS.)
+Versions 5 and 8 are supported, default is 8.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -591,6 +594,7 @@ reading the file from SAS.)</p>
 <li><p><strong>column_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – list of labels for columns (variables), must be the same length as the number of columns. Variables with no
 labels must be represented by None.</p></li>
 <li><p><strong>table_name</strong> (<em>str</em><em>, </em><em>optional</em>) – name of the dataset, by default DATASET</p></li>
+<li><p><strong>file_format_version</strong> (<em>int</em><em>, </em><em>optional</em>) – XPORT file version, either 8 or 5, default is 8</p></li>
 </ul>
 </dd>
 </dl>
@@ -617,11 +621,19 @@ labels must be represented by None.</p></li>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2018-2020, Otto Fajardo
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -632,7 +644,6 @@ labels must be represented by None.</p></li>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

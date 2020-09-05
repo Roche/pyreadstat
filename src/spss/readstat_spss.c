@@ -175,7 +175,11 @@ readstat_variable_t *spss_init_variable_for_info(spss_varinfo_t *info, int index
 
     variable->missingness = spss_missingness_for_info(info);
     variable->measure = info->measure;
-    variable->display_width = info->display_width;
+    if (info->display_width) {
+        variable->display_width = info->display_width;
+    } else {
+        variable->display_width = info->print_format.width;
+    }
 
     return variable;
 }
@@ -232,14 +236,20 @@ readstat_error_t spss_format_for_variable(readstat_variable_t *r_variable,
 
     if (r_variable->type == READSTAT_TYPE_STRING) {
         spss_format->type = SPSS_FORMAT_TYPE_A;
-        if (r_variable->user_width) {
+        if (r_variable->display_width) {
+            spss_format->width = r_variable->display_width;
+        } else if (r_variable->user_width) {
             spss_format->width = r_variable->user_width;
         } else {
             spss_format->width = r_variable->storage_width;
         }
     } else {
         spss_format->type = SPSS_FORMAT_TYPE_F;
-        spss_format->width = 8;
+        if (r_variable->display_width) {
+            spss_format->width = r_variable->display_width;
+        } else {
+            spss_format->width = 8;
+        }
         if (r_variable->type == READSTAT_TYPE_DOUBLE ||
                 r_variable->type == READSTAT_TYPE_FLOAT) {
             spss_format->decimal_places = 2;

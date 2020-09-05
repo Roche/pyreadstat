@@ -120,11 +120,15 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
     if curtype == PYWRITER_DATE:
         if file_format == FILE_FORMAT_DTA:
             return "%td"
+        #elif file_format == FILE_FORMAT_SAV:
+        #    return "DATE11"
         else:
             return "DATE"
     elif curtype == PYWRITER_DATETIME:
         if file_format == FILE_FORMAT_DTA:
             return "%tc"
+        #elif file_format == FILE_FORMAT_SAV:
+        #    return "DATETIME20"
         else:
             return "DATETIME"
     elif curtype == PYWRITER_TIME:
@@ -197,13 +201,18 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
         if col_type in int_types:
             result.append((PYWRITER_INTEGER, 0,0))
         elif col_type in float_types:
-            # if there is a NaN, that's a valid double value, no need to handle specially as missing
-            result.append((PYWRITER_DOUBLE, 0,0))
+            if np.any(pd.isna(curseries)):
+                result.append((PYWRITER_DOUBLE, 0, 1))
+            else:
+                result.append((PYWRITER_DOUBLE, 0, 0))
         elif col_type == np.bool:
             result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
-            result.append((PYWRITER_DATETIME, 0,0))
+            if np.any(pd.isna(curseries)):
+                result.append((PYWRITER_DATETIME, 0,1))
+            else:
+                result.append((PYWRITER_DATETIME, 0,0))
         elif col_type == np.object or col_type in int_mixed_types:
             is_missing = 0
             if curuser_missing:
@@ -649,27 +658,27 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                     label_set = set_value_label(writer, value_labels, labelset_name,
                         col_names_to_types[variable_name], file_format, variable_name, curuser_missing)
                     readstat_variable_set_label_set(variable, label_set)
-                if missing_ranges:
-                    cur_ranges = missing_ranges.get(variable_name)
-                    if cur_ranges:
-                        if not isinstance(cur_ranges, list):
-                            msg = "missing_ranges: values in dictionary must be list"
-                            raise PyreadstatError(msg)
-                        add_missing_ranges(cur_ranges, variable)
-                if variable_alignment:
-                    # At the moment this is ineffective for sav and dta (the function runs but in
-                    # the resulting file all alignments are still unknown)
-                    cur_alignment = variable_alignment.get(variable_name)
-                    if cur_alignment:
-                        set_variable_alignment(variable, cur_alignment, variable_name)
-                if variable_display_width:
-                    cur_display_width = variable_display_width.get(variable_name)
-                    if cur_display_width:
-                        set_variable_display_width(variable, cur_display_width, variable_name)
-                if variable_measure:
-                    cur_measure = variable_measure.get(variable_name)
-                    if cur_measure:
-                        set_variable_measure(variable, cur_measure, variable_name)
+            if missing_ranges:
+                cur_ranges = missing_ranges.get(variable_name)
+                if cur_ranges:
+                    if not isinstance(cur_ranges, list):
+                        msg = "missing_ranges: values in dictionary must be list"
+                        raise PyreadstatError(msg)
+                    add_missing_ranges(cur_ranges, variable)
+            if variable_alignment:
+                # At the moment this is ineffective for sav and dta (the function runs but in
+                # the resulting file all alignments are still unknown)
+                cur_alignment = variable_alignment.get(variable_name)
+                if cur_alignment:
+                    set_variable_alignment(variable, cur_alignment, variable_name)
+            if variable_display_width:
+                cur_display_width = variable_display_width.get(variable_name)
+                if cur_display_width:
+                    set_variable_display_width(variable, cur_display_width, variable_name)
+            if variable_measure:
+                cur_measure = variable_measure.get(variable_name)
+                if cur_measure:
+                    set_variable_measure(variable, cur_measure, variable_name)
 
         # start writing
         if file_format == FILE_FORMAT_SAS7BCAT:
@@ -708,9 +717,10 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
                 curuser_missing = None
                 if missing_user_values:
                     curuser_missing = missing_user_values.get(col_names[col_indx])
-
+                
                 if is_missing:
-                    if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
+                    #if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
+                    if pd.isna(curval):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue
 

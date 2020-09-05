@@ -993,13 +993,14 @@ static readstat_error_t sav_parse_variable_display_parameter_record(sav_ctx_t *c
 
     int i;
     long count = ctx->variable_display_values_count;
-    if (count != 2 * ctx->var_count && count != 3 * ctx->var_count) {
+    if (count != 2 * ctx->var_index && count != 3 * ctx->var_index) {
         return READSTAT_ERROR_PARSE;
     }
-    int has_display_width = ctx->var_count > 0 && (count / ctx->var_count == 3);
+    int has_display_width = ctx->var_index > 0 && (count / ctx->var_index == 3);
     int offset = 0;
     for (i=0; i<ctx->var_index;) {
         spss_varinfo_t *info = ctx->varinfo[i];
+        offset = (2 + has_display_width)*i;
         info->measure = spss_measure_to_readstat_measure(ctx->variable_display_values[offset++]);
         if (has_display_width) {
             info->display_width = ctx->variable_display_values[offset++];
@@ -1652,7 +1653,8 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
         }
     }
 
-    sav_parse_variable_display_parameter_record(ctx);
+    if ((retval = sav_parse_variable_display_parameter_record(ctx)) != READSTAT_OK)
+        goto cleanup;
 
     if ((retval = sav_handle_variables(ctx)) != READSTAT_OK)
         goto cleanup;

@@ -25,7 +25,7 @@
 #define POR_LABEL_NAME_PREFIX   "labels"
 
 #define MAX_FORMAT_TYPE       120
-#define MAX_FORMAT_WIDTH      255
+#define MAX_FORMAT_WIDTH    20000
 #define MAX_FORMAT_DECIMALS   100
 #define MAX_STRING_LENGTH   20000
 
