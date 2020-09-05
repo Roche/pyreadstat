@@ -1,4 +1,4 @@
-# 1.0.2 (github, pypi and conda ...)
+# 1.0.2 (github, pypi and conda 2020.09.05)
 * Updated default widths for DATE and DATETIME formats (from Readstat src). That makes the files readable both in SPSS and PSPP,
   solves issue #69.
 * added support for binary compressed sas7bdat files
