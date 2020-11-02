@@ -19,6 +19,9 @@
 # TODO:
 ## if want to profile: # cython: profile=True
 
+import multiprocessing as mp
+
+import pandas as pd
 
 from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
 from readstat_api cimport readstat_parse_por, readstat_parse_xport
@@ -28,7 +31,7 @@ from _readstat_parser cimport py_file_format, run_conversion
 from _readstat_writer cimport run_write
 cimport _readstat_parser, _readstat_writer
 from copy import deepcopy
-
+from worker import worker
 
 # Public interface
 
@@ -550,7 +553,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
     Yields
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data (no data in this case, so will be empty)
+            a pandas data frame with the data
         metadata :
             object with metadata. The member value_labels is the one that contains the formats.
             Look at the documentation for more information.
@@ -576,6 +579,51 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             yield df, meta
             offset += chunksize
             maxrow += chunksize
+
+def read_file_multiprocessing(read_function, file_path, num_processes=None, **kwargs):
+    """
+    Reads a file in parallel using multiprocessing.
+
+    Parameters
+    ----------
+        read_function : pyreadstat function
+            a pyreadstat reading function
+        file_path : string
+            path to the file to be read
+        num_processes : integer, optional
+            number of processes to spawn, by default the total number of cores
+        kwargs : dict, optional
+            any other keyword argument to pass to the read_function. 
+            row_limit and row_offset will be discarded if present as they are used internally.
+
+    Returns
+    -------
+        data_frame : pandas dataframe
+            a pandas data frame with the data
+        metadata :
+            object with metadata. Look at the documentation for more information.
+    """
+    if "row_offset" in kwargs:
+        _ = kwargs.pop("row_offset")
+
+    if "row_limit" in kwargs:
+        _ = kwargs.pop("row_limit")
+
+    if not num_processes:
+        num_processes = mp.cpu_count()
+    _, meta = read_function(file_path, metadataonly=True)
+    numrows = meta.number_rows
+    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes) ]
+    chunksize = divs[0]
+    offsets = [indx*chunksize for indx in range(num_processes)] 
+
+    jobs = [(x, chunksize, file_path, read_function, kwargs) for x in offsets]
+
+    pool = mp.Pool(processes=num_processes)
+    chunks = pool.map(worker, jobs)
+    final = pd.concat(chunks, axis=0, ignore_index=True)
+    return final, meta
+
 
 # Write API
 
