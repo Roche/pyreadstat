@@ -999,6 +999,7 @@ struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container {
   PyObject *col_names;
   PyObject *col_labels;
   PyObject *col_dtypes;
+  PyObject *col_numpy_dtypes;
   PyObject *col_formats;
   PyObject *col_formats_original;
   PyObject *origin;
@@ -1574,6 +1575,8 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
 /* Module declarations from 'pyreadstat._readstat_parser' */
 static PyTypeObject *__pyx_ptype_10pyreadstat_16_readstat_parser_data_container = 0;
+static PyObject **__pyx_vp_10pyreadstat_16_readstat_parser_readstat_to_numpy_types = 0;
+#define __pyx_v_10pyreadstat_16_readstat_parser_readstat_to_numpy_types (*__pyx_vp_10pyreadstat_16_readstat_parser_readstat_to_numpy_types)
 static PyObject **__pyx_vp_10pyreadstat_16_readstat_parser_sas_date_formats = 0;
 #define __pyx_v_10pyreadstat_16_readstat_parser_sas_date_formats (*__pyx_vp_10pyreadstat_16_readstat_parser_sas_date_formats)
 static PyObject **__pyx_vp_10pyreadstat_16_readstat_parser_sas_datetime_formats = 0;
@@ -12256,6 +12259,7 @@ static int __Pyx_modinit_variable_import_code(void) {
   /*--- Variable import code ---*/
   __pyx_t_1 = PyImport_ImportModule("pyreadstat._readstat_parser"); if (!__pyx_t_1) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
+  if (__Pyx_ImportVoidPtr(__pyx_t_1, "readstat_to_numpy_types", (void **)&__pyx_vp_10pyreadstat_16_readstat_parser_readstat_to_numpy_types, "PyObject *") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   if (__Pyx_ImportVoidPtr(__pyx_t_1, "sas_date_formats", (void **)&__pyx_vp_10pyreadstat_16_readstat_parser_sas_date_formats, "PyObject *") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   if (__Pyx_ImportVoidPtr(__pyx_t_1, "sas_datetime_formats", (void **)&__pyx_vp_10pyreadstat_16_readstat_parser_sas_datetime_formats, "PyObject *") < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   if (__Pyx_ImportVoidPtr(__pyx_t_1, "sas_time_formats", (void **)&__pyx_vp_10pyreadstat_16_readstat_parser_sas_time_formats, "PyObject *") < 0) __PYX_ERR(0, 1, __pyx_L1_error)

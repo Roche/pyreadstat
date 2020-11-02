@@ -363,6 +363,7 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_nodates(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), disable_datetime_conversion=True)
+        #import pdb; pdb.set_trace()
         self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_sav_chunks(self):

@@ -26,6 +26,7 @@ from collections import OrderedDict
 import os
 
 import pandas as pd
+import numpy as np
 #from pandas._libs import Timestamp
 
 from readstat_api cimport *
@@ -52,6 +53,9 @@ cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
+cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: np.object, READSTAT_TYPE_STRING_REF: np.object,
+                                     READSTAT_TYPE_INT8: np.int64, READSTAT_TYPE_INT16: np.int64, READSTAT_TYPE_INT32:np.int64,
+                                     READSTAT_TYPE_FLOAT: np.float64, READSTAT_TYPE_DOUBLE: np.float64}
 
 cdef class data_container:
     """
@@ -68,6 +72,7 @@ cdef class data_container:
         self.col_names = list()
         self.col_labels = list()
         self.col_dtypes = list()
+        self.col_numpy_dtypes = dict()
         self.col_formats = list()
         self.col_formats_original = list()
         self.origin = None
@@ -259,12 +264,14 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef long py_long_value
     cdef double py_float_value
     cdef double tstamp
+    cdef object curnptype
 
     var_type = dc.col_dtypes[index]
     var_format = dc.col_formats[index]
     origin = dc.origin
     dates_as_pandas = dc.dates_as_pandas
     file_format = dc.file_format
+    curnptype = dc.col_numpy_dtypes[index]
 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
@@ -308,6 +315,9 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
         else:
             tstamp = <double> py_long_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            if curnptype != np.object:
+                curnptype = np.object
+                dc.col_numpy_dtypes[index] = curnptype
     elif pyformat == VAR_FORMAT_FLOAT:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
@@ -315,6 +325,9 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             #tstamp = <int> py_float_value
             tstamp = py_float_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            if curnptype != np.object:
+                curnptype = np.object
+                dc.col_numpy_dtypes[index] = curnptype
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
@@ -333,7 +346,7 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         
     cdef int var_count, obs_count
     cdef  data_container dc = <data_container> ctx
-    cdef list row
+    cdef object row
     cdef char * flabel_orig
     cdef char * fencoding_orig
     cdef str flabel, fencoding
@@ -358,13 +371,12 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     data= list()
     for var in range(0,var_count):
         if metaonly:
-            row = list()
+            row = np.empty(1, dtype=np.object)
         else:
-            row = [None] * obs_count
+            row = np.empty(obs_count, dtype=np.object)
         data.append(row)
     dc.col_data = data
-    row = [obs_count] * var_count
-    dc.col_data_len = row
+    dc.col_data_len = [obs_count] * var_count
     
     # read other metadata
     flabel_orig = readstat_get_file_label(metadata);
@@ -442,6 +454,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     
     var_type = readstat_variable_get_type(variable)
     dc.col_dtypes.append(var_type)
+    dc.col_numpy_dtypes[index] = readstat_to_numpy_types[var_type]
     
     # format, we have to transform it in something more usable
     var_format = readstat_variable_get_format(variable)
@@ -519,7 +532,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef int max_n_obs
     cdef bint is_unkown_number_rows
     cdef int var_max_rows
-    cdef list buf_list
+    cdef object buf_list
+    cdef object curnptype
 
     cdef int missing_tag
 
@@ -531,6 +545,7 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
+    curnptype = dc.col_numpy_dtypes[index]
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
@@ -539,16 +554,20 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             dc.max_n_obs = obs_index + 1
         var_max_rows = dc.col_data_len[index]
         if var_max_rows <= obs_index:
-            buf_list = [None] * 100000
-            dc.col_data[index].extend(buf_list)
+            buf_list = np.empty(100000, dtype=np.object)
+            dc.col_data[index] = np.append(dc.col_data[index], buf_list)
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
 
     # transform to python value types
     if readstat_value_is_missing(value, variable):
-        # Or the user does not want to retrieve missing values
+        # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
             dc.col_data[index][obs_index] = NAN
+            # for any type except float, the numpy type will be object as now we have nans
+            if curnptype != np.float64 and curnptype != np.object:
+                curnptype = np.object
+                dc.col_numpy_dtypes[index] = np.object
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -558,17 +577,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
             #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
-            dc.col_data[index][obs_index] =  chr(missing_tag)
+            dc.col_data[index][obs_index] =  chr(missing_tag) #TOCHECK!!!
+            if curnptype != np.object:
+                curnptype = np.object
+                dc.col_numpy_dtypes[index] = np.object
             curset = dc.missing_user_values.get(index)
             if curset is None:
                 curset = set()
             curset.add(chr(missing_tag))
             dc.missing_user_values[index] = curset
-            #dc.missing_user_values.add(chr(missing_tag))
-            #else:
-                #msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
-                #raise PyreadstatError(msg)
-
     else:
         pyvalue = convert_readstat_to_python_value(value, index, dc)
         dc.col_data[index][obs_index] = pyvalue
@@ -797,6 +814,7 @@ cdef object data_container_to_pandas_dataframe(data_container data):
     cdef bint is_unkown_number_rows
     cdef int max_n_obs
     cdef bint metaonly
+    cdef dict numpytypes
 
     final_container = OrderedDict()
     col_data = data.col_data
@@ -804,13 +822,18 @@ cdef object data_container_to_pandas_dataframe(data_container data):
     is_unkown_number_rows = data.is_unkown_number_rows
     max_n_obs = data.max_n_obs
     metaonly = data.metaonly
+    numpytypes = data.col_numpy_dtypes
     
     for fc_cnt in range(0, len(col_names)):
         cur_name_str = col_names[fc_cnt]
         cur_data = col_data[fc_cnt]
+        cur_nptype = numpytypes[fc_cnt]
         if is_unkown_number_rows and not metaonly:
             cur_data = cur_data[0:max_n_obs]
-        final_container[cur_name_str] = cur_data
+        if not metaonly:
+            final_container[cur_name_str] = cur_data.astype(cur_nptype, copy=False)
+        else:
+            final_container[cur_name_str] = list() 
 
     if final_container:
         data_frame = pd.DataFrame.from_dict(final_container)
