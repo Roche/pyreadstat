@@ -40,6 +40,7 @@ the original applications in this regard.**
     - [Reading only the headers](#reading-only-the-headers)
     - [Reading selected columns](#reading-selected-columns)
     - [Reading rows in chunks](#reading-rows-in-chunks)
+    - [Reading files in parallel processes](#reading-files-in-parallel-processes)
     - [Reading value labels](#reading-value-labels)
     - [Missing Values](#missing-values)
       + [SPSS](#spss)
@@ -333,6 +334,20 @@ reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksi
 for df, meta in reader:
     print(df) # df will contain 10 rows except for the last one
     # do some cool calculations here for the chunk
+```
+
+#### Reading files in parallel processes
+
+Another challenge when reading large files is the time consumed in the operation. In order to alleviate this
+pyreadstat provides a function "read_file_multiprocessing" to read a file in parallel processes using the python multiprocessing library.
+Speed ups in the process will depend on a number of factors such as number of processes available, RAM, 
+content of the file etc.
+
+```python
+import pyreadstat
+
+fpath = "path/to/file.sav" 
+df, meta = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath) 
 ```
 
 #### Reading value labels

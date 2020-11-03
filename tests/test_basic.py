@@ -612,6 +612,15 @@ class TestBasic(unittest.TestCase):
         currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
         self.assertTrue(df.equals(currow))
 
+    # read multiprocessing
+
+    def test_multiprocess_reader(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath) 
+        df_single, meta_single = pyreadstat.read_sav(fpath)
+        self.assertTrue(df_multi.equals(df_single))
+        self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
+
     # writing
 
     def test_sav_write_basic(self):

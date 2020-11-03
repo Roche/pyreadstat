@@ -555,7 +555,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
         data_frame : pandas dataframe
             a pandas data frame with the data
         metadata :
-            object with metadata. The member value_labels is the one that contains the formats.
+            object with metadata. 
             Look at the documentation for more information.
 
         it : generator
@@ -613,7 +613,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
         num_processes = mp.cpu_count()
     _, meta = read_function(file_path, metadataonly=True)
     numrows = meta.number_rows
-    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes) ]
+    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes)]
     chunksize = divs[0]
     offsets = [indx*chunksize for indx in range(num_processes)] 
 
