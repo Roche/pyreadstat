@@ -53,6 +53,8 @@ cdef class data_container:
     cdef list col_labels
     cdef list col_dtypes
     cdef dict col_numpy_dtypes
+    cdef dict col_dtypes_isobject
+    cdef dict col_dytpes_isfloat
     cdef list col_formats
     cdef list col_formats_original
     cdef object origin

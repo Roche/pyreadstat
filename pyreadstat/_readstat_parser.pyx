@@ -73,6 +73,8 @@ cdef class data_container:
         self.col_labels = list()
         self.col_dtypes = list()
         self.col_numpy_dtypes = dict()
+        self.col_dtypes_isobject = dict()
+        self.col_dytpes_isfloat = dict()
         self.col_formats = list()
         self.col_formats_original = list()
         self.origin = None
@@ -264,14 +266,14 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef long py_long_value
     cdef double py_float_value
     cdef double tstamp
-    cdef object curnptype
+    cdef int iscurnptypeobject
 
     var_type = dc.col_dtypes[index]
     var_format = dc.col_formats[index]
     origin = dc.origin
     dates_as_pandas = dc.dates_as_pandas
     file_format = dc.file_format
-    curnptype = dc.col_numpy_dtypes[index]
+    iscurnptypeobject = dc.col_dtypes_isobject[index]
 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
@@ -315,9 +317,11 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
         else:
             tstamp = <double> py_long_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
-            if curnptype != np.object:
-                curnptype = np.object
-                dc.col_numpy_dtypes[index] = curnptype
+            if iscurnptypeobject == 0:
+                dc.col_numpy_dtypes[index] = np.object
+                dc.col_dtypes_isobject[index] = 1
+                dc.col_dytpes_isfloat[index] = 0
+                iscurnptypeobject = 1
     elif pyformat == VAR_FORMAT_FLOAT:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
@@ -325,9 +329,11 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             #tstamp = <int> py_float_value
             tstamp = py_float_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
-            if curnptype != np.object:
-                curnptype = np.object
-                dc.col_numpy_dtypes[index] = curnptype
+            if iscurnptypeobject == 0:
+                dc.col_numpy_dtypes[index] = np.object
+                dc.col_dtypes_isobject[index] = 1
+                dc.col_dytpes_isfloat[index] = 0
+                iscurnptypeobject = 1
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
@@ -419,6 +425,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef readstat_value_t loval, hival
     cdef object pyloval, pyhival
     cdef list missing_ranges
+    cdef object curnptype
 
     cdef  data_container dc = <data_container> ctx
     
@@ -454,7 +461,17 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     
     var_type = readstat_variable_get_type(variable)
     dc.col_dtypes.append(var_type)
-    dc.col_numpy_dtypes[index] = readstat_to_numpy_types[var_type]
+    curnptype = readstat_to_numpy_types[var_type]
+    dc.col_numpy_dtypes[index] = curnptype
+    if curnptype == np.object:
+        dc.col_dtypes_isobject[index] = 1
+        dc.col_dytpes_isfloat[index] = 0
+    else:
+        dc.col_dtypes_isobject[index] = 0 
+        if curnptype == np.float64:
+            dc.col_dytpes_isfloat[index] = 1
+        else:
+            dc.col_dytpes_isfloat[index] = 0
     
     # format, we have to transform it in something more usable
     var_format = readstat_variable_get_format(variable)
@@ -533,7 +550,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef bint is_unkown_number_rows
     cdef int var_max_rows
     cdef object buf_list
-    cdef object curnptype
+    cdef int iscurnptypeobject
+    cdef int iscurnptypefloat
 
     cdef int missing_tag
 
@@ -545,7 +563,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
-    curnptype = dc.col_numpy_dtypes[index]
+    iscurnptypeobject = dc.col_dtypes_isobject[index]
+    iscurnptypefloat = dc.col_dytpes_isfloat[index]
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
@@ -565,9 +584,10 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
         if not dc.usernan or readstat_value_is_system_missing(value):
             dc.col_data[index][obs_index] = NAN
             # for any type except float, the numpy type will be object as now we have nans
-            if curnptype != np.float64 and curnptype != np.object:
-                curnptype = np.object
+            if iscurnptypefloat == 0 and iscurnptypeobject == 0:
                 dc.col_numpy_dtypes[index] = np.object
+                dc.col_dtypes_isobject[index] = 1
+                iscurnptypeobject = 1
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -578,9 +598,11 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             # In SAS missing values are A to Z or _ in stata a to z
             #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
             dc.col_data[index][obs_index] =  chr(missing_tag) #TOCHECK!!!
-            if curnptype != np.object:
-                curnptype = np.object
+            if iscurnptypeobject == 0:
                 dc.col_numpy_dtypes[index] = np.object
+                dc.col_dtypes_isobject[index] = 1
+                dc.col_dytpes_isfloat[index] = 0
+                iscurnptypeobject = 1
             curset = dc.missing_user_values.get(index)
             if curset is None:
                 curset = set()

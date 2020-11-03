@@ -1001,6 +1001,8 @@ struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container {
   PyObject *col_labels;
   PyObject *col_dtypes;
   PyObject *col_numpy_dtypes;
+  PyObject *col_dtypes_isobject;
+  PyObject *col_dytpes_isfloat;
   PyObject *col_formats;
   PyObject *col_formats_original;
   PyObject *origin;
