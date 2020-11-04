@@ -106,6 +106,25 @@ some specific columns, and you want to do it quick. This package offers the poss
 it possible a very fast metadata scraping (Pandas read_sas can also do it if you pass the value iterator=True).
 In addition it offers the capability to read sas7bcat files separately from the sas7bdat files.
 
+More recently there has been a lot of interest from users on using pyreadstat to read SPSS sav files. After improvements
+in pyreadstat 1.0.3 below some benchmarks are presented. The small file is 200K rows x 100 columns (152 Mb)
+containing only numeric columns  and
+the big file is 294K rows x 666 columns (1.5 Gb). There are two versions of the big file: one containing numeric
+columns only and one with a mix of numeric and character. Pyreadstat gives two ways to read files: reading in
+a single process using read_sav and reading it in multiple processes using read_file_multiprocessing (see later
+in the readme for more information).
+
+| Method | small  | big numeric | big mixed |
+| :----- | :-----------------: | :----: | :-----: |
+| pyreadstat read_sav | 2.6 s | 33 s | 43 s |
+| pyreadstat read_file_multiprocessing | 0.85 s | 11.5 s | 24.3 s |
+| R - Haven | 2s | 29 s | 29 s |
+
+As you see performance degrades in pyreadstat when reading a table with both numeric and character types. This
+is because numpy and pandas do not have a native type for strings but they use a generic object type which
+brings a big hit in performance. Files with date-like columns were not tested but are expected to have a larger
+performance degradation. The situation can be improved tough by reading files in multiple processes.
+
 
 ## Dependencies
 
@@ -120,7 +139,6 @@ Readstat depends on the C library iconv to handle character encodings. On mac, t
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
 on mac). Readstat also depends on zlib; it was reported not to be installed by default on Lubuntu. If you face this problem installing the
 library solves it.
-
 
 ## Installation
 
