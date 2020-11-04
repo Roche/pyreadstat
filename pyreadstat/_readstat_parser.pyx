@@ -72,9 +72,9 @@ cdef class data_container:
         self.col_names = list()
         self.col_labels = list()
         self.col_dtypes = list()
-        self.col_numpy_dtypes = dict()
-        self.col_dtypes_isobject = dict()
-        self.col_dytpes_isfloat = dict()
+        self.col_numpy_dtypes = list()
+        self.col_dtypes_isobject = list()
+        self.col_dytpes_isfloat = list()
         self.col_formats = list()
         self.col_formats_original = list()
         self.origin = None
@@ -383,6 +383,9 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         data.append(row)
     dc.col_data = data
     dc.col_data_len = [obs_count] * var_count
+    dc.col_numpy_dtypes = [None] * var_count
+    dc.col_dytpes_isfloat = [0] * var_count
+    dc.col_dtypes_isobject = [0] * var_count
     
     # read other metadata
     flabel_orig = readstat_get_file_label(metadata);
@@ -836,7 +839,7 @@ cdef object data_container_to_pandas_dataframe(data_container data):
     cdef bint is_unkown_number_rows
     cdef int max_n_obs
     cdef bint metaonly
-    cdef dict numpytypes
+    cdef list numpytypes
 
     final_container = OrderedDict()
     col_data = data.col_data
