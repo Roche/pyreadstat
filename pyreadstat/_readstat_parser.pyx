@@ -573,6 +573,7 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
 
     cdef object pyvalue
     cdef set curset
+    cdef object curnptype
     
     # extract variables we need from data container
     dc = <data_container> ctx
@@ -589,7 +590,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             dc.max_n_obs = obs_index + 1
         var_max_rows = dc.col_data_len[index]
         if var_max_rows <= obs_index:
-            buf_list = np.empty(100000, dtype=np.object)
+            curnptype = dc.col_numpy_dtypes[index]
+            buf_list = np.empty(100000, dtype=curnptype)
             dc.col_data[index] = np.append(dc.col_data[index], buf_list)
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
