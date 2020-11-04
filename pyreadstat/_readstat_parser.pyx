@@ -375,15 +375,6 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     dc.n_obs = obs_count
     dc.n_vars = var_count
     
-    # pre-allocate data
-    #data= list()
-    #for var in range(0,var_count):
-    #    if metaonly:
-    #        row = np.empty(1, dtype=np.object)
-    #    else:
-    #        row = np.empty(obs_count, dtype=np.object)
-    #    data.append(row)
-    #dc.col_data = data
     dc.col_data_len = [obs_count] * var_count
     dc.col_numpy_dtypes = [None] * var_count
     dc.col_dytpes_isfloat = [0] * var_count
@@ -617,9 +608,9 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             # SAS and Stata missing values
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
-            #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
+            # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
             if iscurnptypeobject == 1:
-                dc.col_data[index][obs_index] =  chr(missing_tag) #TOCHECK!!!
+                dc.col_data[index][obs_index] =  chr(missing_tag) 
             else:
                 dc.col_numpy_dtypes[index] = np.object
                 dc.col_dtypes_isobject[index] = 1
@@ -877,7 +868,7 @@ cdef object data_container_to_pandas_dataframe(data_container data):
         if is_unkown_number_rows and not metaonly:
             cur_data = cur_data[0:max_n_obs]
         if not metaonly:
-            final_container[cur_name_str] = cur_data#.astype(cur_nptype, copy=False)
+            final_container[cur_name_str] = cur_data
         else:
             final_container[cur_name_str] = list() 
 
@@ -894,7 +885,6 @@ cdef object data_container_extract_metadata(data_container data):
     Extracts metadata from a data container and puts it into a metadata 
     object
     """
-    #cdef list col_names, col_labels_str
     cdef list col_names_byte, col_labels_byte
     cdef str colstr
     cdef bint metaonly
@@ -952,7 +942,6 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.original_variable_types = original_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
-    #metadata.missing_user_values = sorted(list(data.missing_user_values))
     metadata.variable_storage_width = data.variable_storage_width
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment
