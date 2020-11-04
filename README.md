@@ -72,7 +72,8 @@ and you have to specify the encoding otherwise in python 3 instead of strings yo
 
 This package corrects those problems.
 
-**1. Good Performance:** Here a comparison of reading a 190 Mb sas7dat file with different methods. As you can see
+**1. Good Performance:** Here a comparison of reading a 190 Mb sas7dat file having 202 K rows 
+by 70 columns with numeric, character and date-like columns using different methods. As you can see
 pyreadstat is the fastest for python and matches the speeds of R Haven.
 
 | Method | time  |
@@ -115,7 +116,7 @@ a single process using read_sav and reading it in multiple processes using read_
 in the readme for more information).
 
 | Method | small  | big numeric | big mixed |
-| :----- | :-----------------: | :----: | :-----: |
+| :----- | :----: | :---------: | :-------: |
 | pyreadstat read_sav | 2.6 s | 33 s | 43 s |
 | pyreadstat read_file_multiprocessing | 0.85 s | 11.5 s | 24.3 s |
 | R - Haven | 2s | 29 s | 29 s |
