@@ -266,7 +266,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef long py_long_value
     cdef double py_float_value
     cdef double tstamp
-    cdef int iscurnptypeobject
+    cdef bint iscurnptypeobject
 
     var_type = dc.col_dtypes[index]
     var_format = dc.col_formats[index]
@@ -322,6 +322,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
                 dc.col_dtypes_isobject[index] = 1
                 dc.col_dytpes_isfloat[index] = 0
                 iscurnptypeobject = 1
+                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
     elif pyformat == VAR_FORMAT_FLOAT:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
@@ -334,6 +335,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
                 dc.col_dtypes_isobject[index] = 1
                 dc.col_dytpes_isfloat[index] = 0
                 iscurnptypeobject = 1
+                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
@@ -352,7 +354,7 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         
     cdef int var_count, obs_count
     cdef  data_container dc = <data_container> ctx
-    cdef object row
+    #cdef object row
     cdef char * flabel_orig
     cdef char * fencoding_orig
     cdef str flabel, fencoding
@@ -374,14 +376,14 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     dc.n_vars = var_count
     
     # pre-allocate data
-    data= list()
-    for var in range(0,var_count):
-        if metaonly:
-            row = np.empty(1, dtype=np.object)
-        else:
-            row = np.empty(obs_count, dtype=np.object)
-        data.append(row)
-    dc.col_data = data
+    #data= list()
+    #for var in range(0,var_count):
+    #    if metaonly:
+    #        row = np.empty(1, dtype=np.object)
+    #    else:
+    #        row = np.empty(obs_count, dtype=np.object)
+    #    data.append(row)
+    #dc.col_data = data
     dc.col_data_len = [obs_count] * var_count
     dc.col_numpy_dtypes = [None] * var_count
     dc.col_dytpes_isfloat = [0] * var_count
@@ -429,6 +431,9 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef object pyloval, pyhival
     cdef list missing_ranges
     cdef object curnptype
+    cdef object row
+    cdef bint metaonly
+    cdef int obs_count
 
     cdef  data_container dc = <data_container> ctx
     
@@ -475,6 +480,14 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
             dc.col_dytpes_isfloat[index] = 1
         else:
             dc.col_dytpes_isfloat[index] = 0
+    metaonly = dc.metaonly
+    # pre-allocate data
+    if metaonly:
+        row = np.empty(1, dtype=curnptype)
+    else:
+        obs_count = dc.n_obs
+        row = np.empty(obs_count, dtype=curnptype)
+    dc.col_data.append(row)
     
     # format, we have to transform it in something more usable
     var_format = readstat_variable_get_format(variable)
@@ -553,8 +566,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef bint is_unkown_number_rows
     cdef int var_max_rows
     cdef object buf_list
-    cdef int iscurnptypeobject
-    cdef int iscurnptypefloat
+    cdef bint iscurnptypeobject
+    cdef bint iscurnptypefloat
 
     cdef int missing_tag
 
@@ -585,12 +598,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     if readstat_value_is_missing(value, variable):
         # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
-            dc.col_data[index][obs_index] = NAN
+            if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
+                dc.col_data[index][obs_index] = NAN
             # for any type except float, the numpy type will be object as now we have nans
-            if iscurnptypefloat == 0 and iscurnptypeobject == 0:
+            else:
                 dc.col_numpy_dtypes[index] = np.object
                 dc.col_dtypes_isobject[index] = 1
                 iscurnptypeobject = 1
+                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
+                dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -600,12 +616,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
             #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
-            dc.col_data[index][obs_index] =  chr(missing_tag) #TOCHECK!!!
-            if iscurnptypeobject == 0:
+            if iscurnptypeobject == 1:
+                dc.col_data[index][obs_index] =  chr(missing_tag) #TOCHECK!!!
+            else:
                 dc.col_numpy_dtypes[index] = np.object
                 dc.col_dtypes_isobject[index] = 1
                 dc.col_dytpes_isfloat[index] = 0
                 iscurnptypeobject = 1
+                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
+                dc.col_data[index][obs_index] =  chr(missing_tag)
             curset = dc.missing_user_values.get(index)
             if curset is None:
                 curset = set()
@@ -856,7 +875,7 @@ cdef object data_container_to_pandas_dataframe(data_container data):
         if is_unkown_number_rows and not metaonly:
             cur_data = cur_data[0:max_n_obs]
         if not metaonly:
-            final_container[cur_name_str] = cur_data.astype(cur_nptype, copy=False)
+            final_container[cur_name_str] = cur_data#.astype(cur_nptype, copy=False)
         else:
             final_container[cur_name_str] = list() 
 
