@@ -266,14 +266,12 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef long py_long_value
     cdef double py_float_value
     cdef double tstamp
-    cdef bint iscurnptypeobject
 
     var_type = dc.col_dtypes[index]
     var_format = dc.col_formats[index]
     origin = dc.origin
     dates_as_pandas = dc.dates_as_pandas
     file_format = dc.file_format
-    iscurnptypeobject = dc.col_dtypes_isobject[index]
 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
@@ -317,12 +315,6 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
         else:
             tstamp = <double> py_long_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
-            if iscurnptypeobject == 0:
-                dc.col_numpy_dtypes[index] = np.object
-                dc.col_dtypes_isobject[index] = 1
-                dc.col_dytpes_isfloat[index] = 0
-                iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
     elif pyformat == VAR_FORMAT_FLOAT:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
@@ -330,12 +322,6 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             #tstamp = <int> py_float_value
             tstamp = py_float_value
             result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
-            if iscurnptypeobject == 0:
-                dc.col_numpy_dtypes[index] = np.object
-                dc.col_dtypes_isobject[index] = 1
-                dc.col_dytpes_isfloat[index] = 0
-                iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
@@ -456,11 +442,27 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     else:
         col_label = <str>var_label
     dc.col_labels.append(col_label)
-    
-    
+
+    # format, we have to transform it in something more usable
+    var_format = readstat_variable_get_format(variable)
+    if var_format == NULL:
+        col_format_original = "NULL"
+    else:
+        col_format_original = <str>var_format
+    file_format = dc.file_format
+    dc.col_formats_original.append(col_format_original)
+    col_format_final = transform_variable_format(col_format_original, file_format)
+    dc.col_formats.append(col_format_final)
+    # readstat type
     var_type = readstat_variable_get_type(variable)
     dc.col_dtypes.append(var_type)
-    curnptype = readstat_to_numpy_types[var_type]
+    # equivalent numpy type
+    # if it's a date then we need object
+    if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0: 
+        curnptype = np.object
+    else:
+        curnptype = readstat_to_numpy_types[var_type]
+    # book keeping numpy types
     dc.col_numpy_dtypes[index] = curnptype
     if curnptype == np.object:
         dc.col_dtypes_isobject[index] = 1
@@ -480,17 +482,6 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
         row = np.empty(obs_count, dtype=curnptype)
     dc.col_data.append(row)
     
-    # format, we have to transform it in something more usable
-    var_format = readstat_variable_get_format(variable)
-    if var_format == NULL:
-        col_format_original = "NULL"
-    else:
-        col_format_original = <str>var_format
-    file_format = dc.file_format
-    dc.col_formats_original.append(col_format_original)
-    col_format_final = transform_variable_format(col_format_original, file_format)
-    dc.col_formats.append(col_format_final)
-
     # missing values
     if dc.usernan:
         n_ranges = readstat_variable_get_missing_ranges_count(variable)
