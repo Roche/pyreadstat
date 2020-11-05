@@ -123,8 +123,7 @@ in the readme for more information).
 
 As you see performance degrades in pyreadstat when reading a table with both numeric and character types. This
 is because numpy and pandas do not have a native type for strings but they use a generic object type which
-brings a big hit in performance. Files with date-like columns were not tested but are expected to have a larger
-performance degradation. The situation can be improved tough by reading files in multiple processes.
+brings a big hit in performance. The situation can be improved tough by reading files in multiple processes.
 
 
 ## Dependencies
