@@ -1,6 +1,7 @@
 # 1.0.3 (github, pypi and conda )
 * Improved performance specially for big files.
 * added a method to read files in parallel
+* added license information to setup.py
 
 # 1.0.2 (github, pypi and conda 2020.09.05)
 * Updated default widths for DATE and DATETIME formats (from Readstat src). That makes the files readable both in SPSS and PSPP,
