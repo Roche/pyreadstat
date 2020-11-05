@@ -38,20 +38,22 @@ cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", 
 cdef list sas_datetime_formats = ["DATETIME", "DATETIME20"]
 cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3"]
 cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
-#sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+cdef double sas_origin_diff = 3653.0 # difference in days from sas origin to 1970-1-1
 
 cdef list spss_datetime_formats = ["DATETIME", 'DATETIME20', 'DATETIME23.2', "DATETIME8", "YMDHMS20"]
 cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE", 'EDATE10', 'DATE8', 'EDATE8', "DATE11"]
 cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
+cdef double spss_origin_diff = 141428.0 # difference in days from spss origin to 1970-1-1
 
 cdef list stata_datetime_formats = ["%tC", "%tc"]
 cdef list stata_date_formats = ["%td", "%d", "%tdD_m_Y", "%tdCCYY-NN-DD"]
 cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+cdef double stata_origin_diff = 3653.0 # difference in days from spss origin to 1970-1-1
 
 cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: np.object, READSTAT_TYPE_STRING_REF: np.object,
                                      READSTAT_TYPE_INT8: np.int64, READSTAT_TYPE_INT16: np.int64, READSTAT_TYPE_INT32:np.int64,
@@ -190,16 +192,24 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     if var_format == DATE_FORMAT_DATE:
         if file_format == FILE_FORMAT_SPSS:
             # tstamp is in seconds
-            days = <int> (floor(tstamp / 86400))
-            secs = <int> (tstamp % 86400)
-            tdelta = timedelta_new(days, secs, 0)
-            #tdelta = timedelta(seconds=tstamp)
+            if dates_as_pandas:
+                tstamp = tstamp - (spss_origin_diff*86400)
+                mydat = np.datetime64(<int>(tstamp*1e9), "ns")
+            else:
+                days = <int> (floor(tstamp / 86400))
+                secs = <int> (tstamp % 86400)
+                tdelta = timedelta_new(days, secs, 0)
+                mydat = origin + tdelta
         else:
             # tstamp is in days
-            days = <int> tstamp
-            tdelta = timedelta_new(days, 0, 0)
-            #tdelta = timedelta(days=tstamp)
-        mydat = origin + tdelta
+            if dates_as_pandas:
+                tstamp = tstamp - sas_origin_diff
+                mydat = np.datetime64(<int>(tstamp*8.64e13), "ns")
+            else:
+                days = <int> tstamp
+                tdelta = timedelta_new(days, 0, 0)
+                #tdelta = timedelta(days=tstamp)
+                mydat = origin + tdelta
         if dates_as_pandas:
             return mydat
         else:
@@ -207,37 +217,60 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     elif var_format == DATE_FORMAT_DATETIME:
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
-            days = <int> (floor(tstamp / 86400000))
-            msecs = tstamp % 86400000
-            secs = <int> (msecs/1000)
-            usecs = <int> ((msecs % 1000) * 1000 )
-            tdelta = timedelta_new(days, secs, usecs)
-            #tdelta = timedelta(milliseconds=tstamp)
+            if dates_as_pandas:
+                tstamp = tstamp - (stata_origin_diff*86400000)
+                mydat = np.datetime64(<int>(tstamp*1e6), "ns")
+            else:
+                days = <int> (floor(tstamp / 86400000))
+                msecs = tstamp % 86400000
+                secs = <int> (msecs/1000)
+                usecs = <int> ((msecs % 1000) * 1000 )
+                tdelta = timedelta_new(days, secs, usecs)
+                #tdelta = timedelta(milliseconds=tstamp)
+                mydat = origin+tdelta
         else:
             # tstamp in seconds
-            days = <int> (floor(tstamp / 86400))
-            secs = <int> (tstamp % 86400)
-            tdelta = timedelta_new(days, secs, 0)
-            #tdelta = timedelta(seconds=tstamp)
-        mydat = origin + tdelta
+            if dates_as_pandas:
+                if file_format == FILE_FORMAT_SAS:
+                    tstamp = tstamp - (sas_origin_diff*86400)
+                    print("oink")
+                else:
+                    tstamp = tstamp - (spss_origin_diff*86400)
+                mydat = np.datetime64(<int>(tstamp*1e9), "ns")
+            else:
+                days = <int> (floor(tstamp / 86400))
+                secs = <int> (tstamp % 86400)
+                tdelta = timedelta_new(days, secs, 0)
+                #tdelta = timedelta(seconds=tstamp)
+                mydat = origin + tdelta
         return mydat
     elif var_format == DATE_FORMAT_TIME:
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
-            days = <int> (floor(tstamp / 86400000))
-            msecs = tstamp % 86400000
-            secs = <int> (msecs/1000)
-            usecs = <int> ((msecs % 1000) * 1000 )
-            tdelta = timedelta_new(days, secs, usecs)
-            #tdelta = timedelta(milliseconds=tstamp)
+            if dates_as_pandas:
+                mydat = np.datetime64(<int>(tstamp*1e6), "ns")
+            else:
+                days = <int> (floor(tstamp / 86400000))
+                msecs = tstamp % 86400000
+                secs = <int> (msecs/1000)
+                usecs = <int> ((msecs % 1000) * 1000 )
+                tdelta = timedelta_new(days, secs, usecs)
+                #tdelta = timedelta(milliseconds=tstamp)
+                mydat = origin + tdelta
         else:
             # tstamp in seconds
-            days = <int> (floor(tstamp / 86400))
-            secs = <int> (tstamp % 86400)
-            tdelta = timedelta_new(days, secs, 0)
-            #tdelta = timedelta(seconds=tstamp)
-        mydat = origin + tdelta
-        return mydat.time()
+            if dates_as_pandas:
+                mydat = np.datetime64(<int>(tstamp*1e9), "ns")
+            else:
+                days = <int> (floor(tstamp / 86400))
+                secs = <int> (tstamp % 86400)
+                tdelta = timedelta_new(days, secs, 0)
+                #tdelta = timedelta(seconds=tstamp)
+                mydat = origin + tdelta
+        if dates_as_pandas:
+            return mydat
+        else:
+            return mydat.time()
 
 
 cdef object convert_readstat_to_python_value(readstat_value_t value, int index, data_container dc):
@@ -457,9 +490,12 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     var_type = readstat_variable_get_type(variable)
     dc.col_dtypes.append(var_type)
     # equivalent numpy type
-    # if it's a date then we need object
+    # if it's a date we need to manage it differently
     if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0: 
-        curnptype = np.object
+        if dc.dates_as_pandas:
+            curnptype = "datetime64[ns]" # pandas native, faster!
+        else:
+            curnptype = np.object # datetime python object
     else:
         curnptype = readstat_to_numpy_types[var_type]
     # book keeping numpy types
