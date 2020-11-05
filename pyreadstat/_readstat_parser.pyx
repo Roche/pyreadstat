@@ -842,7 +842,6 @@ cdef object data_container_to_pandas_dataframe(data_container data):
     cdef bint is_unkown_number_rows
     cdef int max_n_obs
     cdef bint metaonly
-    cdef list numpytypes
 
     final_container = OrderedDict()
     col_data = data.col_data
@@ -850,12 +849,10 @@ cdef object data_container_to_pandas_dataframe(data_container data):
     is_unkown_number_rows = data.is_unkown_number_rows
     max_n_obs = data.max_n_obs
     metaonly = data.metaonly
-    numpytypes = data.col_numpy_dtypes
     
     for fc_cnt in range(0, len(col_names)):
         cur_name_str = col_names[fc_cnt]
         cur_data = col_data[fc_cnt]
-        cur_nptype = numpytypes[fc_cnt]
         if is_unkown_number_rows and not metaonly:
             cur_data = cur_data[0:max_n_obs]
         if not metaonly:
