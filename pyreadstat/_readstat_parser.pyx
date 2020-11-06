@@ -26,6 +26,7 @@ from collections import OrderedDict
 import os
 
 import pandas as pd
+import numpy as np
 #from pandas._libs import Timestamp
 
 from readstat_api cimport *
@@ -52,6 +53,9 @@ cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
+cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: np.object, READSTAT_TYPE_STRING_REF: np.object,
+                                     READSTAT_TYPE_INT8: np.int64, READSTAT_TYPE_INT16: np.int64, READSTAT_TYPE_INT32:np.int64,
+                                     READSTAT_TYPE_FLOAT: np.float64, READSTAT_TYPE_DOUBLE: np.float64}
 
 cdef class data_container:
     """
@@ -68,6 +72,9 @@ cdef class data_container:
         self.col_names = list()
         self.col_labels = list()
         self.col_dtypes = list()
+        self.col_numpy_dtypes = list()
+        self.col_dtypes_isobject = list()
+        self.col_dytpes_isfloat = list()
         self.col_formats = list()
         self.col_formats_original = list()
         self.origin = None
@@ -333,7 +340,7 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         
     cdef int var_count, obs_count
     cdef  data_container dc = <data_container> ctx
-    cdef list row
+    #cdef object row
     cdef char * flabel_orig
     cdef char * fencoding_orig
     cdef str flabel, fencoding
@@ -354,17 +361,10 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     dc.n_obs = obs_count
     dc.n_vars = var_count
     
-    # pre-allocate data
-    data= list()
-    for var in range(0,var_count):
-        if metaonly:
-            row = list()
-        else:
-            row = [None] * obs_count
-        data.append(row)
-    dc.col_data = data
-    row = [obs_count] * var_count
-    dc.col_data_len = row
+    dc.col_data_len = [obs_count] * var_count
+    dc.col_numpy_dtypes = [None] * var_count
+    dc.col_dytpes_isfloat = [0] * var_count
+    dc.col_dtypes_isobject = [0] * var_count
     
     # read other metadata
     flabel_orig = readstat_get_file_label(metadata);
@@ -407,6 +407,12 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef readstat_value_t loval, hival
     cdef object pyloval, pyhival
     cdef list missing_ranges
+    cdef object curnptype
+    cdef object row
+    cdef bint metaonly
+    cdef int obs_count
+    cdef bint iscurnptypefloat
+    cdef bint iscurnptypeobject
 
     cdef  data_container dc = <data_container> ctx
     
@@ -438,11 +444,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     else:
         col_label = <str>var_label
     dc.col_labels.append(col_label)
-    
-    
-    var_type = readstat_variable_get_type(variable)
-    dc.col_dtypes.append(var_type)
-    
+
     # format, we have to transform it in something more usable
     var_format = readstat_variable_get_format(variable)
     if var_format == NULL:
@@ -453,7 +455,36 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     dc.col_formats_original.append(col_format_original)
     col_format_final = transform_variable_format(col_format_original, file_format)
     dc.col_formats.append(col_format_final)
-
+    # readstat type
+    var_type = readstat_variable_get_type(variable)
+    dc.col_dtypes.append(var_type)
+    # equivalent numpy type
+    # if it's a date then we need object
+    if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0: 
+        curnptype = np.object
+    else:
+        curnptype = readstat_to_numpy_types[var_type]
+    iscurnptypefloat = 0
+    iscurnptypeobject = 0
+    # book keeping numpy types
+    dc.col_numpy_dtypes[index] = curnptype
+    if curnptype == np.object:
+        iscurnptypeobject = 1
+    if curnptype == np.float64:
+        iscurnptypefloat = 1
+    dc.col_dtypes_isobject[index] = iscurnptypeobject
+    dc.col_dytpes_isfloat[index] = iscurnptypefloat
+    metaonly = dc.metaonly
+    # pre-allocate data
+    if metaonly:
+        row = np.empty(1, dtype=curnptype)
+    else:
+        obs_count = dc.n_obs
+        row = np.empty(obs_count, dtype=curnptype)
+        if iscurnptypeobject or iscurnptypefloat:
+            row.fill(np.nan)
+    dc.col_data.append(row)
+    
     # missing values
     if dc.usernan:
         n_ranges = readstat_variable_get_missing_ranges_count(variable)
@@ -519,18 +550,23 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef int max_n_obs
     cdef bint is_unkown_number_rows
     cdef int var_max_rows
-    cdef list buf_list
+    cdef object buf_list
+    cdef bint iscurnptypeobject
+    cdef bint iscurnptypefloat
 
     cdef int missing_tag
 
     cdef object pyvalue
     cdef set curset
+    cdef object curnptype
     
     # extract variables we need from data container
     dc = <data_container> ctx
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
+    #iscurnptypeobject = dc.col_dtypes_isobject[index]
+    #iscurnptypefloat = dc.col_dytpes_isfloat[index]
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
@@ -539,36 +575,54 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             dc.max_n_obs = obs_index + 1
         var_max_rows = dc.col_data_len[index]
         if var_max_rows <= obs_index:
-            buf_list = [None] * 100000
-            dc.col_data[index].extend(buf_list)
+            curnptype = dc.col_numpy_dtypes[index]
+            buf_list = np.empty(100000, dtype=curnptype)
+            dc.col_data[index] = np.append(dc.col_data[index], buf_list)
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
 
     # transform to python value types
     if readstat_value_is_missing(value, variable):
-        # Or the user does not want to retrieve missing values
+        # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
-            dc.col_data[index][obs_index] = NAN
+            iscurnptypeobject = dc.col_dtypes_isobject[index]
+            iscurnptypefloat = dc.col_dytpes_isfloat[index]
+            if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
+                # already allocated
+                pass
+                #dc.col_data[index][obs_index] = NAN
+            # for any type except float, the numpy type will be object as now we have nans
+            else:
+                dc.col_numpy_dtypes[index] = np.object
+                dc.col_dtypes_isobject[index] = 1
+                iscurnptypeobject = 1
+                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
+                dc.col_data[index][obs_index:] = np.nan
+                #dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
             dc.col_data[index][obs_index] = pyvalue
         elif readstat_value_is_tagged_missing(value):
+            iscurnptypeobject = dc.col_dtypes_isobject[index]
             # SAS and Stata missing values
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
-            #if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
-            dc.col_data[index][obs_index] =  chr(missing_tag)
+            # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
+            if iscurnptypeobject == 1:
+                dc.col_data[index][obs_index] =  chr(missing_tag) 
+            else:
+                dc.col_numpy_dtypes[index] = np.object
+                dc.col_dtypes_isobject[index] = 1
+                dc.col_dytpes_isfloat[index] = 0
+                iscurnptypeobject = 1
+                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
+                dc.col_data[index][obs_index] =  chr(missing_tag)
             curset = dc.missing_user_values.get(index)
             if curset is None:
                 curset = set()
             curset.add(chr(missing_tag))
             dc.missing_user_values[index] = curset
-            #dc.missing_user_values.add(chr(missing_tag))
-            #else:
-                #msg = "Expecting missing tag value from 65(A) to 90(Z), 95(_) or a (61)to (122)z, got %d instead" % missing_tag
-                #raise PyreadstatError(msg)
-
     else:
         pyvalue = convert_readstat_to_python_value(value, index, dc)
         dc.col_data[index][obs_index] = pyvalue
@@ -810,7 +864,10 @@ cdef object data_container_to_pandas_dataframe(data_container data):
         cur_data = col_data[fc_cnt]
         if is_unkown_number_rows and not metaonly:
             cur_data = cur_data[0:max_n_obs]
-        final_container[cur_name_str] = cur_data
+        if not metaonly:
+            final_container[cur_name_str] = cur_data
+        else:
+            final_container[cur_name_str] = list() 
 
     if final_container:
         data_frame = pd.DataFrame.from_dict(final_container)
@@ -825,7 +882,6 @@ cdef object data_container_extract_metadata(data_container data):
     Extracts metadata from a data container and puts it into a metadata 
     object
     """
-    #cdef list col_names, col_labels_str
     cdef list col_names_byte, col_labels_byte
     cdef str colstr
     cdef bint metaonly
@@ -883,7 +939,6 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.original_variable_types = original_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
-    #metadata.missing_user_values = sorted(list(data.missing_user_values))
     metadata.variable_storage_width = data.variable_storage_width
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment

@@ -52,6 +52,9 @@ cdef class data_container:
     cdef list col_names
     cdef list col_labels
     cdef list col_dtypes
+    cdef list col_numpy_dtypes
+    cdef list col_dtypes_isobject
+    cdef list col_dytpes_isfloat
     cdef list col_formats
     cdef list col_formats_original
     cdef object origin
@@ -76,7 +79,8 @@ cdef class data_container:
     cdef variable_alignment
     cdef variable_measure
     cdef bint no_datetime_conversion
-
+    
+cdef dict readstat_to_numpy_types
 
 # definitions of functions
 cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format)

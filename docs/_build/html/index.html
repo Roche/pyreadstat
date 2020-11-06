@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.2 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.3 documentation</title>
   
 
   
@@ -257,11 +257,35 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 </dd>
 <dt class="field-even">Yields</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data (no data in this case, so will be empty)</p></li>
-<li><p><em>metadata</em> – object with metadata. The member value_labels is the one that contains the formats.
+<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</p></li>
+<li><p><em>metadata</em> – object with metadata.
 Look at the documentation for more information.</p></li>
 <li><p><strong>it</strong> (<em>generator</em>) – A generator that reads the file in chunks.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyreadstat.pyreadstat.read_file_multiprocessing">
+<code class="sig-prename descclassname">pyreadstat.pyreadstat.</code><code class="sig-name descname">read_file_multiprocessing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_multiprocessing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a file in parallel using multiprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>read_function</strong> (<em>pyreadstat function</em>) – a pyreadstat reading function</p></li>
+<li><p><strong>file_path</strong> (<em>string</em>) – path to the file to be read</p></li>
+<li><p><strong>num_processes</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of processes to spawn, by default the total number of cores</p></li>
+<li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function.
+row_limit and row_offset will be discarded if present as they are used internally.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</p></li>
+<li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>

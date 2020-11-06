@@ -363,6 +363,7 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_nodates(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), disable_datetime_conversion=True)
+        #import pdb; pdb.set_trace()
         self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_sav_chunks(self):
@@ -610,6 +611,15 @@ class TestBasic(unittest.TestCase):
         
         currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
         self.assertTrue(df.equals(currow))
+
+    # read multiprocessing
+
+    def test_multiprocess_reader(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath) 
+        df_single, meta_single = pyreadstat.read_sav(fpath)
+        self.assertTrue(df_multi.equals(df_single))
+        self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
 
     # writing
 
