@@ -366,6 +366,14 @@ class TestBasic(unittest.TestCase):
         #import pdb; pdb.set_trace()
         self.assertTrue(df.equals(self.df_nodates_spss))
 
+    def test_sav_dates_as_pandas(self):
+
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), dates_as_pandas_datetime=True)
+        dfno = self.df_pandas.copy()
+        #dfno.loc[:, 'mydate'] = pd.to_datetime(dfno['mydate'])
+        import pdb;pdb.set_trace()
+        self.assertTrue(df.equals(dfno))
+
     def test_sav_chunks(self):
 
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), row_limit = 2, row_offset =1)
@@ -519,6 +527,7 @@ class TestBasic(unittest.TestCase):
 
         sas_file = os.path.join(self.basic_data_folder, "dates.sas7bdat")
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file, dates_as_pandas_datetime=True)
+        #import pdb;pdb.set_trace()
         self.assertTrue(df_sas.equals(self.df_sas_dates_as_pandas))
         
     def test_sas_user_missing(self):

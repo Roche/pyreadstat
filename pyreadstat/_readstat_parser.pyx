@@ -194,7 +194,7 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
             # tstamp is in seconds
             if dates_as_pandas:
                 tstamp = tstamp - (spss_origin_diff*86400)
-                mydat = np.datetime64(int(tstamp*1e9), "ns")
+                mydat = np.datetime64(int(tstamp), "s")
             else:
                 days = <int> (floor(tstamp / 86400))
                 secs = <int> (tstamp % 86400)
@@ -203,8 +203,8 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
         else:
             # tstamp is in days
             if dates_as_pandas:
-                tstamp = tstamp - sas_origin_diff
-                mydat = np.datetime64(int(tstamp*8.64e13), "ns")
+                tstamp = tstamp - sas_origin_diff # sas and stata are the same
+                mydat = np.datetime64(int(tstamp), "D")
             else:
                 days = <int> tstamp
                 tdelta = timedelta_new(days, 0, 0)
@@ -219,7 +219,7 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
             # tstamp is in milliseconds
             if dates_as_pandas:
                 tstamp = tstamp - (stata_origin_diff*86400000)
-                mydat = np.datetime64(int(tstamp*1e6), "ns")
+                mydat = np.datetime64(int(tstamp), "ms")
             else:
                 days = <int> (floor(tstamp / 86400000))
                 msecs = tstamp % 86400000
@@ -235,7 +235,7 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
                     tstamp = tstamp - (sas_origin_diff*86400)
                 else:
                     tstamp = tstamp - (spss_origin_diff*86400)
-                mydat = np.datetime64(int(tstamp*1e9), "ns")
+                mydat = np.datetime64(int(tstamp), "s")
             else:
                 days = <int> (floor(tstamp / 86400))
                 secs = <int> (tstamp % 86400)
@@ -246,30 +246,28 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     elif var_format == DATE_FORMAT_TIME:
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
-            if dates_as_pandas:
-                mydat = np.datetime64(int(tstamp*1e6), "ns")
-            else:
-                days = <int> (floor(tstamp / 86400000))
-                msecs = tstamp % 86400000
-                secs = <int> (msecs/1000)
-                usecs = <int> ((msecs % 1000) * 1000 )
-                tdelta = timedelta_new(days, secs, usecs)
-                #tdelta = timedelta(milliseconds=tstamp)
-                mydat = origin + tdelta
+            #if dates_as_pandas:
+            #    mydat = np.datetime64(int(tstamp*1e6), "ns")
+            #else:
+            days = <int> (floor(tstamp / 86400000))
+            msecs = tstamp % 86400000
+            secs = <int> (msecs/1000)
+            usecs = <int> ((msecs % 1000) * 1000 )
+            tdelta = timedelta_new(days, secs, usecs)
+            #mydat = origin + tdelta
         else:
             # tstamp in seconds
-            if dates_as_pandas:
-                mydat = np.datetime64(int(tstamp*1e9), "ns")
-            else:
-                days = <int> (floor(tstamp / 86400))
-                secs = <int> (tstamp % 86400)
-                tdelta = timedelta_new(days, secs, 0)
-                #tdelta = timedelta(seconds=tstamp)
-                mydat = origin + tdelta
-        if dates_as_pandas:
-            return mydat
-        else:
-            return mydat.time()
+            #if dates_as_pandas:
+            #    mydat = np.datetime64(int(tstamp*1e9), "ns")
+            #else:
+            days = <int> (floor(tstamp / 86400))
+            secs = <int> (tstamp % 86400)
+            tdelta = timedelta_new(days, secs, 0)
+        mydat = origin + tdelta
+        #if dates_as_pandas:
+            #return mydat
+        #else:
+        return mydat.time()
 
 
 cdef object convert_readstat_to_python_value(readstat_value_t value, int index, data_container dc):
@@ -491,7 +489,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     # equivalent numpy type
     # if it's a date we need to manage it differently
     if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0: 
-        if dc.dates_as_pandas:
+        if dc.dates_as_pandas and col_format_final != DATE_FORMAT_TIME:
             curnptype = "datetime64[ns]" # pandas native, faster!
         else:
             curnptype = np.object # datetime python object
