@@ -411,6 +411,8 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef object row
     cdef bint metaonly
     cdef int obs_count
+    cdef bint iscurnptypefloat
+    cdef bint iscurnptypeobject
 
     cdef  data_container dc = <data_container> ctx
     
@@ -462,17 +464,16 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
         curnptype = np.object
     else:
         curnptype = readstat_to_numpy_types[var_type]
+    iscurnptypefloat = 0
+    iscurnptypeobject = 0
     # book keeping numpy types
     dc.col_numpy_dtypes[index] = curnptype
     if curnptype == np.object:
-        dc.col_dtypes_isobject[index] = 1
-        dc.col_dytpes_isfloat[index] = 0
-    else:
-        dc.col_dtypes_isobject[index] = 0 
-        if curnptype == np.float64:
-            dc.col_dytpes_isfloat[index] = 1
-        else:
-            dc.col_dytpes_isfloat[index] = 0
+        iscurnptypeobject = 1
+    if curnptype == np.float64:
+        iscurnptypefloat = 1
+    dc.col_dtypes_isobject[index] = iscurnptypeobject
+    dc.col_dytpes_isfloat[index] = iscurnptypefloat
     metaonly = dc.metaonly
     # pre-allocate data
     if metaonly:
@@ -480,6 +481,8 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     else:
         obs_count = dc.n_obs
         row = np.empty(obs_count, dtype=curnptype)
+        if iscurnptypeobject or iscurnptypefloat:
+            row.fill(np.nan)
     dc.col_data.append(row)
     
     # missing values
@@ -562,8 +565,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
-    iscurnptypeobject = dc.col_dtypes_isobject[index]
-    iscurnptypefloat = dc.col_dytpes_isfloat[index]
+    #iscurnptypeobject = dc.col_dtypes_isobject[index]
+    #iscurnptypefloat = dc.col_dytpes_isfloat[index]
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
@@ -582,20 +585,26 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     if readstat_value_is_missing(value, variable):
         # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
+            iscurnptypeobject = dc.col_dtypes_isobject[index]
+            iscurnptypefloat = dc.col_dytpes_isfloat[index]
             if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
-                dc.col_data[index][obs_index] = NAN
+                # already allocated
+                pass
+                #dc.col_data[index][obs_index] = NAN
             # for any type except float, the numpy type will be object as now we have nans
             else:
                 dc.col_numpy_dtypes[index] = np.object
                 dc.col_dtypes_isobject[index] = 1
                 iscurnptypeobject = 1
                 dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
-                dc.col_data[index][obs_index] = NAN
+                dc.col_data[index][obs_index:] = np.nan
+                #dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
             dc.col_data[index][obs_index] = pyvalue
         elif readstat_value_is_tagged_missing(value):
+            iscurnptypeobject = dc.col_dtypes_isobject[index]
             # SAS and Stata missing values
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
