@@ -117,9 +117,8 @@ in the readme for more information).
 
 | Method | small  | big numeric | big mixed |
 | :----- | :----: | :---------: | :-------: |
-| pyreadstat read_sav | 2.6 s | 33 s | 43 s |
-| pyreadstat read_file_multiprocessing | 0.85 s | 11.5 s | 24.3 s |
-| R - Haven | 2s | 29 s | 29 s |
+| pyreadstat read_sav | 2.3 s | 28 s | 40 s |
+| pyreadstat read_file_multiprocessing | 0.8 s | 10 s | 21 s |
 
 As you see performance degrades in pyreadstat when reading a table with both numeric and character types. This
 is because numpy and pandas do not have a native type for strings but they use a generic object type which
