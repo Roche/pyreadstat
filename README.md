@@ -40,6 +40,7 @@ the original applications in this regard.**
     - [Reading only the headers](#reading-only-the-headers)
     - [Reading selected columns](#reading-selected-columns)
     - [Reading rows in chunks](#reading-rows-in-chunks)
+    - [Reading files in parallel processes](#reading-files-in-parallel-processes)
     - [Reading value labels](#reading-value-labels)
     - [Missing Values](#missing-values)
       + [SPSS](#spss)
@@ -71,7 +72,8 @@ and you have to specify the encoding otherwise in python 3 instead of strings yo
 
 This package corrects those problems.
 
-**1. Good Performance:** Here a comparison of reading a 190 Mb sas7dat file with different methods. As you can see
+**1. Good Performance:** Here a comparison of reading a 190 Mb sas7dat file having 202 K rows 
+by 70 columns with numeric, character and date-like columns using different methods. As you can see
 pyreadstat is the fastest for python and matches the speeds of R Haven.
 
 | Method | time  |
@@ -105,6 +107,23 @@ some specific columns, and you want to do it quick. This package offers the poss
 it possible a very fast metadata scraping (Pandas read_sas can also do it if you pass the value iterator=True).
 In addition it offers the capability to read sas7bcat files separately from the sas7bdat files.
 
+More recently there has been a lot of interest from users on using pyreadstat to read SPSS sav files. After improvements
+in pyreadstat 1.0.3 below some benchmarks are presented. The small file is 200K rows x 100 columns (152 Mb)
+containing only numeric columns  and
+the big file is 294K rows x 666 columns (1.5 Gb). There are two versions of the big file: one containing numeric
+columns only and one with a mix of numeric and character. Pyreadstat gives two ways to read files: reading in
+a single process using read_sav and reading it in multiple processes using read_file_multiprocessing (see later
+in the readme for more information).
+
+| Method | small  | big numeric | big mixed |
+| :----- | :----: | :---------: | :-------: |
+| pyreadstat read_sav | 2.3 s | 28 s | 40 s |
+| pyreadstat read_file_multiprocessing | 0.8 s | 10 s | 21 s |
+
+As you see performance degrades in pyreadstat when reading a table with both numeric and character types. This
+is because numpy and pandas do not have a native type for strings but they use a generic object type which
+brings a big hit in performance. The situation can be improved tough by reading files in multiple processes.
+
 
 ## Dependencies
 
@@ -119,7 +138,6 @@ Readstat depends on the C library iconv to handle character encodings. On mac, t
 users have sometimes reported problems. In those cases it may help to install libiconv with conda (see later, compilation
 on mac). Readstat also depends on zlib; it was reported not to be installed by default on Lubuntu. If you face this problem installing the
 library solves it.
-
 
 ## Installation
 
@@ -333,6 +351,20 @@ reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksi
 for df, meta in reader:
     print(df) # df will contain 10 rows except for the last one
     # do some cool calculations here for the chunk
+```
+
+#### Reading files in parallel processes
+
+Another challenge when reading large files is the time consumed in the operation. In order to alleviate this
+pyreadstat provides a function "read_file_multiprocessing" to read a file in parallel processes using the python multiprocessing library.
+Speed ups in the process will depend on a number of factors such as number of processes available, RAM, 
+content of the file etc.
+
+```python
+import pyreadstat
+
+fpath = "path/to/file.sav" 
+df, meta = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath) 
 ```
 
 #### Reading value labels

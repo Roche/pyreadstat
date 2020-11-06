@@ -1,3 +1,4 @@
+
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -14,10 +15,11 @@
 # limitations under the License.
 # #############################################################################
 
-from .pyreadstat import read_sas7bdat, read_xport, read_dta, read_sav, read_por, read_sas7bcat
-from .pyreadstat import write_sav, write_dta, write_xport, write_por
-from .pyreadstat import set_value_labels, set_catalog_to_sas
-from .pyreadstat import read_file_in_chunks, read_file_multiprocessing
-from ._readstat_parser import ReadstatError, metadata_container
+"""
+Functions to work with multiprocessing
+"""
 
-__version__ = "1.0.3"
+def worker(inpt):
+    offset, chunksize, path, read_function, kwargs = inpt
+    df, meta = read_function(path, row_offset=offset, row_limit=chunksize, **kwargs)
+    return df
