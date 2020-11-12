@@ -39,8 +39,8 @@ the original applications in this regard.**
   + [More reading options](#more-reading-options)
     - [Reading only the headers](#reading-only-the-headers)
     - [Reading selected columns](#reading-selected-columns)
-    - [Reading rows in chunks](#reading-rows-in-chunks)
     - [Reading files in parallel processes](#reading-files-in-parallel-processes)
+    - [Reading rows in chunks](#reading-rows-in-chunks)
     - [Reading value labels](#reading-value-labels)
     - [Missing Values](#missing-values)
       + [SPSS](#spss)
@@ -323,6 +323,44 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variab
 
 ```
 
+#### Reading files in parallel processes
+
+A challenge when reading large files is the time consumed in the operation. In order to alleviate this
+pyreadstat provides a function "read_file_multiprocessing" to read a file in parallel processes using the python multiprocessing library. As it reads the whole file in one go you need to have enough RAM for the operation. If
+that is not the case look at Reading rows in chunks (next section)
+
+Speed ups in the process will depend on a number of factors such as number of processes available, RAM, 
+content of the file etc.
+
+```python
+import pyreadstat
+
+fpath = "path/to/file.sav" 
+df, meta = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, num_processes=4) 
+```
+
+num_processes is the number of workers and it defaults to 4 (or the number of cores if less than 4). You can play with it to see where you 
+get the best performance. You can also get the number of all available workers like this:
+
+```
+import multiprocessing
+num_processes = multiprocessing.cpu_count()
+```
+
+**Notes for windows**
+
+1. For this to work you must include a __name__ == "__main__" section in your script. See [this issue](#85)
+for more details.
+
+```
+import pyreadstat
+
+if __name__ == "__main__":
+     df, meta = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, 'sample.sav')
+```
+2. If you include too many workers or you run out of RAM you main get a message about not enough page file
+size. See [this issue](#87)
+
 #### Reading rows in chunks
 
 Reading large files with hundred of thouseds of rows can be challenging due to memory restrictions. In such cases, it may be helpful
@@ -353,18 +391,19 @@ for df, meta in reader:
     # do some cool calculations here for the chunk
 ```
 
-#### Reading files in parallel processes
-
-Another challenge when reading large files is the time consumed in the operation. In order to alleviate this
-pyreadstat provides a function "read_file_multiprocessing" to read a file in parallel processes using the python multiprocessing library.
-Speed ups in the process will depend on a number of factors such as number of processes available, RAM, 
-content of the file etc.
+For very large files it may be convienient to speed up the process by reading each chunks in parallel. For
+this purpose you can pass the argument multiprocess=True. This is a combination of read_file_in_chunks and
+read_file_multiprocessing. Here you can use the arguments row_offset and row_limit to start reading the
+file from an offest and stop after a row_offset+row_limit. 
 
 ```python
 import pyreadstat
+fpath = "path/to/file.sav"
+reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 10000, multiprocess=True, num_processes=4)
 
-fpath = "path/to/file.sav" 
-df, meta = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath) 
+for df, meta in reader:
+    print(df) # df will contain 10000 rows except for the last one
+    # do some cool calculations here for the chunk
 ```
 
 #### Reading value labels
