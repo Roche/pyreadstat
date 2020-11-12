@@ -610,6 +610,7 @@ class TestBasic(unittest.TestCase):
             pass
         
         currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
+        #import pdb;pdb.set_trace()
         self.assertTrue(df.equals(currow))
 
     # read multiprocessing
@@ -620,6 +621,18 @@ class TestBasic(unittest.TestCase):
         df_single, meta_single = pyreadstat.read_sav(fpath)
         self.assertTrue(df_multi.equals(df_single))
         self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
+
+    def test_chunk_reader_multiprocess(self):
+
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True)
+        alldfs = list()
+        for df, meta in reader:
+            alldfs.append(df)
+        df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
+        df_single, meta_single = pyreadstat.read_sav(fpath)
+        #import pdb;pdb.set_trace()
+        self.assertTrue(df_multi.equals(df_single))
 
     # writing
 

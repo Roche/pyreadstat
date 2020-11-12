@@ -532,7 +532,8 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 
 # convenience functions to read in chunks
 
-def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, limit=0, **kwargs):
+def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, limit=0,
+                        multiprocess=False, num_processes=4, **kwargs):
     """
     Returns a generator that will allow to read a file in chunks.
 
@@ -548,6 +549,10 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             start reading the file after certain number of rows
         limit : integer, optional
             stop reading the file after certain number of rows, will be added to offset
+        multiprocess: integer, optional
+            use multiprocessing to read each chunk?
+        num_processes: bool, optional
+            in case multiprocess is true, how many workers/processes to spawn?
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.
 
@@ -569,17 +574,31 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
     if "row_limit" in kwargs:
         _ = kwargs.pop("row_limit")
 
-    maxrow = offset + chunksize
-    limit = offset + limit
+    if "num_processes" in kwargs:
+        _ = kwargs.pop("num_processes")
+
+    _, meta = read_function(file_path, metadataonly=True)
+    numrows = meta.number_rows
+    if numrows:
+        if not limit:
+            limit = numrows
+        else:
+            limit = min(offset+limit, numrows)
+    else:
+        if limit:
+            limit = offset + limit
     df = [0]
     while len(df):
-        if limit and maxrow > limit:
+        if limit and (offset >= limit):
             break
-        df, meta = read_function(file_path, row_offset=offset, row_limit=chunksize, **kwargs)
+        if multiprocess:
+            df, meta = read_file_multiprocessing(read_function, file_path, num_processes=num_processes,
+                                                 row_offset=offset, row_limit=chunksize, **kwargs)
+        else:
+            df, meta = read_function(file_path, row_offset=offset, row_limit=chunksize, **kwargs)
         if len(df):
             yield df, meta
             offset += chunksize
-            maxrow += chunksize
 
 def read_file_multiprocessing(read_function, file_path, num_processes=None, **kwargs):
     """
@@ -612,11 +631,19 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
     numrows = meta.number_rows
     row_offset = kwargs.pop("row_offset", 0)
     row_limit = kwargs.pop("row_limit", math.inf)
-    numrows = min(max(numrows - row_offset, 0), row_limit)
-    chunksize = numrows // num_processes + (1 if 0 < numrows % num_processes else 0)
-    offsets = [row_offset + indx * chunksize for indx in range(num_processes)] 
-    jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset in offsets]
-
+    if not numrows:
+        raise Exception("The number of rows of the file cannot be determined")
+    numrows = min(max(numrows - row_offset, 0), row_limit)        
+    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes)]
+    offsets = list()
+    prev_offset = row_offset
+    prev_div = 0
+    for indx, div in enumerate(divs):
+        offset = prev_offset + prev_div
+        prev_offset = offset
+        prev_div = div
+        offsets.append((offset, div))
+    jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset, chunksize in offsets]
     pool = mp.Pool(processes=num_processes)
     chunks = pool.map(worker, jobs)
     final = pd.concat(chunks, axis=0, ignore_index=True)
