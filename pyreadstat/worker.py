@@ -20,6 +20,6 @@ Functions to work with multiprocessing
 """
 
 def worker(inpt):
-    offset, chunksize, path, read_function, kwargs = inpt
-    df, meta = read_function(path, row_offset=offset, row_limit=chunksize, **kwargs)
-    return df
+    read_function, path, row_offset, row_limit, kwargs = inpt
+    df, meta = read_function(path, row_offset=row_offset, row_limit=row_limit, **kwargs)
+    return df 

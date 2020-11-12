@@ -20,6 +20,7 @@
 ## if want to profile: # cython: profile=True
 
 import multiprocessing as mp
+import math
 
 import pandas as pd
 
@@ -591,10 +592,9 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
         file_path : string
             path to the file to be read
         num_processes : integer, optional
-            number of processes to spawn, by default the total number of cores
+            number of processes to spawn, by default 4
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. 
-            row_limit and row_offset will be discarded if present as they are used internally.
 
     Returns
     -------
@@ -603,21 +603,19 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
         metadata :
             object with metadata. Look at the documentation for more information.
     """
-    if "row_offset" in kwargs:
-        _ = kwargs.pop("row_offset")
-
-    if "row_limit" in kwargs:
-        _ = kwargs.pop("row_limit")
 
     if not num_processes:
-        num_processes = mp.cpu_count()
+        #num_processes = mp.cpu_count()
+        # let's be more conservative with the number of workers
+        num_processes = 4
     _, meta = read_function(file_path, metadataonly=True)
     numrows = meta.number_rows
-    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes)]
-    chunksize = divs[0]
-    offsets = [indx*chunksize for indx in range(num_processes)] 
-
-    jobs = [(x, chunksize, file_path, read_function, kwargs) for x in offsets]
+    row_offset = kwargs.pop("row_offset", 0)
+    row_limit = kwargs.pop("row_limit", math.inf)
+    numrows = min(max(numrows - row_offset, 0), row_limit)
+    chunksize = numrows // num_processes + (1 if 0 < numrows % num_processes else 0)
+    offsets = [row_offset + indx * chunksize for indx in range(num_processes)] 
+    jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset in offsets]
 
     pool = mp.Pool(processes=num_processes)
     chunks = pool.map(worker, jobs)
