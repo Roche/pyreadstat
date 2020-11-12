@@ -20,7 +20,6 @@
 ## if want to profile: # cython: profile=True
 
 import multiprocessing as mp
-import math
 
 import pandas as pd
 
@@ -630,7 +629,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
     _, meta = read_function(file_path, metadataonly=True)
     numrows = meta.number_rows
     row_offset = kwargs.pop("row_offset", 0)
-    row_limit = kwargs.pop("row_limit", math.inf)
+    row_limit = kwargs.pop("row_limit", float('inf'))
     if not numrows:
         raise Exception("The number of rows of the file cannot be determined")
     numrows = min(max(numrows - row_offset, 0), row_limit)        
