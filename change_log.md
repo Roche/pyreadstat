@@ -1,4 +1,7 @@
-# 1.0.3 (github, pypi and conda )
+# 1.0.4 (github, pypi and conda 2020.11.12)
+* read_file_in_chunks can read chunks with multiprocessing.
+
+# 1.0.3 (github, pypi 2020.11.06 and conda 2020.11.10)
 * Improved performance specially for big files.
 * added a method to read files in parallel
 * added license information to setup.py
