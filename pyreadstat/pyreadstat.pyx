@@ -566,6 +566,9 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
         it : generator
             A generator that reads the file in chunks.
     """
+
+    if read_function == read_sas7bcat:
+        raise Exception("read_sas7bcat not supported")
     
     if "row_offset" in kwargs:
         _ = kwargs.pop("row_offset")
@@ -610,7 +613,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
         file_path : string
             path to the file to be read
         num_processes : integer, optional
-            number of processes to spawn, by default 4
+            number of processes to spawn, by default the min 4 and the max cores on the computer
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. 
 
@@ -622,10 +625,12 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
             object with metadata. Look at the documentation for more information.
     """
 
+    if read_function == read_sas7bcat:
+        raise Exception("read_sas7bcat not supported")
+
     if not num_processes:
-        #num_processes = mp.cpu_count()
         # let's be more conservative with the number of workers
-        num_processes = 4
+        num_processes = min(mp.cpu_count(), 4)
     _, meta = read_function(file_path, metadataonly=True)
     numrows = meta.number_rows
     row_offset = kwargs.pop("row_offset", 0)
@@ -644,7 +649,12 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
         offsets.append((offset, div))
     jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset, chunksize in offsets]
     pool = mp.Pool(processes=num_processes)
-    chunks = pool.map(worker, jobs)
+    try:
+        chunks = pool.map(worker, jobs)
+    except:
+        raise
+    finally:
+        pool.close()
     final = pd.concat(chunks, axis=0, ignore_index=True)
     return final, meta
 

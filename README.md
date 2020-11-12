@@ -339,7 +339,7 @@ fpath = "path/to/file.sav"
 df, meta = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, num_processes=4) 
 ```
 
-num_processes is the number of workers and it defaults to 4. You can play with it to see where you 
+num_processes is the number of workers and it defaults to 4 (or the number of cores if less than 4). You can play with it to see where you 
 get the best performance. You can also get the number of all available workers like this:
 
 ```
