@@ -8074,7 +8074,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
  *         if os.name == "nt":
  * 
  *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)             # <<<<<<<<<<<<<<
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
+ *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
  *             assign_fd(io_ctx, fd)
  */
     __pyx_t_2 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 747, __pyx_L1_error)
@@ -8085,15 +8085,15 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
     /* "pyreadstat/_readstat_parser.pyx":748
  * 
  *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)             # <<<<<<<<<<<<<<
+ *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)             # <<<<<<<<<<<<<<
  *             assign_fd(io_ctx, fd)
  *             return fd
  */
-    __pyx_v_fd = _wsopen(__pyx_v_u16_path, (_O_RDONLY | _O_BINARY), _SH_DENYRD, 0);
+    __pyx_v_fd = _wsopen(__pyx_v_u16_path, (_O_RDONLY | _O_BINARY), _SH_DENYWR, 0);
 
     /* "pyreadstat/_readstat_parser.pyx":749
  *             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
+ *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
  *             assign_fd(io_ctx, fd)             # <<<<<<<<<<<<<<
  *             return fd
  *         #ELSE:
@@ -8101,7 +8101,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
     assign_fd(__pyx_v_io_ctx, __pyx_v_fd);
 
     /* "pyreadstat/_readstat_parser.pyx":750
- *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
+ *             fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
  *             assign_fd(io_ctx, fd)
  *             return fd             # <<<<<<<<<<<<<<
  *         #ELSE:

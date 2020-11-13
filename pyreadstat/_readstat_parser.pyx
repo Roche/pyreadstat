@@ -745,7 +745,7 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         if os.name == "nt":
             
             u16_path = PyUnicode_AsWideCharString(u8_path, &length)
-            fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYRD, 0)
+            fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
             assign_fd(io_ctx, fd)
             return fd
         #ELSE:

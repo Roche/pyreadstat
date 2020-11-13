@@ -406,6 +406,8 @@ for df, meta in reader:
     # do some cool calculations here for the chunk
 ```
 
+**For Windows, please check the notes on the previous section reading files in parallel processes**
+
 #### Reading value labels
 
 For sas7bdat files, value labels are stored in separated sas7bcat files. You can use them in combination with the sas7bdat
