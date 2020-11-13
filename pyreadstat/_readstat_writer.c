@@ -8248,7 +8248,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *         if os.name == "nt":
  *             u16_path = PyUnicode_AsWideCharString(filename_path, &length)             # <<<<<<<<<<<<<<
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
- *             fd = _wsopen(u16_path, flags, _SH_DENYRD, _S_IREAD | _S_IWRITE)
+ *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
  */
     __pyx_v_u16_path = PyUnicode_AsWideCharString(__pyx_v_filename_path, (&__pyx_v_length));
 
@@ -8256,7 +8256,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *         if os.name == "nt":
  *             u16_path = PyUnicode_AsWideCharString(filename_path, &length)
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY             # <<<<<<<<<<<<<<
- *             fd = _wsopen(u16_path, flags, _SH_DENYRD, _S_IREAD | _S_IWRITE)
+ *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
  *         else:
  */
     __pyx_v_flags = ((_O_WRONLY | _O_CREAT) | _O_BINARY);
@@ -8264,11 +8264,11 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
     /* "pyreadstat/_readstat_writer.pyx":498
  *             u16_path = PyUnicode_AsWideCharString(filename_path, &length)
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
- *             fd = _wsopen(u16_path, flags, _SH_DENYRD, _S_IREAD | _S_IWRITE)             # <<<<<<<<<<<<<<
+ *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)             # <<<<<<<<<<<<<<
  *         else:
  *             filename_bytes = filename_path.encode("utf-8")
  */
-    __pyx_v_fd = _wsopen(__pyx_v_u16_path, __pyx_v_flags, _SH_DENYRD, (_S_IREAD | _S_IWRITE));
+    __pyx_v_fd = _wsopen(__pyx_v_u16_path, __pyx_v_flags, _SH_DENYRW, (_S_IREAD | _S_IWRITE));
 
     /* "pyreadstat/_readstat_writer.pyx":495
  *     IF PY_MAJOR_VERSION >2:
@@ -8281,7 +8281,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
   }
 
   /* "pyreadstat/_readstat_writer.pyx":500
- *             fd = _wsopen(u16_path, flags, _SH_DENYRD, _S_IREAD | _S_IWRITE)
+ *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
  *         else:
  *             filename_bytes = filename_path.encode("utf-8")             # <<<<<<<<<<<<<<
  *             path = <char *> filename_bytes

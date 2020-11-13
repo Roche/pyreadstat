@@ -1,3 +1,6 @@
+# 1.0.5 (github, pypi and conda 2020.11.13)
+* fixed sharing permissions when reading files on windows, fixes #87
+
 # 1.0.4 (github, pypi and conda 2020.11.12)
 * read_file_in_chunks can read chunks with multiprocessing.
 
