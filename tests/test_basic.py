@@ -918,6 +918,14 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "hebrews.sav"))
         self.assertTrue(df.columns[0] == "ותק_ב")
 
+    def test_sav_original_var_types(self):
+        # a file with a varname with international characters
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "test_width.sav"))
+        self.assertEqual(meta.original_variable_types['StartDate'],'A1024')
+        self.assertEqual(meta.original_variable_types['ResponseId'],'A18')
+        self.assertEqual(meta.original_variable_types['Duration__in_seconds_'],'F40.2')
+        self.assertEqual(meta.original_variable_types['Finished'],'F1.0')
+
     def test_sav_write_longstr(self):
         path = os.path.join(self.write_folder, "longstr.sav")
         pyreadstat.write_sav(self.df_longstr, path, variable_display_width={"v1": 1000})
@@ -925,7 +933,13 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.variable_display_width['v1']==1000)
         self.assertTrue(len(df.iloc[0,0])==781)
         
-        
+    def test_sas7bdat_file_label_linux(self):
+        "testing file label for file produced on linux"
+        path = os.path.join(self.basic_data_folder, "test_file_label_linux.sas7bdat")
+        df, meta = pyreadstat.read_sas7bdat(path)
+        self.assertEqual(meta.file_label, "mytest label")
+        self.assertEqual(meta.table_name, "TEST_DATA")
+
 
 if __name__ == '__main__':
 
