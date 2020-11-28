@@ -189,7 +189,7 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         retval = READSTAT_ERROR_UNSUPPORTED_CHARSET;
         goto cleanup;
     }
-    memcpy(hinfo->file_label, header_start.file_label, sizeof(header_start.file_label));
+    memcpy(hinfo->table_name, header_start.table_name, sizeof(header_start.table_name));
     if (io->seek(hinfo->pad1, READSTAT_SEEK_CUR, io->io_ctx) == -1) {
         retval = READSTAT_ERROR_SEEK;
         goto cleanup;
@@ -317,16 +317,16 @@ readstat_error_t sas_write_header(readstat_writer_t *writer, sas_header_info_t *
     struct tm epoch_tm = { .tm_year = 60, .tm_mday = 1 };
     time_t epoch = mktime(&epoch_tm);
 
-    memset(header_start.file_label, ' ', sizeof(header_start.file_label));
+    memset(header_start.table_name, ' ', sizeof(header_start.table_name));
 
-    size_t file_label_len = strlen(writer->file_label);
-    if (file_label_len > sizeof(header_start.file_label))
-        file_label_len = sizeof(header_start.file_label);
+    size_t table_name_len = strlen(writer->table_name);
+    if (table_name_len > sizeof(header_start.table_name))
+        table_name_len = sizeof(header_start.table_name);
 
-    if (file_label_len) {
-        memcpy(header_start.file_label, writer->file_label, file_label_len);
+    if (table_name_len) {
+        memcpy(header_start.table_name, writer->table_name, table_name_len);
     } else {
-        memcpy(header_start.file_label, "DATASET", sizeof("DATASET")-1);
+        memcpy(header_start.table_name, "DATASET", sizeof("DATASET")-1);
     }
 
     retval = readstat_write_bytes(writer, &header_start, sizeof(sas_header_start_t));
@@ -379,7 +379,7 @@ readstat_error_t sas_write_header(readstat_writer_t *writer, sas_header_info_t *
         goto cleanup;
 
     sas_header_end_t header_end = {
-        .host = "W32_VSPRO"
+        .host = "9.0401M6Linux"
     };
 
     char release[sizeof(header_end.release)+1] = { 0 };

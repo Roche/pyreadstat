@@ -17,7 +17,8 @@ typedef struct sas_header_start_s {
     unsigned char encoding;
     unsigned char mystery5[13];
     char          file_type[8];
-    char          file_label[64];
+    char          table_name[32];
+    unsigned char mystery6[32];
     char          file_info[8];
 } sas_header_start_t;
 
@@ -47,7 +48,8 @@ typedef struct sas_header_info_s {
     int64_t  header_size;
     time_t   creation_time;
     time_t   modification_time;
-    char     file_label[64];
+    char     table_name[32];
+    char     file_label[256];
     char    *encoding;
 } sas_header_info_t;
 

@@ -85,7 +85,8 @@ typedef struct sas7bdat_ctx_s {
     time_t         ctime;
     time_t         mtime;
     int            version;
-    char           file_label[4*64+1];
+    char           table_name[4*32+1];
+    char           file_label[4*256+1];
     char           error_buf[2048];
 
     unsigned int  rdc_compression:1;
@@ -285,6 +286,7 @@ static readstat_error_t sas7bdat_parse_column_name_subheader(const char *subhead
     int i;
     const char *cnp = &subheader[signature_len+8];
     uint16_t remainder = sas_read2(&subheader[signature_len], ctx->bswap);
+    int off;
 
     if (remainder != sas_subheader_remainder(len, signature_len)) {
         retval = READSTAT_ERROR_PARSE;
@@ -298,6 +300,39 @@ static readstat_error_t sas7bdat_parse_column_name_subheader(const char *subhead
 
     for (i=ctx->col_names_count-cmax; i<ctx->col_names_count; i++) {
         ctx->col_info[i].name_ref = sas7bdat_parse_text_ref(cnp, ctx);
+        if (i == 0) {
+            if (ctx->text_blobs == NULL || ctx->text_blob_lengths == NULL) {
+                retval = READSTAT_ERROR_PARSE;
+                goto cleanup;
+            }
+            if (ctx->version < 9) {
+                off = 36;
+            } else {
+                if (ctx->text_blob_lengths[0] < 19) {
+                    retval = READSTAT_ERROR_PARSE;
+                    goto cleanup;
+                }
+                if (!memcmp(&ctx->text_blobs[0][12], "SASYZCR", 7)) {
+                        off = 44;
+                } else {
+                    off = ctx->u64 ? 36 : 12;
+                }
+            }
+            if (ctx->col_info[0].name_ref.offset >=
+                ctx->text_blob_lengths[0] ||
+                ctx->col_info[0].name_ref.offset < off) {
+                retval = READSTAT_ERROR_PARSE;
+                goto cleanup;
+            }
+            retval = readstat_convert(ctx->file_label,
+                                      sizeof(ctx->file_label),
+                                      &ctx->text_blobs[0][off],
+                                      ctx->col_info[0].name_ref.offset - off,
+                                      ctx->converter
+                                      );
+            if (retval != READSTAT_OK)
+                goto cleanup;
+        }
         cnp += 8;
     }
 
@@ -712,6 +747,7 @@ static readstat_error_t sas7bdat_submit_columns(sas7bdat_ctx_t *ctx, int compres
         readstat_metadata_t metadata = {
             .row_count = ctx->row_limit,
             .var_count = ctx->column_count,
+            .table_name = ctx->table_name,
             .file_label = ctx->file_label,
             .file_encoding = ctx->input_encoding, /* orig encoding? */
             .creation_time = ctx->ctime,
@@ -1219,8 +1255,8 @@ readstat_error_t readstat_parse_sas7bdat(readstat_parser_t *parser, const char *
         ctx->converter = converter;
     }
 
-    if ((retval = readstat_convert(ctx->file_label, sizeof(ctx->file_label),
-                hinfo->file_label, sizeof(hinfo->file_label), ctx->converter)) != READSTAT_OK) {
+    if ((retval = readstat_convert(ctx->table_name, sizeof(ctx->table_name),
+                hinfo->table_name, sizeof(hinfo->table_name), ctx->converter)) != READSTAT_OK) {
         goto cleanup;
     }
 
