@@ -940,6 +940,13 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.file_label, "mytest label")
         self.assertEqual(meta.table_name, "TEST_DATA")
 
+    def test_sas7bdat_file_label_windows(self):
+        "testing file label for file produced on windows"
+        path = os.path.join(self.basic_data_folder, "test_file_label_win.sas7bdat")
+        df, meta = pyreadstat.read_sas7bdat(path)
+        self.assertEqual(meta.file_label, "mytest label")
+        self.assertEqual(meta.table_name, "TEST_DATA")
+
 
 if __name__ == '__main__':
 

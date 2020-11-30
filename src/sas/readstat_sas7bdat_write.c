@@ -158,7 +158,7 @@ static sas7bdat_subheader_t *sas7bdat_subheader_init(uint32_t signature, size_t 
 }
 
 static sas7bdat_subheader_t *sas7bdat_row_size_subheader_init(readstat_writer_t *writer, 
-        sas_header_info_t *hinfo) {
+        sas_header_info_t *hinfo, sas7bdat_column_text_array_t *column_text_array) {
     sas7bdat_subheader_t *subheader = sas7bdat_subheader_init(
             SAS_SUBHEADER_SIGNATURE_ROW_SIZE,
             hinfo->u64 ? 808 : 480);
@@ -185,6 +185,18 @@ static sas7bdat_subheader_t *sas7bdat_row_size_subheader_init(readstat_writer_t 
         memcpy(&subheader->data[36], &ncfl1, sizeof(int32_t));
         memcpy(&subheader->data[52], &page_size, sizeof(int32_t));
         memset(&subheader->data[64], 0xFF, 8);
+    }
+
+    sas_text_ref_t text_ref = { 0 };
+
+    if (writer->file_label[0]) {
+        text_ref = sas7bdat_make_text_ref(column_text_array, writer->file_label);
+        memcpy(&subheader->data[subheader->len-130], &text_ref, sizeof(sas_text_ref_t));
+    }
+
+    if (writer->compression == READSTAT_COMPRESS_ROWS) {
+        text_ref = sas7bdat_make_text_ref(column_text_array, SAS_COMPRESSION_SIGNATURE_RLE);
+        memcpy(&subheader->data[subheader->len-118], &text_ref, sizeof(sas_text_ref_t));
     }
 
     return subheader;
@@ -219,19 +231,13 @@ static sas7bdat_subheader_t *sas7bdat_col_name_subheader_init(readstat_writer_t 
             SAS_SUBHEADER_SIGNATURE_COLUMN_NAME, len);
     memcpy(&subheader->data[signature_len], &remainder, sizeof(uint16_t));
     
-    sas_text_ref_t text_ref = sas7bdat_make_text_ref(column_text_array, "READSTAT");
-    text_ref = sas7bdat_make_text_ref(column_text_array, writer->file_label);
-
     int i;
     char *ptrs = &subheader->data[signature_len+8];
     for (i=0; i<writer->variables_count; i++) {
         readstat_variable_t *variable = readstat_get_variable(writer, i);
         const char *name = readstat_variable_get_name(variable);
-        text_ref = sas7bdat_make_text_ref(column_text_array, name);
-        memcpy(&ptrs[0], &text_ref.index, sizeof(uint16_t));
-        memcpy(&ptrs[2], &text_ref.offset, sizeof(uint16_t));
-        memcpy(&ptrs[4], &text_ref.length, sizeof(uint16_t));
-
+        sas_text_ref_t text_ref = sas7bdat_make_text_ref(column_text_array, name);
+        memcpy(ptrs, &text_ref, sizeof(sas_text_ref_t));
         ptrs += 8;
     }
     return subheader;
@@ -350,7 +356,7 @@ static sas7bdat_subheader_array_t *sas7bdat_subheader_array_init(readstat_writer
     col_name_subheader = sas7bdat_col_name_subheader_init(writer, hinfo, column_text_array);
     col_attrs_subheader = sas7bdat_col_attrs_subheader_init(writer, hinfo);
 
-    sarray->subheaders[idx++] = sas7bdat_row_size_subheader_init(writer, hinfo);
+    sarray->subheaders[idx++] = sas7bdat_row_size_subheader_init(writer, hinfo, column_text_array);
     sarray->subheaders[idx++] = sas7bdat_col_size_subheader_init(writer, hinfo);
 
     col_format_subheaders = calloc(writer->variables_count, sizeof(sas7bdat_subheader_t *));

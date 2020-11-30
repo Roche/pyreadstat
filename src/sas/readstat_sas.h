@@ -108,6 +108,9 @@ typedef struct sas_text_ref_s {
 #define SAS_COMPRESSION_TRUNC  0x01
 #define SAS_COMPRESSION_ROW    0x04
 
+#define SAS_COMPRESSION_SIGNATURE_RLE  "SASYZCRL"
+#define SAS_COMPRESSION_SIGNATURE_RDC  "SASYZCR2"
+
 #define SAS_DEFAULT_FILE_VERSION  9
 
 extern unsigned char sas7bdat_magic_number[32];

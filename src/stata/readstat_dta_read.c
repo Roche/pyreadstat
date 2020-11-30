@@ -1053,7 +1053,7 @@ static readstat_error_t dta_handle_value_labels(dta_ctx_t *ctx) {
                     goto cleanup;
                 }
             }
-        } else if (len > 8) {
+        } else if (len >= 8) {
             if ((retval = dta_read_tag(ctx, "</lbl>")) != READSTAT_OK) {
                 goto cleanup;
             }
