@@ -440,10 +440,8 @@ class TestBasic(unittest.TestCase):
 
     def test_por(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
-        # dates, datetimes and timestamps are not translated but stay as integers, let's just drop them
-        df_pandas_por = self.df_pandas.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        df_pandas_por = self.df_pandas.copy()
         df.columns = [x.lower() for x in df.columns]
-        df = df.drop(labels=["dtime", "mydate", "mytime"], axis=1)
         self.assertTrue(df.equals(df_pandas_por))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_por))
@@ -451,10 +449,8 @@ class TestBasic(unittest.TestCase):
 
     def test_por_formatted(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), apply_value_formats=True, formats_as_category=True)
-        # dates, datetimes and timestamps are not translated but stay as integers, let's just drop them
-        df_pandas_por = self.df_pandas_formatted.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        df_pandas_por = self.df_pandas_formatted.copy()
         df.columns = [x.lower() for x in df.columns]
-        df = df.drop(labels=["dtime", "mydate", "mytime"], axis=1)
         self.assertTrue(df.equals(df_pandas_por))
         self.assertTrue(meta.number_columns == len(self.df_pandas_formatted.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_por))
@@ -485,11 +481,9 @@ class TestBasic(unittest.TestCase):
 
     def test_por_chunks(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), row_limit = 2, row_offset =1)
-        df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
-        # dates, datetimes and timestamps are not translated but stay as integers, let's just drop them
-        df_pandas_por = df_pandas.drop(labels=["dtime", "mydate", "mytime"], axis=1)
+        df_pandas_por = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
+        df_pandas_por.loc[:, 'dtime'] = pd.to_datetime(df_pandas_por.dtime)
         df.columns = [x.lower() for x in df.columns]
-        df = df.drop(labels=["dtime", "mydate", "mytime"], axis=1)
         self.assertTrue(df.equals(df_pandas_por))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_por))
@@ -778,7 +772,6 @@ class TestBasic(unittest.TestCase):
         pyreadstat.write_por(self.df_pandas, path, file_label=file_label, column_labels=col_labels) #, note=file_note)
         df, meta = pyreadstat.read_por(path)
         df.columns = [x.lower() for x in df.columns]
-
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)

@@ -1,3 +1,8 @@
+# 1.0.5 (github, pypi and conda xxx)
+* Updated Readstat to version 1.1.5, this fixes: reading sas7bdat file labels, 
+  reading newer por files date-like columns, and few others.
+* Corrected writing columns with numpy.float32 format.
+ 
 # 1.0.5 (github, pypi and conda 2020.11.13)
 * fixed sharing permissions when reading files on windows, fixes #87
 
