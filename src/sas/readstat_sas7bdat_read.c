@@ -973,7 +973,7 @@ static readstat_error_t sas7bdat_parse_page_pass2(const char *page, size_t page_
              * some files created by Stat/Transfer don't. So verify that the
              * padding is { 0, 0, 0, 0 } or { ' ', ' ', ' ', ' ' } (or that
              * the file is not from Stat/Transfer) before skipping it */
-            if ((shp-page)%8 == 4 && 
+            if ((shp-page)%8 == 4 && shp + 4 <= page + page_size &&
                     (*(uint32_t *)shp == 0x00000000 ||
                      *(uint32_t *)shp == 0x20202020 ||
                      ctx->vendor != READSTAT_VENDOR_STAT_TRANSFER)) {

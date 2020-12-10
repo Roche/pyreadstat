@@ -35,6 +35,7 @@ unsigned char sas7bcat_magic_number[32] = {
 
 /* This table is cobbled together from extant files and:
  * https://support.sas.com/documentation/cdl/en/nlsref/61893/HTML/default/viewer.htm#a002607278.htm
+ * https://support.sas.com/documentation/onlinedoc/dfdmstudio/2.6/dmpdmsug/Content/dfU_Encodings_SAS.html
  *
  * Discrepancies form the official documentation are noted with a comment. It
  * appears that in some instances that SAS software uses a newer encoding than
@@ -56,13 +57,25 @@ static readstat_charset_entry_t _charset_table[] = {
     { .code = 37,    .name = "ISO-8859-9" },
     { .code = 39,    .name = "ISO-8859-11" },
     { .code = 40,    .name = "ISO-8859-15" },
-    { .code = 43,    .name = "CP437" },
-    { .code = 44,    .name = "CP850" },
-    { .code = 45,    .name = "CP852" },
-    { .code = 46,    .name = "CP858" },
-    { .code = 47,    .name = "CP862" },
-    { .code = 51,    .name = "CP866" },
-    { .code = 58,    .name = "CP857" },
+    { .code = 41,    .name = "CP437" },
+    { .code = 42,    .name = "CP850" },
+    { .code = 43,    .name = "CP852" },
+    { .code = 44,    .name = "CP857" },
+    { .code = 45,    .name = "CP858" },
+    { .code = 46,    .name = "CP862" },
+    { .code = 47,    .name = "CP864" },
+    { .code = 48,    .name = "CP865" },
+    { .code = 49,    .name = "CP866" },
+    { .code = 50,    .name = "CP869" },
+    { .code = 51,    .name = "CP874" },
+    { .code = 52,    .name = "CP921" },
+    { .code = 53,    .name = "CP922" },
+    { .code = 54,    .name = "CP1129" },
+    { .code = 55,    .name = "CP720" },
+    { .code = 56,    .name = "CP737" },
+    { .code = 57,    .name = "CP775" },
+    { .code = 58,    .name = "CP860" },
+    { .code = 59,    .name = "CP863" },
     { .code = 60,    .name = "WINDOWS-1250" },
     { .code = 61,    .name = "WINDOWS-1251" },
     { .code = 62,    .name = "WINDOWS-1252" },
@@ -99,6 +112,7 @@ static readstat_charset_entry_t _charset_table[] = {
     { .code = 172,   .name = "ISO-2022-CN-EXT" },
     { .code = 204,   .name = SAS_DEFAULT_STRING_ENCODING }, // "any" in SAS
     { .code = 205,   .name = "GB18030" },
+    { .code = 227,   .name = "ISO-8859-14" },
     { .code = 242,   .name = "ISO-8859-13" },
     { .code = 245,   .name = "MACCROATIAN" },
     { .code = 246,   .name = "MACCYRILLIC" },
