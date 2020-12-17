@@ -747,10 +747,6 @@ user defined missing values in stata/sas where characters (a to z, A to Z, \_) w
 
 pyreadstat builds on top of Readstat and therefore inherits its limitations. Currently those include:
 
-* XPT files v8 with labels are not read correctly (see [here](https://github.com/WizardMac/ReadStat/issues/208))
-* Cannot read sas7bdat dataset labels (see [here](https://github.com/WizardMac/ReadStat/issues/180))
-* Dates, datetimes and times in SPSS POR files are not translated to python dates, datetimes and times, but stay as
-  timestamps. (see [here](https://github.com/WizardMac/ReadStat/issues/160))
 * Cannot write SAS sas7bdat. Those files can be written but not read in
 SAS and therefore are not supported in pyreadstat. (see [here](https://github.com/WizardMac/ReadStat/issues/98))
 
@@ -765,7 +761,7 @@ Converting data types from foreign applications into python some times also brin
  OverflowError: date value out of range
  ```
 
-  The workarounds to deal with this include using the keyword argument disable_datetime_conversion so that you will
+  The workaround is to deal with this include using the keyword argument disable_datetime_conversion so that you will
   get numbers instead of datetime objects or skipping reading such columns with the argument usecols.
 
 ## Python 2.7 support.
@@ -777,8 +773,10 @@ At the moment of writing this document Python 2.7 does not work for windows.
 It does work for Mac and Linux. In Mac and Linux, files cannot be opened
 if the path contains international (non-ascii) characters. As mentioned
 before this bug is not going to be repaired (There is not such issue on
-Python 3).
+Python 3). 
 
+Starting on version 1.0.6 wheels are not produced for Python 2.7 anymore,
+but you can still compile on linux and mac. 
 
 ## Change log
 

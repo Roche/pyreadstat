@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.5 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.6 documentation</title>
   
 
   
@@ -181,6 +181,7 @@ value_labels. Sas7bdat files may have this member populated and its information 
 in the value_labels coming from the sas7bcat file.</p></li>
 <li><p>original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.</p></li>
 <li><p>table_name : table name (string)</p></li>
+<li><p>file_label : file label (SAS) (string)</p></li>
 <li><p>missing_ranges: a dict with keys being variable names. Values are a list of dicts. Each dict contains two
 keys, ‘lo’ and ‘hi’ being the lower boundary and higher boundary for the missing range. Even if the value in both
 lo and hi are the same, the two elements will always be present. This appears for SPSS (sav) files when using the
