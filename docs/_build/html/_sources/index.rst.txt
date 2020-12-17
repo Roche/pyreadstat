@@ -35,6 +35,7 @@ object contains the following fields:
     in the value_labels coming from the sas7bcat file.
   * original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.
   * table_name : table name (string)
+  * file_label : file label (SAS) (string)
   * missing_ranges: a dict with keys being variable names. Values are a list of dicts. Each dict contains two
     keys, 'lo' and 'hi' being the lower boundary and higher boundary for the missing range. Even if the value in both
     lo and hi are the same, the two elements will always be present. This appears for SPSS (sav) files when using the
