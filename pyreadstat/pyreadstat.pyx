@@ -480,7 +480,11 @@ def set_value_labels(dataframe, metadata, formats_as_category=True):
                 if var_name in df_copy.columns:
                     df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
                     if formats_as_category:
-                        df_copy[var_name] = df_copy[var_name].astype("category")
+                        df_copy[var_name] = pd.Categorical(
+                            df_copy[var_name],
+                            ordered = True,
+                            categories = list(dict.fromkeys(labels.values()))
+                        )
 
     return df_copy
 
