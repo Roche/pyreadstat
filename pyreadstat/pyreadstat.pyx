@@ -38,7 +38,7 @@ from worker import worker
 # Parsing functions
 
 def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
-                  formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
+                  formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SAS sas7bdat file.
@@ -61,6 +61,10 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
         formats_as_category : bool, optional
             Will take effect only if the catalog_file was specified. If True the variables whose values were replaced
             by the formats will be transformed into pandas categories.
+        formats_as_ordered_category : bool, optional
+            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
+            the value of formats_as_category.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
@@ -115,7 +119,8 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
 
     if catalog_file:
         _ , catalog = read_sas7bcat(catalog_file, encoding=encoding)
-        data_frame, metadata = set_catalog_to_sas(data_frame, metadata, catalog, formats_as_category=formats_as_category)
+        data_frame, metadata = set_catalog_to_sas(data_frame, metadata, catalog, formats_as_category=formats_as_category, 
+                                formats_as_ordered_category=formats_as_ordered_category)
 
     return data_frame, metadata
 
@@ -182,7 +187,7 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
 
 
 def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
+             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a STATA dta file
@@ -202,6 +207,10 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         formats_as_category : bool, optional
             by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
             for their formatted version will be transformed into pandas categories.
+        formats_as_ordered_category : bool, optional
+            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
+            the value of formats_as_category.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
@@ -253,13 +262,14 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     metadata.file_format = "dta"
 
     if apply_value_formats:
-        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
+        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category,
+                                      formats_as_ordered_category=formats_as_ordered_category)
 
     return data_frame, metadata
 
 
 def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, user_missing=False,
+             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SPSS sav or zsav (compressed) files
@@ -279,6 +289,10 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         formats_as_category : bool, optional
             by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
             for their formatted version will be transformed into pandas categories.
+        formats_as_ordered_category : bool, optional
+            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
+            the value of formats_as_category.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
@@ -330,13 +344,15 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     metadata.file_format = "sav/zsav"
 
     if apply_value_formats:
-        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
+        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category,
+                                      formats_as_ordered_category=formats_as_ordered_category)
 
     return data_frame, metadata
 
 
 def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, str encoding=None, list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
+             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SPSS por file
 
@@ -355,6 +371,10 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
         formats_as_category : bool, optional
             by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
             for their formatted version will be transformed into pandas categories.
+        formats_as_ordered_category : bool, optional
+            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
+            the value of formats_as_category.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
@@ -449,7 +469,7 @@ def read_sas7bcat(str filename_path, str encoding=None):
 # Functions to deal with value labels
 
 
-def set_value_labels(dataframe, metadata, formats_as_category=True):
+def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_ordered_category=False):
     """
     Changes the values in the dataframe according to the value formats in the metadata.
     It will return a copy of the dataframe. If no appropiate formats were found, the result will be an unchanged copy
@@ -463,6 +483,10 @@ def set_value_labels(dataframe, metadata, formats_as_category=True):
             resulting from parsing a file
         formats_as_category : bool, optional
             defaults to True. If True the variables having formats will be transformed into pandas categories.
+        formats_as_ordered_category : bool, optional
+            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
+            the value of formats_as_category.
 
     Returns
     -------
@@ -479,12 +503,22 @@ def set_value_labels(dataframe, metadata, formats_as_category=True):
             if labels:
                 if var_name in df_copy.columns:
                     df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
-                    if formats_as_category:
+                    if formats_as_ordered_category:
+                        categories = list(labels.values())
+                        categories.sort()
+                        df_copy[var_name] = pd.Categorical(
+                            df_copy[var_name],
+                            ordered = True,
+                            categories = categories
+                        )
+                    elif formats_as_category:
                         df_copy[var_name] = df_copy[var_name].astype("category")
+
 
     return df_copy
 
-def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as_category=True):
+def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as_category=True,  
+                       formats_as_ordered_category=False):
     """
     Changes the values in the dataframe and sas_metadata according to the formats in the catalog.
     It will return a copy of the dataframe and metadata. If no appropriate formats were found, the result will
@@ -500,6 +534,10 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
             resulting from parsing a sas7bcat (catalog) file
         formats_as_category : bool, optional
             defaults to True. If True the variables having formats will be transformed into pandas categories.
+        formats_as_ordered_category : bool, optional
+            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
+            the value of formats_as_category.
 
     Returns
     -------
@@ -514,7 +552,8 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
         catalog_metadata_copy = deepcopy(catalog_metadata)
         metadata = deepcopy(sas_metadata)
         metadata.value_labels = catalog_metadata_copy.value_labels
-        df_copy = set_value_labels(sas_dataframe, metadata, formats_as_category=formats_as_category)
+        df_copy = set_value_labels(sas_dataframe, metadata, formats_as_category=formats_as_category,
+                                   formats_as_ordered_category=formats_as_ordered_category)
 
         variable_value_labels = dict()
         for var_name, var_label in metadata.variable_to_label.items():
@@ -663,7 +702,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
 
 def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
-                dict variable_measure=None):
+                dict variable_measure=None, dict variable_format=None):
     """
     Writes a pandas data frame to a SPSS sav or zsav file.
 
@@ -700,21 +739,34 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
     variable_measure: dict, optional
         sets the measure type for a variable. Must be a dictionary with keys being variable names and
         values being strings one of "nominal", "ordinal", "scale" or "unknown" (default).
+    variable_format: dict, optional
+        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        values being strings defining the format. See README, setting variable formats section,
+        for more information.
     """
 
     cdef int file_format_version = 2
+    cdef str var_width
     if compress:
         file_format_version = 3
     cdef table_name = ""
     cdef dict missing_user_values = None
     cdef dict variable_alignment = None
+
+    # formats
+    formats_presets = {'restricted_integer':'N{var_width}', 'integer':'F{var_width}.0'}
+    if variable_format:
+        for col_name, col_format in variable_format.items():
+            if col_format in formats_presets.keys() and col_name in df.columns:
+                var_width = str(len(str(max(df[col_name]))))
+                variable_format[col_name] = formats_presets[col_format].format(var_width=var_width) 
     
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure)
+        variable_alignment, variable_display_width, variable_measure, variable_format)
 
 def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15, 
-            dict variable_value_labels=None, dict missing_user_values=None):
+            dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
     """
     Writes a pandas data frame to a STATA dta file
 
@@ -739,6 +791,10 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
         user defined missing values for numeric variables. Must be a dictionary with keys being variable
         names and values being a list of missing values. Missing values must be a single character
         between a and z.
+    variable_format: dict, optional
+        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        values being strings defining the format. See README, setting variable formats section,
+        for more information.
     """
 
     if version == 15:
@@ -762,12 +818,14 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
     cdef dict variable_alignment = None
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
+    #cdef dict variable_format = None
 
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
      note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
-     variable_display_width, variable_measure)
+     variable_display_width, variable_measure, variable_format)
 
-def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8):
+def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,
+    dict variable_format=None):
     """
     Writes a pandas data frame to a SAS Xport (xpt) file.
     If no table_name is specified the dataset has by default the name DATASET (take it into account if
@@ -789,7 +847,10 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
         name of the dataset, by default DATASET
     file_format_version : int, optional
         XPORT file version, either 8 or 5, default is 8
-
+    variable_format: dict, optional
+        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        values being strings defining the format. See README, setting variable formats section,
+        for more information.
     """
 
     cdef dict variable_value_labels = None
@@ -799,11 +860,12 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
     cdef dict variable_alignment = None
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
+    #cdef dict variable_format = None
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure)
+        variable_alignment,variable_display_width, variable_measure, variable_format)
 
-def write_por(df, str dst_path, str file_label="", list column_labels=None):
+def write_por(df, str dst_path, str file_label="", list column_labels=None, dict variable_format=None):
     """
     Writes a pandas data frame to a SPSS POR file.
 
@@ -818,6 +880,10 @@ def write_por(df, str dst_path, str file_label="", list column_labels=None):
     column_labels : list, optional
         list of labels for columns (variables), must be the same length as the number of columns. Variables with no
         labels must be represented by None.
+    variable_format: dict, optional
+        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        values being strings defining the format. See README, setting variable formats section,
+        for more information.
     """
 
     # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
@@ -830,6 +896,7 @@ def write_por(df, str dst_path, str file_label="", list column_labels=None):
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
     cdef str table_name = ""
+    #cdef dict variable_format = None
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure)
+        variable_alignment,variable_display_width, variable_measure, variable_format)

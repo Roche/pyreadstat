@@ -49,8 +49,9 @@ the original applications in this regard.**
   + [More writing options](#more-writing-options)
     - [File specific options](#file-specific-options)
     - [Writing value labels](#writing-value-labels)
-    - [Writing user defined missing values](writing-user-defined-missing-values)
-    - [Variable type conversion](variable-type-conversion)
+    - [Writing user defined missing values](#writing-user-defined-missing-values)
+    - [Setting variable formats](#setting-variable-formats)
+    - [Variable type conversion](#variable-type-conversion)
 * [Roadmap](#roadmap)
 * [Known limitations](#known-limitations)
 * [Python 2.7 support.](#python-27-support)
@@ -419,8 +420,8 @@ function. The original values will be replaced by the values in the catalog.
 ```python
 import pyreadstat
 
-# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column.
-df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', catalog_file='/path/to/a/file.sas7bcat', formats_as_category=True)
+# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column. There is also formats_as_ordered_category to get an ordered category, this by default is False.
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', catalog_file='/path/to/a/file.sas7bcat', formats_as_category=True, formats_as_ordered_category=False)
 ```
 
 If you prefer to read the sas7bcat file separately, you can apply the formats later with the function set_catalog_to_sas.
@@ -434,8 +435,9 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat')
 # read_sas7bdat returns an emtpy data frame and the catalog
 df_empty, catalog = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bcat')
 # enrich the dataframe with the catalog
-# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column.
-df_enriched, meta_enriched = pyreadstat.set_catalog_to_sas(df, meta, catalog, formats_as_category=True)
+# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column. formats_as_ordered_category is by default False meaning by default categories are not ordered.
+df_enriched, meta_enriched = pyreadstat.set_catalog_to_sas(df, meta, catalog, 
+                             formats_as_category=True, formats_as_ordered_category=False)
 ```
 
 For SPSS and STATA files, the value labels are included in the files. You can choose to replace the values by the labels
@@ -445,8 +447,9 @@ when reading the file using the option apply_value_formats, ...
 import pyreadstat
 
 # apply_value_formats is by default False, so you have to set it to True manually if you want the labels
-# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column.
-df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=True, formats_as_category=True)
+# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column. formats_as_ordered_category is by default False meaning by default categories are not ordered.
+df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=True, 
+                                formats_as_category=True, formats_as_ordered_category=False)
 ```
 
 ... or to do it later with the function set_value_labels:
@@ -457,7 +460,7 @@ import pyreadstat
 # This time no value labels.
 df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=False)
 # now let's add them to a second copy
-df_enriched = pyreadstat.set_value_labels(df, meta, formats_as_category=True)
+df_enriched = pyreadstat.set_value_labels(df, meta, formats_as_category=True, formats_as_ordered_category=False)
 ```
 
 Internally each variable is associated with a label set. This information is stored in meta.variable_to_label. Each
@@ -718,6 +721,47 @@ missing_ranges = {'Var1':['a'], 'Var2': ['b']}
 path = "/path/to/somefile.sav"
 pyreadstat.write_sav(df, path, missing_ranges=missing_ranges, variable_value_labels=variable_value_labels)
 ```
+
+#### Setting variable formats
+
+Numeric types in SPSS, SAS and STATA can have formats that affect how those values are displayed to the user
+in the application. Pyreadstat automatically sets the formatting in some cases, as for example when translating
+dates or datetimes (which in SPSS/SAS/STATA are just numbers with a special format). The user can however specify custom formats
+for their columns with the argument "variable_format", which is
+a dictionary with the column name as key and a string with the format as values:
+
+```python
+import pandas as pd
+import pyreadstat
+
+path = "path/where/to/write/file.sav"
+df = pd.DataFrame({'restricted':[1023, 10], 'integer':[1,2]})
+formats = {'restricted':'N4', 'integer':'F1.0'}
+pyreadstat.write_sav(df, path, variable_format=formats)
+```
+
+The appropiate formats to use are beyond the scope of this documentation. Probably you want to read a file
+produced in the original application and use meta.original_value_formats to get the formats. Otherwise look
+for the documentation of the original application.
+
+##### SPSS
+
+In the case of SPSS we have some presets for some formats:
+* restricted_integer: with leading zeros, equivalent to N + variable width (e.g N4)
+* integer: Numeric with no decimal places, equivalent to F + variable width + ".0" (0 decimal positions). A 
+  pandas column of type integer will also be translated into this format automatically.
+
+```python
+import pandas as pd
+import pyreadstat
+
+path = "path/where/to/write/file.sav"
+df = pd.DataFrame({'restricted':[1023, 10], 'integer':[1,2]})
+formats = {'restricted':'restricted_integer', 'integer':'integer'}
+pyreadstat.write_sav(df, path, variable_format=formats)
+```
+
+There is some information about the possible formats [here](https://www.gnu.org/software/pspp/pspp-dev/html_node/Variable-Record.html).
 
 #### Variable type conversion
 
