@@ -1,3 +1,6 @@
+# 1.0.8 (github, pypi and conda 2021.01.09)
+* fixing order of categories
+
 # 1.0.7 (github, pypi and conda 2021.01.09)
 * Added formats_as_ordered_category to get an ordered category.
 * Added value_formats in order to be able to set the variable format
