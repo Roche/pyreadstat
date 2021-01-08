@@ -10,3 +10,4 @@
 .DS_Store
 dist/
 test_data/write/
+.vscode
