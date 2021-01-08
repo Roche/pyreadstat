@@ -748,7 +748,8 @@ for the documentation of the original application.
 
 In the case of SPSS we have some presets for some formats:
 * restricted_integer: with leading zeros, equivalent to N + variable width (e.g N4)
-* integer: Numeric with no decimal places, equivalent to F + variable width + ".0" (0 decimal positions)
+* integer: Numeric with no decimal places, equivalent to F + variable width + ".0" (0 decimal positions). A 
+  pandas column of type integer will also be translated into this format automatically.
 
 ```python
 import pandas as pd
