@@ -1,3 +1,7 @@
+# 1.0.7 (github, pypi and conda 2021.01.09)
+* Added formats_as_ordered_category to get an ordered category.
+* Added value_formats in order to be able to set the variable format
+  when writing.
 # 1.0.6 (github, pypi and conda 2020.12.17)
 * Updated Readstat to version 1.1.5, this fixes: reading sas7bdat file labels, 
   reading newer por files date-like columns, and few others.
