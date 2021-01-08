@@ -521,7 +521,7 @@ cdef int close_file(int fd):
 cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
-                   dict variable_display_width, dict variable_measure) except *:
+                   dict variable_display_width, dict variable_measure, dict variable_format) except *:
     """
     main entry point for writing all formats. Some parameters are specific for certain file type
     and are even incompatible between them. This function relies on the caller to select the right
@@ -586,6 +586,7 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef pywriter_variable_type curtype
     cdef int max_length
     cdef char *curformat
+    cdef str tempformat
     cdef int col_indx
     cdef bytes cur_col_label
     cdef int col_label_count = 0
@@ -637,7 +638,11 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
             #    max_length = 8
             variable_name = col_names[col_indx]
             variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
-            if curtype in pyrwriter_datetimelike_types:
+            if variable_format:
+                tempformat = variable_format.get(variable_name)
+                if tempformat:
+                   readstat_variable_set_format(variable, tempformat.encode("utf-8")) 
+            if curtype in pyrwriter_datetimelike_types and (variable_format is None or variable_name not in variable_format.keys()):
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
                 readstat_variable_set_format(variable, curformat)
             if col_label_count:

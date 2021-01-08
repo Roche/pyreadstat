@@ -940,6 +940,24 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.file_label, "mytest label")
         self.assertEqual(meta.table_name, "TEST_DATA")
 
+    def test_sav_write_variable_formats(self):
+        "testing variable formats for SAV files"
+        path = os.path.join(self.write_folder, "variable_format.sav")
+        df = pd.DataFrame({'restricted':[1023, 10], 'integer':[1,2]})
+        formats = {'restricted':'restricted_integer', 'integer':'integer'}
+        pyreadstat.write_sav(df, path, variable_format=formats)
+        df2, meta2 = pyreadstat.read_sav(path)
+        self.assertEqual(meta2.original_variable_types['restricted'], "N4")
+        self.assertEqual(meta2.original_variable_types['integer'], "F1.0")
+
+    def test_sav_ordered_categories(self):
+        path = os.path.join(self.basic_data_folder, "ordered_category.sav")
+        df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True)
+        self.assertTrue(df.Col1.cat.ordered)
+        self.assertListEqual(list(df.Col1.cat.categories), ['high', 'low', 'medium'])
+
+        
+
 
 if __name__ == '__main__':
 
