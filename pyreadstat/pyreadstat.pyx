@@ -504,8 +504,15 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                 if var_name in df_copy.columns:
                     df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
                     if formats_as_ordered_category:
-                        categories = list(labels.values())
-                        categories.sort()
+                        categories = list(set(labels.values()))
+                        original_values = list(labels.keys())
+                        original_values.sort()
+                        revdict= dict()
+                        for orival in original_values:
+                            curcat = labels.get(orival)
+                            if not revdict.get(curcat):
+                                revdict[curcat] = orival
+                        categories.sort(key=revdict.get)
                         df_copy[var_name] = pd.Categorical(
                             df_copy[var_name],
                             ordered = True,
