@@ -505,7 +505,7 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                     df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
                     if formats_as_ordered_category:
                         categories = list(labels.values())
-                        categories.sort()
+                        categories.sort(key=labels.get)
                         df_copy[var_name] = pd.Categorical(
                             df_copy[var_name],
                             ordered = True,
