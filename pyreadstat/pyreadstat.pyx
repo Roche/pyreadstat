@@ -671,8 +671,8 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
             object with metadata. Look at the documentation for more information.
     """
 
-    if read_function == read_sas7bcat:
-        raise Exception("read_sas7bcat not supported")
+    if read_function in (read_sas7bcat, read_xport, read_por):
+        raise Exception("read_sas7bcat, read_xport and read_por are not supported")
 
     if not num_processes:
         # let's be more conservative with the number of workers
