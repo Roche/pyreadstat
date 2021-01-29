@@ -238,7 +238,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 if col_type in int_mixed_types:
                     result.append((PYWRITER_INTEGER, 0, 0))
                     continue
-                curtype = type(curseries[0])
+                curtype = type(curseries.iloc[0])
                 equal = check_series_all_same_types(curseries, curtype)
                 #equal = curseries.apply(lambda x: type(x) == curtype)
                 #if not np.all(equal):
