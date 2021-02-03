@@ -204,7 +204,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 result.append((PYWRITER_DOUBLE, 0, 1))
             else:
                 result.append((PYWRITER_DOUBLE, 0, 0))
-        elif col_type == np.bool:
+        elif col_type == bool:
             result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
@@ -212,7 +212,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 result.append((PYWRITER_DATETIME, 0,1))
             else:
                 result.append((PYWRITER_DATETIME, 0,0))
-        elif col_type == np.object or col_type in int_mixed_types:
+        elif col_type == object or col_type in int_mixed_types:
             is_missing = 0
             if curuser_missing:
                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
@@ -251,7 +251,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 result.append((PYWRITER_INTEGER, 0, is_missing))
             elif curtype in float_types:
                 result.append((PYWRITER_DOUBLE, 0, is_missing))
-            elif curtype == np.bool:
+            elif curtype == bool:
                 result.append((PYWRITER_LOGICAL, 0, is_missing))
             elif curtype == str:
                 if is_missing:

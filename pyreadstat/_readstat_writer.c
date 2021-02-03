@@ -1655,6 +1655,7 @@ static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_chr;
 static PyObject *__pyx_builtin_enumerate;
 static PyObject *__pyx_builtin_zip;
+static PyObject *__pyx_builtin_object;
 static const char __pyx_k_x[] = "x";
 static const char __pyx_k__2[] = " ";
 static const char __pyx_k_hi[] = "hi";
@@ -1671,7 +1672,6 @@ static const char __pyx_k_min[] = "min";
 static const char __pyx_k_utc[] = "utc";
 static const char __pyx_k_zip[] = "zip";
 static const char __pyx_k_asm8[] = "asm8";
-static const char __pyx_k_bool[] = "bool";
 static const char __pyx_k_core[] = "core";
 static const char __pyx_k_date[] = "date";
 static const char __pyx_k_days[] = "days";
@@ -1812,7 +1812,6 @@ static PyObject *__pyx_n_s_any;
 static PyObject *__pyx_n_s_asarray;
 static PyObject *__pyx_n_s_asm8;
 static PyObject *__pyx_n_s_astype;
-static PyObject *__pyx_n_s_bool;
 static PyObject *__pyx_n_s_calendar;
 static PyObject *__pyx_n_s_center;
 static PyObject *__pyx_n_s_chr;
@@ -3867,7 +3866,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
  *                 result.append((PYWRITER_DOUBLE, 0, 1))
  *             else:
  *                 result.append((PYWRITER_DOUBLE, 0, 0))             # <<<<<<<<<<<<<<
- *         elif col_type == np.bool:
+ *         elif col_type == bool:
  *             result.append((PYWRITER_LOGICAL, 0,0))
  */
       /*else*/ {
@@ -3902,24 +3901,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
     /* "pyreadstat/_readstat_writer.pyx":207
  *             else:
  *                 result.append((PYWRITER_DOUBLE, 0, 0))
- *         elif col_type == np.bool:             # <<<<<<<<<<<<<<
+ *         elif col_type == bool:             # <<<<<<<<<<<<<<
  *             result.append((PYWRITER_LOGICAL, 0,0))
  *         # np.datetime64[ns]
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_bool); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 207, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyObject_RichCompare(__pyx_v_col_type, __pyx_t_7, Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_6 = PyObject_RichCompare(__pyx_v_col_type, ((PyObject*)&PyBool_Type), Py_EQ); __Pyx_XGOTREF(__pyx_t_6); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
     __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_6); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     if (__pyx_t_11) {
 
       /* "pyreadstat/_readstat_writer.pyx":208
  *                 result.append((PYWRITER_DOUBLE, 0, 0))
- *         elif col_type == np.bool:
+ *         elif col_type == bool:
  *             result.append((PYWRITER_LOGICAL, 0,0))             # <<<<<<<<<<<<<<
  *         # np.datetime64[ns]
  *         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
@@ -3943,7 +3936,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
       /* "pyreadstat/_readstat_writer.pyx":207
  *             else:
  *                 result.append((PYWRITER_DOUBLE, 0, 0))
- *         elif col_type == np.bool:             # <<<<<<<<<<<<<<
+ *         elif col_type == bool:             # <<<<<<<<<<<<<<
  *             result.append((PYWRITER_LOGICAL, 0,0))
  *         # np.datetime64[ns]
  */
@@ -4085,7 +4078,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
  *                 result.append((PYWRITER_DATETIME, 0,1))
  *             else:
  *                 result.append((PYWRITER_DATETIME, 0,0))             # <<<<<<<<<<<<<<
- *         elif col_type == np.object or col_type in int_mixed_types:
+ *         elif col_type == object or col_type in int_mixed_types:
  *             is_missing = 0
  */
       /*else*/ {
@@ -4120,17 +4113,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
     /* "pyreadstat/_readstat_writer.pyx":215
  *             else:
  *                 result.append((PYWRITER_DATETIME, 0,0))
- *         elif col_type == np.object or col_type in int_mixed_types:             # <<<<<<<<<<<<<<
+ *         elif col_type == object or col_type in int_mixed_types:             # <<<<<<<<<<<<<<
  *             is_missing = 0
  *             if curuser_missing:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_object); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 215, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyObject_RichCompare(__pyx_v_col_type, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __pyx_t_3 = PyObject_RichCompare(__pyx_v_col_type, __pyx_builtin_object, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
     __pyx_t_14 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_14 < 0)) __PYX_ERR(0, 215, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (!__pyx_t_14) {
@@ -4150,7 +4137,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
 
       /* "pyreadstat/_readstat_writer.pyx":216
  *                 result.append((PYWRITER_DATETIME, 0,0))
- *         elif col_type == np.object or col_type in int_mixed_types:
+ *         elif col_type == object or col_type in int_mixed_types:
  *             is_missing = 0             # <<<<<<<<<<<<<<
  *             if curuser_missing:
  *                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
@@ -4158,7 +4145,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
       __pyx_v_is_missing = 0;
 
       /* "pyreadstat/_readstat_writer.pyx":217
- *         elif col_type == np.object or col_type in int_mixed_types:
+ *         elif col_type == object or col_type in int_mixed_types:
  *             is_missing = 0
  *             if curuser_missing:             # <<<<<<<<<<<<<<
  *                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
@@ -4211,7 +4198,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
         __pyx_t_7 = 0;
 
         /* "pyreadstat/_readstat_writer.pyx":217
- *         elif col_type == np.object or col_type in int_mixed_types:
+ *         elif col_type == object or col_type in int_mixed_types:
  *             is_missing = 0
  *             if curuser_missing:             # <<<<<<<<<<<<<<
  *                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
@@ -4760,7 +4747,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
  *                 result.append((PYWRITER_INTEGER, 0, is_missing))
  *             elif curtype in float_types:             # <<<<<<<<<<<<<<
  *                 result.append((PYWRITER_DOUBLE, 0, is_missing))
- *             elif curtype == np.bool:
+ *             elif curtype == bool:
  */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_writer_float_types == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
@@ -4774,7 +4761,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
  *                 result.append((PYWRITER_INTEGER, 0, is_missing))
  *             elif curtype in float_types:
  *                 result.append((PYWRITER_DOUBLE, 0, is_missing))             # <<<<<<<<<<<<<<
- *             elif curtype == np.bool:
+ *             elif curtype == bool:
  *                 result.append((PYWRITER_LOGICAL, 0, is_missing))
  */
         __pyx_t_6 = __Pyx_PyInt_From___pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type(__pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_DOUBLE); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 253, __pyx_L1_error)
@@ -4800,7 +4787,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
  *                 result.append((PYWRITER_INTEGER, 0, is_missing))
  *             elif curtype in float_types:             # <<<<<<<<<<<<<<
  *                 result.append((PYWRITER_DOUBLE, 0, is_missing))
- *             elif curtype == np.bool:
+ *             elif curtype == bool:
  */
         goto __pyx_L23;
       }
@@ -4808,24 +4795,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
       /* "pyreadstat/_readstat_writer.pyx":254
  *             elif curtype in float_types:
  *                 result.append((PYWRITER_DOUBLE, 0, is_missing))
- *             elif curtype == np.bool:             # <<<<<<<<<<<<<<
+ *             elif curtype == bool:             # <<<<<<<<<<<<<<
  *                 result.append((PYWRITER_LOGICAL, 0, is_missing))
  *             elif curtype == str:
  */
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_bool); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 254, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_v_curtype), __pyx_t_7, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_v_curtype), ((PyObject*)&PyBool_Type), Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
       __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       if (__pyx_t_11) {
 
         /* "pyreadstat/_readstat_writer.pyx":255
  *                 result.append((PYWRITER_DOUBLE, 0, is_missing))
- *             elif curtype == np.bool:
+ *             elif curtype == bool:
  *                 result.append((PYWRITER_LOGICAL, 0, is_missing))             # <<<<<<<<<<<<<<
  *             elif curtype == str:
  *                 if is_missing:
@@ -4851,7 +4832,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
         /* "pyreadstat/_readstat_writer.pyx":254
  *             elif curtype in float_types:
  *                 result.append((PYWRITER_DOUBLE, 0, is_missing))
- *             elif curtype == np.bool:             # <<<<<<<<<<<<<<
+ *             elif curtype == bool:             # <<<<<<<<<<<<<<
  *                 result.append((PYWRITER_LOGICAL, 0, is_missing))
  *             elif curtype == str:
  */
@@ -4859,7 +4840,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
       }
 
       /* "pyreadstat/_readstat_writer.pyx":256
- *             elif curtype == np.bool:
+ *             elif curtype == bool:
  *                 result.append((PYWRITER_LOGICAL, 0, is_missing))
  *             elif curtype == str:             # <<<<<<<<<<<<<<
  *                 if is_missing:
@@ -4976,7 +4957,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
         /* "pyreadstat/_readstat_writer.pyx":256
- *             elif curtype == np.bool:
+ *             elif curtype == bool:
  *                 result.append((PYWRITER_LOGICAL, 0, is_missing))
  *             elif curtype == str:             # <<<<<<<<<<<<<<
  *                 if is_missing:
@@ -5318,7 +5299,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_get_pandas_column_types
       /* "pyreadstat/_readstat_writer.pyx":215
  *             else:
  *                 result.append((PYWRITER_DATETIME, 0,0))
- *         elif col_type == np.object or col_type in int_mixed_types:             # <<<<<<<<<<<<<<
+ *         elif col_type == object or col_type in int_mixed_types:             # <<<<<<<<<<<<<<
  *             is_missing = 0
  *             if curuser_missing:
  */
@@ -12059,7 +12040,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_asarray, __pyx_k_asarray, sizeof(__pyx_k_asarray), 0, 0, 1, 1},
   {&__pyx_n_s_asm8, __pyx_k_asm8, sizeof(__pyx_k_asm8), 0, 0, 1, 1},
   {&__pyx_n_s_astype, __pyx_k_astype, sizeof(__pyx_k_astype), 0, 0, 1, 1},
-  {&__pyx_n_s_bool, __pyx_k_bool, sizeof(__pyx_k_bool), 0, 0, 1, 1},
   {&__pyx_n_s_calendar, __pyx_k_calendar, sizeof(__pyx_k_calendar), 0, 0, 1, 1},
   {&__pyx_n_s_center, __pyx_k_center, sizeof(__pyx_k_center), 0, 0, 1, 1},
   {&__pyx_n_s_chr, __pyx_k_chr, sizeof(__pyx_k_chr), 0, 0, 1, 1},
@@ -12175,6 +12155,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_chr = __Pyx_GetBuiltinName(__pyx_n_s_chr); if (!__pyx_builtin_chr) __PYX_ERR(0, 56, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 189, __pyx_L1_error)
   __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 189, __pyx_L1_error)
+  __pyx_builtin_object = __Pyx_GetBuiltinName(__pyx_n_s_object); if (!__pyx_builtin_object) __PYX_ERR(0, 215, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
