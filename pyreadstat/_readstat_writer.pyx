@@ -611,7 +611,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         if not type(filename_path) == str and not isinstance(filename_path, Path):
             raise PyreadstatError("filename_path must be either string or pathlib.Path")
         if isinstance(filename_path, Path):
-            filename_path = str(filename_path.resolve())
+            filename_path = str(filename_path.expanduser().resolve())
     else:
         if not type(filename_path) == str:
             raise PyreadstatError("filename_path must be string")
