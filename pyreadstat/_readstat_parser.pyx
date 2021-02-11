@@ -24,6 +24,12 @@ from libc.math cimport NAN, floor
 #from datetime import timedelta, datetime
 from collections import OrderedDict
 import os
+is_pathlib_available = False
+try:
+    from pathlib import Path
+    is_pathlib_available = True
+except:
+    pass
 
 import pandas as pd
 import numpy as np
@@ -947,7 +953,7 @@ cdef object data_container_extract_metadata(data_container data):
     return metadata
 
 
-cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
+cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
                            bint no_datetime_conversion, long row_limit, long row_offset):
     """
@@ -959,6 +965,15 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     cdef char * filename    
     cdef data_container data
     cdef object origin
+
+    if is_pathlib_available:
+        if not type(filename_path) == str and not isinstance(filename_path, Path):
+            raise PyreadstatError("filename_path must be either string or pathlib.Path")
+        if isinstance(filename_path, Path):
+            filename_path = str(filename_path.resolve())
+    else:
+        if not type(filename_path) == str:
+            raise PyreadstatError("filename_path must be string")
 
     filename_bytes = filename_path.encode("utf-8")
    

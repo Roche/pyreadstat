@@ -2195,14 +2195,14 @@ static PyObject *__pyx_codeobj__34;
 /* "pyreadstat/pyreadstat.pyx":40
  * # Parsing functions
  * 
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_read_sas7bdat[] = "\n    Read a SAS sas7bdat file.\n    It accepts the path to a sas7bcat.\n    \n    Parameters\n    ----------\n        filename_path : str\n            path to the file. The string is assumed to be utf-8 encoded.\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        catalog_file : str, optional\n            path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values\n            by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,\n            Use read_sas7bcat to parse the catalog independently\n            of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.\n        formats_as_category : bool, optional\n            Will take effect only if the catalog_file was specified. If True the variables whose values were replaced\n            by the formats will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        u""ser_missing : bool, optional\n            by default False, in this case user defined missing values are delivered as nan. If true, the missing values\n            will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)\n            to be able to interpret those values as missing.\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata\n            object with metadata. The members variables_value_labels will be empty unless a valid catalog file is\n            supplied.\n            Look at the documentation for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_read_sas7bdat[] = "\n    Read a SAS sas7bdat file.\n    It accepts the path to a sas7bcat.\n    \n    Parameters\n    ----------\n        filename_path : str or pathlib.Path\n            path to the file. The string is assumed to be utf-8 encoded.\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        catalog_file : str, optional\n            path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values\n            by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,\n            Use read_sas7bcat to parse the catalog independently\n            of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.\n        formats_as_category : bool, optional\n            Will take effect only if the catalog_file was specified. If True the variables whose values were replaced\n            by the formats will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensi""tive!\n        user_missing : bool, optional\n            by default False, in this case user defined missing values are delivered as nan. If true, the missing values\n            will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)\n            to be able to interpret those values as missing.\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata\n            object with metadata. The members variables_value_labels will be empty unless a valid catalog file is\n            supplied.\n            Look at the documentation for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_1read_sas7bdat = {"read_sas7bdat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_read_sas7bdat};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename_path = 0;
@@ -2232,7 +2232,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__p
 
     /* "pyreadstat/pyreadstat.pyx":41
  * 
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,             # <<<<<<<<<<<<<<
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
@@ -2244,7 +2244,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__p
     values[8] = ((PyObject *)Py_False);
 
     /* "pyreadstat/pyreadstat.pyx":42
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):             # <<<<<<<<<<<<<<
  *     r"""
@@ -2386,7 +2386,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__p
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_filename_path = ((PyObject*)values[0]);
+    __pyx_v_filename_path = values[0];
     __pyx_v_metadataonly = values[1];
     __pyx_v_dates_as_pandas_datetime = values[2];
     __pyx_v_catalog_file = values[3];
@@ -2415,7 +2415,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__p
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename_path), (&PyString_Type), 1, "filename_path", 1))) __PYX_ERR(0, 40, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyString_Type), 1, "encoding", 1))) __PYX_ERR(0, 41, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 41, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_read_sas7bdat(__pyx_self, __pyx_v_filename_path, __pyx_v_metadataonly, __pyx_v_dates_as_pandas_datetime, __pyx_v_catalog_file, __pyx_v_formats_as_category, __pyx_v_formats_as_ordered_category, __pyx_v_encoding, __pyx_v_usecols, __pyx_v_user_missing, __pyx_v_disable_datetime_conversion, __pyx_v_row_limit, __pyx_v_row_offset);
@@ -2423,7 +2422,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_1read_sas7bdat(PyObject *__p
   /* "pyreadstat/pyreadstat.pyx":40
  * # Parsing functions
  * 
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -2897,7 +2896,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_read_sas7bdat(CYTHON_UNUSED 
   /* "pyreadstat/pyreadstat.pyx":40
  * # Parsing functions
  * 
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -2923,14 +2922,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_read_sas7bdat(CYTHON_UNUSED 
 /* "pyreadstat/pyreadstat.pyx":128
  * 
  * 
- * def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
+ * def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
  *                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_3read_xport(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_2read_xport[] = "\n    Read a SAS xport file.\n\n    Parameters\n    ----------\n        filename_path : str\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas d""ata frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_2read_xport[] = "\n    Read a SAS xport file.\n\n    Parameters\n    ----------\n        filename_path : str or pathlib.Path\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n      ""      a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_3read_xport = {"read_xport", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_3read_xport, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_2read_xport};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_3read_xport(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename_path = 0;
@@ -2956,7 +2955,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_3read_xport(PyObject *__pyx_
 
     /* "pyreadstat/pyreadstat.pyx":129
  * 
- * def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
+ * def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
  *                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):             # <<<<<<<<<<<<<<
  *     r"""
  *     Read a SAS xport file.
@@ -3058,7 +3057,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_3read_xport(PyObject *__pyx_
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_filename_path = ((PyObject*)values[0]);
+    __pyx_v_filename_path = values[0];
     __pyx_v_metadataonly = values[1];
     __pyx_v_dates_as_pandas_datetime = values[2];
     __pyx_v_encoding = ((PyObject*)values[3]);
@@ -3083,7 +3082,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_3read_xport(PyObject *__pyx_
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename_path), (&PyString_Type), 1, "filename_path", 1))) __PYX_ERR(0, 128, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyString_Type), 1, "encoding", 1))) __PYX_ERR(0, 128, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 129, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_2read_xport(__pyx_self, __pyx_v_filename_path, __pyx_v_metadataonly, __pyx_v_dates_as_pandas_datetime, __pyx_v_encoding, __pyx_v_usecols, __pyx_v_disable_datetime_conversion, __pyx_v_row_limit, __pyx_v_row_offset);
@@ -3091,7 +3089,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_3read_xport(PyObject *__pyx_
   /* "pyreadstat/pyreadstat.pyx":128
  * 
  * 
- * def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
+ * def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
  *                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
  */
@@ -3347,7 +3345,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_2read_xport(CYTHON_UNUSED Py
   /* "pyreadstat/pyreadstat.pyx":128
  * 
  * 
- * def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
+ * def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
  *                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
  */
@@ -3371,14 +3369,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_2read_xport(CYTHON_UNUSED Py
 /* "pyreadstat/pyreadstat.pyx":189
  * 
  * 
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_4read_dta[] = "\n    Read a STATA dta file\n\n    Parameters\n    ----------\n        filename_path : str\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        apply_value_formats : bool, optional\n            by default False. If true it will change values in the dataframe for they value labels in the metadata,\n            if any appropiate are found.\n        formats_as_category : bool, optional\n            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed\n            for their formatted version will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        user_missing : bool, optional\n            by default False, in this case user defined missing values are delivered as nan. If true, the missing values\n            will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_values)\n         ""   to be able to interpret those values as missing.\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_4read_dta[] = "\n    Read a STATA dta file\n\n    Parameters\n    ----------\n        filename_path : str or pathlib.Path\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        apply_value_formats : bool, optional\n            by default False. If true it will change values in the dataframe for they value labels in the metadata,\n            if any appropiate are found.\n        formats_as_category : bool, optional\n            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed\n            for their formatted version will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        user_missing : bool, optional\n            by default False, in this case user defined missing values are delivered as nan. If true, the missing values\n            will be deliver as is, and an extra piece of information will be set in the metadata (missing_user_va""lues)\n            to be able to interpret those values as missing.\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_5read_dta = {"read_dta", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_5read_dta, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_4read_dta};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename_path = 0;
@@ -3408,7 +3406,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_se
 
     /* "pyreadstat/pyreadstat.pyx":190
  * 
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,             # <<<<<<<<<<<<<<
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
@@ -3420,7 +3418,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_se
     values[8] = ((PyObject *)Py_False);
 
     /* "pyreadstat/pyreadstat.pyx":191
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):             # <<<<<<<<<<<<<<
  *     r"""
@@ -3562,7 +3560,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_se
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_filename_path = ((PyObject*)values[0]);
+    __pyx_v_filename_path = values[0];
     __pyx_v_metadataonly = values[1];
     __pyx_v_dates_as_pandas_datetime = values[2];
     __pyx_v_apply_value_formats = values[3];
@@ -3591,7 +3589,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_se
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename_path), (&PyString_Type), 1, "filename_path", 1))) __PYX_ERR(0, 189, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyString_Type), 1, "encoding", 1))) __PYX_ERR(0, 190, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 190, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_4read_dta(__pyx_self, __pyx_v_filename_path, __pyx_v_metadataonly, __pyx_v_dates_as_pandas_datetime, __pyx_v_apply_value_formats, __pyx_v_formats_as_category, __pyx_v_formats_as_ordered_category, __pyx_v_encoding, __pyx_v_usecols, __pyx_v_user_missing, __pyx_v_disable_datetime_conversion, __pyx_v_row_limit, __pyx_v_row_offset);
@@ -3599,7 +3596,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_5read_dta(PyObject *__pyx_se
   /* "pyreadstat/pyreadstat.pyx":189
  * 
  * 
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -3947,7 +3944,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_4read_dta(CYTHON_UNUSED PyOb
   /* "pyreadstat/pyreadstat.pyx":189
  * 
  * 
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -3971,14 +3968,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_4read_dta(CYTHON_UNUSED PyOb
 /* "pyreadstat/pyreadstat.pyx":271
  * 
  * 
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_6read_sav[] = "\n    Read a SPSS sav or zsav (compressed) files\n\n    Parameters\n    ----------\n        filename_path : str\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        apply_value_formats : bool, optional\n            by default False. If true it will change values in the dataframe for they value labels in the metadata,\n            if any appropiate are found.\n        formats_as_category : bool, optional\n            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed\n            for their formatted version will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        user_missing : bool, optional\n            by default False, in this case user defined missing values are delivered as nan. If true, the missing values\n            will be deliver as is, and an extra piece of information will be set in the metadata (missing_ra""nges)\n            to be able to interpret those values as missing.\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_6read_sav[] = "\n    Read a SPSS sav or zsav (compressed) files\n\n    Parameters\n    ----------\n        filename_path : str or pathlib.Path\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        apply_value_formats : bool, optional\n            by default False. If true it will change values in the dataframe for they value labels in the metadata,\n            if any appropiate are found.\n        formats_as_category : bool, optional\n            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed\n            for their formatted version will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        user_missing : bool, optional\n            by default False, in this case user defined missing values are delivered as nan. If true, the missing values\n            will be deliver as is, and an extra piece of information will be set in the meta""data (missing_ranges)\n            to be able to interpret those values as missing.\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_7read_sav = {"read_sav", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_7read_sav, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_6read_sav};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename_path = 0;
@@ -4008,7 +4005,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_se
 
     /* "pyreadstat/pyreadstat.pyx":272
  * 
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,             # <<<<<<<<<<<<<<
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
@@ -4020,7 +4017,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_se
     values[8] = ((PyObject *)Py_False);
 
     /* "pyreadstat/pyreadstat.pyx":273
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):             # <<<<<<<<<<<<<<
  *     r"""
@@ -4162,7 +4159,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_se
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_filename_path = ((PyObject*)values[0]);
+    __pyx_v_filename_path = values[0];
     __pyx_v_metadataonly = values[1];
     __pyx_v_dates_as_pandas_datetime = values[2];
     __pyx_v_apply_value_formats = values[3];
@@ -4191,7 +4188,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_se
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename_path), (&PyString_Type), 1, "filename_path", 1))) __PYX_ERR(0, 271, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyString_Type), 1, "encoding", 1))) __PYX_ERR(0, 272, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 272, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_6read_sav(__pyx_self, __pyx_v_filename_path, __pyx_v_metadataonly, __pyx_v_dates_as_pandas_datetime, __pyx_v_apply_value_formats, __pyx_v_formats_as_category, __pyx_v_formats_as_ordered_category, __pyx_v_encoding, __pyx_v_usecols, __pyx_v_user_missing, __pyx_v_disable_datetime_conversion, __pyx_v_row_limit, __pyx_v_row_offset);
@@ -4199,7 +4195,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_7read_sav(PyObject *__pyx_se
   /* "pyreadstat/pyreadstat.pyx":271
  * 
  * 
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -4547,7 +4543,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_6read_sav(CYTHON_UNUSED PyOb
   /* "pyreadstat/pyreadstat.pyx":271
  * 
  * 
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -4571,14 +4567,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_6read_sav(CYTHON_UNUSED PyOb
 /* "pyreadstat/pyreadstat.pyx":353
  * 
  * 
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_8read_por[] = "\n    Read a SPSS por file\n\n    Parameters\n    ----------\n        filename_path : str\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        apply_value_formats : bool, optional\n            by default False. If true it will change values in the dataframe for they value labels in the metadata,\n            if any appropiate are found.\n        formats_as_category : bool, optional\n            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed\n            for their formatted version will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object, the user can us""e the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_8read_por[] = "\n    Read a SPSS por file\n\n    Parameters\n    ----------\n        filename_path : str or pathlib.Path\n            path to the file. The string is assumed to be utf-8 encoded\n        metadataonly : bool, optional\n            by default False. IF true, no data will be read but only metadata, so that you can get all elements in the\n            metadata object. The data frame will be set with the correct column names but no data.\n        dates_as_pandas_datetime : bool, optional\n            by default False. If true dates will be transformed to pandas datetime64 instead of date.\n        apply_value_formats : bool, optional\n            by default False. If true it will change values in the dataframe for they value labels in the metadata,\n            if any appropiate are found.\n        formats_as_category : bool, optional\n            by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed\n            for their formatted version will be transformed into pandas categories.\n        formats_as_ordered_category : bool, optional\n            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.\n            it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of\n            the value of formats_as_category.\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n        usecols : list, optional\n            a list with column names to read from the file. Only those columns will be imported. Case sensitive!\n        disable_datetime_conversion : bool, optional\n            if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns\n            will remain as numbers. In order to convert them later to an appropiate python object,"" the user can use the\n            information about the original variable format stored in the metadata object in original_variable_types.\n            Disabling datetime conversion speeds up reading files. In addition it helps to overcome situations where\n            there are datetimes that are beyond the limits of python datetime (which is limited to year 10,000, dates\n            beyond that will rise an Overflow error in pyreadstat).\n        row_limit : int, optional\n            maximum number of rows to read. The default is 0 meaning unlimited.\n        row_offset : int, optional\n            start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data\n        metadata :\n            object with metadata. Look at the documentation for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_9read_por = {"read_por", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_9read_por, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_8read_por};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename_path = 0;
@@ -4607,7 +4603,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_se
 
     /* "pyreadstat/pyreadstat.pyx":354
  * 
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,             # <<<<<<<<<<<<<<
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
@@ -4618,7 +4614,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_se
     values[7] = ((PyObject*)Py_None);
 
     /* "pyreadstat/pyreadstat.pyx":355
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):             # <<<<<<<<<<<<<<
  *     r"""
@@ -4750,7 +4746,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_se
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_filename_path = ((PyObject*)values[0]);
+    __pyx_v_filename_path = values[0];
     __pyx_v_metadataonly = values[1];
     __pyx_v_dates_as_pandas_datetime = values[2];
     __pyx_v_apply_value_formats = values[3];
@@ -4778,7 +4774,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_se
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename_path), (&PyString_Type), 1, "filename_path", 1))) __PYX_ERR(0, 353, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyString_Type), 1, "encoding", 1))) __PYX_ERR(0, 354, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 354, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_8read_por(__pyx_self, __pyx_v_filename_path, __pyx_v_metadataonly, __pyx_v_dates_as_pandas_datetime, __pyx_v_apply_value_formats, __pyx_v_formats_as_category, __pyx_v_formats_as_ordered_category, __pyx_v_encoding, __pyx_v_usecols, __pyx_v_disable_datetime_conversion, __pyx_v_row_limit, __pyx_v_row_offset);
@@ -4786,7 +4781,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_9read_por(PyObject *__pyx_se
   /* "pyreadstat/pyreadstat.pyx":353
  * 
  * 
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -5089,7 +5084,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_8read_por(CYTHON_UNUSED PyOb
   /* "pyreadstat/pyreadstat.pyx":353
  * 
  * 
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -5113,14 +5108,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_8read_por(CYTHON_UNUSED PyOb
 /* "pyreadstat/pyreadstat.pyx":428
  * 
  * 
- * def read_sas7bcat(str filename_path, str encoding=None):             # <<<<<<<<<<<<<<
+ * def read_sas7bcat(filename_path, str encoding=None):             # <<<<<<<<<<<<<<
  *     r"""
  *     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_11read_sas7bcat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_10read_sas7bcat[] = "\n    Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary\n    value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary\n    variable_to_label contains a map from variable name to the formats.\n    In order to apply the catalog to the sas7bdat file use set_catalog_to_sas or pass the catalog file as an argument\n    to read_sas7bdat directly.\n    SAS catalog files are difficult ones, some of them can be read only in specific SAS version, may contain strange\n    encodings etc. Therefore it may be that many catalog files are not readable from this application.\n\n    Parameters\n    ----------\n        filename_path : str\n            path to the file. The string is assumed to be utf-8 encoded\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data (no data in this case, so will be empty)\n        metadata :\n            object with metadata. The member value_labels is the one that contains the formats.\n            Look at the documentation for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_10read_sas7bcat[] = "\n    Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary\n    value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary\n    variable_to_label contains a map from variable name to the formats.\n    In order to apply the catalog to the sas7bdat file use set_catalog_to_sas or pass the catalog file as an argument\n    to read_sas7bdat directly.\n    SAS catalog files are difficult ones, some of them can be read only in specific SAS version, may contain strange\n    encodings etc. Therefore it may be that many catalog files are not readable from this application.\n\n    Parameters\n    ----------\n        filename_path : str or pathlib.Path\n            path to the file. The string is assumed to be utf-8 encoded\n        encoding : str, optional\n            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an\n            iconv-compatible name\n\n    Returns\n    -------\n        data_frame : pandas dataframe\n            a pandas data frame with the data (no data in this case, so will be empty)\n        metadata :\n            object with metadata. The member value_labels is the one that contains the formats.\n            Look at the documentation for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_11read_sas7bcat = {"read_sas7bcat", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_11read_sas7bcat, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_10read_sas7bcat};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_11read_sas7bcat(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename_path = 0;
@@ -5170,7 +5165,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_11read_sas7bcat(PyObject *__
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_filename_path = ((PyObject*)values[0]);
+    __pyx_v_filename_path = values[0];
     __pyx_v_encoding = ((PyObject*)values[1]);
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -5181,7 +5176,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_11read_sas7bcat(PyObject *__
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename_path), (&PyString_Type), 1, "filename_path", 1))) __PYX_ERR(0, 428, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyString_Type), 1, "encoding", 1))) __PYX_ERR(0, 428, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_10pyreadstat_10read_sas7bcat(__pyx_self, __pyx_v_filename_path, __pyx_v_encoding);
 
@@ -5382,7 +5376,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_10read_sas7bcat(CYTHON_UNUSE
   /* "pyreadstat/pyreadstat.pyx":428
  * 
  * 
- * def read_sas7bcat(str filename_path, str encoding=None):             # <<<<<<<<<<<<<<
+ * def read_sas7bcat(filename_path, str encoding=None):             # <<<<<<<<<<<<<<
  *     r"""
  *     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
  */
@@ -9015,14 +9009,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_19read_file_multiprocessing(
 /* "pyreadstat/pyreadstat.pyx":710
  * # Write API
  * 
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_21write_sav[] = "\n    Writes a pandas data frame to a SPSS sav or zsav file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    compress : boolean, optional\n        if true a zsav will be written, by default False, a sav is written\n    note : str, optional\n        a note to add to the file\n    variable_value_labels : dict, optional\n        value labels, a dictionary with key variable name and value a dictionary with key values and\n        values labels. Variable names must match variable names in the dataframe otherwise will be\n        ignored. Value types must match the type of the column in the dataframe.\n    missing_ranges : dict, optional\n        user defined missing values. Must be a dictionary with keys as variable names matching variable\n        names in the dataframe. The values must be a list. Each element in that list can either be\n        either a discrete numeric or string value (max 3 per variable) or a dictionary with keys 'hi' and 'lo' to\n        indicate the upper and lower range for numeric values (max 1 range value + 1 discrete value per\n        variable). hi and lo may also be the same value in which case it will be interpreted as a discrete\n        missing value.\n        For this to be effective, values in the dataframe must be the same as reported here and not NaN.\n    variable_display_width : dict, optional\n        set the display width for variables. Must be a dictonary with keys being variable names and\n        values being integers.\n    variable_measure: dict, optional\n        sets the measure type for a variable. Must be a dictionary with keys bei""ng variable names and\n        values being strings one of \"nominal\", \"ordinal\", \"scale\" or \"unknown\" (default).\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_21write_sav[] = "\n    Writes a pandas data frame to a SPSS sav or zsav file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str or pathlib.Path\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    compress : boolean, optional\n        if true a zsav will be written, by default False, a sav is written\n    note : str, optional\n        a note to add to the file\n    variable_value_labels : dict, optional\n        value labels, a dictionary with key variable name and value a dictionary with key values and\n        values labels. Variable names must match variable names in the dataframe otherwise will be\n        ignored. Value types must match the type of the column in the dataframe.\n    missing_ranges : dict, optional\n        user defined missing values. Must be a dictionary with keys as variable names matching variable\n        names in the dataframe. The values must be a list. Each element in that list can either be\n        either a discrete numeric or string value (max 3 per variable) or a dictionary with keys 'hi' and 'lo' to\n        indicate the upper and lower range for numeric values (max 1 range value + 1 discrete value per\n        variable). hi and lo may also be the same value in which case it will be interpreted as a discrete\n        missing value.\n        For this to be effective, values in the dataframe must be the same as reported here and not NaN.\n    variable_display_width : dict, optional\n        set the display width for variables. Must be a dictonary with keys being variable names and\n        values being integers.\n    variable_measure: dict, optional\n        sets the measure type for a variable. Must be a dictiona""ry with keys being variable names and\n        values being strings one of \"nominal\", \"ordinal\", \"scale\" or \"unknown\" (default).\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_22write_sav = {"write_sav", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_22write_sav, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_21write_sav};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_df = 0;
@@ -9052,7 +9046,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_
 
     /* "pyreadstat/pyreadstat.pyx":711
  * 
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,             # <<<<<<<<<<<<<<
  *                 dict variable_measure=None, dict variable_format=None):
  *     """
@@ -9062,7 +9056,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_
     values[8] = ((PyObject*)Py_None);
 
     /* "pyreadstat/pyreadstat.pyx":712
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
@@ -9195,7 +9189,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_
       }
     }
     __pyx_v_df = values[0];
-    __pyx_v_dst_path = ((PyObject*)values[1]);
+    __pyx_v_dst_path = values[1];
     __pyx_v_file_label = ((PyObject*)values[2]);
     __pyx_v_column_labels = ((PyObject*)values[3]);
     __pyx_v_compress = values[4];
@@ -9214,7 +9208,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dst_path), (&PyString_Type), 1, "dst_path", 1))) __PYX_ERR(0, 710, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_label), (&PyString_Type), 1, "file_label", 1))) __PYX_ERR(0, 710, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_column_labels), (&PyList_Type), 1, "column_labels", 1))) __PYX_ERR(0, 710, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_note), (&PyString_Type), 1, "note", 1))) __PYX_ERR(0, 710, __pyx_L1_error)
@@ -9228,7 +9221,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_22write_sav(PyObject *__pyx_
   /* "pyreadstat/pyreadstat.pyx":710
  * # Write API
  * 
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
  */
@@ -9592,7 +9585,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_21write_sav(CYTHON_UNUSED Py
   /* "pyreadstat/pyreadstat.pyx":710
  * # Write API
  * 
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
  */
@@ -9624,14 +9617,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_21write_sav(CYTHON_UNUSED Py
 /* "pyreadstat/pyreadstat.pyx":775
  *         variable_alignment, variable_display_width, variable_measure, variable_format)
  * 
- * def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
+ * def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
  *             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
  *     """
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_dta(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_23write_dta[] = "\n    Writes a pandas data frame to a STATA dta file\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    version : int, optional\n        dta file version, supported from 8 to 15, default is 15\n    variable_value_labels : dict, optional\n        value labels, a dictionary with key variable name and value a dictionary with key values and\n        values labels. Variable names must match variable names in the dataframe otherwise will be\n        ignored. Value types must match the type of the column in the dataframe.\n    missing_user_values : dict, optional\n        user defined missing values for numeric variables. Must be a dictionary with keys being variable\n        names and values being a list of missing values. Missing values must be a single character\n        between a and z.\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_23write_dta[] = "\n    Writes a pandas data frame to a STATA dta file\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str or pathlib.Path\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    version : int, optional\n        dta file version, supported from 8 to 15, default is 15\n    variable_value_labels : dict, optional\n        value labels, a dictionary with key variable name and value a dictionary with key values and\n        values labels. Variable names must match variable names in the dataframe otherwise will be\n        ignored. Value types must match the type of the column in the dataframe.\n    missing_user_values : dict, optional\n        user defined missing values for numeric variables. Must be a dictionary with keys being variable\n        names and values being a list of missing values. Missing values must be a single character\n        between a and z.\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_24write_dta = {"write_dta", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_24write_dta, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_23write_dta};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_dta(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_df = 0;
@@ -9656,7 +9649,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_dta(PyObject *__pyx_
 
     /* "pyreadstat/pyreadstat.pyx":776
  * 
- * def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15,
+ * def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15,
  *             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
  *     Writes a pandas data frame to a STATA dta file
@@ -9759,7 +9752,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_dta(PyObject *__pyx_
       }
     }
     __pyx_v_df = values[0];
-    __pyx_v_dst_path = ((PyObject*)values[1]);
+    __pyx_v_dst_path = values[1];
     __pyx_v_file_label = ((PyObject*)values[2]);
     __pyx_v_column_labels = ((PyObject*)values[3]);
     if (values[4]) {
@@ -9779,7 +9772,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_dta(PyObject *__pyx_
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dst_path), (&PyString_Type), 1, "dst_path", 1))) __PYX_ERR(0, 775, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_label), (&PyString_Type), 1, "file_label", 1))) __PYX_ERR(0, 775, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_column_labels), (&PyList_Type), 1, "column_labels", 1))) __PYX_ERR(0, 775, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_variable_value_labels), (&PyDict_Type), 1, "variable_value_labels", 1))) __PYX_ERR(0, 776, __pyx_L1_error)
@@ -9790,7 +9782,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_24write_dta(PyObject *__pyx_
   /* "pyreadstat/pyreadstat.pyx":775
  *         variable_alignment, variable_display_width, variable_measure, variable_format)
  * 
- * def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
+ * def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
  *             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
  *     """
  */
@@ -10049,7 +10041,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_dta(CYTHON_UNUSED Py
   /* "pyreadstat/pyreadstat.pyx":775
  *         variable_alignment, variable_display_width, variable_measure, variable_format)
  * 
- * def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
+ * def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
  *             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
  *     """
  */
@@ -10076,14 +10068,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_23write_dta(CYTHON_UNUSED Py
 /* "pyreadstat/pyreadstat.pyx":834
  *      variable_display_width, variable_measure, variable_format)
  * 
- * def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
+ * def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
  *     dict variable_format=None):
  *     """
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_xport(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_25write_xport[] = "\n    Writes a pandas data frame to a SAS Xport (xpt) file.\n    If no table_name is specified the dataset has by default the name DATASET (take it into account if\n    reading the file from SAS.)\n    Versions 5 and 8 are supported, default is 8.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    table_name : str, optional\n        name of the dataset, by default DATASET\n    file_format_version : int, optional\n        XPORT file version, either 8 or 5, default is 8\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_25write_xport[] = "\n    Writes a pandas data frame to a SAS Xport (xpt) file.\n    If no table_name is specified the dataset has by default the name DATASET (take it into account if\n    reading the file from SAS.)\n    Versions 5 and 8 are supported, default is 8.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str or pathlib.Path\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    table_name : str, optional\n        name of the dataset, by default DATASET\n    file_format_version : int, optional\n        XPORT file version, either 8 or 5, default is 8\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_26write_xport = {"write_xport", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_26write_xport, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_25write_xport};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_xport(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_df = 0;
@@ -10108,7 +10100,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_xport(PyObject *__py
 
     /* "pyreadstat/pyreadstat.pyx":835
  * 
- * def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,
+ * def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,
  *     dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
  *     Writes a pandas data frame to a SAS Xport (xpt) file.
@@ -10199,7 +10191,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_xport(PyObject *__py
       }
     }
     __pyx_v_df = values[0];
-    __pyx_v_dst_path = ((PyObject*)values[1]);
+    __pyx_v_dst_path = values[1];
     __pyx_v_file_label = ((PyObject*)values[2]);
     __pyx_v_column_labels = ((PyObject*)values[3]);
     __pyx_v_table_name = ((PyObject*)values[4]);
@@ -10218,7 +10210,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_xport(PyObject *__py
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dst_path), (&PyString_Type), 1, "dst_path", 1))) __PYX_ERR(0, 834, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_label), (&PyString_Type), 1, "file_label", 1))) __PYX_ERR(0, 834, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_column_labels), (&PyList_Type), 1, "column_labels", 1))) __PYX_ERR(0, 834, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_table_name), (&PyString_Type), 1, "table_name", 1))) __PYX_ERR(0, 834, __pyx_L1_error)
@@ -10228,7 +10219,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_26write_xport(PyObject *__py
   /* "pyreadstat/pyreadstat.pyx":834
  *      variable_display_width, variable_measure, variable_format)
  * 
- * def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
+ * def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
  *     dict variable_format=None):
  *     """
  */
@@ -10339,7 +10330,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_25write_xport(CYTHON_UNUSED 
   /* "pyreadstat/pyreadstat.pyx":834
  *      variable_display_width, variable_measure, variable_format)
  * 
- * def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
+ * def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
  *     dict variable_format=None):
  *     """
  */
@@ -10366,14 +10357,14 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_25write_xport(CYTHON_UNUSED 
 /* "pyreadstat/pyreadstat.pyx":875
  *         variable_alignment,variable_display_width, variable_measure, variable_format)
  * 
- * def write_por(df, str dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
+ * def write_por(df, dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
  *     Writes a pandas data frame to a SPSS POR file.
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_28write_por(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_10pyreadstat_10pyreadstat_27write_por[] = "\n    Writes a pandas data frame to a SPSS POR file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
+static char __pyx_doc_10pyreadstat_10pyreadstat_27write_por[] = "\n    Writes a pandas data frame to a SPSS POR file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str or pathlib.Path\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list, optional\n        list of labels for columns (variables), must be the same length as the number of columns. Variables with no\n        labels must be represented by None.\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ";
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_28write_por = {"write_por", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_28write_por, METH_VARARGS|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_27write_por};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_28write_por(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_df = 0;
@@ -10458,7 +10449,7 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_28write_por(PyObject *__pyx_
       }
     }
     __pyx_v_df = values[0];
-    __pyx_v_dst_path = ((PyObject*)values[1]);
+    __pyx_v_dst_path = values[1];
     __pyx_v_file_label = ((PyObject*)values[2]);
     __pyx_v_column_labels = ((PyObject*)values[3]);
     __pyx_v_variable_format = ((PyObject*)values[4]);
@@ -10471,7 +10462,6 @@ static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_28write_por(PyObject *__pyx_
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_dst_path), (&PyString_Type), 1, "dst_path", 1))) __PYX_ERR(0, 875, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_label), (&PyString_Type), 1, "file_label", 1))) __PYX_ERR(0, 875, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_column_labels), (&PyList_Type), 1, "column_labels", 1))) __PYX_ERR(0, 875, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_variable_format), (&PyDict_Type), 1, "variable_format", 1))) __PYX_ERR(0, 875, __pyx_L1_error)
@@ -10604,7 +10594,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_27write_por(CYTHON_UNUSED Py
   /* "pyreadstat/pyreadstat.pyx":875
  *         variable_alignment,variable_display_width, variable_measure, variable_format)
  * 
- * def write_por(df, str dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
+ * def write_por(df, dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
  *     Writes a pandas data frame to a SPSS POR file.
  */
@@ -11157,7 +11147,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":40
  * # Parsing functions
  * 
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11169,7 +11159,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":128
  * 
  * 
- * def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
+ * def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
  *                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
  */
@@ -11181,7 +11171,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":189
  * 
  * 
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11193,7 +11183,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":271
  * 
  * 
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11205,7 +11195,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":353
  * 
  * 
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11217,7 +11207,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":428
  * 
  * 
- * def read_sas7bcat(str filename_path, str encoding=None):             # <<<<<<<<<<<<<<
+ * def read_sas7bcat(filename_path, str encoding=None):             # <<<<<<<<<<<<<<
  *     r"""
  *     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
  */
@@ -11277,7 +11267,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":710
  * # Write API
  * 
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
  */
@@ -11289,7 +11279,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":775
  *         variable_alignment, variable_display_width, variable_measure, variable_format)
  * 
- * def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
+ * def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
  *             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
  *     """
  */
@@ -11301,7 +11291,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":834
  *      variable_display_width, variable_measure, variable_format)
  * 
- * def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
+ * def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
  *     dict variable_format=None):
  *     """
  */
@@ -11313,7 +11303,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/pyreadstat.pyx":875
  *         variable_alignment,variable_display_width, variable_measure, variable_format)
  * 
- * def write_por(df, str dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
+ * def write_por(df, dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
  *     Writes a pandas data frame to a SPSS POR file.
  */
@@ -11757,7 +11747,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":40
  * # Parsing functions
  * 
- * def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
+ * def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,             # <<<<<<<<<<<<<<
  *                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11769,7 +11759,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":128
  * 
  * 
- * def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
+ * def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,             # <<<<<<<<<<<<<<
  *                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  *     r"""
  */
@@ -11781,7 +11771,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":189
  * 
  * 
- * def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11793,7 +11783,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":271
  * 
  * 
- * def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11805,7 +11795,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":353
  * 
  * 
- * def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
+ * def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,             # <<<<<<<<<<<<<<
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
  */
@@ -11817,7 +11807,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":428
  * 
  * 
- * def read_sas7bcat(str filename_path, str encoding=None):             # <<<<<<<<<<<<<<
+ * def read_sas7bcat(filename_path, str encoding=None):             # <<<<<<<<<<<<<<
  *     r"""
  *     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
  */
@@ -11877,7 +11867,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":710
  * # Write API
  * 
- * def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
  */
@@ -11889,7 +11879,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":775
  *         variable_alignment, variable_display_width, variable_measure, variable_format)
  * 
- * def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
+ * def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15,             # <<<<<<<<<<<<<<
  *             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
  *     """
  */
@@ -11901,7 +11891,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":834
  *      variable_display_width, variable_measure, variable_format)
  * 
- * def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
+ * def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,             # <<<<<<<<<<<<<<
  *     dict variable_format=None):
  *     """
  */
@@ -11913,7 +11903,7 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/pyreadstat.pyx":875
  *         variable_alignment,variable_display_width, variable_measure, variable_format)
  * 
- * def write_por(df, str dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
+ * def write_por(df, dst_path, str file_label="", list column_labels=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
  *     Writes a pandas data frame to a SPSS POR file.
  */

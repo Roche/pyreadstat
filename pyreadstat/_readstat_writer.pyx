@@ -16,10 +16,6 @@
 # limitations under the License.
 # #############################################################################
 import os
-from readstat_api cimport *
-from _readstat_parser import ReadstatError, PyreadstatError
-from _readstat_parser cimport check_exit_status
-
 import numpy as np
 #cimport numpy as np
 import pandas as pd
@@ -30,7 +26,16 @@ IF PY_MAJOR_VERSION >2:
 ELSE: # not available on python 2
     import pytz as _timezone
 from libc.math cimport round, NAN
+is_pathlib_available = False
+try:
+    from pathlib import Path
+    is_pathlib_available = True
+except:
+    pass
 
+from readstat_api cimport *
+from _readstat_parser import ReadstatError, PyreadstatError
+from _readstat_parser cimport check_exit_status
 
 cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'), np.dtype('uint8'), np.dtype('uint16'),
              np.int32, np.int16, np.int8, np.uint8, np.uint16}
@@ -518,7 +523,7 @@ cdef int close_file(int fd):
     else:
         return close(fd)
 
-cdef int run_write(df, str filename_path, dst_file_format file_format, str file_label, list column_labels,
+cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, list column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format) except *:
@@ -600,6 +605,16 @@ cdef int run_write(df, str filename_path, dst_file_format file_format, str file_
     cdef dict value_labels
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
+
+
+    if is_pathlib_available:
+        if not type(filename_path) == str and not isinstance(filename_path, Path):
+            raise PyreadstatError("filename_path must be either string or pathlib.Path")
+        if isinstance(filename_path, Path):
+            filename_path = str(filename_path.resolve())
+    else:
+        if not type(filename_path) == str:
+            raise PyreadstatError("filename_path must be string")
 
     filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)

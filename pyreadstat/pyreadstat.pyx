@@ -37,7 +37,7 @@ from worker import worker
 
 # Parsing functions
 
-def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
+def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
                   disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
@@ -46,7 +46,7 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     
     Parameters
     ----------
-        filename_path : str
+        filename_path : str or pathlib.Path
             path to the file. The string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -125,14 +125,14 @@ def read_sas7bdat(str filename_path, metadataonly=False, dates_as_pandas_datetim
     return data_frame, metadata
 
 
-def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
+def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
                list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
     Read a SAS xport file.
 
     Parameters
     ----------
-        filename_path : str
+        filename_path : str or pathlib.Path
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -186,7 +186,7 @@ def read_xport(str filename_path, metadataonly=False, dates_as_pandas_datetime=F
     return data_frame, metadata
 
 
-def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
@@ -194,7 +194,7 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
     Parameters
     ----------
-        filename_path : str
+        filename_path : str or pathlib.Path
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -268,7 +268,7 @@ def read_dta(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     return data_frame, metadata
 
 
-def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
@@ -276,7 +276,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
     Parameters
     ----------
-        filename_path : str
+        filename_path : str or pathlib.Path
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -350,7 +350,7 @@ def read_sav(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     return data_frame, metadata
 
 
-def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
+def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
              disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
     r"""
@@ -358,7 +358,7 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
 
     Parameters
     ----------
-        filename_path : str
+        filename_path : str or pathlib.Path
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -425,7 +425,7 @@ def read_por(str filename_path, metadataonly=False, dates_as_pandas_datetime=Fal
     
 
 
-def read_sas7bcat(str filename_path, str encoding=None):
+def read_sas7bcat(filename_path, str encoding=None):
     r"""
     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
     value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
@@ -437,7 +437,7 @@ def read_sas7bcat(str filename_path, str encoding=None):
 
     Parameters
     ----------
-        filename_path : str
+        filename_path : str or pathlib.Path
             path to the file. The string is assumed to be utf-8 encoded
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -707,7 +707,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
 
 # Write API
 
-def write_sav(df, str dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
+def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
                 dict variable_measure=None, dict variable_format=None):
     """
@@ -717,7 +717,7 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
     ----------
     df : pandas data frame
         pandas data frame to write to sav or zsav
-    dst_path : str
+    dst_path : str or pathlib.Path
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
@@ -772,7 +772,7 @@ def write_sav(df, str dst_path, str file_label="", list column_labels=None, comp
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
         variable_alignment, variable_display_width, variable_measure, variable_format)
 
-def write_dta(df, str dst_path, str file_label="", list column_labels=None, int version=15, 
+def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15, 
             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
     """
     Writes a pandas data frame to a STATA dta file
@@ -781,7 +781,7 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
     ----------
     df : pandas data frame
         pandas data frame to write to sav or zsav
-    dst_path : str
+    dst_path : str or pathlib.Path
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
@@ -831,7 +831,7 @@ def write_dta(df, str dst_path, str file_label="", list column_labels=None, int 
      note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
      variable_display_width, variable_measure, variable_format)
 
-def write_xport(df, str dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,
+def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,
     dict variable_format=None):
     """
     Writes a pandas data frame to a SAS Xport (xpt) file.
@@ -843,7 +843,7 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
     ----------
     df : pandas data frame
         pandas data frame to write to sav or zsav
-    dst_path : str
+    dst_path : str or pathlib.Path
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
@@ -872,7 +872,7 @@ def write_xport(df, str dst_path, str file_label="", list column_labels=None, st
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
         variable_alignment,variable_display_width, variable_measure, variable_format)
 
-def write_por(df, str dst_path, str file_label="", list column_labels=None, dict variable_format=None):
+def write_por(df, dst_path, str file_label="", list column_labels=None, dict variable_format=None):
     """
     Writes a pandas data frame to a SPSS POR file.
 
@@ -880,7 +880,7 @@ def write_por(df, str dst_path, str file_label="", list column_labels=None, dict
     ----------
     df : pandas data frame
         pandas data frame to write to sav or zsav
-    dst_path : str
+    dst_path : str or pathlib.Path
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
