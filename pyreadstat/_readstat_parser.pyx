@@ -24,6 +24,12 @@ from libc.math cimport NAN, floor
 #from datetime import timedelta, datetime
 from collections import OrderedDict
 import os
+is_pathlib_available = False
+try:
+    from pathlib import Path
+    is_pathlib_available = True
+except:
+    pass
 
 import pandas as pd
 import numpy as np
@@ -53,7 +59,7 @@ cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
-cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: np.object, READSTAT_TYPE_STRING_REF: np.object,
+cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: object, READSTAT_TYPE_STRING_REF: object,
                                      READSTAT_TYPE_INT8: np.int64, READSTAT_TYPE_INT16: np.int64, READSTAT_TYPE_INT32:np.int64,
                                      READSTAT_TYPE_FLOAT: np.float64, READSTAT_TYPE_DOUBLE: np.float64}
 
@@ -461,14 +467,14 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     # equivalent numpy type
     # if it's a date then we need object
     if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0: 
-        curnptype = np.object
+        curnptype = object
     else:
         curnptype = readstat_to_numpy_types[var_type]
     iscurnptypefloat = 0
     iscurnptypeobject = 0
     # book keeping numpy types
     dc.col_numpy_dtypes[index] = curnptype
-    if curnptype == np.object:
+    if curnptype == object:
         iscurnptypeobject = 1
     if curnptype == np.float64:
         iscurnptypefloat = 1
@@ -593,10 +599,10 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
                 #dc.col_data[index][obs_index] = NAN
             # for any type except float, the numpy type will be object as now we have nans
             else:
-                dc.col_numpy_dtypes[index] = np.object
+                dc.col_numpy_dtypes[index] = object
                 dc.col_dtypes_isobject[index] = 1
                 iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
+                dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
                 dc.col_data[index][obs_index:] = np.nan
                 #dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
@@ -612,11 +618,11 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             if iscurnptypeobject == 1:
                 dc.col_data[index][obs_index] =  chr(missing_tag) 
             else:
-                dc.col_numpy_dtypes[index] = np.object
+                dc.col_numpy_dtypes[index] = object
                 dc.col_dtypes_isobject[index] = 1
                 dc.col_dytpes_isfloat[index] = 0
                 iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(np.object, copy=False)
+                dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
                 dc.col_data[index][obs_index] =  chr(missing_tag)
             curset = dc.missing_user_values.get(index)
             if curset is None:
@@ -947,7 +953,7 @@ cdef object data_container_extract_metadata(data_container data):
     return metadata
 
 
-cdef object run_conversion(str filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
+cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
                            bint no_datetime_conversion, long row_limit, long row_offset):
     """
@@ -959,6 +965,15 @@ cdef object run_conversion(str filename_path, py_file_format file_format, readst
     cdef char * filename    
     cdef data_container data
     cdef object origin
+
+    if is_pathlib_available:
+        if not type(filename_path) == str and not isinstance(filename_path, Path):
+            raise PyreadstatError("filename_path must be either string or pathlib.Path")
+        if isinstance(filename_path, Path):
+            filename_path = str(filename_path.expanduser().resolve())
+    else:
+        if not type(filename_path) == str:
+            raise PyreadstatError("filename_path must be string")
 
     filename_bytes = filename_path.encode("utf-8")
    
