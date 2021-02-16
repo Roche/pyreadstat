@@ -1,4 +1,4 @@
-# 1.0.9 (github, pypi and conda 2021.0X.XX)
+# 1.0.9 (github, pypi and conda 2021.02.16)
 * Adding better error message for not accepting certain files types in multiprocessing, solves #105
 * Fixing #106 writing failing when row 0 is removed from dataframe.
 * Removing numpy deprecated objects solves #107.
