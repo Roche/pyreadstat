@@ -594,9 +594,9 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             start reading the file after certain number of rows
         limit : integer, optional
             stop reading the file after certain number of rows, will be added to offset
-        multiprocess: integer, optional
+        multiprocess: bool, optional
             use multiprocessing to read each chunk?
-        num_processes: bool, optional
+        num_processes: integer, optional
             in case multiprocess is true, how many workers/processes to spawn?
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.
