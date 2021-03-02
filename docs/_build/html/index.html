@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.0.9 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.1.0 documentation</title>
   
 
   
@@ -180,6 +180,9 @@ as values. In the case of parsing a sas7bcat file this is where the formats are.
 value_labels. Sas7bdat files may have this member populated and its information can be used to match the information
 in the value_labels coming from the sas7bcat file.</p></li>
 <li><p>original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.</p></li>
+<li><p>readstat_variable_types : a dict of variable name to variable type in the original file as extracted by Readstat.i
+For debugging purposes. In SAS and SPSS variables will be either double (numeric in the original app) or string (character).
+Stata has in addition int8, int32 and float types.</p></li>
 <li><p>table_name : table name (string)</p></li>
 <li><p>file_label : file label (SAS) (string)</p></li>
 <li><p>missing_ranges: a dict with keys being variable names. Values are a list of dicts. Each dict contains two
@@ -256,8 +259,8 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>chunksize</strong> (<em>integer</em><em>, </em><em>optional</em>) – size of the chunks to read</p></li>
 <li><p><strong>offset</strong> (<em>integer</em><em>, </em><em>optional</em>) – start reading the file after certain number of rows</p></li>
 <li><p><strong>limit</strong> (<em>integer</em><em>, </em><em>optional</em>) – stop reading the file after certain number of rows, will be added to offset</p></li>
-<li><p><strong>multiprocess</strong> (<em>integer</em><em>, </em><em>optional</em>) – use multiprocessing to read each chunk?</p></li>
-<li><p><strong>num_processes</strong> (<em>bool</em><em>, </em><em>optional</em>) – in case multiprocess is true, how many workers/processes to spawn?</p></li>
+<li><p><strong>multiprocess</strong> (<em>bool</em><em>, </em><em>optional</em>) – use multiprocessing to read each chunk?</p></li>
+<li><p><strong>num_processes</strong> (<em>integer</em><em>, </em><em>optional</em>) – in case multiprocess is true, how many workers/processes to spawn?</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.</p></li>
 </ul>
 </dd>
