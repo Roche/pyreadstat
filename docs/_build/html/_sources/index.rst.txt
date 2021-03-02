@@ -34,6 +34,9 @@ object contains the following fields:
     value_labels. Sas7bdat files may have this member populated and its information can be used to match the information
     in the value_labels coming from the sas7bcat file.
   * original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.
+  * readstat_variable_types : a dict of variable name to variable type in the original file as extracted by Readstat.i
+    For debugging purposes. In SAS and SPSS variables will be either double (numeric in the original app) or string (character).
+    Stata has in addition int8, int32 and float types.
   * table_name : table name (string)
   * file_label : file label (SAS) (string)
   * missing_ranges: a dict with keys being variable names. Values are a list of dicts. Each dict contains two

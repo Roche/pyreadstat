@@ -164,21 +164,18 @@ class TestBasic(unittest.TestCase):
         self._prepare_data()
 
     def test_sas7bdat(self):
-
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"))
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
 
     def test_sas7bdat_bincompressed(self):
-
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample_bincompressed.sas7bdat"))
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
 
     def test_sas7bdat_metaonly(self):
-
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"))
         df2, meta2 = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), metadataonly=True)
         self.assertTrue(df2.empty)
@@ -186,9 +183,11 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == meta2.number_rows)
         self.assertTrue(meta.column_names == meta2.column_names)
         self.assertTrue(meta.column_labels == meta2.column_labels)
+        self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
+        self.assertTrue(meta.readstat_variable_types["myord"]=="double")
+        self.assertTrue(meta.readstat_variable_types["dtime"]=="double")
 
     def test_sas7bdat_usecols(self):
-
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), usecols=self.usecols)
         self.assertTrue(df.equals(self.df_usecols))
         self.assertTrue(meta.number_columns == len(self.usecols))
@@ -210,7 +209,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_nodates_sastata))
 
     def test_sas7bdat_chunk(self):
-
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), row_limit = 2, row_offset =1)
         df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
         df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
@@ -219,7 +217,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
 
     def test_xport(self):
-
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"))
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.df_pandas))
@@ -227,18 +224,15 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
 
     def test_xport_v5(self):
-
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt5"))
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.xptv5v8))
 
     def test_xport_v8(self):
-
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt8"))
         self.assertTrue(df.equals(self.xptv5v8))
 
     def test_xport_metaonly(self):
-
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"))
         df2, meta2 = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"), metadataonly=True)
         self.assertTrue(df2.empty)
@@ -261,7 +255,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_nodates_sastata))
 
     def test_xport_chunks(self):
-
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"), row_limit = 2, row_offset =1)
         df.columns = [x.lower() for x in df.columns]
         df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
@@ -271,7 +264,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
 
     def test_dta(self):
-
         # discard dtime and arrange time
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"))
         df_pandas = self.df_pandas.copy()
@@ -280,9 +272,11 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(df_pandas))
         self.assertTrue(meta.number_columns == len(df_pandas.columns))
         self.assertTrue(meta.number_rows == len(df_pandas))
+        self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
+        self.assertTrue(meta.readstat_variable_types["myord"]=="int8")
+        self.assertTrue(meta.readstat_variable_types["dtime"]=="double")
 
     def test_dta_metaonly(self):
-
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"))
         df2, meta2 = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), metadataonly=True)
         self.assertTrue(df2.empty)
@@ -309,7 +303,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(df_pandas))
 
     def test_dta_chunks(self):
-
         # discard dtime and arrange time
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), row_limit = 2, row_offset =1)
         df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
@@ -321,7 +314,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
 
     def test_sav(self):
-
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
@@ -330,9 +322,10 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.variable_display_width["mychar"]==9)
         self.assertTrue(meta.variable_storage_width["mychar"] == 8)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
+        self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
+        self.assertTrue(meta.readstat_variable_types["myord"]=="double")
 
     def test_sav_metaonly(self):
-
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
         df2, meta2 = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), metadataonly=True)
         self.assertTrue(df2.empty)
@@ -374,7 +367,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_sav_chunks(self):
-
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), row_limit = 2, row_offset =1)
         df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
         df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
@@ -387,7 +379,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
     
     def test_sav_expand(self):
-        
         src = os.path.join(self.basic_data_folder, "sample.sav")
         dst = "~/sample.sav"
         shutil.copyfile(src, os.path.expanduser(dst))
@@ -397,7 +388,6 @@ class TestBasic(unittest.TestCase):
 
        
     def test_zsav(self):
-
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"))
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
@@ -405,7 +395,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(len(meta.notes) > 0)
 
     def test_zsav_metaonly(self):
-
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"))
         df2, meta2 = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), metadataonly=True)
         self.assertTrue(df2.empty)
@@ -433,7 +422,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_nodates_spss))
 
     def test_zsav_chunks(self):
-
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), row_limit = 2, row_offset =1)
         df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
         df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
@@ -464,7 +452,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(len(meta.notes) > 0)
 
     def test_por_metaonly(self):
-
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"))
         df2, meta2 = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), metadataonly=True)
         self.assertTrue(df2.empty)
@@ -511,13 +498,11 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_sas_format))
 
     def test_sas_dates(self):
-
         sas_file = os.path.join(self.basic_data_folder, "dates.sas7bdat")
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file)
         self.assertTrue(df_sas.equals(self.df_sas_dates))
 
     def test_sas_dates_as_pandas(self):
-
         sas_file = os.path.join(self.basic_data_folder, "dates.sas7bdat")
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file, dates_as_pandas_datetime=True)
         self.assertTrue(df_sas.equals(self.df_sas_dates_as_pandas))
@@ -603,7 +588,6 @@ class TestBasic(unittest.TestCase):
     # read in chunks
 
     def test_chunk_reader(self):
-
         fpath = os.path.join(self.basic_data_folder, "sample.sas7bdat")
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 2, offset=1, limit=2, disable_datetime_conversion=True)
         
@@ -624,7 +608,6 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
 
     def test_chunk_reader_multiprocess(self):
-
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True)
         alldfs = list()
@@ -638,7 +621,6 @@ class TestBasic(unittest.TestCase):
     # writing
 
     def test_sav_write_basic(self):
-
         file_label = "basic write"
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
@@ -662,7 +644,6 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.variable_measure["mychar"], variable_measure["mychar"])
 
     def test_sav_write_basic_expanduser(self):
-
         file_label = "basic write"
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
@@ -679,10 +660,7 @@ class TestBasic(unittest.TestCase):
         os.remove(os.path.expanduser(path))
         self.assertTrue(df.equals(self.df_pandas))
 
-
-
     def test_zsav_write_basic(self):
-
         file_label = "basic write"
         file_note = "These are some notes"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
@@ -699,7 +677,6 @@ class TestBasic(unittest.TestCase):
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_dta_write_basic(self):
-
         df_pandas = self.df_pandas.copy()
         df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
         df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int32)
@@ -720,11 +697,6 @@ class TestBasic(unittest.TestCase):
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_dta_write_user_missing(self):
-
-
-        #formatted_csv = os.path.join(self.missing_data_folder, "missing_dta_formatted.csv")
-        #labeled_csv = os.path.join(self.missing_data_folder, "missing_dta_labeled.csv")
-        
         df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
         df_csv2 = pd.DataFrame([[3,"a"],["labeled","b"]], columns=["Var1", "Var2"])
 
@@ -741,7 +713,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df_csv2.equals(df_dta2))
 
     def test_xport_write_basic_v8(self):
-
         file_label = "basic write"
         table_name = "TEST"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
@@ -756,7 +727,6 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(table_name, meta.table_name)
 
     def test_xport_write_basic_v5(self):
-
         file_label = "basic write"
         table_name = "TEST"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
@@ -925,6 +895,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.original_variable_types['ResponseId'],'A18')
         self.assertEqual(meta.original_variable_types['Duration__in_seconds_'],'F40.2')
         self.assertEqual(meta.original_variable_types['Finished'],'F1.0')
+        self.assertEqual(meta.readstat_variable_types['Finished'],'double')
 
     def test_sav_write_longstr(self):
         path = os.path.join(self.write_folder, "longstr.sav")

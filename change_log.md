@@ -1,4 +1,5 @@
-# 1.1.0 (github, pypi and conda XXXX.XX.XX)
+# 1.1.0 (github, pypi and conda 2021.03.02)
+* added meta.readstat_variable_types to track the type of binary variable in the original file.
 
 # 1.0.9 (github, pypi and conda 2021.02.16)
 * Adding better error message for not accepting certain files types in multiprocessing, solves #105

@@ -121,6 +121,7 @@ class metadata_container:
         self.variable_to_label = dict()
         self.notes = list()
         self.original_variable_types = dict()
+        self.readstat_variable_types = dict()
         self.table_name = None
         self.missing_ranges = dict()
         self.missing_user_values = dict()
@@ -898,6 +899,7 @@ cdef object data_container_extract_metadata(data_container data):
     cdef object current_labels
     cdef object labels_str
     cdef object original_types
+    cdef readstat_type_t var_type
 
     metaonly = data.metaonly
     is_unkown_number_rows = data.is_unkown_number_rows
@@ -924,10 +926,26 @@ cdef object data_container_extract_metadata(data_container data):
                 variable_value_labels[var_name] = current_labels
 
     original_types = dict()
+    readstat_types = dict()
     for indx in range(metadata.number_columns):
         cur_col = data.col_names[indx]
         cur_type = data.col_formats_original[indx]
         original_types[cur_col] = cur_type
+        var_type = data.col_dtypes[indx]
+        if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
+            readstat_types[cur_col] = "string"
+        elif var_type == READSTAT_TYPE_INT8:
+            readstat_types[cur_col] = "int8"
+        elif var_type == READSTAT_TYPE_INT16:
+            readstat_types[cur_col] = "int16"
+        elif var_type == READSTAT_TYPE_INT32:
+            readstat_types[cur_col] = "int32"
+        elif var_type == READSTAT_TYPE_FLOAT:
+            readstat_types[cur_col] = "float"
+        elif var_type == READSTAT_TYPE_DOUBLE:
+            readstat_types[cur_col] = "double"
+        else:
+            raise PyreadstatError("Unkown data type")
 
     for indx, curset in data.missing_user_values.items():
         cur_col = data.col_names[indx]
@@ -943,6 +961,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.value_labels = labels_raw
     metadata.variable_to_label = label_to_var_name
     metadata.original_variable_types = original_types
+    metadata.readstat_variable_types = readstat_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges
     metadata.variable_storage_width = data.variable_storage_width
