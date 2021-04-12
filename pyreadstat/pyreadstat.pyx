@@ -46,7 +46,7 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
     
     Parameters
     ----------
-        filename_path : str or pathlib.Path
+        filename_path : str, bytes or Path-like object
             path to the file. The string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -132,7 +132,7 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
 
     Parameters
     ----------
-        filename_path : str or pathlib.Path
+        filename_path : str, bytes or Path-like object
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -194,7 +194,7 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Parameters
     ----------
-        filename_path : str or pathlib.Path
+        filename_path : str, bytes or Path-like object
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -276,7 +276,7 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Parameters
     ----------
-        filename_path : str or pathlib.Path
+        filename_path : str, bytes or Path-like object
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -358,7 +358,7 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Parameters
     ----------
-        filename_path : str or pathlib.Path
+        filename_path : str, bytes or Path-like object
             path to the file. The string is assumed to be utf-8 encoded
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -437,7 +437,7 @@ def read_sas7bcat(filename_path, str encoding=None):
 
     Parameters
     ----------
-        filename_path : str or pathlib.Path
+        filename_path : str, bytes or Path-like object
             path to the file. The string is assumed to be utf-8 encoded
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an

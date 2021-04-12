@@ -26,12 +26,6 @@ IF PY_MAJOR_VERSION >2:
 ELSE: # not available on python 2
     import pytz as _timezone
 from libc.math cimport round, NAN
-is_pathlib_available = False
-try:
-    from pathlib import Path
-    is_pathlib_available = True
-except:
-    pass
 
 from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
@@ -485,7 +479,7 @@ cdef void _check_exit_status(readstat_error_t retcode) except *:
         err_message = <str> err_readstat
         raise ReadstatError(err_message)
 
-cdef int open_file(str filename_path):
+cdef int open_file(bytes filename_path):
 
     cdef int fd
     cdef int flags
@@ -501,8 +495,8 @@ cdef int open_file(str filename_path):
             flags = _O_WRONLY | _O_CREAT | _O_BINARY
             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
         else:
-            filename_bytes = filename_path.encode("utf-8")
-            path = <char *> filename_bytes
+            #filename_bytes = filename_path.encode("utf-8")
+            path = <char *> filename_path
             flags = O_WRONLY | O_CREAT | O_TRUNC
             fd = open(path, flags, 0644)
 
@@ -606,16 +600,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
 
-
-    if is_pathlib_available:
-        if not type(filename_path) == str and not isinstance(filename_path, Path):
-            raise PyreadstatError("filename_path must be either string or pathlib.Path")
-        if isinstance(filename_path, Path):
-            filename_path = str(filename_path.expanduser().resolve())
-    else:
-        if not type(filename_path) == str:
-            raise PyreadstatError("filename_path must be string")
-
+    filename_path = os.fsencode(filename_path)
     filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()

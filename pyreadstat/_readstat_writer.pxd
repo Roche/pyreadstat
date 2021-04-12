@@ -73,7 +73,7 @@ cdef int check_series_all_same_types(object series, object type_to_check)
 cdef list get_pandas_column_types(object df, dict missing_user_values)
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx)
 #cdef void check_exit_status(readstat_error_t retcode) except *
-cdef int open_file(str filename_path)
+cdef int open_file(bytes filename_path)
 cdef int close_file(int fd)
 
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, list column_labels,

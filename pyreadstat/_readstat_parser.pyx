@@ -24,12 +24,6 @@ from libc.math cimport NAN, floor
 #from datetime import timedelta, datetime
 from collections import OrderedDict
 import os
-is_pathlib_available = False
-try:
-    from pathlib import Path
-    is_pathlib_available = True
-except:
-    pass
 
 import pandas as pd
 import numpy as np
@@ -985,17 +979,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     cdef data_container data
     cdef object origin
 
-    if is_pathlib_available:
-        if not type(filename_path) == str and not isinstance(filename_path, Path):
-            raise PyreadstatError("filename_path must be either string or pathlib.Path")
-        if isinstance(filename_path, Path):
-            filename_path = str(filename_path.expanduser().resolve())
-    else:
-        if not type(filename_path) == str:
-            raise PyreadstatError("filename_path must be string")
-
-    filename_bytes = filename_path.encode("utf-8")
-   
+    filename_bytes = os.fsencode(filename_path)
     filename_bytes = os.path.expanduser(filename_bytes)
     if not os.path.isfile(filename_bytes):
         raise PyreadstatError("File {0} does not exist!".format(filename_path))
