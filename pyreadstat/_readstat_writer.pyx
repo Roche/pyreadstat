@@ -491,7 +491,8 @@ cdef int open_file(bytes filename_path):
     IF PY_MAJOR_VERSION >2:
 
         if os.name == "nt":
-            u16_path = PyUnicode_AsWideCharString(filename_path, &length)
+            filename_str = filename_path.decode('utf-8')
+            u16_path = PyUnicode_AsWideCharString(filename_str, &length)
             flags = _O_WRONLY | _O_CREAT | _O_BINARY
             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
         else:
@@ -600,7 +601,16 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
 
-    filename_path = os.fsencode(filename_path)
+    if hasattr(os, 'fsencode'):
+        filename_path = os.fsencode(filename_path)
+    else:
+        if type(filename_path) == str:
+            filename_bytes = filename_path.encode('utf-8')
+        elif type(filename_path) == bytes:
+            filename_bytes = filename_path
+        else:
+            raise PyreadstatError("path must be either str or bytes")
+
     filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()

@@ -979,7 +979,16 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     cdef data_container data
     cdef object origin
 
-    filename_bytes = os.fsencode(filename_path)
+    if hasattr(os, 'fsencode'):
+        filename_bytes = os.fsencode(filename_path)
+    else:
+        if type(filename_path) == str:
+            filename_bytes = filename_path.encode('utf-8')
+        elif type(filename_path) == bytes:
+            filename_bytes = filename_path
+        else:
+            raise PyreadstatError("path must be either str or bytes")
+
     filename_bytes = os.path.expanduser(filename_bytes)
     if not os.path.isfile(filename_bytes):
         raise PyreadstatError("File {0} does not exist!".format(filename_path))
