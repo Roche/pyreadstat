@@ -8227,8 +8227,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
   PyObject *__pyx_t_2 = NULL;
   int __pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  char *__pyx_t_6;
+  char *__pyx_t_5;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -8238,7 +8237,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *     IF PY_MAJOR_VERSION >2:
  * 
  *         if os.name == "nt":             # <<<<<<<<<<<<<<
- *             filename_str = os.fsdecode(filename_path).encode('utf-8')
+ *             filename_str = os.fsdecode(filename_path)
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
  */
   __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 493, __pyx_L1_error)
@@ -8253,54 +8252,36 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
     /* "pyreadstat/_readstat_writer.pyx":494
  * 
  *         if os.name == "nt":
- *             filename_str = os.fsdecode(filename_path).encode('utf-8')             # <<<<<<<<<<<<<<
+ *             filename_str = os.fsdecode(filename_path)             # <<<<<<<<<<<<<<
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_os); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 494, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_fsdecode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 494, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_5, function);
-      }
-    }
-    __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_4, __pyx_v_filename_path) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_v_filename_path);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 494, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 494, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_encode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 494, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_fsdecode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 494, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_1 = NULL;
-    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
-      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_5);
+    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
       if (likely(__pyx_t_1)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
         __Pyx_INCREF(__pyx_t_1);
         __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_5, function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
       }
     }
-    __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_1, __pyx_kp_s_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_kp_s_utf_8);
+    __pyx_t_2 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_v_filename_path) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_filename_path);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 494, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_filename_str = __pyx_t_2;
     __pyx_t_2 = 0;
 
     /* "pyreadstat/_readstat_writer.pyx":495
  *         if os.name == "nt":
- *             filename_str = os.fsdecode(filename_path).encode('utf-8')
+ *             filename_str = os.fsdecode(filename_path)
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)             # <<<<<<<<<<<<<<
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
  *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
@@ -8308,7 +8289,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
     __pyx_v_u16_path = PyUnicode_AsWideCharString(__pyx_v_filename_str, (&__pyx_v_length));
 
     /* "pyreadstat/_readstat_writer.pyx":496
- *             filename_str = os.fsdecode(filename_path).encode('utf-8')
+ *             filename_str = os.fsdecode(filename_path)
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY             # <<<<<<<<<<<<<<
  *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
@@ -8329,7 +8310,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *     IF PY_MAJOR_VERSION >2:
  * 
  *         if os.name == "nt":             # <<<<<<<<<<<<<<
- *             filename_str = os.fsdecode(filename_path).encode('utf-8')
+ *             filename_str = os.fsdecode(filename_path)
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
  */
     goto __pyx_L3;
@@ -8347,8 +8328,8 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
       PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
       __PYX_ERR(0, 500, __pyx_L1_error)
     }
-    __pyx_t_6 = __Pyx_PyBytes_AsWritableString(__pyx_v_filename_path); if (unlikely((!__pyx_t_6) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L1_error)
-    __pyx_v_path = ((char *)__pyx_t_6);
+    __pyx_t_5 = __Pyx_PyBytes_AsWritableString(__pyx_v_filename_path); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L1_error)
+    __pyx_v_path = ((char *)__pyx_t_5);
 
     /* "pyreadstat/_readstat_writer.pyx":501
  *             #filename_bytes = filename_path.encode("utf-8")
@@ -8393,7 +8374,6 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
   __Pyx_WriteUnraisable("pyreadstat._readstat_writer.open_file", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_r = 0;
   __pyx_L0:;
