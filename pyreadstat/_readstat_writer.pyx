@@ -604,12 +604,17 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     if hasattr(os, 'fsencode'):
         filename_path = os.fsencode(filename_path)
     else:
-        if type(filename_path) == str:
+        IF PY_MAJOR_VERSION >2:
+            if type(filename_path) == str:
+                filename_bytes = filename_path.encode('utf-8')
+            elif type(filename_path) == bytes:
+                filename_bytes = filename_path
+            else:
+                raise PyreadstatError("path must be either str or bytes")
+        ELSE:
+            if type(filename_path) not in (str, bytes, unicode):
+                raise PyreadstatError("path must be str, bytes or unicode")
             filename_bytes = filename_path.encode('utf-8')
-        elif type(filename_path) == bytes:
-            filename_bytes = filename_path
-        else:
-            raise PyreadstatError("path must be either str or bytes")
 
     filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)
