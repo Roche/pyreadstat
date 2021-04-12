@@ -602,7 +602,11 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef readstat_label_set_t *label_set
 
     if hasattr(os, 'fsencode'):
-        filename_path = os.fsencode(filename_path)
+        try:
+            filename_path = os.fsencode(filename_path)
+        except UnicodeError:
+            if type(filename_path) != bytes:
+                filename_path = str(filename_path).encode('utf-8', 'surrogateescape')
     else:
         IF PY_MAJOR_VERSION >2:
             if type(filename_path) == str:
