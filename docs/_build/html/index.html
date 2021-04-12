@@ -210,7 +210,7 @@ in the next section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
+<li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
@@ -305,7 +305,7 @@ Look at the documentation for more information.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
+<li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
@@ -352,7 +352,7 @@ encodings etc. Therefore it may be that many catalog files are not readable from
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
+<li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</p></li>
 </ul>
@@ -376,7 +376,7 @@ It accepts the path to a sas7bcat.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – path to the file. The string is assumed to be utf-8 encoded.</p></li>
+<li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded.</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
@@ -424,7 +424,7 @@ Look at the documentation for more information.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
+<li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
@@ -468,7 +468,7 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>filename_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
+<li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
