@@ -491,7 +491,7 @@ cdef int open_file(bytes filename_path):
     IF PY_MAJOR_VERSION >2:
 
         if os.name == "nt":
-            filename_str = filename_path.decode('utf-8')
+            filename_str = os.fsdecode(filename_path).encode('utf-8')
             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
             flags = _O_WRONLY | _O_CREAT | _O_BINARY
             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
