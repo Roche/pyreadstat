@@ -123,6 +123,10 @@ typedef struct readstat_metadata_s {
     unsigned int is64bit:1;
 } readstat_metadata_t;
 
+/* If the row count is unknown (e.g. it's an XPORT or POR file, or an SAV
+ * file created with non-conforming software), then readstat_get_row_count
+ * returns -1.
+ */
 int readstat_get_row_count(readstat_metadata_t *metadata);
 int readstat_get_var_count(readstat_metadata_t *metadata);
 time_t readstat_get_creation_time(readstat_metadata_t *metadata);

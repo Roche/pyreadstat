@@ -34,9 +34,15 @@ from readstat_api cimport *
 # necessary to work with the datetime C API
 import_datetime()
 
-cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10"]
-cdef list sas_datetime_formats = ["DATETIME", "DATETIME20"]
-cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3"]
+cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10", 
+                                "DDMMYYB", "DDMMYYB10", "DDMMYYC", "DDMMYYC10", "DDMMYYD", "DDMMYYD10",
+                                "DDMMYYN6", "DDMMYYN8", "DDMMYYP", "DDMMYYP10", "DDMMYYS", "DDMMYYS10",
+                                "MMDDYYB", "MMDDYYB10", "MMDDYYC", "MMDDYYC10", "MMDDYYD", "MMDDYYD10",
+                                "MMDDYYN6", "MMDDYYN8", "MMDDYYP", "MMDDYYP10", "MMDDYYS", "MMDDYYS10",
+                                "MONNAME", "MONTH", "WEEKDATX", "WEEKDAY", "QTR", "QTRR", "YEAR",
+                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
+cdef list sas_datetime_formats = ["DATETIME", "DATETIME20", "TOD"]
+cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
 cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 #sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
