@@ -24,6 +24,8 @@ from libc.math cimport NAN, floor
 #from datetime import timedelta, datetime
 from collections import OrderedDict
 import os
+import warnings
+import sys
 
 import pandas as pd
 import numpy as np
@@ -989,10 +991,8 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
         try:
             filename_bytes = os.fsencode(filename_path)
         except UnicodeError:
-            if type(filename_path) == bytes:
-                filename_bytes = filename_path
-            else:
-                filename_bytes = str(filename_path).encode('utf-8', 'surrogateescape')
+            warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
+            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")
     else:
         IF PY_MAJOR_VERSION >2:
             if type(filename_path) == str:
