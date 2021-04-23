@@ -707,7 +707,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
 
 # Write API
 
-def write_sav(df, dst_path, str file_label="", list column_labels=None, compress=False, str note=None,
+def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, str note=None,
                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
                 dict variable_measure=None, dict variable_format=None):
     """
@@ -721,9 +721,11 @@ def write_sav(df, dst_path, str file_label="", list column_labels=None, compress
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
-    column_labels : list, optional
-        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-        labels must be represented by None.
+    column_labels : list or dict, optional
+        labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+        labels must be represented by None. If dict values must be variable names and values variable labels.
+        In such case there is no need to include all variables; labels for non existent
+        variables will be ignored with no warning or error.
     compress : boolean, optional
         if true a zsav will be written, by default False, a sav is written
     note : str, optional
@@ -772,7 +774,7 @@ def write_sav(df, dst_path, str file_label="", list column_labels=None, compress
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
         variable_alignment, variable_display_width, variable_measure, variable_format)
 
-def write_dta(df, dst_path, str file_label="", list column_labels=None, int version=15, 
+def write_dta(df, dst_path, str file_label="", object column_labels=None, int version=15, 
             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
     """
     Writes a pandas data frame to a STATA dta file
@@ -785,9 +787,11 @@ def write_dta(df, dst_path, str file_label="", list column_labels=None, int vers
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
-    column_labels : list, optional
-        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-        labels must be represented by None.
+    column_labels : list or dict, optional
+        labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+        labels must be represented by None. If dict values must be variable names and values variable labels.
+        In such case there is no need to include all variables; labels for non existent
+        variables will be ignored with no warning or error.
     version : int, optional
         dta file version, supported from 8 to 15, default is 15
     variable_value_labels : dict, optional
@@ -831,7 +835,7 @@ def write_dta(df, dst_path, str file_label="", list column_labels=None, int vers
      note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
      variable_display_width, variable_measure, variable_format)
 
-def write_xport(df, dst_path, str file_label="", list column_labels=None, str table_name=None, int file_format_version = 8,
+def write_xport(df, dst_path, str file_label="", object column_labels=None, str table_name=None, int file_format_version = 8,
     dict variable_format=None):
     """
     Writes a pandas data frame to a SAS Xport (xpt) file.
@@ -847,9 +851,11 @@ def write_xport(df, dst_path, str file_label="", list column_labels=None, str ta
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
-    column_labels : list, optional
-        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-        labels must be represented by None.
+    column_labels : list or dict, optional
+        labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+        labels must be represented by None. If dict values must be variable names and values variable labels.
+        In such case there is no need to include all variables; labels for non existent
+        variables will be ignored with no warning or error.
     table_name : str, optional
         name of the dataset, by default DATASET
     file_format_version : int, optional
@@ -872,7 +878,7 @@ def write_xport(df, dst_path, str file_label="", list column_labels=None, str ta
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
         variable_alignment,variable_display_width, variable_measure, variable_format)
 
-def write_por(df, dst_path, str file_label="", list column_labels=None, dict variable_format=None):
+def write_por(df, dst_path, str file_label="", object column_labels=None, dict variable_format=None):
     """
     Writes a pandas data frame to a SPSS POR file.
 
@@ -884,9 +890,11 @@ def write_por(df, dst_path, str file_label="", list column_labels=None, dict var
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
-    column_labels : list, optional
-        list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-        labels must be represented by None.
+    column_labels : list or dict, optional
+        labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+        labels must be represented by None. If dict values must be variable names and values variable labels.
+        In such case there is no need to include all variables; labels for non existent
+        variables will be ignored with no warning or error.
     variable_format: dict, optional
         sets the format of a variable. Must be a dictionary with keys being the variable names and 
         values being strings defining the format. See README, setting variable formats section,

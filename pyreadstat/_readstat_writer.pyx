@@ -521,7 +521,7 @@ cdef int close_file(int fd):
     else:
         return close(fd)
 
-cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, list column_labels,
+cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format) except *:
@@ -603,6 +603,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef dict value_labels
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
+    cdef list col_label_temp 
 
     if hasattr(os, 'fsencode'):
         try:
@@ -650,6 +651,18 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
         # add variables
         if column_labels:
+            if type(column_labels) != list and type(column_labels) != dict:
+                raise PyreadstatError("column_labels must be either list or dict!")
+            if type(column_labels) == dict:
+                col_label_temp = list()
+                for col_indx in range(col_count):
+                    variable_name = col_names[col_indx]
+                    if variable_name in column_labels.keys():
+                        col_label_temp.append(column_labels[variable_name])
+                    else:
+                        col_label_temp.append(None)
+                column_labels = col_label_temp
+
             col_label_count = len(column_labels)
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")

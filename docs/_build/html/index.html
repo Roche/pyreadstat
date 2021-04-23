@@ -561,8 +561,9 @@ otherwise</p>
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result sav or zsav file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
-<li><p><strong>column_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-labels must be represented by None.</p></li>
+<li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+labels must be represented by None. If dict there is no need to include all variables; labels for non existent
+variables will be ignored with no warning or error.</p></li>
 <li><p><strong>version</strong> (<em>int</em><em>, </em><em>optional</em>) – dta file version, supported from 8 to 15, default is 15</p></li>
 <li><p><strong>variable_value_labels</strong> (<em>dict</em><em>, </em><em>optional</em>) – value labels, a dictionary with key variable name and value a dictionary with key values and
 values labels. Variable names must match variable names in the dataframe otherwise will be
@@ -588,8 +589,9 @@ for more information.</p></li>
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result sav or zsav file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
-<li><p><strong>column_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-labels must be represented by None.</p></li>
+<li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+labels must be represented by None. If dict there is no need to include all variables; labels for non existent
+variables will be ignored with no warning or error.</p></li>
 <li><p><strong>variable_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – sets the format of a variable. Must be a dictionary with keys being the variable names and
 values being strings defining the format. See README, setting variable formats section,
 for more information.</p></li>
@@ -608,8 +610,9 @@ for more information.</p></li>
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result sav or zsav file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
-<li><p><strong>column_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-labels must be represented by None.</p></li>
+<li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+labels must be represented by None. If dict there is no need to include all variables; labels for non existent
+variables will be ignored with no warning or error.</p></li>
 <li><p><strong>compress</strong> (<em>boolean</em><em>, </em><em>optional</em>) – if true a zsav will be written, by default False, a sav is written</p></li>
 <li><p><strong>note</strong> (<em>str</em><em>, </em><em>optional</em>) – a note to add to the file</p></li>
 <li><p><strong>variable_value_labels</strong> (<em>dict</em><em>, </em><em>optional</em>) – value labels, a dictionary with key variable name and value a dictionary with key values and
@@ -647,8 +650,9 @@ Versions 5 and 8 are supported, default is 8.</p>
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result sav or zsav file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
-<li><p><strong>column_labels</strong> (<em>list</em><em>, </em><em>optional</em>) – list of labels for columns (variables), must be the same length as the number of columns. Variables with no
-labels must be represented by None.</p></li>
+<li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+labels must be represented by None. If dict there is no need to include all variables; labels for non existent
+variables will be ignored with no warning or error.</p></li>
 <li><p><strong>table_name</strong> (<em>str</em><em>, </em><em>optional</em>) – name of the dataset, by default DATASET</p></li>
 <li><p><strong>file_format_version</strong> (<em>int</em><em>, </em><em>optional</em>) – XPORT file version, either 8 or 5, default is 8</p></li>
 <li><p><strong>variable_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – sets the format of a variable. Must be a dictionary with keys being the variable names and

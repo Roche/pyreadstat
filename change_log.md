@@ -2,6 +2,7 @@
 * added meta.readstat_variable_types to track the type of binary variable in the original file.
 * Using os.fsencode when reading file paths to support file system encoding and Path-like objects (#123)
 * Updated Readstat source to version 1.1.6, fixes #117
+* Accepting dict as the column_label parameter for writing functions.
 
 # 1.0.9 (github, pypi and conda 2021.02.16)
 * Adding better error message for not accepting certain files types in multiprocessing, solves #105
