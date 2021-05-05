@@ -24,12 +24,8 @@ from libc.math cimport NAN, floor
 #from datetime import timedelta, datetime
 from collections import OrderedDict
 import os
-is_pathlib_available = False
-try:
-    from pathlib import Path
-    is_pathlib_available = True
-except:
-    pass
+import warnings
+import sys
 
 import pandas as pd
 import numpy as np
@@ -40,9 +36,15 @@ from readstat_api cimport *
 # necessary to work with the datetime C API
 import_datetime()
 
-cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10"]
-cdef list sas_datetime_formats = ["DATETIME", "DATETIME20"]
-cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3"]
+cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10", 
+                                "DDMMYYB", "DDMMYYB10", "DDMMYYC", "DDMMYYC10", "DDMMYYD", "DDMMYYD10",
+                                "DDMMYYN6", "DDMMYYN8", "DDMMYYP", "DDMMYYP10", "DDMMYYS", "DDMMYYS10",
+                                "MMDDYYB", "MMDDYYB10", "MMDDYYC", "MMDDYYC10", "MMDDYYD", "MMDDYYD10",
+                                "MMDDYYN6", "MMDDYYN8", "MMDDYYP", "MMDDYYP10", "MMDDYYS", "MMDDYYS10",
+                                "MONNAME", "MONTH", "WEEKDATX", "WEEKDAY", "QTR", "QTRR", "YEAR",
+                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
+cdef list sas_datetime_formats = ["DATETIME", "DATETIME20", "TOD"]
+cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
 cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 #sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
@@ -985,17 +987,26 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     cdef data_container data
     cdef object origin
 
-    if is_pathlib_available:
-        if not type(filename_path) == str and not isinstance(filename_path, Path):
-            raise PyreadstatError("filename_path must be either string or pathlib.Path")
-        if isinstance(filename_path, Path):
-            filename_path = str(filename_path.expanduser().resolve())
+    if hasattr(os, 'fsencode'):
+        try:
+            filename_bytes = os.fsencode(filename_path)
+        except UnicodeError:
+            warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
+            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")
     else:
-        if not type(filename_path) == str:
-            raise PyreadstatError("filename_path must be string")
+        IF PY_MAJOR_VERSION >2:
+            if type(filename_path) == str:
+                filename_bytes = filename_path.encode('utf-8')
+            elif type(filename_path) == bytes:
+                filename_bytes = filename_path
+            else:
+                raise PyreadstatError("path must be either str or bytes")
+        ELSE:
+            if type(filename_path) not in (str, bytes, unicode):
+                raise PyreadstatError("path must be str, bytes or unicode")
+            filename_bytes = filename_path.encode('utf-8')
 
-    filename_bytes = filename_path.encode("utf-8")
-   
+
     filename_bytes = os.path.expanduser(filename_bytes)
     if not os.path.isfile(filename_bytes):
         raise PyreadstatError("File {0} does not exist!".format(filename_path))

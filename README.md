@@ -267,6 +267,7 @@ import pandas as pd
 import pyreadstat
 
 df = pd.DataFrame([[1,2.0,"a"],[3,4.0,"b"]], columns=["v1", "v2", "v3"])
+# column_labels can also be a dictionary with variable name as key and label as value
 column_labels = ["Variable 1", "Variable 2", "Variable 3"]
 pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_labels=column_labels)
 ```

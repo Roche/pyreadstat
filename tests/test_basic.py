@@ -964,6 +964,18 @@ class TestBasic(unittest.TestCase):
             #self.assertDictEqual(meta.variable_alignment, variable_alignment)
             self.assertEqual(meta.variable_measure["mychar"], variable_measure["mychar"])
 
+    def test_sav_write_dictlabels(self):
+        col_names = ["mychar", "mynum", "mydate", "dtime", "mylabl", "myord", "mytime"]
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        col_lab_dict = {k:v for k,v in zip(col_names, col_labels) if v}
+        variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+        missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
+        path = os.path.join(self.write_folder, "dictlabel_write.sav")
+        pyreadstat.write_sav(self.df_pandas, path, column_labels=col_lab_dict)
+        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertListEqual(meta.column_labels, col_labels)
+
 
 if __name__ == '__main__':
 

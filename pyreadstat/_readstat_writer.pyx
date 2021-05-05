@@ -16,6 +16,9 @@
 # limitations under the License.
 # #############################################################################
 import os
+import warnings
+import sys
+
 import numpy as np
 #cimport numpy as np
 import pandas as pd
@@ -26,12 +29,6 @@ IF PY_MAJOR_VERSION >2:
 ELSE: # not available on python 2
     import pytz as _timezone
 from libc.math cimport round, NAN
-is_pathlib_available = False
-try:
-    from pathlib import Path
-    is_pathlib_available = True
-except:
-    pass
 
 from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
@@ -485,7 +482,7 @@ cdef void _check_exit_status(readstat_error_t retcode) except *:
         err_message = <str> err_readstat
         raise ReadstatError(err_message)
 
-cdef int open_file(str filename_path):
+cdef int open_file(bytes filename_path):
 
     cdef int fd
     cdef int flags
@@ -497,12 +494,13 @@ cdef int open_file(str filename_path):
     IF PY_MAJOR_VERSION >2:
 
         if os.name == "nt":
-            u16_path = PyUnicode_AsWideCharString(filename_path, &length)
+            filename_str = os.fsdecode(filename_path)
+            u16_path = PyUnicode_AsWideCharString(filename_str, &length)
             flags = _O_WRONLY | _O_CREAT | _O_BINARY
             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
         else:
-            filename_bytes = filename_path.encode("utf-8")
-            path = <char *> filename_bytes
+            #filename_bytes = filename_path.encode("utf-8")
+            path = <char *> filename_path
             flags = O_WRONLY | O_CREAT | O_TRUNC
             fd = open(path, flags, 0644)
 
@@ -523,7 +521,7 @@ cdef int close_file(int fd):
     else:
         return close(fd)
 
-cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, list column_labels,
+cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format) except *:
@@ -605,16 +603,26 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef dict value_labels
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
+    cdef list col_label_temp 
 
-
-    if is_pathlib_available:
-        if not type(filename_path) == str and not isinstance(filename_path, Path):
-            raise PyreadstatError("filename_path must be either string or pathlib.Path")
-        if isinstance(filename_path, Path):
-            filename_path = str(filename_path.expanduser().resolve())
+    if hasattr(os, 'fsencode'):
+        try:
+            filename_path = os.fsencode(filename_path)
+        except UnicodeError:
+            warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
+            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")
     else:
-        if not type(filename_path) == str:
-            raise PyreadstatError("filename_path must be string")
+        IF PY_MAJOR_VERSION >2:
+            if type(filename_path) == str:
+                filename_bytes = filename_path.encode('utf-8')
+            elif type(filename_path) == bytes:
+                filename_bytes = filename_path
+            else:
+                raise PyreadstatError("path must be either str or bytes")
+        ELSE:
+            if type(filename_path) not in (str, bytes, unicode):
+                raise PyreadstatError("path must be str, bytes or unicode")
+            filename_bytes = filename_path.encode('utf-8')
 
     filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)
@@ -643,6 +651,18 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
         # add variables
         if column_labels:
+            if type(column_labels) != list and type(column_labels) != dict:
+                raise PyreadstatError("column_labels must be either list or dict!")
+            if type(column_labels) == dict:
+                col_label_temp = list()
+                for col_indx in range(col_count):
+                    variable_name = col_names[col_indx]
+                    if variable_name in column_labels.keys():
+                        col_label_temp.append(column_labels[variable_name])
+                    else:
+                        col_label_temp.append(None)
+                column_labels = col_label_temp
+
             col_label_count = len(column_labels)
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")
