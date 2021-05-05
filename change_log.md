@@ -1,3 +1,6 @@
+# 1.1.2 (github, pypi and conda 2021.05.05)
+# correction when reading file paths in python <3.7
+
 # 1.1.1 (github, pypi and conda 2021.05.05)
 * Using os.fsencode when reading file paths to support file system encoding and Path-like objects (#123)
 * Updated Readstat source to version 1.1.6, fixes #117

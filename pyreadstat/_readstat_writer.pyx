@@ -610,7 +610,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             filename_path = os.fsencode(filename_path)
         except UnicodeError:
             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
-            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")
+            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
     else:
         IF PY_MAJOR_VERSION >2:
             if type(filename_path) == str:

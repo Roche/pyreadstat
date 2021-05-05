@@ -857,6 +857,8 @@ pull request to ReadStat first.
 
 [Clemens Brunner](https://github.com/cbrnr) - integration with pandas.read_spss
 
+[Thomas Grainger](https://github.com/graingert) - corrections and suggestions to source code
+
 [benjello](https://github.com/benjello), [maxwell8888](https://github.com/maxwell8888), [drcjar](https://github.com/drcjar), [labenech](https://github.com/labenech): improvements to documentation
 
 [alchemyst](https://github.com/alchemyst): improvements to docstrings
