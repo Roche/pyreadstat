@@ -1778,7 +1778,7 @@ static const char __pyx_k_total_seconds[] = "total_seconds";
 static const char __pyx_k_PyreadstatError[] = "PyreadstatError";
 static const char __pyx_k_readstat_parser[] = "_readstat_parser";
 static const char __pyx_k_CategoricalDtype[] = "CategoricalDtype";
-static const char __pyx_k_surrogateencoding[] = "surrogateencoding";
+static const char __pyx_k_surrogateescape[] = "surrogateescape";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_unknown_file_format[] = "unknown file format";
 static const char __pyx_k_getfilesystemencoding[] = "getfilesystemencoding";
@@ -1920,7 +1920,7 @@ static PyObject *__pyx_n_s_replace;
 static PyObject *__pyx_n_s_reset_index;
 static PyObject *__pyx_n_s_right;
 static PyObject *__pyx_n_s_scale;
-static PyObject *__pyx_n_s_surrogateencoding;
+static PyObject *__pyx_n_s_surrogateescape;
 static PyObject *__pyx_n_s_sys;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_time;
@@ -9841,7 +9841,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_d
  *             filename_path = os.fsencode(filename_path)
  *         except UnicodeError:             # <<<<<<<<<<<<<<
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
- *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")
+ *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
  */
       __pyx_t_18 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_UnicodeError);
       if (__pyx_t_18) {
@@ -9855,7 +9855,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_d
  *             filename_path = os.fsencode(filename_path)
  *         except UnicodeError:
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())             # <<<<<<<<<<<<<<
- *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")
+ *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
  *     else:
  */
         __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_n_s_warnings); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 612, __pyx_L38_except_error)
@@ -9907,7 +9907,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_d
         /* "pyreadstat/_readstat_writer.pyx":613
  *         except UnicodeError:
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
- *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")             # <<<<<<<<<<<<<<
+ *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")             # <<<<<<<<<<<<<<
  *     else:
  *         IF PY_MAJOR_VERSION >2:
  */
@@ -12708,7 +12708,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_reset_index, __pyx_k_reset_index, sizeof(__pyx_k_reset_index), 0, 0, 1, 1},
   {&__pyx_n_s_right, __pyx_k_right, sizeof(__pyx_k_right), 0, 0, 1, 1},
   {&__pyx_n_s_scale, __pyx_k_scale, sizeof(__pyx_k_scale), 0, 0, 1, 1},
-  {&__pyx_n_s_surrogateencoding, __pyx_k_surrogateencoding, sizeof(__pyx_k_surrogateencoding), 0, 0, 1, 1},
+  {&__pyx_n_s_surrogateescape, __pyx_k_surrogateescape, sizeof(__pyx_k_surrogateescape), 0, 0, 1, 1},
   {&__pyx_n_s_sys, __pyx_k_sys, sizeof(__pyx_k_sys), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
@@ -12777,11 +12777,11 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pyreadstat/_readstat_writer.pyx":613
  *         except UnicodeError:
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
- *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateencoding")             # <<<<<<<<<<<<<<
+ *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")             # <<<<<<<<<<<<<<
  *     else:
  *         IF PY_MAJOR_VERSION >2:
  */
-  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_kp_s_utf_8, __pyx_n_s_surrogateencoding); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 613, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(2, __pyx_kp_s_utf_8, __pyx_n_s_surrogateescape); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 613, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
