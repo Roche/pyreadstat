@@ -317,7 +317,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             result = py_str_value
         else:
             #str_byte_val = py_str_value.encode("UTF-8")
-            raise PyreadstatError("STRING type with value %s with date type" % py_str_value )
+            raise PyreadstatError("STRING type with value '%s' with date type in column '%s'" % (py_str_value, dc.col_names[index]))
     elif pyformat == VAR_FORMAT_LONG:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_long_value
