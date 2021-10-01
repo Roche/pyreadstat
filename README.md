@@ -863,4 +863,4 @@ pull request to ReadStat first.
 
 [alchemyst](https://github.com/alchemyst): improvements to docstrings
 
-[bmwiedemann](https://github.com/bmwiedemann), [toddrme2178 ](https://github.com/toddrme2178): improvements to source code
+[bmwiedemann](https://github.com/bmwiedemann), [toddrme2178 ](https://github.com/toddrme2178), [Martin Thorsen Ranang](https://github.com/mtr): improvements to source code
