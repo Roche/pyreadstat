@@ -243,7 +243,7 @@ static int sav_n_missing_string_values(readstat_variable_t *r_variable) {
 
 static readstat_error_t sav_n_missing_values(int *out_n_missing_values, readstat_variable_t *r_variable) {
     int n_missing_values = 0;
-    if (r_variable->type == READSTAT_TYPE_DOUBLE) {
+    if (readstat_variable_get_type_class(r_variable) == READSTAT_TYPE_CLASS_NUMERIC) {
         n_missing_values = sav_n_missing_double_values(r_variable);
     } else if (readstat_variable_get_storage_width(r_variable) <= 8) {
         n_missing_values = sav_n_missing_string_values(r_variable);
@@ -344,7 +344,7 @@ cleanup:
 }
 
 static readstat_error_t sav_emit_variable_missing_values(readstat_writer_t *writer, readstat_variable_t *r_variable) {
-    if (r_variable->type == READSTAT_TYPE_DOUBLE) {
+    if (readstat_variable_get_type_class(r_variable) == READSTAT_TYPE_CLASS_NUMERIC) {
         return sav_emit_variable_missing_double_values(writer, r_variable);
     } else if (readstat_variable_get_storage_width(r_variable) <= 8) {
         return sav_emit_variable_missing_string_values(writer, r_variable);
@@ -1304,7 +1304,7 @@ static sav_varnames_t *sav_varnames_init(readstat_writer_t *writer) {
             shortname[k] = toupper(shortname[k]);
         }
         if (ck_str_hash_lookup(shortname, table)) {
-            snprintf(shortname, sizeof(varnames[0].shortname), "V%d_A", i+1);
+            snprintf(shortname, sizeof(varnames[0].shortname), "V%d_A", ((unsigned int)i+1)%100000);
         }
         ck_str_hash_insert(shortname, r_variable, table);
 

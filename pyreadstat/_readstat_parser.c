@@ -1932,7 +1932,7 @@ static const char __pyx_k_This_class_holds_metadata_we_wa[] = "\n    This class 
 static const char __pyx_k_pyreadstat__readstat_parser_pyx[] = "pyreadstat/_readstat_parser.pyx";
 static const char __pyx_k_Failed_convert_C_to_python_value[] = "Failed convert C to python value";
 static const char __pyx_k_Failed_to_read_number_of_variabl[] = "Failed to read number of variables";
-static const char __pyx_k_STRING_type_with_value_s_with_da[] = "STRING type with value %s with date type";
+static const char __pyx_k_STRING_type_with_value_s_with_da[] = "STRING type with value '%s' with date type in column '%s'";
 static const char __pyx_k_file_path_could_not_be_encoded_w[] = "file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly.";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static const char __pyx_k_path_must_be_either_str_or_bytes[] = "path must be either str or bytes";
@@ -4434,7 +4434,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_pyt
     /* "pyreadstat/_readstat_parser.pyx":320
  *         else:
  *             #str_byte_val = py_str_value.encode("UTF-8")
- *             raise PyreadstatError("STRING type with value %s with date type" % py_str_value )             # <<<<<<<<<<<<<<
+ *             raise PyreadstatError("STRING type with value '%s' with date type in column '%s'" % (py_str_value, dc.col_names[index]))             # <<<<<<<<<<<<<<
  *     elif pyformat == VAR_FORMAT_LONG:
  *         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
  */
@@ -4442,8 +4442,23 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_pyt
       __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_PyreadstatError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 320, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (unlikely(!__pyx_v_py_str_value)) { __Pyx_RaiseUnboundLocalError("py_str_value"); __PYX_ERR(0, 320, __pyx_L1_error) }
-      __pyx_t_7 = __Pyx_PyString_Format(__pyx_kp_s_STRING_type_with_value_s_with_da, __pyx_v_py_str_value); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L1_error)
+      if (unlikely(__pyx_v_dc->col_names == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 320, __pyx_L1_error)
+      }
+      __pyx_t_7 = __Pyx_GetItemInt_List(__pyx_v_dc->col_names, __pyx_v_index, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_9 = PyTuple_New(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 320, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      __Pyx_INCREF(__pyx_v_py_str_value);
+      __Pyx_GIVEREF(__pyx_v_py_str_value);
+      PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_v_py_str_value);
+      __Pyx_GIVEREF(__pyx_t_7);
+      PyTuple_SET_ITEM(__pyx_t_9, 1, __pyx_t_7);
+      __pyx_t_7 = 0;
+      __pyx_t_7 = __Pyx_PyString_Format(__pyx_kp_s_STRING_type_with_value_s_with_da, __pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 320, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_9 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
         __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_1);
@@ -4477,7 +4492,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_pyt
     case __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_LONG:
 
     /* "pyreadstat/_readstat_parser.pyx":322
- *             raise PyreadstatError("STRING type with value %s with date type" % py_str_value )
+ *             raise PyreadstatError("STRING type with value '%s' with date type in column '%s'" % (py_str_value, dc.col_names[index]))
  *     elif pyformat == VAR_FORMAT_LONG:
  *         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:             # <<<<<<<<<<<<<<
  *             result = py_long_value
@@ -4507,7 +4522,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_pyt
       __pyx_t_6 = 0;
 
       /* "pyreadstat/_readstat_parser.pyx":322
- *             raise PyreadstatError("STRING type with value %s with date type" % py_str_value )
+ *             raise PyreadstatError("STRING type with value '%s' with date type in column '%s'" % (py_str_value, dc.col_names[index]))
  *     elif pyformat == VAR_FORMAT_LONG:
  *         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:             # <<<<<<<<<<<<<<
  *             result = py_long_value
@@ -4542,7 +4557,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_pyt
 
     /* "pyreadstat/_readstat_parser.pyx":321
  *             #str_byte_val = py_str_value.encode("UTF-8")
- *             raise PyreadstatError("STRING type with value %s with date type" % py_str_value )
+ *             raise PyreadstatError("STRING type with value '%s' with date type in column '%s'" % (py_str_value, dc.col_names[index]))
  *     elif pyformat == VAR_FORMAT_LONG:             # <<<<<<<<<<<<<<
  *         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
  *             result = py_long_value

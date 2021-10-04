@@ -594,7 +594,7 @@ static readstat_error_t dta_117_emit_strl_header(readstat_writer_t *writer, read
         .len = ref->len
     };
 
-    return readstat_write_bytes(writer, &header, sizeof(dta_117_strl_header_t));
+    return readstat_write_bytes(writer, &header, SIZEOF_DTA_117_STRL_HEADER_T);
 }
 
 static readstat_error_t dta_118_emit_strl_header(readstat_writer_t *writer, readstat_string_ref_t *ref) {
@@ -605,7 +605,7 @@ static readstat_error_t dta_118_emit_strl_header(readstat_writer_t *writer, read
         .len = ref->len
     };
 
-    return readstat_write_bytes(writer, &header, sizeof(dta_118_strl_header_t));
+    return readstat_write_bytes(writer, &header, SIZEOF_DTA_118_STRL_HEADER_T);
 }
 
 static readstat_error_t dta_emit_strls(readstat_writer_t *writer, dta_ctx_t *ctx) {
@@ -1067,9 +1067,9 @@ static size_t dta_measure_strls(readstat_writer_t *writer, dta_ctx_t *ctx) {
     for (i=0; i<writer->string_refs_count; i++) {
         readstat_string_ref_t *ref = writer->string_refs[i];
         if (ctx->strl_o_len > 4) {
-            strls_len += 20 + ref->len;
+            strls_len += sizeof("GSO") - 1 + SIZEOF_DTA_118_STRL_HEADER_T + ref->len;
         } else {
-            strls_len += 16 + ref->len;
+            strls_len += sizeof("GSO") - 1 + SIZEOF_DTA_117_STRL_HEADER_T + ref->len;
         }
     }
 
