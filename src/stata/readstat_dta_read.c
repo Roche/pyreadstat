@@ -317,10 +317,10 @@ cleanup:
 static int dta_compare_strls(const void *elem1, const void *elem2) {
     const dta_strl_t *key = (const dta_strl_t *)elem1;
     const dta_strl_t *target = *(const dta_strl_t **)elem2;
-    if (key->v == target->v)
-        return key->o - target->o;
+    if (key->o == target->o)
+        return key->v - target->v;
 
-    return key->v - target->v;
+    return key->o - target->o;
 }
 
 static dta_strl_t dta_interpret_strl_vo_bytes(dta_ctx_t *ctx, const unsigned char *vo_bytes) {
@@ -360,7 +360,7 @@ static readstat_error_t dta_117_read_strl(dta_ctx_t *ctx, dta_strl_t *strl) {
     readstat_io_t *io = ctx->io;
     dta_117_strl_header_t header;
 
-    if (io->read(&header, sizeof(header), io->io_ctx) != sizeof(dta_117_strl_header_t)) {
+    if (io->read(&header, SIZEOF_DTA_117_STRL_HEADER_T, io->io_ctx) != SIZEOF_DTA_117_STRL_HEADER_T) {
         retval = READSTAT_ERROR_READ;
         goto cleanup;
     }
@@ -379,7 +379,7 @@ static readstat_error_t dta_118_read_strl(dta_ctx_t *ctx, dta_strl_t *strl) {
     readstat_io_t *io = ctx->io;
     dta_118_strl_header_t header;
 
-    if (io->read(&header, sizeof(header), io->io_ctx) != sizeof(dta_118_strl_header_t)) {
+    if (io->read(&header, SIZEOF_DTA_118_STRL_HEADER_T, io->io_ctx) != SIZEOF_DTA_118_STRL_HEADER_T) {
         retval = READSTAT_ERROR_READ;
         goto cleanup;
     }

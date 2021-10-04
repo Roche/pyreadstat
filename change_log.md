@@ -1,3 +1,8 @@
+# 1.1.3 (github, pypi and conda 2021.10.05)
+# Updated Readstat source to version 1.1.17
+* Improved error when reading dates and finding a string (#145)
+* repaired not reading correctly metadata with multiprocessing (#146)
+
 # 1.1.2 (github, pypi and conda 2021.05.05)
 # correction when reading file paths in python <3.7
 

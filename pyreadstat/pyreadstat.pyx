@@ -677,12 +677,13 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
     if not num_processes:
         # let's be more conservative with the number of workers
         num_processes = min(mp.cpu_count(), 4)
-    _, meta = read_function(file_path, metadataonly=True)
-    numrows = meta.number_rows
+    _ = kwargs.pop('metadataonly', None)
     row_offset = kwargs.pop("row_offset", 0)
     row_limit = kwargs.pop("row_limit", float('inf'))
+    _, meta = read_function(file_path, metadataonly=True, **kwargs)
+    numrows = meta.number_rows
     if not numrows:
-        raise Exception("The number of rows of the file cannot be determined")
+        raise Exception("The number of rows of the file cannot be determined from the file's metadata")
     numrows = min(max(numrows - row_offset, 0), row_limit)        
     divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes)]
     offsets = list()
