@@ -136,7 +136,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.1.3',
+    version='1.1.4',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",
@@ -156,6 +156,6 @@ setup(
     ext_modules=extensions,
     packages=["pyreadstat"],
     data_files=data_files,
-    install_requires=['pandas>0.24.0'],
+    install_requires=['pandas>=1.2.0'],
     license="Apache License Version 2.0",
 )
