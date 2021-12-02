@@ -38,7 +38,8 @@ cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'
              np.int32, np.int16, np.int8, np.uint8, np.uint16}
 cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
 cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
-               np.dtype('float32'), np.int64, np.uint64, np.uint32, np.float, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype()}
+               np.dtype('float32'), np.int64, np.uint64, np.uint32, np.float, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
+               pd.Float64Dtype(), pd.Float32Dtype()}
 cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
 cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}

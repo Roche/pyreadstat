@@ -1,3 +1,7 @@
+# 1.1.4 (github, pypi and conda 2021.11.xx)
+* Included new pandas datatypes Float32Dtype and Float64Dtype when writing. Soves #150.
+* Forcing cythonization when installing from source solves #151.
+
 # 1.1.3 (github, pypi and conda 2021.10.05)
 # Updated Readstat source to version 1.1.17
 * Improved error when reading dates and finding a string (#145)

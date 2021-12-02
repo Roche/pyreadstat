@@ -18,37 +18,20 @@ import setuptools
 from distutils.core import setup, Extension
 import os
 import sys
-#import numpy
+import Cython
+from Cython.Build import cythonize
 
 PY_MAJOR_VERSION = sys.version_info[0]
 
 if PY_MAJOR_VERSION < 3 and os.name == 'nt':
     raise Exception("Python 2 is not supported on Windows.")
 
-# If cython is there and version is good, use it.
-try:
-    import Cython
-    from Cython.Build import cythonize
-    cyver = int(Cython.__version__.split(".")[1])
-    if cyver < 28:
-        msg = "Cython version 0.28 or newer required"
-        raise Exception(msg)
-    USE_CYTHON = True
-except:
-    USE_CYTHON = False
-    if PY_MAJOR_VERSION < 3:
-        msg = "In order to compile with Python 2.7, please install Cython version > 0.28"
-        raise Exception(msg)
-    if '--use-cython' in sys.argv:
-        raise
+cyver = int(Cython.__version__.split(".")[1])
+if cyver < 28:
+    msg = "Cython version 0.28 or newer required"
+    raise Exception(msg)
 
-# To re-compile the pyx sources use the option --use-cython
-if '--use-cython' in sys.argv:
-    if not USE_CYTHON:
-        raise Exception("--use-cython failed to set cython to be used!")
-    sys.argv.remove('--use-cython')
-
-ext = '.pyx' if USE_CYTHON else '.c'
+ext = '.pyx'
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -120,11 +103,9 @@ extensions = [Extension("pyreadstat.pyreadstat",
 for e in extensions:
     e.cython_directives = {"embedsignature": True}
 
-if USE_CYTHON:
-    #from Cython.Build import cythonize
-    # let's use cython with force so that it always recompiles in case 
-    # somebody is switching between python 2 and 3
-    extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
+# let's use cython with force so that it always recompiles in case 
+# somebody is switching between python 2 and 3
+extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
 
 long_description = """ A Python package to read and write SAS
 (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas data frames. It is a wrapper
@@ -136,7 +117,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.1.3',
+    version='1.1.4',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",
@@ -156,6 +137,6 @@ setup(
     ext_modules=extensions,
     packages=["pyreadstat"],
     data_files=data_files,
-    install_requires=['pandas>0.24.0'],
+    install_requires=['pandas>=1.2.0'],
     license="Apache License Version 2.0",
 )
