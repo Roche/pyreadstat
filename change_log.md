@@ -1,4 +1,4 @@
-# 1.1.4 (github, pypi and conda 2021.11.xx)
+# 1.1.4 (github, pypi and conda 2021.12.02)
 * Included new pandas datatypes Float32Dtype and Float64Dtype when writing. Soves #150.
 * Forcing cythonization when installing from source solves #151.
 
