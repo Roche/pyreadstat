@@ -219,6 +219,9 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             is_missing = 0
             if curuser_missing:
                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
+                if not len(curseries):
+                    result.append((PYWRITER_DOUBLE, 0, 1))
+                    continue
             if np.any(pd.isna(curseries)):
                 if col_type in int_mixed_types:
                     result.append((PYWRITER_INTEGER, 0, 1))
@@ -235,7 +238,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                         result.append((PYWRITER_OBJECT, max_length, 1))
                         continue
                 else:
-                    result.append((PYWRITER_LOGICAL, 0, 1))
+                    if curuser_missing:
+                        result.append((PYWRITER_DOUBLE, 0, 1))
+                    else:
+                        result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
             else:
                 if col_type in int_mixed_types:

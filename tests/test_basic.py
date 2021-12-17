@@ -975,6 +975,24 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sav(path, user_missing=True)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertListEqual(meta.column_labels, col_labels)
+    
+    def test_dta_write_single_value_user_missing(self):
+        df = pd.DataFrame({"var": ["a", "a", "a", "a"]})
+        missing_user_values = {"var": ["a"]}
+        path = os.path.join(self.write_folder, "singleusermissing.dta")
+        pyreadstat.write_dta(df=df, dst_path=path, missing_user_values=missing_user_values,version=12) 
+        df2, meta2 = pyreadstat.read_dta(path, user_missing=True)
+        self.assertTrue(df.equals(df2))
+
+    def test_dta_write_only_missing_and_user_missing(self):
+        df = pd.DataFrame({"var": [np.nan, "a", "b"]})
+        path = os.path.join(self.write_folder, "onlymissing_and_usermissing.dta")
+        variable_value_labels={"var": {1: "Val 1", 2: "Val 2", 3: "Val 3", "a": "Missing A", "b": "Missing B", } }
+        missing_user_values={"var": ["a", "b"]}
+        pyreadstat.write_dta(df, path, variable_value_labels=variable_value_labels, missing_user_values=missing_user_values,version=12)
+        df2, meta2 = pyreadstat.read_dta(path, user_missing=True, )
+        self.assertTrue(df.equals(df2))
+
 
 
 if __name__ == '__main__':
