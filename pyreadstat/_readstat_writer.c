@@ -47,6 +47,7 @@
             "./src/sas/readstat_sas7bdat_write.c",
             "./src/sas/readstat_sas_rle.c",
             "./src/sas/readstat_xport.c",
+            "./src/sas/readstat_xport_parse_format.c",
             "./src/sas/readstat_xport_read.c",
             "./src/sas/readstat_xport_write.c",
             "./src/spss/readstat_por.c",
