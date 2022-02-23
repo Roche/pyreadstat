@@ -1,5 +1,5 @@
 # 1.1.5 (github, pypi and conda xxxx.xx.xx)
-* Solved #159 and #158.
+* Solved #159, #158, #163, 164.
 * Removed np.float, solves #160
 
 # 1.1.4 (github, pypi and conda 2021.12.02)
