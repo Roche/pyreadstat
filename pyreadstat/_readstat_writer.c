@@ -7237,7 +7237,7 @@ static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject 
  *                     if len(hi) > 8:
  *                         msg = "missing_ranges: string values length must not be larger than 8"             # <<<<<<<<<<<<<<
  *                         raise PyreadstatError(msg)
- *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))
+ *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi))#.encode("utf-8")))
  */
             __Pyx_INCREF(__pyx_kp_s_missing_ranges_string_values_len);
             __pyx_v_msg = __pyx_kp_s_missing_ranges_string_values_len;
@@ -7246,7 +7246,7 @@ static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject 
  *                     if len(hi) > 8:
  *                         msg = "missing_ranges: string values length must not be larger than 8"
  *                         raise PyreadstatError(msg)             # <<<<<<<<<<<<<<
- *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))
+ *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi))#.encode("utf-8")))
  *                     discrete_strings += 1
  */
             __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_PyreadstatError); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 392, __pyx_L1_error)
@@ -7282,34 +7282,16 @@ static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject 
           /* "pyreadstat/_readstat_writer.pyx":393
  *                         msg = "missing_ranges: string values length must not be larger than 8"
  *                         raise PyreadstatError(msg)
- *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))             # <<<<<<<<<<<<<<
+ *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi))#.encode("utf-8")))             # <<<<<<<<<<<<<<
  *                     discrete_strings += 1
  *                 else:
  */
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_hi, __pyx_n_s_encode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 393, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_7 = NULL;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-            __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_6);
-            if (likely(__pyx_t_7)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-              __Pyx_INCREF(__pyx_t_7);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_6, function);
-            }
-          }
-          __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_7, __pyx_kp_s_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_kp_s_utf_8);
-          __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 393, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_3);
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          __pyx_t_12 = __Pyx_PyObject_AsString(__pyx_t_3); if (unlikely((!__pyx_t_12) && PyErr_Occurred())) __PYX_ERR(0, 393, __pyx_L1_error)
+          __pyx_t_12 = __Pyx_PyObject_AsString(__pyx_v_hi); if (unlikely((!__pyx_t_12) && PyErr_Occurred())) __PYX_ERR(0, 393, __pyx_L1_error)
           __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_variable_add_missing_string_value(__pyx_v_variable, __pyx_t_12)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 393, __pyx_L1_error)
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
           /* "pyreadstat/_readstat_writer.pyx":394
  *                         raise PyreadstatError(msg)
- *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))
+ *                     check_exit_status(readstat_variable_add_missing_string_value(variable, hi))#.encode("utf-8")))
  *                     discrete_strings += 1             # <<<<<<<<<<<<<<
  *                 else:
  *                     #check_exit_status(readstat_variable_add_missing_string_range(variable, lo, hi))
@@ -7501,7 +7483,7 @@ static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject 
  *                 if len(cur_range) > 8:
  *                         msg = "missing_ranges: string values length must not be larger than 8"             # <<<<<<<<<<<<<<
  *                         raise PyreadstatError(msg)
- *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))
+ *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))#.encode("utf-8")))
  */
           __Pyx_INCREF(__pyx_kp_s_missing_ranges_string_values_len);
           __pyx_v_msg = __pyx_kp_s_missing_ranges_string_values_len;
@@ -7510,7 +7492,7 @@ static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject 
  *                 if len(cur_range) > 8:
  *                         msg = "missing_ranges: string values length must not be larger than 8"
  *                         raise PyreadstatError(msg)             # <<<<<<<<<<<<<<
- *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))
+ *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))#.encode("utf-8")))
  *                 discrete_strings += 1
  */
           __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_PyreadstatError); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 409, __pyx_L1_error)
@@ -7546,34 +7528,16 @@ static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject 
         /* "pyreadstat/_readstat_writer.pyx":410
  *                         msg = "missing_ranges: string values length must not be larger than 8"
  *                         raise PyreadstatError(msg)
- *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))             # <<<<<<<<<<<<<<
+ *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))#.encode("utf-8")))             # <<<<<<<<<<<<<<
  *                 discrete_strings += 1
  *             else:
  */
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_cur_range, __pyx_n_s_encode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 410, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = NULL;
-        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-          __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_6);
-          if (likely(__pyx_t_7)) {
-            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-            __Pyx_INCREF(__pyx_t_7);
-            __Pyx_INCREF(function);
-            __Pyx_DECREF_SET(__pyx_t_6, function);
-          }
-        }
-        __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_7, __pyx_kp_s_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_kp_s_utf_8);
-        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 410, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __pyx_t_12 = __Pyx_PyObject_AsString(__pyx_t_3); if (unlikely((!__pyx_t_12) && PyErr_Occurred())) __PYX_ERR(0, 410, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyObject_AsString(__pyx_v_cur_range); if (unlikely((!__pyx_t_12) && PyErr_Occurred())) __PYX_ERR(0, 410, __pyx_L1_error)
         __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_variable_add_missing_string_value(__pyx_v_variable, __pyx_t_12)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 410, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
         /* "pyreadstat/_readstat_writer.pyx":411
  *                         raise PyreadstatError(msg)
- *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))
+ *                 check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))#.encode("utf-8")))
  *                 discrete_strings += 1             # <<<<<<<<<<<<<<
  *             else:
  *                 msg = "missing_ranges: values must be both either of numeric or string type"
