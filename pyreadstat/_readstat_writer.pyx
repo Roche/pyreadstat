@@ -194,6 +194,8 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
 
     cdef list result = list()
     cdef int equal, is_missing
+    if variable_value_labels is None:
+        variable_value_labels = dict()
 
     for indx, (col_name, col_type) in enumerate(zip(columns, types)):
 
