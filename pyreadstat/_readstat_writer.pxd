@@ -46,7 +46,7 @@ cdef extern from "conditional_includes.h":
 
 IF PY_MAJOR_VERSION >2:
     cdef extern from "Python.h":
-            wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *)
+            wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
 
 ctypedef enum dst_file_format:
     FILE_FORMAT_SAS7BDAT
