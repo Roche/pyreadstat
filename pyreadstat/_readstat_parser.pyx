@@ -49,8 +49,8 @@ cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_f
 #sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
-cdef list spss_datetime_formats = ["DATETIME", 'DATETIME20', 'DATETIME23.2', "DATETIME8", "YMDHMS20"]
-cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE", 'EDATE10', 'DATE8', 'EDATE8', "DATE11"]
+cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
+cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
 cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)

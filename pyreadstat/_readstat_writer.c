@@ -958,7 +958,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format {
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format;
 
 /* "pyreadstat/_readstat_writer.pxd":51
- *             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *)
+ *             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
  * 
  * ctypedef enum dst_file_format:             # <<<<<<<<<<<<<<
  *     FILE_FORMAT_SAS7BDAT
@@ -8537,7 +8537,8 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
   PyObject *__pyx_t_2 = NULL;
   int __pyx_t_3;
   PyObject *__pyx_t_4 = NULL;
-  char *__pyx_t_5;
+  wchar_t *__pyx_t_5;
+  char *__pyx_t_6;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -8596,7 +8597,8 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
  *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
  */
-    __pyx_v_u16_path = PyUnicode_AsWideCharString(__pyx_v_filename_str, (&__pyx_v_length));
+    __pyx_t_5 = PyUnicode_AsWideCharString(__pyx_v_filename_str, (&__pyx_v_length)); if (unlikely(__pyx_t_5 == ((wchar_t *)NULL))) __PYX_ERR(0, 513, __pyx_L1_error)
+    __pyx_v_u16_path = __pyx_t_5;
 
     /* "pyreadstat/_readstat_writer.pyx":514
  *             filename_str = os.fsdecode(filename_path)
@@ -8638,8 +8640,8 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
       PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
       __PYX_ERR(0, 518, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyBytes_AsWritableString(__pyx_v_filename_path); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(0, 518, __pyx_L1_error)
-    __pyx_v_path = ((char *)__pyx_t_5);
+    __pyx_t_6 = __Pyx_PyBytes_AsWritableString(__pyx_v_filename_path); if (unlikely((!__pyx_t_6) && PyErr_Occurred())) __PYX_ERR(0, 518, __pyx_L1_error)
+    __pyx_v_path = ((char *)__pyx_t_6);
 
     /* "pyreadstat/_readstat_writer.pyx":519
  *             #filename_bytes = filename_path.encode("utf-8")

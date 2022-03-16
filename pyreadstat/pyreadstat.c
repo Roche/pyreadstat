@@ -959,7 +959,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format {
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format;
 
 /* "_readstat_writer.pxd":51
- *             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *)
+ *             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
  * 
  * ctypedef enum dst_file_format:             # <<<<<<<<<<<<<<
  *     FILE_FORMAT_SAS7BDAT
