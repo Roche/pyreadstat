@@ -1894,7 +1894,11 @@ static const char __pyx_k_from_dict[] = "from_dict";
 static const char __pyx_k_metaclass[] = "__metaclass__";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
 static const char __pyx_k_DATETIME17[] = "DATETIME17";
+static const char __pyx_k_DATETIME18[] = "DATETIME18";
+static const char __pyx_k_DATETIME19[] = "DATETIME19";
 static const char __pyx_k_DATETIME20[] = "DATETIME20";
+static const char __pyx_k_DATETIME21[] = "DATETIME21";
+static const char __pyx_k_DATETIME22[] = "DATETIME22";
 static const char __pyx_k_YMDHMS19_2[] = "YMDHMS19.2";
 static const char __pyx_k_expanduser[] = "expanduser";
 static const char __pyx_k_file_label[] = "file_label";
@@ -1972,7 +1976,11 @@ static PyObject *__pyx_n_s_DATE8;
 static PyObject *__pyx_n_s_DATE9;
 static PyObject *__pyx_n_s_DATETIME;
 static PyObject *__pyx_n_s_DATETIME17;
+static PyObject *__pyx_n_s_DATETIME18;
+static PyObject *__pyx_n_s_DATETIME19;
 static PyObject *__pyx_n_s_DATETIME20;
+static PyObject *__pyx_n_s_DATETIME21;
+static PyObject *__pyx_n_s_DATETIME22;
 static PyObject *__pyx_kp_s_DATETIME23_2;
 static PyObject *__pyx_n_s_DATETIME8;
 static PyObject *__pyx_n_s_DAY;
@@ -12622,7 +12630,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_DATE9, __pyx_k_DATE9, sizeof(__pyx_k_DATE9), 0, 0, 1, 1},
   {&__pyx_n_s_DATETIME, __pyx_k_DATETIME, sizeof(__pyx_k_DATETIME), 0, 0, 1, 1},
   {&__pyx_n_s_DATETIME17, __pyx_k_DATETIME17, sizeof(__pyx_k_DATETIME17), 0, 0, 1, 1},
+  {&__pyx_n_s_DATETIME18, __pyx_k_DATETIME18, sizeof(__pyx_k_DATETIME18), 0, 0, 1, 1},
+  {&__pyx_n_s_DATETIME19, __pyx_k_DATETIME19, sizeof(__pyx_k_DATETIME19), 0, 0, 1, 1},
   {&__pyx_n_s_DATETIME20, __pyx_k_DATETIME20, sizeof(__pyx_k_DATETIME20), 0, 0, 1, 1},
+  {&__pyx_n_s_DATETIME21, __pyx_k_DATETIME21, sizeof(__pyx_k_DATETIME21), 0, 0, 1, 1},
+  {&__pyx_n_s_DATETIME22, __pyx_k_DATETIME22, sizeof(__pyx_k_DATETIME22), 0, 0, 1, 1},
   {&__pyx_kp_s_DATETIME23_2, __pyx_k_DATETIME23_2, sizeof(__pyx_k_DATETIME23_2), 0, 0, 1, 0},
   {&__pyx_n_s_DATETIME8, __pyx_k_DATETIME8, sizeof(__pyx_k_DATETIME8), 0, 0, 1, 1},
   {&__pyx_n_s_DAY, __pyx_k_DAY, sizeof(__pyx_k_DAY), 0, 0, 1, 1},
@@ -13568,21 +13580,33 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/_readstat_parser.pyx":46
  *                                 "MONNAME", "MONTH", "WEEKDATX", "WEEKDAY", "QTR", "QTRR", "YEAR",
  *                                 "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
- * cdef list sas_datetime_formats = ["DATETIME", "DATETIME20", "TOD"]             # <<<<<<<<<<<<<<
+ * cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22", "TOD"]             # <<<<<<<<<<<<<<
  * cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
  * cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
  */
-  __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_DATETIME);
   __Pyx_GIVEREF(__pyx_n_s_DATETIME);
   PyList_SET_ITEM(__pyx_t_2, 0, __pyx_n_s_DATETIME);
+  __Pyx_INCREF(__pyx_n_s_DATETIME18);
+  __Pyx_GIVEREF(__pyx_n_s_DATETIME18);
+  PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_DATETIME18);
+  __Pyx_INCREF(__pyx_n_s_DATETIME19);
+  __Pyx_GIVEREF(__pyx_n_s_DATETIME19);
+  PyList_SET_ITEM(__pyx_t_2, 2, __pyx_n_s_DATETIME19);
   __Pyx_INCREF(__pyx_n_s_DATETIME20);
   __Pyx_GIVEREF(__pyx_n_s_DATETIME20);
-  PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_DATETIME20);
+  PyList_SET_ITEM(__pyx_t_2, 3, __pyx_n_s_DATETIME20);
+  __Pyx_INCREF(__pyx_n_s_DATETIME21);
+  __Pyx_GIVEREF(__pyx_n_s_DATETIME21);
+  PyList_SET_ITEM(__pyx_t_2, 4, __pyx_n_s_DATETIME21);
+  __Pyx_INCREF(__pyx_n_s_DATETIME22);
+  __Pyx_GIVEREF(__pyx_n_s_DATETIME22);
+  PyList_SET_ITEM(__pyx_t_2, 5, __pyx_n_s_DATETIME22);
   __Pyx_INCREF(__pyx_n_s_TOD);
   __Pyx_GIVEREF(__pyx_n_s_TOD);
-  PyList_SET_ITEM(__pyx_t_2, 2, __pyx_n_s_TOD);
+  PyList_SET_ITEM(__pyx_t_2, 6, __pyx_n_s_TOD);
   __Pyx_XGOTREF(__pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats);
   __Pyx_DECREF_SET(__pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats, ((PyObject*)__pyx_t_2));
   __Pyx_GIVEREF(__pyx_t_2);
@@ -13590,7 +13614,7 @@ if (!__Pyx_RefNanny) {
 
   /* "pyreadstat/_readstat_parser.pyx":47
  *                                 "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
- * cdef list sas_datetime_formats = ["DATETIME", "DATETIME20", "TOD"]
+ * cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22", "TOD"]
  * cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]             # <<<<<<<<<<<<<<
  * cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
  * #sas_origin = datetime(1960,1,1)
@@ -13621,7 +13645,7 @@ if (!__Pyx_RefNanny) {
   __pyx_t_2 = 0;
 
   /* "pyreadstat/_readstat_parser.pyx":48
- * cdef list sas_datetime_formats = ["DATETIME", "DATETIME20", "TOD"]
+ * cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22", "TOD"]
  * cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
  * cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats             # <<<<<<<<<<<<<<
  * #sas_origin = datetime(1960,1,1)
