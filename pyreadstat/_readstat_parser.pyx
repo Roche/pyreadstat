@@ -579,6 +579,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
+    iscurnptypeobject = dc.col_dtypes_isobject[index]
+    iscurnptypefloat = dc.col_dytpes_isfloat[index]
     if is_unkown_number_rows:
         if max_n_obs <= obs_index:
             dc.max_n_obs = obs_index + 1
@@ -586,6 +588,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
         if var_max_rows <= obs_index:
             curnptype = dc.col_numpy_dtypes[index]
             buf_list = np.empty(100000, dtype=curnptype)
+            if iscurnptypeobject or iscurnptypefloat:
+                buf_list.fill(np.nan)
             dc.col_data[index] = np.append(dc.col_data[index], buf_list)
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
@@ -594,10 +598,10 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     if readstat_value_is_missing(value, variable):
         # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
-            iscurnptypeobject = dc.col_dtypes_isobject[index]
-            iscurnptypefloat = dc.col_dytpes_isfloat[index]
             if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
-                dc.col_data[index][obs_index] = np.nan
+                # already allocated
+                pass
+                #dc.col_data[index][obs_index] = np.nan
             # for any type except float, the numpy type will be object as now we have nans
             else:
                 dc.col_numpy_dtypes[index] = object
