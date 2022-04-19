@@ -597,9 +597,7 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             iscurnptypeobject = dc.col_dtypes_isobject[index]
             iscurnptypefloat = dc.col_dytpes_isfloat[index]
             if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
-                # already allocated
-                pass
-                #dc.col_data[index][obs_index] = NAN
+                dc.col_data[index][obs_index] = np.nan
             # for any type except float, the numpy type will be object as now we have nans
             else:
                 dc.col_numpy_dtypes[index] = object
