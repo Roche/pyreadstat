@@ -361,7 +361,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
 
     return label_set
 
-cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) except *:
+cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pywriter_variable_type vartype, str variablename) except *:
     """
     Adding missing ranges, user defined missing discrete values both numeric and character,
      this happens for SPSS
@@ -379,6 +379,9 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                 msg = "dictionaries in missing_ranges must have the keys hi and lo"
                 raise PyreadstatError(msg)
             if type(hi) in numeric_types  and type(lo) in numeric_types:
+                if vartype not in pywriter_numeric_types:
+                    msg = "numeric missing_ranges value given for non numeric variable %s" %variablename
+                    raise PyreadstatError(msg)
                 if hi == lo:
                     check_exit_status(readstat_variable_add_missing_double_value(variable, hi))
                     discrete_values += 1
@@ -386,6 +389,9 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                     check_exit_status(readstat_variable_add_missing_double_range(variable, lo, hi))
                     range_values += 1
             elif type(hi) == str and type(lo) == str:
+                if vartype != PYWRITER_CHARACTER:
+                    msg = "character missing_ranges value given for non character variable %s" %variablename
+                    raise PyreadstatError(msg)
                 if hi == lo:
                     if len(hi) > 8:
                         msg = "missing_ranges: string values length must not be larger than 8"
@@ -401,9 +407,15 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                 raise PyreadstatError(msg)
         else:
             if type(cur_range) in numeric_types:
+                if vartype not in pywriter_numeric_types:
+                    msg = "numeric missing_ranges value given for non numeric variable %s" %variablename
+                    raise PyreadstatError(msg)
                 check_exit_status(readstat_variable_add_missing_double_value(variable, cur_range))
                 discrete_values += 1
             elif type(cur_range) == str:
+                if vartype != PYWRITER_CHARACTER:
+                    msg = "character missing_ranges value given for non character variable %s" %variablename
+                    raise PyreadstatError(msg)
                 if len(cur_range) > 8:
                         msg = "missing_ranges: string values length must not be larger than 8"
                         raise PyreadstatError(msg)
@@ -716,7 +728,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     if not isinstance(cur_ranges, list):
                         msg = "missing_ranges: values in dictionary must be list"
                         raise PyreadstatError(msg)
-                    add_missing_ranges(cur_ranges, variable)
+                    add_missing_ranges(cur_ranges, variable, curtype, variable_name)
             if variable_alignment:
                 # At the moment this is ineffective for sav and dta (the function runs but in
                 # the resulting file all alignments are still unknown)
