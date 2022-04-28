@@ -1,3 +1,10 @@
+# 1.1.5 (github, pypi and conda xxxx.xx.xx)
+* Solved #159, #158, #163, #164, #172, #177
+* Added new date formats for SAS and SPSS solves #170, #171
+* Added check missing\_range type against variable type solves #180
+* Removed np.float, solves #160
+* Updated Readstat source code to Release 1.1.8 candidate 0
+
 # 1.1.4 (github, pypi and conda 2021.12.02)
 * Included new pandas datatypes Float32Dtype and Float64Dtype when writing. Soves #150.
 * Forcing cythonization when installing from source solves #151.

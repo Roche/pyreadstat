@@ -38,7 +38,7 @@ cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'
              np.int32, np.int16, np.int8, np.uint8, np.uint16}
 cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
 cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
-               np.dtype('float32'), np.int64, np.uint64, np.uint32, np.float, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
+               np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
                pd.Float64Dtype(), pd.Float32Dtype()}
 cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
 cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
@@ -143,7 +143,7 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
         raise PyreadstatError("Unknown pywriter variable format")
 
 
-cdef int get_pandas_str_series_max_length(object series):
+cdef int get_pandas_str_series_max_length(object series, dict value_labels):
     """ For a pandas string series get the max length of the strings. Assumes there is no NaN among the elements. 
     """
     values = series.values
@@ -151,15 +151,21 @@ cdef int get_pandas_str_series_max_length(object series):
     cdef bytes temp
     cdef int max_length = 0
     cdef int curlen
+    cdef list labels
     for val in values:
         temp = val.encode("utf-8")
         curlen = len(temp)
         if curlen > max_length:
             max_length = curlen
+    if value_labels:
+        labels = list(value_labels.keys())
+        for lab in labels:
+            curlen = len(str(lab))
+            if curlen > max_length:
+                max_length = curlen
 
     return max_length
 
-    #return int(series.str.encode(encoding="utf-8").str.len().max())
 
 cdef int check_series_all_same_types(object series, object type_to_check):
     """
@@ -173,7 +179,7 @@ cdef int check_series_all_same_types(object series, object type_to_check):
     return 1
 
 
-cdef list get_pandas_column_types(object df, dict missing_user_values):
+cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels):
     """
     From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
     as third.
@@ -188,6 +194,8 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
 
     cdef list result = list()
     cdef int equal, is_missing
+    if variable_value_labels is None:
+        variable_value_labels = dict()
 
     for indx, (col_name, col_type) in enumerate(zip(columns, types)):
 
@@ -219,6 +227,9 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             is_missing = 0
             if curuser_missing:
                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
+                if not len(curseries):
+                    result.append((PYWRITER_DOUBLE, 0, 1))
+                    continue
             if np.any(pd.isna(curseries)):
                 if col_type in int_mixed_types:
                     result.append((PYWRITER_INTEGER, 0, 1))
@@ -231,11 +242,14 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                     #equal = col.apply(lambda x: type(x) == curtype)
                     #if not np.all(equal):
                     if not equal:
-                        max_length = get_pandas_str_series_max_length(col.astype(str))
+                        max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
                         result.append((PYWRITER_OBJECT, max_length, 1))
                         continue
                 else:
-                    result.append((PYWRITER_LOGICAL, 0, 1))
+                    if curuser_missing:
+                        result.append((PYWRITER_DOUBLE, 0, 1))
+                    else:
+                        result.append((PYWRITER_LOGICAL, 0, 1))
                     continue
             else:
                 if col_type in int_mixed_types:
@@ -246,7 +260,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 #equal = curseries.apply(lambda x: type(x) == curtype)
                 #if not np.all(equal):
                 if not equal:
-                    max_length = get_pandas_str_series_max_length(curseries.astype(str))
+                    max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
                     result.append((PYWRITER_OBJECT, max_length, 0))
                     continue
 
@@ -259,9 +273,9 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
             elif curtype == str:
                 if is_missing:
                     col = curseries.dropna().reset_index(drop=True)
-                    max_length = get_pandas_str_series_max_length(col)
+                    max_length = get_pandas_str_series_max_length(col, variable_value_labels.get(col_name))
                 else:
-                    max_length = get_pandas_str_series_max_length(curseries)
+                    max_length = get_pandas_str_series_max_length(curseries, variable_value_labels.get(col_name))
                 result.append((PYWRITER_CHARACTER, max_length, is_missing))
             elif curtype == datetime.date:
                 result.append((PYWRITER_DATE, 0, is_missing))
@@ -273,14 +287,14 @@ cdef list get_pandas_column_types(object df, dict missing_user_values):
                 curseries = curseries.astype(str)
                 if is_missing:
                     col = curseries.dropna().reset_index(drop=True)
-                    max_length = get_pandas_str_series_max_length(col.astype(str))
+                    max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
                 else:
-                    max_length = get_pandas_str_series_max_length(curseries.astype(str))
+                    max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
                 result.append((PYWRITER_OBJECT, max_length, is_missing))
 
         else:
             # generic object
-            max_length = get_pandas_str_series_max_length(curseries.astype(str))
+            max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
             is_missing = 0
             if np.any(pd.isna(curseries)):
                 is_missing = 1
@@ -347,7 +361,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
 
     return label_set
 
-cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) except *:
+cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pywriter_variable_type vartype, str variablename) except *:
     """
     Adding missing ranges, user defined missing discrete values both numeric and character,
      this happens for SPSS
@@ -365,6 +379,9 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                 msg = "dictionaries in missing_ranges must have the keys hi and lo"
                 raise PyreadstatError(msg)
             if type(hi) in numeric_types  and type(lo) in numeric_types:
+                if vartype not in pywriter_numeric_types:
+                    msg = "numeric missing_ranges value given for non numeric variable %s" %variablename
+                    raise PyreadstatError(msg)
                 if hi == lo:
                     check_exit_status(readstat_variable_add_missing_double_value(variable, hi))
                     discrete_values += 1
@@ -372,11 +389,14 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                     check_exit_status(readstat_variable_add_missing_double_range(variable, lo, hi))
                     range_values += 1
             elif type(hi) == str and type(lo) == str:
+                if vartype != PYWRITER_CHARACTER:
+                    msg = "character missing_ranges value given for non character variable %s" %variablename
+                    raise PyreadstatError(msg)
                 if hi == lo:
                     if len(hi) > 8:
                         msg = "missing_ranges: string values length must not be larger than 8"
                         raise PyreadstatError(msg)
-                    check_exit_status(readstat_variable_add_missing_string_value(variable, hi.encode("utf-8")))
+                    check_exit_status(readstat_variable_add_missing_string_value(variable, hi))#.encode("utf-8")))
                     discrete_strings += 1
                 else:
                     #check_exit_status(readstat_variable_add_missing_string_range(variable, lo, hi))
@@ -387,13 +407,19 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable) exc
                 raise PyreadstatError(msg)
         else:
             if type(cur_range) in numeric_types:
+                if vartype not in pywriter_numeric_types:
+                    msg = "numeric missing_ranges value given for non numeric variable %s" %variablename
+                    raise PyreadstatError(msg)
                 check_exit_status(readstat_variable_add_missing_double_value(variable, cur_range))
                 discrete_values += 1
             elif type(cur_range) == str:
+                if vartype != PYWRITER_CHARACTER:
+                    msg = "character missing_ranges value given for non character variable %s" %variablename
+                    raise PyreadstatError(msg)
                 if len(cur_range) > 8:
                         msg = "missing_ranges: string values length must not be larger than 8"
                         raise PyreadstatError(msg)
-                check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range.encode("utf-8")))
+                check_exit_status(readstat_variable_add_missing_string_value(variable, cur_range))#.encode("utf-8")))
                 discrete_strings += 1
             else:
                 msg = "missing_ranges: values must be both either of numeric or string type"
@@ -581,7 +607,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     if file_format == FILE_FORMAT_POR:
         col_names = [x.upper() for x in col_names]
 
-    cdef list col_types = get_pandas_column_types(df, missing_user_values)
+    cdef list col_types = get_pandas_column_types(df, missing_user_values, variable_value_labels)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
     cdef dict col_names_to_types = {k:v[0] for k,v in zip(col_names, col_types)}
@@ -670,8 +696,6 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
      
         for col_indx in range(col_count):
             curtype, max_length, _ = col_types[col_indx]
-            #if file_format == FILE_FORMAT_XPORT and curtype == PYWRITER_DOUBLE:
-            #    max_length = 8
             variable_name = col_names[col_indx]
             variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
             if variable_format:
@@ -704,7 +728,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     if not isinstance(cur_ranges, list):
                         msg = "missing_ranges: values in dictionary must be list"
                         raise PyreadstatError(msg)
-                    add_missing_ranges(cur_ranges, variable)
+                    add_missing_ranges(cur_ranges, variable, curtype, variable_name)
             if variable_alignment:
                 # At the moment this is ineffective for sav and dta (the function runs but in
                 # the resulting file all alignments are still unknown)

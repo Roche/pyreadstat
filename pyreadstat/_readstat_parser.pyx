@@ -43,14 +43,14 @@ cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", 
                                 "MMDDYYN6", "MMDDYYN8", "MMDDYYP", "MMDDYYP10", "MMDDYYS", "MMDDYYS10",
                                 "MONNAME", "MONTH", "WEEKDATX", "WEEKDAY", "QTR", "QTRR", "YEAR",
                                 "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
-cdef list sas_datetime_formats = ["DATETIME", "DATETIME20", "TOD"]
+cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22", "TOD"]
 cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
 cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 #sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
-cdef list spss_datetime_formats = ["DATETIME", 'DATETIME20', 'DATETIME23.2', "DATETIME8", "YMDHMS20"]
-cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE", 'EDATE10', 'DATE8', 'EDATE8', "DATE11"]
+cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
+cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
 cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
@@ -579,6 +579,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
+    iscurnptypeobject = dc.col_dtypes_isobject[index]
+    iscurnptypefloat = dc.col_dytpes_isfloat[index]
     if is_unkown_number_rows:
         if max_n_obs <= obs_index:
             dc.max_n_obs = obs_index + 1
@@ -586,6 +588,8 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
         if var_max_rows <= obs_index:
             curnptype = dc.col_numpy_dtypes[index]
             buf_list = np.empty(100000, dtype=curnptype)
+            if iscurnptypeobject or iscurnptypefloat:
+                buf_list.fill(np.nan)
             dc.col_data[index] = np.append(dc.col_data[index], buf_list)
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
@@ -594,12 +598,10 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     if readstat_value_is_missing(value, variable):
         # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
-            iscurnptypeobject = dc.col_dtypes_isobject[index]
-            iscurnptypefloat = dc.col_dytpes_isfloat[index]
             if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
                 # already allocated
                 pass
-                #dc.col_data[index][obs_index] = NAN
+                #dc.col_data[index][obs_index] = np.nan
             # for any type except float, the numpy type will be object as now we have nans
             else:
                 dc.col_numpy_dtypes[index] = object

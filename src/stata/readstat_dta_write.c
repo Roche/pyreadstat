@@ -279,7 +279,7 @@ static readstat_error_t dta_validate_name_chars(const char *name, int unicode) {
     /* TODO check Unicode class */
     int j;
     for (j=0; name[j]; j++) {
-        if ((name[j] > 0 || !unicode) && name[j] != '_' &&
+        if (((unsigned char)name[j] < 0x80 || !unicode) && name[j] != '_' &&
                 !(name[j] >= 'a' && name[j] <= 'z') &&
                 !(name[j] >= 'A' && name[j] <= 'Z') &&
                 !(name[j] >= '0' && name[j] <= '9')) {
@@ -287,7 +287,7 @@ static readstat_error_t dta_validate_name_chars(const char *name, int unicode) {
         }
     }
     char first_char = name[0];
-    if ((first_char > 0 || !unicode) && first_char != '_' &&
+    if (((unsigned char)first_char < 0x80 || !unicode) && first_char != '_' &&
             !(first_char >= 'a' && first_char <= 'z') &&
             !(first_char >= 'A' && first_char <= 'Z')) {
         return READSTAT_ERROR_NAME_BEGINS_WITH_ILLEGAL_CHARACTER;
