@@ -1,4 +1,7 @@
-# 1.1.5 (github, pypi and conda xxxx.xx.xx)
+# 1.1.6 (github, pypi and conda xxxx.xx.xx)
+* Solved #183
+
+# 1.1.5 (github, pypi and conda 2022.04.28)
 * Solved #159, #158, #163, #164, #172, #177
 * Added new date formats for SAS and SPSS solves #170, #171
 * Added check missing\_range type against variable type solves #180

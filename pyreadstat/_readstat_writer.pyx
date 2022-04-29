@@ -223,7 +223,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                 result.append((PYWRITER_DATETIME, 0,1))
             else:
                 result.append((PYWRITER_DATETIME, 0,0))
-        elif col_type == object or col_type in int_mixed_types:
+        elif col_type == object or col_type == 'string' or col_type in int_mixed_types:
             is_missing = 0
             if curuser_missing:
                 curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
@@ -263,7 +263,6 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                     max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
                     result.append((PYWRITER_OBJECT, max_length, 0))
                     continue
-
             if curtype in int_types:
                 result.append((PYWRITER_INTEGER, 0, is_missing))
             elif curtype in float_types:
@@ -389,7 +388,7 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pyw
                     check_exit_status(readstat_variable_add_missing_double_range(variable, lo, hi))
                     range_values += 1
             elif type(hi) == str and type(lo) == str:
-                if vartype != PYWRITER_CHARACTER:
+                if vartype != PYWRITER_CHARACTER and vartype != PYWRITER_OBJECT:
                     msg = "character missing_ranges value given for non character variable %s" %variablename
                     raise PyreadstatError(msg)
                 if hi == lo:
@@ -413,7 +412,7 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pyw
                 check_exit_status(readstat_variable_add_missing_double_value(variable, cur_range))
                 discrete_values += 1
             elif type(cur_range) == str:
-                if vartype != PYWRITER_CHARACTER:
+                if vartype != PYWRITER_CHARACTER and vartype != PYWRITER_OBJECT:
                     msg = "character missing_ranges value given for non character variable %s" %variablename
                     raise PyreadstatError(msg)
                 if len(cur_range) > 8:
