@@ -2,6 +2,7 @@
 * Solved #183
 * new parameter output_type to switch between returning a pandas dataframe
   or a dict of numpy arrays, partial solution for #184
+* Implemented row_compression for writing sav files, solves #185
 
 # 1.1.5 (github, pypi and conda 2022.04.28)
 * Solved #159, #158, #163, #164, #172, #177
@@ -15,7 +16,7 @@
 * Forcing cythonization when installing from source solves #151.
 
 # 1.1.3 (github, pypi and conda 2021.10.05)
-# Updated Readstat source to version 1.1.17
+* Updated Readstat source to version 1.1.17
 * Improved error when reading dates and finding a string (#145)
 * repaired not reading correctly metadata with multiprocessing (#146)
 

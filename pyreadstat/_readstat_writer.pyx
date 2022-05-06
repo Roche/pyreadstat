@@ -550,7 +550,7 @@ cdef int close_file(int fd):
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
                    int file_format_version, str note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
-                   dict variable_display_width, dict variable_measure, dict variable_format) except *:
+                   dict variable_display_width, dict variable_measure, dict variable_format, bint row_compression) except *:
     """
     main entry point for writing all formats. Some parameters are specific for certain file type
     and are even incompatible between them. This function relies on the caller to select the right
@@ -668,6 +668,9 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
         if file_format_version > -1:
             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))
+
+        if row_compression:
+            check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))
 
         # table name is used only for xpt files
         if table_name:

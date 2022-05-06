@@ -552,6 +552,7 @@ labels must be represented by None. If dict values must be variable names and va
 In such case there is no need to include all variables; labels for non existent
 variables will be ignored with no warning or error.</p></li>
 <li><p><strong>compress</strong> (<em>boolean</em><em>, </em><em>optional</em>) – if true a zsav will be written, by default False, a sav is written</p></li>
+<li><p><strong>row_compress</strong> (<em>boolean</em><em>, </em><em>optional</em>) – if true it applies row compression, by default False, compress and row_compress cannot be both true at the same time</p></li>
 <li><p><strong>note</strong> (<em>str</em><em>, </em><em>optional</em>) – a note to add to the file</p></li>
 <li><p><strong>variable_value_labels</strong> (<em>dict</em><em>, </em><em>optional</em>) – value labels, a dictionary with key variable name and value a dictionary with key values and
 values labels. Variable names must match variable names in the dataframe otherwise will be

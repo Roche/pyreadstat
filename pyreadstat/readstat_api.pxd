@@ -122,6 +122,11 @@ cdef extern from "readstat.h":
         READSTAT_ALIGNMENT_LEFT = 1,
         READSTAT_ALIGNMENT_CENTER,
         READSTAT_ALIGNMENT_RIGHT
+
+    ctypedef enum readstat_compress_t:
+        READSTAT_COMPRESS_NONE,
+        READSTAT_COMPRESS_ROWS,
+        READSTAT_COMPRESS_BINARY
         
 
     ctypedef off_t readstat_off_t
@@ -210,6 +215,7 @@ cdef extern from "readstat.h":
     
     cdef readstat_error_t readstat_writer_set_file_label(readstat_writer_t *writer, const char *file_label);
     cdef readstat_error_t readstat_writer_set_file_format_version(readstat_writer_t *writer, uint8_t file_format_version)
+    cdef readstat_error_t readstat_writer_set_compression(readstat_writer_t *writer, readstat_compress_t compression)
 
     cdef void readstat_add_note(readstat_writer_t *writer, const char *note);
 

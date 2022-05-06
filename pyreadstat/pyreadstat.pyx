@@ -28,6 +28,7 @@ from readstat_api cimport readstat_parse_por, readstat_parse_xport
 from readstat_api cimport readstat_parse_sas7bcat
 from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
 from _readstat_parser cimport py_file_format, run_conversion
+from _readstat_parser import  PyreadstatError
 from _readstat_writer cimport run_write
 cimport _readstat_parser, _readstat_writer
 from copy import deepcopy
@@ -743,7 +744,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
 
 # Write API
 
-def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, str note=None,
+def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
                 dict variable_measure=None, dict variable_format=None):
     """
@@ -764,6 +765,8 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
         variables will be ignored with no warning or error.
     compress : boolean, optional
         if true a zsav will be written, by default False, a sav is written
+    row_compress : boolean, optional
+        if true it applies row compression, by default False, compress and row_compress cannot be both true at the same time
     note : str, optional
         a note to add to the file
     variable_value_labels : dict, optional
@@ -792,11 +795,17 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
 
     cdef int file_format_version = 2
     cdef str var_width
+    cdef bint row_compression = 0
+    if compress and row_compress:
+        raise PyreadstatError("compress and row_compress cannot be both True")
     if compress:
         file_format_version = 3
+    if row_compress:
+        row_compression = 1
     cdef table_name = ""
     cdef dict missing_user_values = None
     cdef dict variable_alignment = None
+
 
     # formats
     formats_presets = {'restricted_integer':'N{var_width}', 'integer':'F{var_width}.0'}
@@ -808,7 +817,7 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
     
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format)
+        variable_alignment, variable_display_width, variable_measure, variable_format, row_compression)
 
 def write_dta(df, dst_path, str file_label="", object column_labels=None, int version=15, 
             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
@@ -866,10 +875,11 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
     #cdef dict variable_format = None
+    cdef bint row_compression = 0
 
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
      note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
-     variable_display_width, variable_measure, variable_format)
+     variable_display_width, variable_measure, variable_format, row_compression)
 
 def write_xport(df, dst_path, str file_label="", object column_labels=None, str table_name=None, int file_format_version = 8,
     dict variable_format=None):
@@ -910,9 +920,10 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
     #cdef dict variable_format = None
+    cdef bint row_compression = 0
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format)
+        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
 
 def write_por(df, dst_path, str file_label="", object column_labels=None, dict variable_format=None):
     """
@@ -948,6 +959,7 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
     cdef dict variable_measure = None
     cdef str table_name = ""
     #cdef dict variable_format = None
+    cdef bint row_compression = 0
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format)
+        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
