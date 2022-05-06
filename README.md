@@ -659,6 +659,19 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_datetime=True)
 ```
 
+You can get a dictionary of numpy arrays instead of a pandas dataframe when reading any file format.
+In order to do that, set the parameter output_format='dict' (default is 'pandas'). This is useful if
+you want to transform the data to some other format different to pandas, as transforming the data to pandas is a costly
+process both in terms of speed and memory. Here for example an efficient way to transform the data to a polars dataframe:
+
+```python
+import pyreadstat
+import polars
+
+dicdata, meta = pyreadstat.read_sav('/path/to/a/file.sav', output_format='dict')
+df = polars.DataFrame(dicdata)
+```
+
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
 ### More writing options
