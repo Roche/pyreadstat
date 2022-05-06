@@ -96,11 +96,12 @@ cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HAN
 cdef void check_exit_status(readstat_error_t retcode) except *
 
 cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *
-cdef object data_container_to_pandas_dataframe(data_container data)
+cdef object data_container_to_dict(data_container data)
+cdef object dict_to_pandas_dataframe(object final_container)
 cdef object data_container_extract_metadata(data_container data)
 cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion, long row_limit, long row_offset)
+                           bint no_datetime_conversion, long row_limit, long row_offset, str output_format)
 
 # definitions for stuff about dates
 cdef list sas_date_formats 

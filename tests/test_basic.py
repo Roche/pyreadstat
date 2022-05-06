@@ -993,6 +993,25 @@ class TestBasic(unittest.TestCase):
         df2, meta2 = pyreadstat.read_dta(path, user_missing=True, )
         self.assertTrue(df.equals(df2))
 
+    def test_sav_outputformat_dict(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), output_format='dict')
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(self.df_pandas))
+        self.assertTrue(len(meta.notes)>0)
+        self.assertTrue(meta.variable_display_width["mychar"]==9)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_measure["mychar"]=="nominal")
+        self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
+        self.assertTrue(meta.readstat_variable_types["myord"]=="double")
+        padic = self.df_pandas.to_dict(orient='list')
+        #import pdb;pdb.set_trace()
+        for colname, data in df.items():
+            curdfcol = df[colname]
+            for indx, val in enumerate(data):
+                if pd.isna(val) and pd.isna(curdfcol[indx]):
+                    continue
+                self.assertTrue(val==curdfcol[indx])
+
 
 
 if __name__ == '__main__':

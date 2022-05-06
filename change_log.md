@@ -1,5 +1,7 @@
 # 1.1.6 (github, pypi and conda xxxx.xx.xx)
 * Solved #183
+* new parameter output_type to switch between returning a pandas dataframe
+  or a dict of numpy arrays, partial solution for #184
 
 # 1.1.5 (github, pypi and conda 2022.04.28)
 * Solved #159, #158, #163, #164, #172, #177

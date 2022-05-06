@@ -39,7 +39,7 @@ from worker import worker
 
 def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
                   formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-                  disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
+                  disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None):
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
@@ -85,11 +85,15 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             maximum number of rows to read. The default is 0 meaning unlimited.
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
+        output_format : str, optional
+            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            dataframe is avoided.
 
     Returns
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data
+            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
         metadata
             object with metadata. The members variables_value_labels will be empty unless a valid catalog file is
             supplied.
@@ -114,7 +118,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bdat, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
+                                          output_format)
     metadata.file_format = "sas7bdat"
 
     if catalog_file:
@@ -126,7 +131,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
 
 
 def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
-               list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
+               list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0,
+               str output_format=None):
     r"""
     Read a SAS xport file.
 
@@ -155,11 +161,15 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
             maximum number of rows to read. The default is 0 meaning unlimited.
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
+        output_format : str, optional
+            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            dataframe is avoided.
 
     Returns
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data
+            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -180,7 +190,8 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_xport, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
+                                          output_format)
     metadata.file_format = "xport"
 
     return data_frame, metadata
@@ -188,7 +199,7 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
 
 def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None):
     r"""
     Read a STATA dta file
 
@@ -231,11 +242,15 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             maximum number of rows to read. The default is 0 meaning unlimited.
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
+        output_format : str, optional
+            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            dataframe is avoided.
 
     Returns
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data
+            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -258,7 +273,8 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
+                                          output_format)
     metadata.file_format = "dta"
 
     if apply_value_formats:
@@ -270,7 +286,7 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
 def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None):
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -313,11 +329,15 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             maximum number of rows to read. The default is 0 meaning unlimited.
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
+        output_format : str, optional
+            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            dataframe is avoided.
 
     Returns
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data
+            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -340,7 +360,8 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sav, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
+                                          output_format)
     metadata.file_format = "sav/zsav"
 
     if apply_value_formats:
@@ -352,7 +373,7 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
 def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0):
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None):
     r"""
     Read a SPSS por file
 
@@ -391,11 +412,15 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             maximum number of rows to read. The default is 0 meaning unlimited.
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
+        output_format : str, optional
+            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            dataframe is avoided.
 
     Returns
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data
+            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -416,7 +441,8 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_por, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
+                                          output_format)
     metadata.file_format = "por"
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
@@ -425,7 +451,7 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
     
 
 
-def read_sas7bcat(filename_path, str encoding=None):
+def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
     r"""
     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
     value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
@@ -442,11 +468,16 @@ def read_sas7bcat(filename_path, str encoding=None):
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
+        output_format : str, optional
+            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned. 
+            Notice that for this function the resulting object is always empty, this is done for consistency with other functions
+            but has no impact on performance.
 
     Returns
     -------
         data_frame : pandas dataframe
-            a pandas data frame with the data (no data in this case, so will be empty)
+            a pandas data frame with the data (no data in this case, so will be empty). If the output_parameter is other
+            than 'pandas' then the object type will change accordingly altough the object will always be empty
         metadata :
             object with metadata. The member value_labels is the one that contains the formats.
             Look at the documentation for more information.
@@ -461,7 +492,8 @@ def read_sas7bcat(filename_path, str encoding=None):
 
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
     data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bcat, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, row_limit, row_offset)
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, row_limit, row_offset, 
+                                          output_format)
     metadata.file_format = "sas7bcat"
 
     return data_frame, metadata
