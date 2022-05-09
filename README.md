@@ -273,7 +273,7 @@ pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_la
 ```
 
 Some special arguments are available depending on the function. write_sav can take also notes as string, wheter to
-compress or not as zsav, variable display widths and variable measures. write_dta can take a stata version.
+compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
 write_xport a name for the dataset. User defined missing values and value labels are also supported. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
@@ -679,7 +679,7 @@ For more information, please check the [Module documentation](https://ofajardo.g
 #### File specific options
 
 Some special arguments are available depending on the function. write_sav can take also notes as string, wheter to
-compress or not as zsav, variable display widths and variable measures. write_dta can take a stata version.
+compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
 write_xport a name for the dataset. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
