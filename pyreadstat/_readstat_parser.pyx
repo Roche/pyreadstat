@@ -849,7 +849,7 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
         check_exit_status(error)
         
 
-cdef object data_container_to_pandas_dataframe(data_container data):
+cdef object data_container_to_dict(data_container data):
     """
     Transforms a data container object to a pandas data frame
     """
@@ -880,8 +880,16 @@ cdef object data_container_to_pandas_dataframe(data_container data):
         else:
             final_container[cur_name_str] = list() 
 
-    if final_container:
-        data_frame = pd.DataFrame.from_dict(final_container)
+    return final_container
+
+
+cdef object dict_to_pandas_dataframe(object dict_data):
+    """
+    Transforms a dict of numpy arrays to a pandas data frame
+    """
+
+    if dict_data:
+        data_frame = pd.DataFrame.from_dict(dict_data)
     else:
         data_frame = pd.DataFrame()
 
@@ -978,7 +986,7 @@ cdef object data_container_extract_metadata(data_container data):
 
 cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion, long row_limit, long row_offset):
+                           bint no_datetime_conversion, long row_limit, long row_offset, str output_format):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -988,6 +996,9 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     cdef char * filename    
     cdef data_container data
     cdef object origin
+    cdef set allowed_formats
+    cdef object data_dict
+    cdef object data_frame
 
     if hasattr(os, 'fsencode'):
         try:
@@ -1012,6 +1023,13 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     filename_bytes = os.path.expanduser(filename_bytes)
     if not os.path.isfile(filename_bytes):
         raise PyreadstatError("File {0} does not exist!".format(filename_path))
+
+    if output_format is None:
+        output_format = 'pandas'
+    allowed_formats = {'pandas', 'dict'}
+    if output_format not in allowed_formats:
+        raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
+                
 
     filename = <char *> filename_bytes
     
@@ -1045,7 +1063,11 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     
     # go!
     run_readstat_parser(filename, data, parse_func, row_limit, row_offset)    
-    data_frame = data_container_to_pandas_dataframe(data)
+    data_dict = data_container_to_dict(data)
+    if output_format == 'dict':
+        data_frame = data_dict
+    elif output_format == 'pandas':
+        data_frame = dict_to_pandas_dataframe(data_dict)
     metadata = data_container_extract_metadata(data)
 
     return data_frame, metadata

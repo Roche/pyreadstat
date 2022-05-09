@@ -993,7 +993,47 @@ class TestBasic(unittest.TestCase):
         df2, meta2 = pyreadstat.read_dta(path, user_missing=True, )
         self.assertTrue(df.equals(df2))
 
+    def test_sav_outputformat_dict(self):
+        df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), output_format='dict')
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(self.df_pandas))
+        self.assertTrue(len(meta.notes)>0)
+        self.assertTrue(meta.variable_display_width["mychar"]==9)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_measure["mychar"]=="nominal")
+        self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
+        self.assertTrue(meta.readstat_variable_types["myord"]=="double")
+        padic = self.df_pandas.to_dict(orient='list')
+        #import pdb;pdb.set_trace()
+        for colname, data in df.items():
+            curdfcol = df[colname]
+            for indx, val in enumerate(data):
+                if pd.isna(val) and pd.isna(curdfcol[indx]):
+                    continue
+                self.assertTrue(val==curdfcol[indx])
 
+    def test_sav_write_rowcompression(self):
+        file_label = "row compression write"
+        file_note = "These are some notes"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        variable_value_labels = {'mylabl': {1.0: 'Male', 2.0: 'Female'}, 'myord': {1.0: 'low', 2.0: 'medium', 3.0: 'high'}}
+        missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
+        #variable_alignment = {'mychar':"center", 'myord':"right"}
+        variable_display_width = {'mychar':20}
+        variable_measure = {"mychar": "nominal"}
+        path = os.path.join(self.write_folder, "rowcompression_write.sav")
+        pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
+            variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
+            variable_measure=variable_measure, row_compress=True) #, variable_alignment=variable_alignment)
+        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        self.assertEqual(meta.notes[0], file_note)
+        self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
+        self.assertEqual(meta.variable_display_width['mychar'], variable_display_width['mychar'])
+        #self.assertDictEqual(meta.variable_alignment, variable_alignment)
+        self.assertEqual(meta.variable_measure["mychar"], variable_measure["mychar"])
 
 if __name__ == '__main__':
 
