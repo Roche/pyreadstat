@@ -156,15 +156,15 @@ If you are running on a machine without admin rights, and you want to install ag
 pip install pyreadstat --user
 ```
 
-Notice that at the moment we offer pre-compiled wheels for windows, mac and
-linux for Python 2.7, 3.6, 3.7 and 3.8. Python 2.7 does not work for
-windows (see later python 2.7 support). If there is no pre-compiled
+At the moment we offer pre-compiled wheels for windows, mac and
+linux. Look at the [pypi webpage](https://pypi.org/project/pyreadstat/) to find out which python versions
+are currently supported. If there is no pre-compiled
 wheel available, pip will attempt to compile the source code.
 
 ### Using conda
 
 The package is also available in [conda-forge](https://anaconda.org/conda-forge/pyreadstat) for windows, mac and linux
-64 bit, python 3.6, 3.7 and 3.8. only.
+64 bit. Visit the Conda forge webpage to find out which python versions are currently supported.
 
 In order to install:
 
