@@ -1,4 +1,8 @@
-# 1.1.6 (github, pypi and conda xxxx.xx.xx)
+# 1.1.7 (github, pypi and conda 2022.xx.xx)
+* Updated Readstat code to Release 1.1.8
+
+
+# 1.1.6 (github, pypi and conda 2022.05.09)
 * Solved #183
 * new parameter output_type to switch between returning a pandas dataframe
   or a dict of numpy arrays, partial solution for #184

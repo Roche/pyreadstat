@@ -422,6 +422,8 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef int obs_count
     cdef bint iscurnptypefloat
     cdef bint iscurnptypeobject
+    cdef str newcolname
+    cdef int dupcolcnt
 
     cdef  data_container dc = <data_container> ctx
     
@@ -438,6 +440,19 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
         return READSTAT_HANDLER_SKIP_VARIABLE
 
     index = readstat_variable_get_index_after_skipping(variable)
+
+    if col_name in dc.col_names:
+        dupcolcnt = 1
+        while True:
+            newcolname = col_name + "_duplicated" + str(dupcolcnt)
+            if newcolname in col_name:
+                dupcolcnt += 1
+                continue
+            else:
+                msg = "column '{0}' is duplicated, renamed to '{1}'".format(col_name, newcolname)
+                warnings.warn(msg)
+                col_name = newcolname
+                break
 
     dc.col_names.append(col_name)
 

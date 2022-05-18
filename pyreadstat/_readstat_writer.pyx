@@ -594,6 +594,9 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
+    if len(col_names) != len(set(col_names)):
+        msg = "Non unique column names detected in the dataframe!"
+        raise PyreadstatError(msg)
 
     for variable_name in col_names:
         if type(variable_name) != str:
