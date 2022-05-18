@@ -1,5 +1,6 @@
 # 1.1.7 (github, pypi and conda 2022.xx.xx)
 * Updated Readstat code to Release 1.1.8
+* Solved issue with duplicated columns, #188
 
 
 # 1.1.6 (github, pypi and conda 2022.05.09)
