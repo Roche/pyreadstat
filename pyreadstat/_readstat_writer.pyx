@@ -522,7 +522,7 @@ cdef int open_file(bytes filename_path):
         if os.name == "nt":
             filename_str = os.fsdecode(filename_path)
             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
-            flags = _O_WRONLY | _O_CREAT | _O_BINARY
+            flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
         else:
             #filename_bytes = filename_path.encode("utf-8")
