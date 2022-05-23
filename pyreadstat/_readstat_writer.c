@@ -957,7 +957,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format;
 
-/* "pyreadstat/_readstat_writer.pxd":51
+/* "pyreadstat/_readstat_writer.pxd":52
  *             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
  * 
  * ctypedef enum dst_file_format:             # <<<<<<<<<<<<<<
@@ -974,7 +974,7 @@ enum __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format;
 
-/* "pyreadstat/_readstat_writer.pxd":59
+/* "pyreadstat/_readstat_writer.pxd":60
  *     FILE_FORMAT_POR
  * 
  * ctypedef enum pywriter_variable_type:             # <<<<<<<<<<<<<<
@@ -8847,7 +8847,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *         if os.name == "nt":
  *             filename_str = os.fsdecode(filename_path)             # <<<<<<<<<<<<<<
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
- *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
+ *             flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
  */
     __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 523, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -8876,7 +8876,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
  *         if os.name == "nt":
  *             filename_str = os.fsdecode(filename_path)
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)             # <<<<<<<<<<<<<<
- *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
+ *             flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
  *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
  */
     __pyx_t_5 = PyUnicode_AsWideCharString(__pyx_v_filename_str, (&__pyx_v_length)); if (unlikely(__pyx_t_5 == ((wchar_t *)NULL))) __PYX_ERR(0, 524, __pyx_L1_error)
@@ -8885,15 +8885,15 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *__pyx_v_f
     /* "pyreadstat/_readstat_writer.pyx":525
  *             filename_str = os.fsdecode(filename_path)
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
- *             flags = _O_WRONLY | _O_CREAT | _O_BINARY             # <<<<<<<<<<<<<<
+ *             flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC             # <<<<<<<<<<<<<<
  *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
  *         else:
  */
-    __pyx_v_flags = ((_O_WRONLY | _O_CREAT) | _O_BINARY);
+    __pyx_v_flags = (((_O_WRONLY | _O_CREAT) | _O_BINARY) | _O_TRUNC);
 
     /* "pyreadstat/_readstat_writer.pyx":526
  *             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
- *             flags = _O_WRONLY | _O_CREAT | _O_BINARY
+ *             flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
  *             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)             # <<<<<<<<<<<<<<
  *         else:
  *             #filename_bytes = filename_path.encode("utf-8")
