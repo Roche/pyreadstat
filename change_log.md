@@ -1,4 +1,4 @@
-# 1.1.7 (github, pypi and conda 2022.xx.xx)
+# 1.1.7 (github, pypi and conda 2022.06.03)
 * Updated Readstat code to Release 1.1.8
 * Solved issue with duplicated columns, #188
 * Solved issue with no truncation of written files on windows #191
