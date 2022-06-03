@@ -21,10 +21,18 @@ with open(os.path.join(script_folder, "setup.py")) as h:
 raw = re.findall("version=\'.*?\'", content)
 setup_version = raw[0].replace("version=", "")
 setup_version = setup_version.replace("'", "")
+
+with open(os.path.join(script_folder, "CITATION.cff")) as h:
+    content = h.readlines()
+raw = [x for x in content if x.startswith("version")]
+cff_version = raw[0].replace("version:", "").strip()
+
 print("testing if module and setup versions match")
 assert(pyreadstat_version == setup_version)
 print("testing if documentation and setup versions match")
 assert(conf.release == setup_version)
+print("testing if cff and setup versions match")
+assert(cff_version == setup_version)
 print("all versions match!")
 
 
