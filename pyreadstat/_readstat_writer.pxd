@@ -35,6 +35,7 @@ cdef extern from "conditional_includes.h":
     int _O_BINARY
     int _O_WRONLY
     int _O_CREAT
+    int _O_TRUNC
     int _SH_DENYRW  # Denies read and write access to a file.
     int _SH_DENYWR  # Denies write access to a file.
     int _SH_DENYRD  # Denies read access to a file.

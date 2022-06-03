@@ -522,7 +522,7 @@ cdef int open_file(bytes filename_path):
         if os.name == "nt":
             filename_str = os.fsdecode(filename_path)
             u16_path = PyUnicode_AsWideCharString(filename_str, &length)
-            flags = _O_WRONLY | _O_CREAT | _O_BINARY
+            flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
             fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
         else:
             #filename_bytes = filename_path.encode("utf-8")
@@ -594,6 +594,9 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef char *file_labl
 
     cdef list col_names = df.columns.values.tolist()
+    if len(col_names) != len(set(col_names)):
+        msg = "Non unique column names detected in the dataframe!"
+        raise PyreadstatError(msg)
 
     for variable_name in col_names:
         if type(variable_name) != str:
