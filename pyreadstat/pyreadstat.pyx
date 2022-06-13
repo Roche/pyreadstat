@@ -829,7 +829,7 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
     df : pandas data frame
         pandas data frame to write to sav or zsav
     dst_path : str or pathlib.Path
-        full path to the result sav or zsav file
+        full path to the result dta file
     file_label : str, optional
         a label for the file
     column_labels : list or dict, optional
@@ -894,7 +894,7 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
     df : pandas data frame
         pandas data frame to write to sav or zsav
     dst_path : str or pathlib.Path
-        full path to the result sav or zsav file
+        full path to the result xport file
     file_label : str, optional
         a label for the file
     column_labels : list or dict, optional
@@ -934,7 +934,7 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
     df : pandas data frame
         pandas data frame to write to sav or zsav
     dst_path : str or pathlib.Path
-        full path to the result sav or zsav file
+        full path to the result por file
     file_label : str, optional
         a label for the file
     column_labels : list or dict, optional
