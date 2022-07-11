@@ -34,7 +34,8 @@ cdef extern from "<stdint.h>" nogil:
     ctypedef   signed long  int64_t
     ctypedef unsigned char  uint8_t
 
-cdef extern from '<unistd.h>':
+IF UNAME_SYSNAME != 'Windows':
+    cdef extern from '<unistd.h>':
         int close(int fd)
         ssize_t write(int fd, const void *buf, size_t nbyte)
     

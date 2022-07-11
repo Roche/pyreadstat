@@ -49,6 +49,12 @@ IF PY_MAJOR_VERSION >2:
     cdef extern from "Python.h":
             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
 
+IF UNAME_SYSNAME == 'Windows':
+
+    cdef extern from '<io.h>':
+        cdef int _close(int fd)
+        ssize_t _write(int fd, const void *buf, size_t nbyte)
+
 ctypedef enum dst_file_format:
     FILE_FORMAT_SAS7BDAT
     FILE_FORMAT_SAS7BCAT

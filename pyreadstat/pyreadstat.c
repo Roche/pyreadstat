@@ -958,8 +958,8 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format;
 
-/* "_readstat_writer.pxd":52
- *             wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
+/* "_readstat_writer.pxd":58
+ *         ssize_t _write(int fd, const void *buf, size_t nbyte)
  * 
  * ctypedef enum dst_file_format:             # <<<<<<<<<<<<<<
  *     FILE_FORMAT_SAS7BDAT
@@ -975,7 +975,7 @@ enum __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format;
 
-/* "_readstat_writer.pxd":60
+/* "_readstat_writer.pxd":66
  *     FILE_FORMAT_POR
  * 
  * ctypedef enum pywriter_variable_type:             # <<<<<<<<<<<<<<

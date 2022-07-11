@@ -58,20 +58,25 @@ source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname 
 # altough these are win specific we want them to be in the source distribution
 # therefore we will always include them.
 data_files = []
-libraries=["m", "z"]
+libraries = []
+include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."]
+library_dirs = []
 # Windows
 if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
-    win_install_dir = "Lib/site-packages/pyreadstat"
-    if is64bit:
-        data_folder = "win_libs/64bit/"
-        data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
-    else:
-        data_folder = "win_libs/32bit/"
-        data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
+    #win_install_dir = "Lib/site-packages/pyreadstat"
+    #if is64bit:
+        #data_folder = "win_libs/64bit/"
+        #data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
+    #else:
+        #data_folder = "win_libs/32bit/"
+        #data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
     #data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
-    libraries.append("iconv")
+    libraries.extend(["libiconv-static", "libz-static"])
+    include_dirs.append("win_libs/64bit")
+    library_dirs.append("win_libs/64bit")
 else:
+    libraries.extend(["m", "z"])
     _platform = sys.platform
     # Mac: iconv needs to be linked statically
     if _platform.lower().startswith("darwin"):
@@ -82,17 +87,20 @@ sources.sort()
 extensions = [Extension("pyreadstat.pyreadstat",
                     sources=["pyreadstat/pyreadstat" + ext] + sources,
                     # this dot here is important for cython to find the pxd files
-                    include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."],
+                    include_dirs =include_dirs,
                     libraries=libraries,
+                    library_dirs=library_dirs,
                     extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"] ),
                 Extension("pyreadstat._readstat_parser",
                     sources=["pyreadstat/_readstat_parser" + ext] + sources,
-                    include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."],
+                    include_dirs = include_dirs,
+                    library_dirs=library_dirs,
                     libraries=libraries,
                     extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"]),
                 Extension("pyreadstat._readstat_writer",
                         sources=["pyreadstat/_readstat_writer" + ext] + sources,
-                        include_dirs=[source_dir_root] + source_dirs + ["pyreadstat", "."],# + [numpy.get_include()],
+                        include_dirs=include_dirs,# + [numpy.get_include()],
+                        library_dirs=library_dirs,
                         libraries=libraries,
                         extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"])
               ]
@@ -117,7 +125,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.1.7',
+    version='1.1.8',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

@@ -9,14 +9,48 @@ cross-compile for windows, but using all the linux compiling toolchain.
 Since Python 3.5, the recommended way is using Visual Studio, as Microsoft introduced changes in the compiler that are 
 not 100% compatible with MINGW, actually it is recommended not to use mingw 
 (see [this](https://stevedower.id.au/blog/building-for-python-3-5/) and [this](https://github.com/cython/cython/wiki/CythonExtensionsOnWindows)). 
-However, Readstat (the library that pyreadstat wraps) is written in a way that depends on Posix (unix) libraries, 
-and therefore cannot be compiled with Visual Studio, therefore, one must compile with MINGW. 
+In the past, Readstat (the library that pyreadstat wraps) was written in a way that depended on Posix (unix) libraries, 
+and therefore could not be compiled with Visual Studio, therefore, one must compile with MINGW. 
+In more recent revisions of Readstat, it is now possible to compile with Microsoft Visual Studio, and therefore this is now 
+the recommended way. I keep here also at the end how to compile with mingw with two different ways as it was done before
+
+## Using Microsoft Visual Studio Compiler
+
+This assumes that MSVC is installed and working. The only pre-requisite before compiling is that we need two external libraries
+compiled with the same MSVC version as we pretend to compile pyreadstat, and the static libraries and header files should be copied
+to the win\_libs/64bit folder in pyreadstat:
+
+```
+# libiconv
+git clone https://github.com/kiyolee/libiconv-win-build.git
+msbuild.exe libiconv-win-build/build-VS2019-MT/libiconv.sln /property:Configuration=Release;Platform=X64
+copy libiconv-win-build\\include\\iconv.h pyreadstat\\win_libs\\64bit                                   
+copy libiconv-win-build\\build-VS2019-MT\\x64\\Release\\libiconv-static.lib  pyreadstat\\win_libs\\64bit
+# libz
+git clone https://github.com/kiyolee/zlib-win-build.git
+msbuild.exe zlib-win-build/build-VS2019-MT/zlib.sln /property:Configuration=Release;Platform=X64
+copy zlib-win-build\\zlib.h pyreadstat\\win_libs\\64bit                                   
+copy zlib-win-build\\zconf.h pyreadstat\\win_libs\\64bit                                   
+copy zlib-win-build\\build-VS2019-MT\\x64\\Release\\libz-static.lib  pyreadstat\\win_libs\\64bit
+``` 
+
+Maybe you observed that win\_libs/64 bit already contains the files needed. It may be therefore that those already
+works for you, but chances are that MSVC is going to compile that those files were not generated with the same
+MSVC version as you have, and therefore you have to do what is descrived before.
+
+Once this is done, one can build the library as usual:
+```
+python setup.py build_ext --inplace
+```
+
+Of course any other variant of installation (setup.py install, pip etc) should work as well. 
+
+
+## Using m2w64-toolchain
 
 Initially I compiled using purely Msys2/MingW64. This approach however requires lot of manual tweaking (see later) and is not
 compatible with CI services such as appveyor. Now I am using m2w64-toolchain which is a conda package that makes the
 process much easier and is compatible with Appveyor.
-
-## Using m2w64-toolchain
 
 pre-requisite:
 
