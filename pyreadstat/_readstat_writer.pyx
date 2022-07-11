@@ -494,7 +494,10 @@ cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
     """
     cdef int fd
     fd = (<int *>ctx)[0]
-    return write(fd, data, _len)
+    IF UNAME_SYSNAME == 'Windows':
+        return _write(fd, data, _len)
+    ELSE:
+        return write(fd, data, _len)
 
 cdef void _check_exit_status(readstat_error_t retcode) except *:
     """
@@ -542,9 +545,9 @@ cdef int open_file(bytes filename_path):
     return fd
 
 cdef int close_file(int fd):
-    if os.name == "nt":
+    IF UNAME_SYSNAME == 'Windows':
         return _close(fd)
-    else:
+    ELSE:
         return close(fd)
 
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,

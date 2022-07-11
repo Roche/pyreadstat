@@ -1,3 +1,6 @@
+# 1.1.8 (github, pypi and conda 2022.07.1X)
+* Changed windows compilation to use MSVC 2019
+
 # 1.1.7 (github, pypi and conda 2022.06.03)
 * Updated Readstat code to Release 1.1.8
 * Solved issue with duplicated columns, #188
