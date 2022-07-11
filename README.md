@@ -53,6 +53,7 @@ the original applications in this regard.**
     - [Setting variable formats](#setting-variable-formats)
     - [Variable type conversion](#variable-type-conversion)
 * [Roadmap](#roadmap)
+* [CD/CI and wheels](#cdci_and_wheels)
 * [Known limitations](#known-limitations)
 * [Python 2.7 support.](#python-27-support)
 * [Change log](#change-log)
@@ -800,6 +801,11 @@ user defined missing values in stata/sas where characters (a to z, A to Z, \_) w
 ## Roadmap
 
 * Include latest releases from Readstat as they come out.
+
+## CD/CI and Wheels
+
+A CD/CI pipeline producing the wheels is available [here](https://github.com/ofajardo/pyreadstat_wheels3). Contributions
+are welcome.
 
 ## Known limitations
 
