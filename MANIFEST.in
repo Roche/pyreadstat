@@ -5,6 +5,4 @@ include *.pyx
 recursive-include pyreadstat *.pyx
 include *.pxd
 recursive-include pyreadstat *.pxd
-recursive-include win_libs/64bit *.dll
-recursive-include win_libs/32bit *.dll
 
