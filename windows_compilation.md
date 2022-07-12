@@ -16,8 +16,14 @@ the recommended way. I keep here also at the end how to compile with mingw with 
 
 ## Using Microsoft Visual Studio Compiler
 
-This assumes that MSVC is installed and working. The only pre-requisite before compiling is that we need two external libraries
-compiled with the same MSVC version as we pretend to compile pyreadstat, and the static libraries and header files should be copied
+This assumes that MSVC is installed and working. The only pre-requisite before compiling is that we need two external libraries.
+There are two ways of getting them:
+
+### Compiling external libraries
+
+The advantage of this way is that we can do a static compilation of those libraries, therefore pyreadstat is not going to depend on any dll file.
+This is the way used to produce the wheels on pypi.
+The libraries must be compiled with the same MSVC version as we pretend to compile pyreadstat, and the static libraries and header files should be copied
 to the win\_libs/64bit folder in pyreadstat:
 
 ```
@@ -34,7 +40,7 @@ copy zlib-win-build\\zconf.h pyreadstat\\win_libs\\64bit
 copy zlib-win-build\\build-VS2019-MT\\x64\\Release\\libz-static.lib  pyreadstat\\win_libs\\64bit
 ``` 
 
-Maybe you observed that win\_libs/64 bit already contains the files needed. It may be therefore that those already
+Maybe you observed that win\_libs/samples\_64bit already contains the files needed. It may be therefore that those already
 works for you, but chances are that MSVC is going to compile that those files were not generated with the same
 MSVC version as you have, and therefore you have to do what is descrived before.
 
@@ -45,8 +51,20 @@ python setup.py build_ext --inplace
 
 Of course any other variant of installation (setup.py install, pip etc) should work as well. 
 
+### Installing libraries with conda
+
+You can also install the libraries with conda, and then install as usual:
+This is the way used for the conda packages.
+
+```
+conda install -c conda-forge libiconv
+conda install -c conda-forge zlib
+python setup.py build_ext --inplace # or any other way of installing/building
+```
 
 ## Using m2w64-toolchain
+
+Warning: This method is not working starting from release 1.1.8, but it is the way to compile for version 1.1.7 and before.
 
 Initially I compiled using purely Msys2/MingW64. This approach however requires lot of manual tweaking (see later) and is not
 compatible with CI services such as appveyor. Now I am using m2w64-toolchain which is a conda package that makes the

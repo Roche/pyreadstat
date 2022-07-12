@@ -36,6 +36,7 @@ ext = '.pyx'
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 source_dir_root = "src"
+python_dir = sys.exec_prefix
 
 # Get a list of C source files and C source directories but omitting certain things
 omitted_sources = [
@@ -54,27 +55,28 @@ for dirname, _ , filenames in os.walk(source_dir_root):
 
 source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname not in omitted_source_dirs]
 
-# libraries and data (in this case data are windows dlls)
-# altough these are win specific we want them to be in the source distribution
-# therefore we will always include them.
+
 data_files = []
 libraries = []
 include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."]
 library_dirs = []
 # Windows
+# On Windows we have two possible setups: the user has included the static libraries in win_libs/64bit
+# Or the user is going to use the Conda forge versions of those. See the windows compilation document
+# for more details
 if os.name == 'nt':
     is64bit = sys.maxsize > 2 ** 32
-    #win_install_dir = "Lib/site-packages/pyreadstat"
-    #if is64bit:
-        #data_folder = "win_libs/64bit/"
-        #data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
-    #else:
-        #data_folder = "win_libs/32bit/"
-        #data_files = [(win_install_dir, [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll", data_folder +"libwinpthread-1.dll", data_folder + "libgcc_s_dw2-1.dll"])]
-    #data_files = [("", [data_folder + "zlib1.dll", data_folder + "libiconv-2.dll"])]
-    libraries.extend(["libiconv-static", "libz-static"])
-    include_dirs.append("win_libs/64bit")
-    library_dirs.append("win_libs/64bit")
+    # The user included the compiled static libraries
+    if os.path.isfile("win_libs/64bit/libiconv-static.lib") and os.path.isfile("win_libs/64bit/libz-static.lib"):
+        libraries.extend(["libiconv-static", "libz-static"])
+        include_dirs.append("win_libs/64bit")
+        library_dirs.append("win_libs/64bit")
+    # conda forge libraries
+    else:
+        libraries.extend(["iconv", "zlib"])
+        include_dirs.append(os.path.join(python_dir, "Library", "include"))
+        library_dirs.append(os.path.join(python_dir, "Library", "bin"))
+        library_dirs.append(os.path.join(python_dir, "Library", "lib"))
 else:
     libraries.extend(["m", "z"])
     _platform = sys.platform
@@ -125,7 +127,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.1.8',
+    version='1.1.9',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",
