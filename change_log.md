@@ -1,4 +1,7 @@
-# 1.1.8 (github, pypi and conda 2022.07.11)
+# 1.1.8 (github, pypi and conda 2022.07.12)
+* Adapted setup.py to work with conda forge libraries on windows
+
+# 1.1.8 (github, pypi 2022.07.11)
 * Changed windows compilation to use MSVC 2019. Static compilation for windows, no
   longer need for dll files.
 
