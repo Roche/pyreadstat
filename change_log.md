@@ -1,5 +1,5 @@
 # 1.2.0 (github, pypi and conda 2022.10.XX)
-* Fixed #206
+* Fixed #206, #207
 * added pyproject.toml
 
 # 1.1.9 (github, pypi and conda 2022.07.12)
