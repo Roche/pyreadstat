@@ -144,6 +144,7 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
+            Notice that number_rows will be None as xport files do not have the number of rows recorded in the file metadata.
         dates_as_pandas_datetime : bool, optional
             by default False. If true dates will be transformed to pandas datetime64 instead of date.
         encoding : str, optional
@@ -385,6 +386,7 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
+            Notice that number_rows will be None as por files do not have the number of rows recorded in the file metadata.
         dates_as_pandas_datetime : bool, optional
             by default False. If true dates will be transformed to pandas datetime64 instead of date.
         apply_value_formats : bool, optional
@@ -684,6 +686,8 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
 def read_file_multiprocessing(read_function, file_path, num_processes=None, **kwargs):
     """
     Reads a file in parallel using multiprocessing.
+    Xport and Por files are not supported as they do not have the number of rows recorded in the metadata, 
+    information needed for this function.
 
     Parameters
     ----------
@@ -892,7 +896,7 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
     Parameters
     ----------
     df : pandas data frame
-        pandas data frame to write to sav or zsav
+        pandas data frame to write to xport
     dst_path : str or pathlib.Path
         full path to the result xport file
     file_label : str, optional
@@ -932,7 +936,7 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
     Parameters
     ----------
     df : pandas data frame
-        pandas data frame to write to sav or zsav
+        pandas data frame to write to por
     dst_path : str or pathlib.Path
         full path to the result por file
     file_label : str, optional

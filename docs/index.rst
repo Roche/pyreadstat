@@ -24,7 +24,7 @@ object contains the following fields:
   * number_columns : an int with the number of columns
   * number_rows : an int with the number of rows. If metadataonly option was used, it may
     be None if the number of rows could not be determined. If you need the number of rows in
-    this case you need to parse the whole file.
+    this case you need to parse the whole file. This happens for xport and por files.
   * variable_value_labels : a dict with keys being variable names, and values being a dict with values as keys and labels
     as values. It may be empty if the dataset did not contain such labels. For sas7bdat files it will be empty unless
     a sas7bcat was given. It is a combination of value_labels and variable_to_label.

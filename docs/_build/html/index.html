@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.1.9 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -86,7 +86,7 @@ object contains the following fields:</p>
 <li><p>number_columns : an int with the number of columns</p></li>
 <li><p>number_rows : an int with the number of rows. If metadataonly option was used, it may
 be None if the number of rows could not be determined. If you need the number of rows in
-this case you need to parse the whole file.</p></li>
+this case you need to parse the whole file. This happens for xport and por files.</p></li>
 <li><p>variable_value_labels : a dict with keys being variable names, and values being a dict with values as keys and labels
 as values. It may be empty if the dataset did not contain such labels. For sas7bdat files it will be empty unless
 a sas7bcat was given. It is a combination of value_labels and variable_to_label.</p></li>
@@ -197,7 +197,9 @@ Look at the documentation for more information.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_file_multiprocessing">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_multiprocessing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_multiprocessing" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a file in parallel using multiprocessing.</p>
+<dd><p>Reads a file in parallel using multiprocessing.
+Xport and Por files are not supported as they do not have the number of rows recorded in the metadata,
+information needed for this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -226,7 +228,8 @@ Look at the documentation for more information.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
-metadata object. The data frame will be set with the correct column names but no data.</p></li>
+metadata object. The data frame will be set with the correct column names but no data.
+Notice that number_rows will be None as por files do not have the number of rows recorded in the file metadata.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
 <li><p><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
 if any appropiate are found.</p></li>
@@ -402,7 +405,8 @@ dataframe is avoided.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
-metadata object. The data frame will be set with the correct column names but no data.</p></li>
+metadata object. The data frame will be set with the correct column names but no data.
+Notice that number_rows will be None as xport files do not have the number of rows recorded in the file metadata.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</p></li>
@@ -522,7 +526,7 @@ for more information.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
+<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to por</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result por file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
 <li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
@@ -586,7 +590,7 @@ Versions 5 and 8 are supported, default is 8.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
+<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to xport</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result xport file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
 <li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no

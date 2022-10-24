@@ -1818,6 +1818,7 @@ static const char __pyx_k_scale[] = "scale";
 static const char __pyx_k_utf_8[] = "utf-8";
 static const char __pyx_k_ADATE8[] = "ADATE8";
 static const char __pyx_k_DATE11[] = "DATE11";
+static const char __pyx_k_DATE12[] = "DATE12";
 static const char __pyx_k_DDMMYY[] = "DDMMYY";
 static const char __pyx_k_EDATE8[] = "EDATE8";
 static const char __pyx_k_JDATE5[] = "JDATE5";
@@ -1993,6 +1994,7 @@ static PyObject *__pyx_n_s_ADATE10;
 static PyObject *__pyx_n_s_ADATE8;
 static PyObject *__pyx_n_s_DATE;
 static PyObject *__pyx_n_s_DATE11;
+static PyObject *__pyx_n_s_DATE12;
 static PyObject *__pyx_n_s_DATE8;
 static PyObject *__pyx_n_s_DATE9;
 static PyObject *__pyx_n_s_DATETIME;
@@ -13426,6 +13428,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ADATE8, __pyx_k_ADATE8, sizeof(__pyx_k_ADATE8), 0, 0, 1, 1},
   {&__pyx_n_s_DATE, __pyx_k_DATE, sizeof(__pyx_k_DATE), 0, 0, 1, 1},
   {&__pyx_n_s_DATE11, __pyx_k_DATE11, sizeof(__pyx_k_DATE11), 0, 0, 1, 1},
+  {&__pyx_n_s_DATE12, __pyx_k_DATE12, sizeof(__pyx_k_DATE12), 0, 0, 1, 1},
   {&__pyx_n_s_DATE8, __pyx_k_DATE8, sizeof(__pyx_k_DATE8), 0, 0, 1, 1},
   {&__pyx_n_s_DATE9, __pyx_k_DATE9, sizeof(__pyx_k_DATE9), 0, 0, 1, 1},
   {&__pyx_n_s_DATETIME, __pyx_k_DATETIME, sizeof(__pyx_k_DATETIME), 0, 0, 1, 1},
@@ -14494,7 +14497,7 @@ if (!__Pyx_RefNanny) {
  * cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
  * 
  * cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]             # <<<<<<<<<<<<<<
- * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
+ * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
  * cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
  */
   __pyx_t_1 = PyList_New(9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
@@ -14534,11 +14537,11 @@ if (!__Pyx_RefNanny) {
   /* "pyreadstat/_readstat_parser.pyx":53
  * 
  * cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
- * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]             # <<<<<<<<<<<<<<
+ * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]             # <<<<<<<<<<<<<<
  * cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
  * cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
  */
-  __pyx_t_1 = PyList_New(15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(16); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_DATE);
   __Pyx_GIVEREF(__pyx_n_s_DATE);
@@ -14549,42 +14552,45 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_DATE11);
   __Pyx_GIVEREF(__pyx_n_s_DATE11);
   PyList_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_DATE11);
+  __Pyx_INCREF(__pyx_n_s_DATE12);
+  __Pyx_GIVEREF(__pyx_n_s_DATE12);
+  PyList_SET_ITEM(__pyx_t_1, 3, __pyx_n_s_DATE12);
   __Pyx_INCREF(__pyx_n_s_ADATE);
   __Pyx_GIVEREF(__pyx_n_s_ADATE);
-  PyList_SET_ITEM(__pyx_t_1, 3, __pyx_n_s_ADATE);
+  PyList_SET_ITEM(__pyx_t_1, 4, __pyx_n_s_ADATE);
   __Pyx_INCREF(__pyx_n_s_ADATE8);
   __Pyx_GIVEREF(__pyx_n_s_ADATE8);
-  PyList_SET_ITEM(__pyx_t_1, 4, __pyx_n_s_ADATE8);
+  PyList_SET_ITEM(__pyx_t_1, 5, __pyx_n_s_ADATE8);
   __Pyx_INCREF(__pyx_n_s_ADATE10);
   __Pyx_GIVEREF(__pyx_n_s_ADATE10);
-  PyList_SET_ITEM(__pyx_t_1, 5, __pyx_n_s_ADATE10);
+  PyList_SET_ITEM(__pyx_t_1, 6, __pyx_n_s_ADATE10);
   __Pyx_INCREF(__pyx_n_s_EDATE);
   __Pyx_GIVEREF(__pyx_n_s_EDATE);
-  PyList_SET_ITEM(__pyx_t_1, 6, __pyx_n_s_EDATE);
+  PyList_SET_ITEM(__pyx_t_1, 7, __pyx_n_s_EDATE);
   __Pyx_INCREF(__pyx_n_s_EDATE8);
   __Pyx_GIVEREF(__pyx_n_s_EDATE8);
-  PyList_SET_ITEM(__pyx_t_1, 7, __pyx_n_s_EDATE8);
+  PyList_SET_ITEM(__pyx_t_1, 8, __pyx_n_s_EDATE8);
   __Pyx_INCREF(__pyx_n_s_EDATE10);
   __Pyx_GIVEREF(__pyx_n_s_EDATE10);
-  PyList_SET_ITEM(__pyx_t_1, 8, __pyx_n_s_EDATE10);
+  PyList_SET_ITEM(__pyx_t_1, 9, __pyx_n_s_EDATE10);
   __Pyx_INCREF(__pyx_n_s_JDATE);
   __Pyx_GIVEREF(__pyx_n_s_JDATE);
-  PyList_SET_ITEM(__pyx_t_1, 9, __pyx_n_s_JDATE);
+  PyList_SET_ITEM(__pyx_t_1, 10, __pyx_n_s_JDATE);
   __Pyx_INCREF(__pyx_n_s_JDATE5);
   __Pyx_GIVEREF(__pyx_n_s_JDATE5);
-  PyList_SET_ITEM(__pyx_t_1, 10, __pyx_n_s_JDATE5);
+  PyList_SET_ITEM(__pyx_t_1, 11, __pyx_n_s_JDATE5);
   __Pyx_INCREF(__pyx_n_s_JDATE7);
   __Pyx_GIVEREF(__pyx_n_s_JDATE7);
-  PyList_SET_ITEM(__pyx_t_1, 11, __pyx_n_s_JDATE7);
+  PyList_SET_ITEM(__pyx_t_1, 12, __pyx_n_s_JDATE7);
   __Pyx_INCREF(__pyx_n_s_SDATE);
   __Pyx_GIVEREF(__pyx_n_s_SDATE);
-  PyList_SET_ITEM(__pyx_t_1, 12, __pyx_n_s_SDATE);
+  PyList_SET_ITEM(__pyx_t_1, 13, __pyx_n_s_SDATE);
   __Pyx_INCREF(__pyx_n_s_SDATE8);
   __Pyx_GIVEREF(__pyx_n_s_SDATE8);
-  PyList_SET_ITEM(__pyx_t_1, 13, __pyx_n_s_SDATE8);
+  PyList_SET_ITEM(__pyx_t_1, 14, __pyx_n_s_SDATE8);
   __Pyx_INCREF(__pyx_n_s_SDATE10);
   __Pyx_GIVEREF(__pyx_n_s_SDATE10);
-  PyList_SET_ITEM(__pyx_t_1, 14, __pyx_n_s_SDATE10);
+  PyList_SET_ITEM(__pyx_t_1, 15, __pyx_n_s_SDATE10);
   __Pyx_XGOTREF(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats);
   __Pyx_DECREF_SET(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats, ((PyObject*)__pyx_t_1));
   __Pyx_GIVEREF(__pyx_t_1);
@@ -14592,7 +14598,7 @@ if (!__Pyx_RefNanny) {
 
   /* "pyreadstat/_readstat_parser.pyx":54
  * cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
- * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
+ * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
  * cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']             # <<<<<<<<<<<<<<
  * cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
  * cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
@@ -14620,7 +14626,7 @@ if (!__Pyx_RefNanny) {
   __pyx_t_1 = 0;
 
   /* "pyreadstat/_readstat_parser.pyx":55
- * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
+ * cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
  * cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
  * cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats             # <<<<<<<<<<<<<<
  * cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
