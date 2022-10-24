@@ -285,7 +285,10 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
         c_str_value = readstat_string_value(value)
-        py_str_value = <str> c_str_value
+        if c_str_value != NULL:
+            py_str_value = <str> c_str_value
+        else:
+            py_str_value = ''
         pyformat = VAR_FORMAT_STRING
     elif var_type == READSTAT_TYPE_INT8:
         c_int8_value = readstat_int8_value(value)
