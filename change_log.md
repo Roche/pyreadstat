@@ -1,4 +1,8 @@
-# 1.1.8 (github, pypi and conda 2022.07.12)
+# 1.2.0 (github, pypi and conda 2022.10.XX)
+* Fixed #206
+* added pyproject.toml
+
+# 1.1.9 (github, pypi and conda 2022.07.12)
 * Adapted setup.py to work with conda forge libraries on windows
 
 # 1.1.8 (github, pypi 2022.07.11)
