@@ -50,7 +50,7 @@ cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_f
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
 cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
-cdef list spss_date_formats = ["DATE",'DATE8','DATE11', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
+cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
 cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
@@ -285,7 +285,10 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
         c_str_value = readstat_string_value(value)
-        py_str_value = <str> c_str_value
+        if c_str_value != NULL:
+            py_str_value = <str> c_str_value
+        else:
+            py_str_value = ''
         pyformat = VAR_FORMAT_STRING
     elif var_type == READSTAT_TYPE_INT8:
         c_int8_value = readstat_int8_value(value)
@@ -898,13 +901,29 @@ cdef object data_container_to_dict(data_container data):
     return final_container
 
 
-cdef object dict_to_pandas_dataframe(object dict_data):
+cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
     """
     Transforms a dict of numpy arrays to a pandas data frame
     """
 
+    cdef bint dates_as_pandas
+    cdef int index
+    cdef str column
+    cdef py_datetime_format var_format
+    cdef list dtypes
+
+    dates_as_pandas = dc.dates_as_pandas
+
     if dict_data:
         data_frame = pd.DataFrame.from_dict(dict_data)
+        if dates_as_pandas:
+            dtypes = data_frame.dtypes.tolist()
+            # check that datetime columns are datetime type
+            # this is needed in case all date values are nan
+            for index, column in enumerate(data_frame.columns):
+                var_format = dc.col_formats[index]
+                if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
+                    data_frame[column] = pd.to_datetime(data_frame[column])
     else:
         data_frame = pd.DataFrame()
 
@@ -1082,7 +1101,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     if output_format == 'dict':
         data_frame = data_dict
     elif output_format == 'pandas':
-        data_frame = dict_to_pandas_dataframe(data_dict)
+        data_frame = dict_to_pandas_dataframe(data_dict, data)
     metadata = data_container_extract_metadata(data)
 
     return data_frame, metadata
