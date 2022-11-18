@@ -41,7 +41,7 @@ cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('
                np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
                pd.Float64Dtype(), pd.Float32Dtype()}
 cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
-cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp}
+cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}

@@ -1,3 +1,7 @@
+# 1.2.1 (github, pypi and conda 2022.11.xx)
+* introduced recognition for pandas datatype datetime64[ns, UTC] when writing, 
+  so that this column type gets correctly written as datetime
+
 # 1.2.0 (github, pypi and conda 2022.10.25)
 * Fixed #206, #207
 * added pyproject.toml
