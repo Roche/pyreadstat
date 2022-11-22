@@ -594,7 +594,6 @@ class TestBasic(unittest.TestCase):
             pass
         
         currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
-        #import pdb;pdb.set_trace()
         self.assertTrue(df.equals(currow))
 
     # read multiprocessing
@@ -614,7 +613,6 @@ class TestBasic(unittest.TestCase):
             alldfs.append(df)
         df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
         df_single, meta_single = pyreadstat.read_sav(fpath)
-        #import pdb;pdb.set_trace()
         self.assertTrue(df_multi.equals(df_single))
 
     # writing

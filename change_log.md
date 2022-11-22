@@ -1,6 +1,7 @@
 # 1.2.1 (github, pypi and conda 2022.11.xx)
-* introduced recognition for pandas datatype datetime64[ns, UTC] when writing, 
+* introduced recognition for pandas datatype datetime64[ns, UTC] and other datetime64 types when writing, 
   so that this column type gets correctly written as datetime
+* improved performace of writer when there are datetime64 columns
 
 # 1.2.0 (github, pypi and conda 2022.10.25)
 * Fixed #206, #207

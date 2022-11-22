@@ -22,6 +22,7 @@ import sys
 import numpy as np
 #cimport numpy as np
 import pandas as pd
+from pandas.api.types import is_datetime64_any_dtype, is_datetime64_ns_dtype
 import datetime
 import calendar
 IF PY_MAJOR_VERSION >2:
@@ -41,7 +42,7 @@ cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('
                np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
                pd.Float64Dtype(), pd.Float32Dtype()}
 cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
-cdef set datetime_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
+cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
@@ -218,7 +219,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
         elif col_type == bool:
             result.append((PYWRITER_LOGICAL, 0,0))
         # np.datetime64[ns]
-        elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types:
+        elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types or is_datetime64_any_dtype(df[col_name]):
             if np.any(pd.isna(curseries)):
                 result.append((PYWRITER_DATETIME, 0,1))
             else:
@@ -636,6 +637,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef int lblset_cnt = 0
     cdef readstat_label_set_t *label_set
     cdef list col_label_temp 
+    cdef bint hasdatetime64
+    cdef dict dtimecol_vectorized
+    cdef object df2
+    cdef float mulfac
 
     if hasattr(os, 'fsencode'):
         try:
@@ -774,10 +779,34 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             tempvar = readstat_get_variable(writer, col_indx)
             check_exit_status(readstat_validate_variable(writer, tempvar))
 
-        # inserting
-        values = df.values
+        # vectorized transform of datetime64ns columns
+        hasdatetime64 = 0
+        for col_indx in range(col_count):
+            if is_datetime64_ns_dtype(df.iloc[:, col_indx]):
+                hasdatetime64 = 1
+                break
+        dtimecol_vectorized = {x:False for x in range(col_count)}
+        if hasdatetime64:
+            df2 = df.copy()
+            for col_indx in range(col_count):
+                if is_datetime64_ns_dtype(df2.iloc[:, col_indx]):
+                    if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
+                        offset_secs = spss_offset_secs
+                    else:
+                        offset_secs = sas_offset_secs
+                    mulfac = 1.0
+                    if file_format == FILE_FORMAT_DTA:
+                        # stata stores in milliseconds
+                        mulfac = 1000.0
+                    df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
+                    dtimecol_vectorized[col_indx] = True
+        else:
+            df2 = df
 
-        for  row in values:
+        # inserting
+        rowcnt = 0
+
+        for  row in df2.values:
             check_exit_status(readstat_begin_row(writer))
 
             for col_indx in range(col_count):
@@ -813,12 +842,16 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     curvalstr = str(curval)
                     check_exit_status(readstat_insert_string_value(writer, tempvar, curvalstr.encode("utf-8")))
                 elif curtype in pyrwriter_datetimelike_types:
-                    dtimelikeval = convert_datetimelike_to_number(file_format, curtype, curval)
+                    if dtimecol_vectorized[col_indx]:
+                        dtimelikeval = <double>curval
+                    else:
+                        dtimelikeval = convert_datetimelike_to_number(file_format, curtype, curval)
                     check_exit_status(readstat_insert_double_value(writer, tempvar, dtimelikeval))
                 else:
                     raise PyreadstatError("Unknown data format to insert")
 
             check_exit_status(readstat_end_row(writer))
+            rowcnt += 1
 
         check_exit_status(readstat_end_writing(writer))
 
