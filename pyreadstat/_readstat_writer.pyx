@@ -781,15 +781,15 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
         # vectorized transform of datetime64ns columns
         hasdatetime64 = 0
+        dtimecol_vectorized = {x:False for x in range(col_count)}
         for col_indx in range(col_count):
             if is_datetime64_ns_dtype(df.iloc[:, col_indx]):
                 hasdatetime64 = 1
-                break
-        dtimecol_vectorized = {x:False for x in range(col_count)}
+                dtimecol_vectorized[col_indx] = True
         if hasdatetime64:
             df2 = df.copy()
             for col_indx in range(col_count):
-                if is_datetime64_ns_dtype(df2.iloc[:, col_indx]):
+                if dtimecol_vectorized[col_indx]:
                     if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
                         offset_secs = spss_offset_secs
                     else:
@@ -799,7 +799,6 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                         # stata stores in milliseconds
                         mulfac = 1000.0
                     df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
-                    dtimecol_vectorized[col_indx] = True
         else:
             df2 = df
 
