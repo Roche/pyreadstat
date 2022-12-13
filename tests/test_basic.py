@@ -777,6 +777,7 @@ class TestBasic(unittest.TestCase):
         path = os.path.join(self.write_folder, "dates_write.xpt")
         pyreadstat.write_xport(self.df_sas_dates2, path)
         df, meta = pyreadstat.read_xport(path)
+        #import pdb;pdb.set_trace()
         self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_sav_write_charnan(self):
