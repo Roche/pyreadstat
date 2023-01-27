@@ -41,10 +41,14 @@ cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", 
                                 "DDMMYYN6", "DDMMYYN8", "DDMMYYP", "DDMMYYP10", "DDMMYYS", "DDMMYYS10",
                                 "MMDDYYB", "MMDDYYB10", "MMDDYYC", "MMDDYYC10", "MMDDYYD", "MMDDYYD10",
                                 "MMDDYYN6", "MMDDYYN8", "MMDDYYP", "MMDDYYP10", "MMDDYYS", "MMDDYYS10",
-                                "MONNAME", "MONTH", "WEEKDATX", "WEEKDAY", "QTR", "QTRR", "YEAR",
-                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
-cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22", "TOD", "E8601DT"]
-cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
+                                #"MONNAME", "MONTH",  "WEEKDAY", "QTR", "QTRR", "YEAR","DAY",  "DOWNAME" # these do not print as full dates in sas
+                                "WEEKDATX", "DTDATE",
+                                "IS8601DA", "E8601DA", "B8601DA",
+                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS",]
+cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22",
+            "E8601DT", "DATEAMPM", "MDYAMPM", "IS8601DT", "B8601DT", "B8601DN"]
+cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "TIME5", "TOD", "TIMEAMPM", "IS8601TM", "E8601TM", "B8601TM", ]
+# "HOUR" # these do not print as full time formats in sas 
 cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 #sas_origin = datetime(1960,1,1)
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
