@@ -15,7 +15,7 @@
 # limitations under the License.
 # #############################################################################
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import unittest
 import os
 import sys
@@ -908,6 +908,13 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sas7bdat(path)
         self.assertEqual(meta.file_label, "mytest label")
         self.assertEqual(meta.table_name, "TEST_DATA")
+
+    def test_sas7bdat_extra_date_formats(self):
+        "testing extra date format argument"
+        path = os.path.join(self.basic_data_folder, "date_test.sas7bdat")
+        df, meta = pyreadstat.read_sas7bdat(path, extra_date_formats=["MMYY", "YEAR"])
+        self.assertEqual(df['yr'].iloc[0], date(2023,1,1))
+        self.assertEqual(df['dtc4'].iloc[0], date(2023,7,1))
 
     def test_sas7bdat_file_label_windows(self):
         "testing file label for file produced on windows"
