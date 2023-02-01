@@ -641,8 +641,8 @@ sas7bcat and dta.
 #### Reading datetime and date columns
 
 SAS, SPSS and STATA represent datetime, date and other similar concepts as a numeric column and then applies a 
-display format on top. Roughly speaking, internally there are two possible representations: one for concepts with a day 
-granularity or above (date, week, quarter, year, etc.) and those with a granularity lower than a day (datetime, time, hour, etc).
+display format on top. Roughly speaking, internally there are two possible representations: one for concepts with a day or lower 
+granularity (date, week, quarter, year, etc.) and those with a higher granularity than a day (datetime, time, hour, etc).
 The first group is suceptible to be converted to a python date object and the second to a python datetime object. 
 
 Pyreadstat attempts to read columns with datetime, date and time formats that are convertible
