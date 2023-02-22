@@ -1,9 +1,10 @@
-# 1.2.1 (github, pypi and conda 2022.11.xx)
+# 1.2.1 (github, pypi and conda 2023.02.22)
+* Readstat source updated to version 1.1.9
 * introduced recognition for pandas datatype datetime64[ns, UTC] and other datetime64 types when writing, 
   so that this column type gets correctly written as datetime
-* improved performace of writer when there are datetime64 columns
 * introduced extra_datetime_formats and extra_date_formats arguments for read functions, cleaned the list of 
   sas date, datetime and time formats to exclude those not directly convertible to python objects
+* improved performace of writer when there are datetime64 columns
 
 # 1.2.0 (github, pypi and conda 2022.10.25)
 * Fixed #206, #207
