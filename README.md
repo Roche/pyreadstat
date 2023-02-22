@@ -45,6 +45,7 @@ the original applications in this regard.**
     - [Missing Values](#missing-values)
       + [SPSS](#spss)
       + [SAS and STATA](#sas-and-stata)
+    - [Reading datetime and date columns](#reading-datetime-and-date-columns)
     - [Other options](#other-options)
   + [More writing options](#more-writing-options)
     - [File specific options](#file-specific-options)
@@ -636,6 +637,36 @@ This is a list listing all user defined missing values.
 
 User defined missing values are currently not supported for file types other than sas7bdat,
 sas7bcat and dta.
+
+#### Reading datetime and date columns
+
+SAS, SPSS and STATA represent datetime, date and other similar concepts as a numeric column and then applies a 
+display format on top. Roughly speaking, internally there are two possible representations: one for concepts with a day or lower 
+granularity (date, week, quarter, year, etc.) and those with a higher granularity than a day (datetime, time, hour, etc).
+The first group is suceptible to be converted to a python date object and the second to a python datetime object. 
+
+Pyreadstat attempts to read columns with datetime, date and time formats that are convertible
+to python datetime, date and time objects automatically. However there are other formats that are not fully convertible to
+any of these formats, for example SAS "YEAR" (displaying only the year), "MMYY" (displaying only month and year), etc.
+Because there are too many of these formats and these keep changing, it is not possible to implement a rule for each of
+those, therefore these columns are not transformed and the user will obtain a numeric column. 
+
+In order to cope with this issue, there are two options for each reader function: extra\_datetime\_formats and
+ extra\_date\_formats that allow the user to
+pass these datetime or date formats, to transform the numeric values into datetime or date python objects. Then, the user
+can format those columns appropiately; for example extracting the year only to an integer column in the case of 'YEAR' or
+formatting it to a string 'YYYY-MM' in the case of 'MMYY'. The choice between datetime or date format depends on the granularity
+of the data as explained above.
+
+This arguments are also useful in the case you have a valid datetime, date or time format that is currently not recognized in pyreadstat.
+In those cases, feel free to file an issue to ask those to be added to the list, in the meantime you can use these arguments to do
+the conversion.
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', extra_date_formats=["YEAR", "MMYY"])
+```
 
 #### Other options
 

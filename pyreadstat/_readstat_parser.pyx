@@ -41,24 +41,30 @@ cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", 
                                 "DDMMYYN6", "DDMMYYN8", "DDMMYYP", "DDMMYYP10", "DDMMYYS", "DDMMYYS10",
                                 "MMDDYYB", "MMDDYYB10", "MMDDYYC", "MMDDYYC10", "MMDDYYD", "MMDDYYD10",
                                 "MMDDYYN6", "MMDDYYN8", "MMDDYYP", "MMDDYYP10", "MMDDYYS", "MMDDYYS10",
-                                "MONNAME", "MONTH", "WEEKDATX", "WEEKDAY", "QTR", "QTRR", "YEAR",
-                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS", "DAY", "DOWNAME"]
-cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22", "TOD"]
-cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "HOUR", "TIME5"]
-cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
-#sas_origin = datetime(1960,1,1)
+                                #"MONNAME", "MONTH",  "WEEKDAY", "QTR", "QTRR", "YEAR","DAY",  "DOWNAME" # these do not print as full dates in sas
+                                "WEEKDATX", "DTDATE",
+                                "IS8601DA", "E8601DA", "B8601DA",
+                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS",]
+cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22",
+                "E8601DT", "DATEAMPM", "MDYAMPM", "IS8601DT", "B8601DT", "B8601DN"]
+cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "TIME5", "TOD", "TIMEAMPM", "IS8601TM", "E8601TM", "B8601TM", ]
+# "HOUR" # these do not print as full time formats in sas 
+#cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
+cdef list sas_all_formats
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
 cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
 cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
 cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
-cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
+#cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
+cdef list spss_all_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
 
 cdef list stata_datetime_formats = ["%tC", "%tc"]
 cdef list stata_date_formats = ["%td", "%d", "%tdD_m_Y", "%tdCCYY-NN-DD"]
 cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
-cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
+#cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
+cdef list stata_all_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 
 cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: object, READSTAT_TYPE_STRING_REF: object,
@@ -1020,7 +1026,8 @@ cdef object data_container_extract_metadata(data_container data):
 
 cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
-                           bint no_datetime_conversion, long row_limit, long row_offset, str output_format):
+                           bint no_datetime_conversion, long row_limit, long row_offset, str output_format, 
+                           list extra_datetime_formats, list extra_date_formats):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -1063,7 +1070,29 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     allowed_formats = {'pandas', 'dict'}
     if output_format not in allowed_formats:
         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
-                
+
+    if extra_date_formats is not None:
+        if file_format == FILE_FORMAT_SAS:
+            sas_date_formats.extend(extra_date_formats)
+        elif file_format == FILE_FORMAT_SPSS:
+            spss_date_formats.extend(extra_date_formats)
+        elif file_format == FILE_FORMAT_STATA:
+            stata_date_formats.extend(extra_date_formats)
+        else:
+            raise PyreadstatError("Unknown file format")
+    if extra_datetime_formats is not None:
+        if file_format == FILE_FORMAT_SAS:
+            sas_datetime_formats.extend(extra_datetime_formats)
+        elif file_format == FILE_FORMAT_SPSS:
+            spss_datetime_formats.extend(extra_datetime_formats)
+        elif file_format == FILE_FORMAT_STATA:
+            stata_datetime_formats.extend(extra_datetime_formats)
+        else:
+            raise PyreadstatError("Unknown file format")
+    global sas_all_formats, spss_all_formats, stata_all_formats
+    sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
+    stata_all_formats = stata_date_formats + stata_datetime_formats + stata_time_formats
+    spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 
     filename = <char *> filename_bytes
     

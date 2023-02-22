@@ -15,7 +15,7 @@
 # limitations under the License.
 # #############################################################################
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import unittest
 import os
 import sys
@@ -594,7 +594,6 @@ class TestBasic(unittest.TestCase):
             pass
         
         currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
-        #import pdb;pdb.set_trace()
         self.assertTrue(df.equals(currow))
 
     # read multiprocessing
@@ -614,7 +613,6 @@ class TestBasic(unittest.TestCase):
             alldfs.append(df)
         df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
         df_single, meta_single = pyreadstat.read_sav(fpath)
-        #import pdb;pdb.set_trace()
         self.assertTrue(df_multi.equals(df_single))
 
     # writing
@@ -779,6 +777,7 @@ class TestBasic(unittest.TestCase):
         path = os.path.join(self.write_folder, "dates_write.xpt")
         pyreadstat.write_xport(self.df_sas_dates2, path)
         df, meta = pyreadstat.read_xport(path)
+        #import pdb;pdb.set_trace()
         self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_sav_write_charnan(self):
@@ -909,6 +908,13 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sas7bdat(path)
         self.assertEqual(meta.file_label, "mytest label")
         self.assertEqual(meta.table_name, "TEST_DATA")
+
+    def test_sas7bdat_extra_date_formats(self):
+        "testing extra date format argument"
+        path = os.path.join(self.basic_data_folder, "date_test.sas7bdat")
+        df, meta = pyreadstat.read_sas7bdat(path, extra_date_formats=["MMYY", "YEAR"])
+        self.assertEqual(df['yr'].iloc[0], date(2023,1,1))
+        self.assertEqual(df['dtc4'].iloc[0], date(2023,7,1))
 
     def test_sas7bdat_file_label_windows(self):
         "testing file label for file produced on windows"
