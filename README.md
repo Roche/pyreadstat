@@ -330,7 +330,8 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variab
 #### Reading files in parallel processes
 
 A challenge when reading large files is the time consumed in the operation. In order to alleviate this
-pyreadstat provides a function "read_file_multiprocessing" to read a file in parallel processes using the python multiprocessing library. As it reads the whole file in one go you need to have enough RAM for the operation. If
+pyreadstat provides a function "read\_file\_multiprocessing" to read a file in parallel processes using
+ the python multiprocessing library. As it reads the whole file in one go you need to have enough RAM for the operation. If
 that is not the case look at Reading rows in chunks (next section)
 
 Speed ups in the process will depend on a number of factors such as number of processes available, RAM, 
@@ -350,6 +351,11 @@ get the best performance. You can also get the number of all available workers l
 import multiprocessing
 num_processes = multiprocessing.cpu_count()
 ```
+
+**Notes for Xport, Por and some defective SAV files not having the number of rows in the metadata**
+1. In all Xport, Por and some defective SAV files, the number of rows cannot be determined from the metadata. In such cases,
+   you can use the parameter num\_rows to be equal or larger to the number of rows in the dataset. This number can be obtained
+   reading the file without multiprocessing, reading in another application, etc.
 
 **Notes for windows**
 
@@ -410,6 +416,9 @@ for df, meta in reader:
     # do some cool calculations here for the chunk
 ```
 
+**If using multiprocessing, please read the notes in the previous section regarding Xport, Por and some defective SAV files not
+having the number of rows in the metadata**
+ 
 **For Windows, please check the notes on the previous section reading files in parallel processes**
 
 #### Reading value labels

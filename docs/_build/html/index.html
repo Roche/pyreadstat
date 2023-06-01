@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.1 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -172,6 +172,9 @@ dataframe is avoided.</p></li>
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_file_in_chunks">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_in_chunks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_in_chunks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a generator that will allow to read a file in chunks.</p>
+<p>If using multiprocessing, for Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata,
+the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
+be obtained by the user before running this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -182,6 +185,11 @@ dataframe is avoided.</p></li>
 <li><p><strong>limit</strong> (<em>integer</em><em>, </em><em>optional</em>) – stop reading the file after certain number of rows, will be added to offset</p></li>
 <li><p><strong>multiprocess</strong> (<em>bool</em><em>, </em><em>optional</em>) – use multiprocessing to read each chunk?</p></li>
 <li><p><strong>num_processes</strong> (<em>integer</em><em>, </em><em>optional</em>) – in case multiprocess is true, how many workers/processes to spawn?</p></li>
+<li><p><strong>num_rows</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of rows in the dataset. If using multiprocessing it is obligatory for files where
+the number of rows cannot be obtained from the medatata, such as xport, por and
+some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata or not using
+multiprocessing.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.</p></li>
 </ul>
 </dd>
@@ -200,14 +208,18 @@ Look at the documentation for more information.</p></li>
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_file_multiprocessing">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_multiprocessing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_multiprocessing" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a file in parallel using multiprocessing.
-Xport and Por files are not supported as they do not have the number of rows recorded in the metadata,
-information needed for this function.</p>
+For Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata,
+the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
+be obtained by the user before running this function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_function</strong> (<em>pyreadstat function</em>) – a pyreadstat reading function</p></li>
 <li><p><strong>file_path</strong> (<em>string</em>) – path to the file to be read</p></li>
 <li><p><strong>num_processes</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of processes to spawn, by default the min 4 and the max cores on the computer</p></li>
+<li><p><strong>num_rows</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as xport, por and
+some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function.</p></li>
 </ul>
 </dd>

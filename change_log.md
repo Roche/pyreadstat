@@ -1,3 +1,7 @@
+# 1.2.1 (github, pypi and conda 2023.06.01)
+* added num_rows to multiprocessing to allow processing of xport, por and 
+  sav files not having the number of rows in the metadata.
+
 # 1.2.1 (github, pypi and conda 2023.02.22)
 * Readstat source updated to version 1.1.9
 * introduced recognition for pandas datatype datetime64[ns, UTC] and other datetime64 types when writing, 

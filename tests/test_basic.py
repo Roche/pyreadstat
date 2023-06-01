@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -613,6 +613,12 @@ class TestBasic(unittest.TestCase):
             alldfs.append(df)
         df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
         df_single, meta_single = pyreadstat.read_sav(fpath)
+        self.assertTrue(df_multi.equals(df_single))
+
+    def test_multiprocess_reader_xport(self):
+        fpath = os.path.join(self.basic_data_folder, "sample.xpt")
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_xport, fpath, num_rows=1000) 
+        df_single, meta_single = pyreadstat.read_xport(fpath)
         self.assertTrue(df_multi.equals(df_single))
 
     # writing
