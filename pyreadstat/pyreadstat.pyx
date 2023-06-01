@@ -640,9 +640,13 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
 # convenience functions to read in chunks
 
 def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, limit=0,
-                        multiprocess=False, num_processes=4, **kwargs):
+                        multiprocess=False, num_processes=4, num_rows=None, **kwargs):
     """
     Returns a generator that will allow to read a file in chunks.
+
+    If using multiprocessing, for Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata, 
+    the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
+    be obtained by the user before running this function.
 
     Parameters
     ----------
@@ -660,6 +664,12 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             use multiprocessing to read each chunk?
         num_processes: integer, optional
             in case multiprocess is true, how many workers/processes to spawn?
+        num_rows: integer, optional
+            number of rows in the dataset. If using multiprocessing it is obligatory for files where
+            the number of rows cannot be obtained from the medatata, such as xport, por and 
+            some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+            larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata or not using
+            multiprocessing.
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.
 
@@ -703,18 +713,19 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             break
         if multiprocess:
             df, meta = read_file_multiprocessing(read_function, file_path, num_processes=num_processes,
-                                                 row_offset=offset, row_limit=chunksize, **kwargs)
+                                                 row_offset=offset, row_limit=chunksize, num_rows=num_rows, **kwargs)
         else:
             df, meta = read_function(file_path, row_offset=offset, row_limit=chunksize, **kwargs)
         if len(df):
             yield df, meta
             offset += chunksize
 
-def read_file_multiprocessing(read_function, file_path, num_processes=None, **kwargs):
+def read_file_multiprocessing(read_function, file_path, num_processes=None, num_rows=None, **kwargs):
     """
     Reads a file in parallel using multiprocessing.
-    Xport and Por files are not supported as they do not have the number of rows recorded in the metadata, 
-    information needed for this function.
+    For Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata, 
+    the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
+    be obtained by the user before running this function.
 
     Parameters
     ----------
@@ -724,6 +735,10 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
             path to the file to be read
         num_processes : integer, optional
             number of processes to spawn, by default the min 4 and the max cores on the computer
+        num_rows: integer, optional
+            number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as xport, por and 
+            some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+            larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata.
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. 
 
@@ -735,19 +750,25 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, **kw
             object with metadata. Look at the documentation for more information.
     """
 
-    if read_function in (read_sas7bcat, read_xport, read_por):
-        raise Exception("read_sas7bcat, read_xport and read_por are not supported")
+    if read_function in (read_sas7bcat,):
+        raise Exception("read_sas7bcat is not supported")
+
+    if read_function in (read_xport, read_por) and num_rows is None:
+        raise Exception("num_rows must be specified for read_xport and read_por to be a number equal or larger than the number of rows in the dataset.")
 
     if not num_processes:
-        # let's be more conservative with the number of workers
+        # let's be conservative with the number of workers
         num_processes = min(mp.cpu_count(), 4)
     _ = kwargs.pop('metadataonly', None)
     row_offset = kwargs.pop("row_offset", 0)
     row_limit = kwargs.pop("row_limit", float('inf'))
     _, meta = read_function(file_path, metadataonly=True, **kwargs)
     numrows = meta.number_rows
+
     if numrows is None:
-        raise Exception("The number of rows of the file cannot be determined from the file's metadata")
+        if num_rows is None:
+            raise Exception("The number of rows of the file cannot be determined from the file's metadata. If you still want to proceed, please set num_rows to a number equal or larger than the number of rows of your data")
+        numrows = num_rows
     elif numrows == 0:
         final, meta = read_function(file_path, **kwargs)
 
