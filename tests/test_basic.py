@@ -86,7 +86,7 @@ class TestBasic(unittest.TestCase):
         df_dates1 = pd.read_csv(sas_dates)
         df_dates1["date"] = pd.to_datetime(df_dates1["date"])
         df_dates1["dtime"] = pd.to_datetime(df_dates1["dtime"])
-        df_dates1["time"] = pd.to_datetime(df_dates1["time"])
+        df_dates1["time"] = pd.to_datetime(df_dates1["time"], format='%H:%M:%S')
         df_dates1["time"] = df_dates1["time"].apply(lambda x: x.time())
         self.df_sas_dates_as_pandas = df_dates1
 
@@ -475,7 +475,7 @@ class TestBasic(unittest.TestCase):
     def test_por_chunks(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), row_limit = 2, row_offset =1)
         df_pandas_por = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
-        df_pandas_por.loc[:, 'dtime'] = pd.to_datetime(df_pandas_por.dtime)
+        df_pandas_por['dtime'] = pd.to_datetime(df_pandas_por.dtime)
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(df_pandas_por))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
