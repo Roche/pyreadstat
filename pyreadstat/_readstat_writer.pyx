@@ -25,10 +25,7 @@ import pandas as pd
 from pandas.api.types import is_datetime64_any_dtype, is_datetime64_ns_dtype
 import datetime
 import calendar
-IF PY_MAJOR_VERSION >2:
-    from datetime import timezone as _timezone
-ELSE: # not available on python 2
-    import pytz as _timezone
+from datetime import timezone as _timezone
 from libc.math cimport round, NAN
 
 from readstat_api cimport *
@@ -495,15 +492,15 @@ cdef void set_variable_measure(readstat_variable_t *variable, str measure_str, s
     readstat_variable_set_measure(variable, measure);
 
 
-cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx):
+cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx) noexcept:
     """
     for the writer an explicit function to write must be defined 
     """
     cdef int fd
     fd = (<int *>ctx)[0]
-    IF UNAME_SYSNAME == 'Windows':
+    if os.name=='nt':
         return _write(fd, data, _len)
-    ELSE:
+    else:
         return write(fd, data, _len)
 
 cdef void _check_exit_status(readstat_error_t retcode) except *:
@@ -527,34 +524,23 @@ cdef int open_file(bytes filename_path):
     cdef bytes filename_bytes
     cdef char *path
 
-    IF PY_MAJOR_VERSION >2:
-
-        if os.name == "nt":
-            filename_str = os.fsdecode(filename_path)
-            u16_path = PyUnicode_AsWideCharString(filename_str, &length)
-            flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
-            fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
-        else:
-            #filename_bytes = filename_path.encode("utf-8")
-            path = <char *> filename_path
-            flags = O_WRONLY | O_CREAT | O_TRUNC
-            fd = open(path, flags, 0644)
-
-    ELSE:
-        if os.name == "nt":
-            return -1
-        else:
-            filename_bytes = filename_path.encode("utf-8")
-            path = <char *> filename_bytes
-            flags = O_WRONLY | O_CREAT | O_TRUNC
-            fd = open(path, flags, 0644)
+    if os.name == "nt":
+        filename_str = os.fsdecode(filename_path)
+        u16_path = PyUnicode_AsWideCharString(filename_str, &length)
+        flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
+        fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
+    else:
+        #filename_bytes = filename_path.encode("utf-8")
+        path = <char *> filename_path
+        flags = O_WRONLY | O_CREAT | O_TRUNC
+        fd = open(path, flags, 0644)
 
     return fd
 
 cdef int close_file(int fd):
-    IF UNAME_SYSNAME == 'Windows':
+    if os.name == "nt":
         return _close(fd)
-    ELSE:
+    else:
         return close(fd)
 
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
@@ -566,10 +552,6 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     and are even incompatible between them. This function relies on the caller to select the right
     combination of parameters, not checking them otherwise.
     """
-
-    IF PY_MAJOR_VERSION <3:
-        if os.name == "nt":
-            raise PyreadstatError("Writing API not supported on python 2 on windows")
 
     if not isinstance(df, pd.DataFrame):
         raise PyreadstatError("first argument must be a pandas data frame")
@@ -655,17 +637,12 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
     else:
-        IF PY_MAJOR_VERSION >2:
-            if type(filename_path) == str:
-                filename_bytes = filename_path.encode('utf-8')
-            elif type(filename_path) == bytes:
-                filename_bytes = filename_path
-            else:
-                raise PyreadstatError("path must be either str or bytes")
-        ELSE:
-            if type(filename_path) not in (str, bytes, unicode):
-                raise PyreadstatError("path must be str, bytes or unicode")
+        if type(filename_path) == str:
             filename_bytes = filename_path.encode('utf-8')
+        elif type(filename_path) == bytes:
+            filename_bytes = filename_path
+        else:
+            raise PyreadstatError("path must be either str or bytes")
 
     filename_path = os.path.expanduser(filename_path)
     cdef int fd = open_file(filename_path)

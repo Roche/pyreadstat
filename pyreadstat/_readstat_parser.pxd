@@ -19,6 +19,13 @@ from libc.stddef cimport wchar_t
 from readstat_api cimport *
 
 # Definitions of enum types
+ctypedef enum py_file_extension:
+    FILE_EXT_SAV
+    FILE_EXT_SAS7BDAT
+    FILE_EXT_DTA
+    FILE_EXT_XPORT
+    FILE_EXT_POR
+    FILE_EXT_SAS7BCAT
 
 ctypedef enum py_file_format:
     FILE_FORMAT_SAS
@@ -95,11 +102,11 @@ cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HAN
 
 cdef void check_exit_status(readstat_error_t retcode) except *
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *
+cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset) except *
 cdef object data_container_to_dict(data_container data)
 cdef object dict_to_pandas_dataframe(object final_container, data_container data)
 cdef object data_container_extract_metadata(data_container data)
-cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
+cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
                            bint no_datetime_conversion, long row_limit, long row_offset, str output_format, list extra_datetime_formats, 
 			   list extra_date_formats)
@@ -126,26 +133,25 @@ cdef object stata_origin
 # Stuff for opening files on windows in order to handle international characters
 # Courtesy of Jonathon Love
 # works only in python 3
-IF PY_MAJOR_VERSION >2:
+#cdef extern from "readstat_io_unistd.h":
+#    cdef struct unistd_io_ctx_t "unistd_io_ctx_s":
+#        int fd
+    
+cdef extern from "Python.h":
+    wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
+    
+# these ones would make the c file produced by cython not portable between windows and unix
+# therefore the conditional including of the libraries is handled in C
+cdef extern from "conditional_includes.h":
+    int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode)
+    int _O_RDONLY
+    int _O_BINARY
+    int _O_WRONLY
+    int _O_CREAT
+    int _SH_DENYRW  # Denies read and write access to a file.
+    int _SH_DENYWR  # Denies write access to a file.
+    int _SH_DENYRD  # Denies read access to a file.
+    int _SH_DENYNO
+    void assign_fd(void *io_ctx, int fd)
+    long seek_fd(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx)
 
-    cdef extern from "readstat_io_unistd.h":
-        cdef struct unistd_io_ctx_t "unistd_io_ctx_s":
-            pass
-            
-    cdef extern from "Python.h":
-        wchar_t* PyUnicode_AsWideCharString(object, Py_ssize_t *) except NULL
-            
-    # these ones would make the c file produced by cython not portable between windows and unix
-    # therefore the conditional including of the libraries is handled in C
-    cdef extern from "conditional_includes.h":
-        int _wsopen(const wchar_t *filename, int oflag, int shflag, int pmode)
-        int _O_RDONLY
-        int _O_BINARY
-        int _O_WRONLY
-        int _O_CREAT
-        int _SH_DENYRW  # Denies read and write access to a file.
-        int _SH_DENYWR  # Denies write access to a file.
-        int _SH_DENYRD  # Denies read access to a file.
-        int _SH_DENYNO
-        void assign_fd(void *io_ctx, int fd)
-        long seek_fd(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx)

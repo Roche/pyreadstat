@@ -5,7 +5,7 @@ authors:
   given-names: "Otto"
   orcid: "https://orcid.org/0000-0002-3363-9287"
 title: "Pyreadstat"
-version: 1.2.2
+version: 1.2.3
 doi: 10.5281/zenodo.6612282
 date-released: 2018-09-24
 url: "https://github.com/Roche/pyreadstat"
