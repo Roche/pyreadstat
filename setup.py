@@ -26,9 +26,9 @@ PY_MAJOR_VERSION = sys.version_info[0]
 if PY_MAJOR_VERSION < 3 and os.name == 'nt':
     raise Exception("Python 2 is not supported on Windows.")
 
-cyver = int(Cython.__version__.split(".")[1])
-if cyver < 28:
-    msg = "Cython version 0.28 or newer required"
+cyver = int(Cython.__version__.split(".")[0])
+if cyver < 3:
+    msg = "Cython version 3 or newer required"
     raise Exception(msg)
 
 ext = '.pyx'
@@ -127,7 +127,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.2.2',
+    version='1.2.3',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

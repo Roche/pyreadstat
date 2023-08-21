@@ -23,11 +23,11 @@ import multiprocessing as mp
 
 import pandas as pd
 
-from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
-from readstat_api cimport readstat_parse_por, readstat_parse_xport
-from readstat_api cimport readstat_parse_sas7bcat
-from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
-from _readstat_parser cimport py_file_format, run_conversion
+#from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
+#from readstat_api cimport readstat_parse_por, readstat_parse_xport
+#from readstat_api cimport readstat_parse_sas7bcat
+#from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
+from _readstat_parser cimport py_file_format, py_file_extension, run_conversion
 from _readstat_parser import  PyreadstatError
 from _readstat_writer cimport run_write
 cimport _readstat_parser, _readstat_writer
@@ -124,7 +124,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
         no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bdat, encoding, metaonly,
+    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAS7BDAT
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
                                           output_format, extra_datetime_formats, extra_date_formats)
     metadata.file_format = "sas7bdat"
@@ -201,7 +202,8 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
         no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_xport, encoding, metaonly,
+    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_XPORT
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
                                           output_format, extra_datetime_formats, extra_date_formats)
     metadata.file_format = "xport"
@@ -289,7 +291,8 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_dta, encoding, metaonly,
+    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_DTA
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
                                           output_format, extra_datetime_formats, extra_date_formats)
     metadata.file_format = "dta"
@@ -381,7 +384,8 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sav, encoding, metaonly,
+    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAV
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
                                           output_format, extra_datetime_formats, extra_date_formats)
     metadata.file_format = "sav/zsav"
@@ -468,7 +472,8 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         no_datetime_conversion = 1
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_por, encoding, metaonly,
+    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_POR
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
                                           output_format, extra_datetime_formats, extra_date_formats)
     metadata.file_format = "por"
@@ -521,7 +526,8 @@ def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
     cdef list extra_date_formats=None
 
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    data_frame, metadata = run_conversion(filename_path, file_format, readstat_parse_sas7bcat, encoding, metaonly,
+    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAS7BCAT
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, row_limit, row_offset, 
                                           output_format, extra_datetime_formats, extra_date_formats)
     metadata.file_format = "sas7bcat"
