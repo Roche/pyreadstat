@@ -194,9 +194,7 @@ You can also install from the github repo directly (without cloning). Use the fl
 pip install git+https://github.com/Roche/pyreadstat.git
 ```
 
-You need a working C compiler. If working in python 2.7 you will need
-cython version >= 0.28 installed (see later Python 2.7 support). For python 3, cython
-is not necessary if compiling on unix, but if installed it will be used.
+You need a working C compiler and cython >=3.0.0.
 
 ### Compiling on Windows and Mac
 
@@ -870,17 +868,9 @@ Converting data types from foreign applications into python some times also brin
 
 ## Python 2.7 support.
 
-Python 2.7 is not actively supported. If it works, we are happy about that. But if it does not, and the
-bug is specific for python 2.7 (cannot be reproduced in python 3), the issue is not going to be solved.
-
-At the moment of writing this document Python 2.7 does not work for windows.
-It does work for Mac and Linux. In Mac and Linux, files cannot be opened
-if the path contains international (non-ascii) characters. As mentioned
-before this bug is not going to be repaired (There is not such issue on
-Python 3). 
-
-Starting on version 1.0.6 wheels are not produced for Python 2.7 anymore,
-but you can still compile on linux and mac. 
+As version 1.2.3 Python 2.7 is not supported. In previous versions it was possible to compile it for 
+mac and linux but not for windows, but no wheels were provided. In linux and mac it will fail if
+ the path file contains non-ascii characters.
 
 ## Change log
 

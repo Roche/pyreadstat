@@ -1,4 +1,8 @@
-# 1.2.1 (github, pypi and conda 2023.06.01)
+# 1.2.3 (github, pypi and conda 2023.07.xx)
+* changes introduced for compatibility with cython 3.0.0. Cython 0.29 no longer supported. 
+  Python 2.7 no longer supported.
+
+# 1.2.2 (github, pypi and conda 2023.06.01)
 * added num_rows to multiprocessing to allow processing of xport, por and 
   sav files not having the number of rows in the metadata.
 

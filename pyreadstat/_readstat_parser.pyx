@@ -768,25 +768,18 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
     Special open handler for windows in order to be able to handle paths with international characters
     Courtesy of Jonathon Love.
     """
-    IF PY_MAJOR_VERSION >2:
+    cdef int fd
+    cdef Py_ssize_t length
 
-        cdef int fd
-        cdef Py_ssize_t length
+    if not os.path.isfile(u8_path):
+        return -1
 
-        if not os.path.isfile(u8_path):
-            return -1
-
-        #IF UNAME_SYSNAME == 'Windows':
-        if os.name == "nt":
-            
-            u16_path = PyUnicode_AsWideCharString(u8_path, &length)
-            fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
-            assign_fd(io_ctx, fd)
-            return fd
-        #ELSE:
-        else:
-            return -1
-    ELSE:
+    if os.name == "nt":
+        u16_path = PyUnicode_AsWideCharString(u8_path, &length)
+        fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
+        assign_fd(io_ctx, fd)
+        return fd
+    else:
         return -1
 
 
@@ -803,7 +796,7 @@ cdef void check_exit_status(readstat_error_t retcode) except *:
         raise ReadstatError(err_message)
 
 
-cdef void run_readstat_parser(char * filename, data_container data, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *), long row_limit, long row_offset) except *:
+cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset) except *:
     """
     Runs the parsing of the file by readstat library
     """
@@ -841,13 +834,9 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
     check_exit_status(readstat_set_note_handler(parser, note_handler))
 
     # on windows we need a custom open handler in order to deal with internation characters in the path.
-    IF PY_MAJOR_VERSION >2:
-        if os.name == "nt":
-            open_handler = <readstat_open_handler> handle_open
-            readstat_set_open_handler(parser, open_handler)
-    ELSE:
-        if os.name == "nt":
-            raise PyreadstatError("Python 2 on windows not supported!")
+    if os.name == "nt":
+        open_handler = <readstat_open_handler> handle_open
+        readstat_set_open_handler(parser, open_handler)
 
     if not metaonly:
         check_exit_status(readstat_set_value_handler(parser, value_handler))
@@ -864,7 +853,19 @@ cdef void run_readstat_parser(char * filename, data_container data, readstat_err
         check_exit_status(readstat_set_row_offset(parser, row_offset))
 
     # parse!
-    error = parse_func(parser, filename, ctx);
+    if file_extension == FILE_EXT_SAV:
+        error = readstat_parse_sav(parser, filename, ctx);
+    elif file_extension == FILE_EXT_SAS7BDAT:
+        error = readstat_parse_sas7bdat(parser, filename, ctx);
+    elif file_extension == FILE_EXT_DTA:
+        error = readstat_parse_dta(parser, filename, ctx);
+    elif file_extension == FILE_EXT_XPORT:
+        error = readstat_parse_xport(parser, filename, ctx);
+    elif file_extension == FILE_EXT_POR:
+        error = readstat_parse_por(parser, filename, ctx);
+    elif file_extension == FILE_EXT_SAS7BCAT:
+        error = readstat_parse_sas7bcat(parser, filename, ctx);
+    #error = parse_func(parser, filename, ctx);
     readstat_parser_free(parser)
     # check if a python error ocurred, if yes, it will be printed by the interpreter, 
     # if not, make sure that the return from parse_func is OK, if not print
@@ -1024,7 +1025,7 @@ cdef object data_container_extract_metadata(data_container data):
     return metadata
 
 
-cdef object run_conversion(object filename_path, py_file_format file_format, readstat_error_t parse_func(readstat_parser_t *parse, const char *, void *),
+cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
                            bint no_datetime_conversion, long row_limit, long row_offset, str output_format, 
                            list extra_datetime_formats, list extra_date_formats):
@@ -1048,17 +1049,15 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
     else:
-        IF PY_MAJOR_VERSION >2:
-            if type(filename_path) == str:
-                filename_bytes = filename_path.encode('utf-8')
-            elif type(filename_path) == bytes:
-                filename_bytes = filename_path
-            else:
-                raise PyreadstatError("path must be either str or bytes")
-        ELSE:
-            if type(filename_path) not in (str, bytes, unicode):
-                raise PyreadstatError("path must be str, bytes or unicode")
+        if type(filename_path) == str:
             filename_bytes = filename_path.encode('utf-8')
+        elif type(filename_path) == bytes:
+            filename_bytes = filename_path
+        else:
+            raise PyreadstatError("path must be either str or bytes")
+        if type(filename_path) not in (str, bytes, unicode):
+            raise PyreadstatError("path must be str, bytes or unicode")
+        filename_bytes = filename_path.encode('utf-8')
 
 
     filename_bytes = os.path.expanduser(filename_bytes)
@@ -1125,7 +1124,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, rea
     data.no_datetime_conversion = no_datetime_conversion
     
     # go!
-    run_readstat_parser(filename, data, parse_func, row_limit, row_offset)    
+    run_readstat_parser(filename, data, file_extension, row_limit, row_offset)    
     data_dict = data_container_to_dict(data)
     if output_format == 'dict':
         data_frame = data_dict

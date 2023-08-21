@@ -34,11 +34,11 @@ cdef extern from "<stdint.h>" nogil:
     ctypedef   signed long  int64_t
     ctypedef unsigned char  uint8_t
 
-IF UNAME_SYSNAME != 'Windows':
-    cdef extern from '<unistd.h>':
-        int close(int fd)
-        ssize_t write(int fd, const void *buf, size_t nbyte)
-    
+#cdef extern from "conditional_includes.h":
+#    int close(int fd)
+#    ssize_t write(int fd, const void *buf, size_t nbyte)
+
+
 
 cdef extern from "readstat.h":
 
@@ -264,3 +264,7 @@ cdef extern from "readstat.h":
 
     cdef readstat_error_t readstat_end_writing(readstat_writer_t *writer);
     cdef void readstat_writer_free(readstat_writer_t *writer);
+
+cdef extern from "readstat_io_unistd.h":
+    cdef struct unistd_io_ctx_t "unistd_io_ctx_s":
+        int fd

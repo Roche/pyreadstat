@@ -12,6 +12,8 @@
     
     // Stuff for handling paths with international characters on windows
     void assign_fd(void *io_ctx, int fd) { ((unistd_io_ctx_t*)io_ctx)->fd = fd; }
+    //ssize_t write(int fd, const void *buf, size_t nbyte){return 0;};
+    //int close(int fd);
         
 #else
 
@@ -35,5 +37,6 @@
     int _S_IREAD;
     void assign_fd(void *io_ctx, int fd){};
     int _close(int fd){ return 0; };
+    ssize_t _write(int fd, const void *buf, size_t nbyte){return 0;};
     
 #endif
