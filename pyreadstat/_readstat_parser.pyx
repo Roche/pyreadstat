@@ -23,6 +23,7 @@ from libc.math cimport NAN, floor
 
 #from datetime import timedelta, datetime
 from collections import OrderedDict
+import datetime
 import os
 import warnings
 import sys
@@ -112,6 +113,8 @@ cdef class data_container:
         self.variable_alignment = dict()
         self.variable_measure = dict()
         self.no_datetime_conversion = 0
+        self.ctime = 0
+        self.mtime = 0
         
 class metadata_container:
     """
@@ -137,6 +140,8 @@ class metadata_container:
         self.variable_display_width = dict()
         self.variable_alignment = dict()
         self.variable_measure = dict()
+        self.creation_time = None
+        self.modification_time = None
 
 
 class ReadstatError(Exception):
@@ -364,6 +369,8 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     cdef str flabel, fencoding
     cdef bint metaonly
     cdef char * table
+    cdef int ctime
+    cdef int mtime
 
     metaonly = dc.metaonly
     
@@ -402,7 +409,10 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     table = readstat_get_table_name(metadata)
     if table != NULL and table[0]:
         dc.table_name = <str> table
-        
+
+    dc.ctime = readstat_get_creation_time(metadata)
+    dc.mtime = readstat_get_modified_time(metadata)
+
     return READSTAT_HANDLER_OK
 
 cdef int handle_variable(int index, readstat_variable_t *variable, 
@@ -1021,6 +1031,8 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment
     metadata.variable_measure = data.variable_measure
+    metadata.creation_time = datetime.datetime.fromtimestamp(data.ctime).strftime("%Y-%m-%d %H:%M:%S")
+    metadata.modification_time = datetime.datetime.fromtimestamp(data.mtime).strftime("%Y-%m-%d %H:%M:%S")
     
     return metadata
 
