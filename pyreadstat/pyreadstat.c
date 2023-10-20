@@ -1573,6 +1573,8 @@ struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container {
   PyObject *variable_alignment;
   PyObject *variable_measure;
   int no_datetime_conversion;
+  int ctime;
+  int mtime;
 };
 
 

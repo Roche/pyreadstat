@@ -1,3 +1,6 @@
+# 1.2.4 (github, pypi and conda 2023.xx.xx)
+* Added modification_time and creation_time to metadata
+
 # 1.2.3 (github, pypi and conda 2023.08.21)
 * changes introduced for compatibility with cython 3.0.0. Cython 0.29 no longer supported. 
   Python 2.7 no longer supported.

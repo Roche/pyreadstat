@@ -86,6 +86,8 @@ cdef class data_container:
     cdef variable_alignment
     cdef variable_measure
     cdef bint no_datetime_conversion
+    cdef int ctime
+    cdef int mtime
     
 cdef dict readstat_to_numpy_types
 

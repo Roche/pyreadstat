@@ -17,6 +17,8 @@ Each parsing function returns a metadata object in addition to a pandas datafram
 object contains the following fields:
 
   * notes: notes or documents (text annotations) attached to the file if any (spss and stata).
+  * creation_time: time of creation of the file by the application.
+  * modification_time: time of modification of the file by the application.
   * column_names : a list with the names of the columns.
   * column_labels : a list with the column labels, if any.
   * column_names_to_labels : a dictionary with column_names as keys and column_labels as values
