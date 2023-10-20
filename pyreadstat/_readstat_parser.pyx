@@ -1031,8 +1031,8 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.variable_display_width = data.variable_display_width
     metadata.variable_alignment = data.variable_alignment
     metadata.variable_measure = data.variable_measure
-    metadata.creation_time = datetime.datetime.fromtimestamp(data.ctime).strftime("%Y-%m-%d %H:%M:%S")
-    metadata.modification_time = datetime.datetime.fromtimestamp(data.mtime).strftime("%Y-%m-%d %H:%M:%S")
+    metadata.creation_time = datetime.datetime.fromtimestamp(data.ctime)
+    metadata.modification_time = datetime.datetime.fromtimestamp(data.mtime)
     
     return metadata
 
