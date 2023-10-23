@@ -1,4 +1,4 @@
-# 1.2.4 (github, pypi and conda 2023.xx.xx)
+# 1.2.4 (github, pypi and conda 2023.10.23)
 * Added modification_time and creation_time to metadata
 * added datetime64[us in addition to ns for improvement when writing.
 
