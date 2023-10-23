@@ -1525,7 +1525,8 @@ enum __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type {
   __pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_DATE,
   __pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_DATETIME,
   __pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_TIME,
-  __pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_DATETIME64
+  __pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_DATETIME64_NS,
+  __pyx_e_10pyreadstat_16_readstat_writer_PYWRITER_DATETIME64_US
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type;
 
@@ -1573,6 +1574,8 @@ struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container {
   PyObject *variable_alignment;
   PyObject *variable_measure;
   int no_datetime_conversion;
+  int ctime;
+  int mtime;
 };
 
 

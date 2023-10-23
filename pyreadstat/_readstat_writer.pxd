@@ -70,7 +70,8 @@ ctypedef enum pywriter_variable_type:
     PYWRITER_DATE
     PYWRITER_DATETIME
     PYWRITER_TIME
-    PYWRITER_DATETIME64
+    PYWRITER_DATETIME64_NS
+    PYWRITER_DATETIME64_US
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *
 cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, pywriter_variable_type curtype)

@@ -167,6 +167,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
+        #self.assertTrue(meta.creation_time==datetime(2018, 8, 16, 18, 21, 52))
+        #self.assertTrue(meta.modification_time==datetime(2018, 8, 16, 18, 21, 52))
 
     def test_sas7bdat_bincompressed(self):
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample_bincompressed.sas7bdat"))
@@ -221,6 +223,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
+        #self.assertTrue(meta.creation_time==datetime(2018, 8, 14, 10, 55, 46))
+        #self.assertTrue(meta.modification_time==datetime(2018, 8, 14, 10, 55, 46))
 
     def test_xport_v5(self):
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt5"))
@@ -274,6 +278,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="int8")
         self.assertTrue(meta.readstat_variable_types["dtime"]=="double")
+        #self.assertTrue(meta.creation_time==datetime(2018, 12, 17, 14, 53))
+        #self.assertTrue(meta.modification_time==datetime(2018, 12, 17, 14, 53))
 
     def test_dta_metaonly(self):
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"))
@@ -323,6 +329,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
+        #self.assertTrue(meta.creation_time==datetime(2018, 8, 16, 17, 22, 33))
+        #self.assertTrue(meta.modification_time==datetime(2018, 8, 16, 17, 22, 33))
 
     def test_sav_metaonly(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"))
@@ -440,6 +448,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(df_pandas_por))
         self.assertTrue(len(meta.notes) > 0)
+        #self.assertTrue(meta.creation_time==datetime(2018, 12, 16, 17, 28, 21))
+        #self.assertTrue(meta.modification_time==datetime(2018, 12, 16, 17, 28, 21))
 
     def test_por_formatted(self):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), apply_value_formats=True, formats_as_category=True)

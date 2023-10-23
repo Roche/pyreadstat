@@ -41,13 +41,13 @@ cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('
 cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
 cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
-cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64}
+cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64_NS,  PYWRITER_DATETIME64_US}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 cdef dict pandas_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
                                       PYWRITER_CHARACTER: READSTAT_TYPE_STRING, PYWRITER_LOGICAL: READSTAT_TYPE_INT32,
                                       PYWRITER_OBJECT: READSTAT_TYPE_STRING, PYWRITER_DATE: READSTAT_TYPE_DOUBLE,
                                       PYWRITER_DATETIME: READSTAT_TYPE_DOUBLE, PYWRITER_TIME: READSTAT_TYPE_DOUBLE,
-                                      PYWRITER_DATETIME64: READSTAT_TYPE_DOUBLE}
+                                      PYWRITER_DATETIME64_NS: READSTAT_TYPE_DOUBLE, PYWRITER_DATETIME64_US: READSTAT_TYPE_DOUBLE}
 
 cdef double spss_offset_secs = 12219379200
 cdef double sas_offset_secs = 315619200
@@ -73,7 +73,7 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
         offset_days = sas_offset_days
         offset_secs = sas_offset_secs
 
-    if curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64:
+    if curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64_NS:
         # get timestamp in seconds
         if type(curval) == pd._libs.tslibs.timestamps.Timestamp:
             curval = curval.asm8
@@ -126,7 +126,7 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
         #    return "DATE11"
         else:
             return "DATE"
-    elif curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64:
+    elif curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64_NS or curtype == PYWRITER_DATETIME64_US:
         if file_format == FILE_FORMAT_DTA:
             return "%tc"
         #elif file_format == FILE_FORMAT_SAV:
@@ -219,14 +219,15 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
         # np.datetime64[ns]
         elif is_datetime64_ns_dtype(df[col_name]):
             if np.any(pd.isna(curseries)):
-                result.append((PYWRITER_DATETIME64, 0,1))
+                result.append((PYWRITER_DATETIME64_NS, 0,1))
             else:
-                result.append((PYWRITER_DATETIME64, 0,0))
+                result.append((PYWRITER_DATETIME64_NS, 0,0))
         elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types or is_datetime64_any_dtype(df[col_name]):
-            if np.any(pd.isna(curseries)):
-                result.append((PYWRITER_DATETIME, 0,1))
+            is_missing = 1 if np.any(pd.isna(curseries)) else 0
+            if str(col_type).startswith('datetime64[us'):
+                result.append((PYWRITER_DATETIME64_US, 0, is_missing))    
             else:
-                result.append((PYWRITER_DATETIME, 0,0))
+                result.append((PYWRITER_DATETIME, 0, is_missing))
         elif col_type == object or col_type == 'string' or col_type in int_mixed_types:
             is_missing = 0
             if curuser_missing:
@@ -355,7 +356,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
             value = str(value)
             readstat_label_string_value(label_set, value.encode("utf-8"), label.encode("utf-8"))
 
-        elif curpytype in (PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64):
+        elif curpytype in (PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64_NS, PYWRITER_DATETIME64_US):
             if type(value) not in nat_types:
                 msg = "variable_value_labels: type of Value %s in variable %s must match the type of the column in pandas and be of type date, datetime or time" % (str(value), variable_name)
                 raise PyreadstatError(msg)
@@ -628,7 +629,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef bint hasdatetime64
     cdef list pywriter_types
     cdef object df2
-    cdef float mulfac
+    cdef float mulfac, conv2secs
 
     if hasattr(os, 'fsencode'):
         try:
@@ -764,20 +765,22 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
         # vectorized transform of datetime64ns columns
         pywriter_types = [x[0] for x in col_types]
-        hasdatetime64 = PYWRITER_DATETIME64 in pywriter_types
+        hasdatetime64 = PYWRITER_DATETIME64_NS in pywriter_types or PYWRITER_DATETIME64_US in pywriter_types
         if hasdatetime64:
+            if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
+                offset_secs = spss_offset_secs
+            else:
+                offset_secs = sas_offset_secs
+            mulfac = 1.0
+            if file_format == FILE_FORMAT_DTA:
+                # stata stores in milliseconds
+                mulfac = 1000.0
             df2 = df.copy()
             for col_indx in range(col_count):
-                if pywriter_types[col_indx] == PYWRITER_DATETIME64:
-                    if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
-                        offset_secs = spss_offset_secs
-                    else:
-                        offset_secs = sas_offset_secs
-                    mulfac = 1.0
-                    if file_format == FILE_FORMAT_DTA:
-                        # stata stores in milliseconds
-                        mulfac = 1000.0
+                if pywriter_types[col_indx] == PYWRITER_DATETIME64_NS: 
                     df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
+                elif pywriter_types[col_indx] == PYWRITER_DATETIME64_US:
+                    df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
         else:
             df2 = df
 
@@ -820,7 +823,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                 elif curtype == PYWRITER_OBJECT:
                     curvalstr = str(curval)
                     check_exit_status(readstat_insert_string_value(writer, tempvar, curvalstr.encode("utf-8")))
-                elif curtype == PYWRITER_DATETIME64:
+                elif curtype == PYWRITER_DATETIME64_NS or curtype ==  PYWRITER_DATETIME64_US:
                     check_exit_status(readstat_insert_double_value(writer, tempvar, <double>curval))
                 elif curtype in pyrwriter_datetimelike_types:
                     dtimelikeval = convert_datetimelike_to_number(file_format, curtype, curval)

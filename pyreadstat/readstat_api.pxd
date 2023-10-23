@@ -158,6 +158,8 @@ cdef extern from "readstat.h":
     cdef char *readstat_get_file_label(readstat_metadata_t *metadata);
     cdef char *readstat_get_file_encoding(readstat_metadata_t *metadata);
     cdef char *readstat_get_table_name(readstat_metadata_t *metadata);
+    cdef int readstat_get_creation_time(readstat_metadata_t *metadata);
+    cdef int readstat_get_modified_time(readstat_metadata_t *metadata);
 
     cdef int readstat_variable_get_index_after_skipping(readstat_variable_t *variable)
     cdef char *readstat_variable_get_name(readstat_variable_t *variable)
