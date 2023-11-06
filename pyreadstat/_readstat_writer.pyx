@@ -781,20 +781,21 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
                 elif pywriter_types[col_indx] == PYWRITER_DATETIME64_US:
                     df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
+                    df2.loc[df2[df2.columns[col_indx]]==-9223056417655, df2.columns[col_indx]] = np.nan
+
         else:
             df2 = df
 
         # inserting
         rowcnt = 0
 
-        for  row in df2.values:
+        for row in df2.values:
             check_exit_status(readstat_begin_row(writer))
 
             for col_indx in range(col_count):
 
                 tempvar = readstat_get_variable(writer, col_indx)
                 curval = row[col_indx]
-                #curtype = col_types[col_indx][0]
                 curtype = pywriter_types[col_indx]
                 is_missing = col_types[col_indx][2]
                 curuser_missing = None

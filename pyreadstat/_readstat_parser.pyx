@@ -608,8 +608,6 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
-    #iscurnptypeobject = dc.col_dtypes_isobject[index]
-    #iscurnptypefloat = dc.col_dytpes_isfloat[index]
     
     # check that we still have enough room in our pre-allocated lists
     # if not, add more room
