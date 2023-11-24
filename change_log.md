@@ -1,4 +1,4 @@
-# 1.2.5 (github, pypi and conda 2023.11.xx)
+# 1.2.5 (github, pypi and conda 2023.11.24)
 * Correcting bug for datetime64[us
 
 # 1.2.4 (github, pypi and conda 2023.10.23)
