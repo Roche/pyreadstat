@@ -1,3 +1,6 @@
+# 1.2.5 (github, pypi and conda 2023.12.xx)
+* correcting bug when writing files with character columns with all missing, character length set to 1
+
 # 1.2.5 (github, pypi and conda 2023.11.24)
 * Correcting bug for datetime64[us
 
