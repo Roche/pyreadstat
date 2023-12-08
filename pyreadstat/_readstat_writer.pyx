@@ -148,7 +148,7 @@ cdef int get_pandas_str_series_max_length(object series, dict value_labels):
     values = series.values
     cdef str val
     cdef bytes temp
-    cdef int max_length = 0
+    cdef int max_length = 1
     cdef int curlen
     cdef list labels
     for val in values:
@@ -248,7 +248,6 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                     #if not np.all(equal):
                     if not equal:
                         max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                        max_length = max(1, max_length)
                         result.append((PYWRITER_OBJECT, max_length, 1))
                         continue
                 else:
@@ -267,7 +266,6 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                 #if not np.all(equal):
                 if not equal:
                     max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                    max_length = max(1, max_length)
                     result.append((PYWRITER_OBJECT, max_length, 0))
                     continue
             if curtype in int_types:
@@ -283,7 +281,6 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                     max_length = max(1, max_length)
                 else:
                     max_length = get_pandas_str_series_max_length(curseries, variable_value_labels.get(col_name))
-                    max_length = max(1, max_length)
                 result.append((PYWRITER_CHARACTER, max_length, is_missing))
             elif curtype == datetime.date:
                 result.append((PYWRITER_DATE, 0, is_missing))
@@ -296,16 +293,13 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                 if is_missing:
                     col = curseries.dropna().reset_index(drop=True)
                     max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                    max_length = max(1, max_length)
                 else:
                     max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                    max_length = max(1, max_length)
                 result.append((PYWRITER_OBJECT, max_length, is_missing))
 
         else:
             # generic object
             max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-            max_length = max(1, max_length)
             is_missing = 0
             if np.any(pd.isna(curseries)):
                 is_missing = 1
