@@ -148,7 +148,7 @@ cdef int get_pandas_str_series_max_length(object series, dict value_labels):
     values = series.values
     cdef str val
     cdef bytes temp
-    cdef int max_length = 0
+    cdef int max_length = 1
     cdef int curlen
     cdef list labels
     for val in values:
@@ -278,6 +278,7 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                 if is_missing:
                     col = curseries.dropna().reset_index(drop=True)
                     max_length = get_pandas_str_series_max_length(col, variable_value_labels.get(col_name))
+                    max_length = max(1, max_length)
                 else:
                     max_length = get_pandas_str_series_max_length(curseries, variable_value_labels.get(col_name))
                 result.append((PYWRITER_CHARACTER, max_length, is_missing))
