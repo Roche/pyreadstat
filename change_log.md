@@ -1,4 +1,4 @@
-# 1.2.5 (github, pypi and conda 2023.12.xx)
+# 1.2.5 (github, pypi and conda 2023.12.20)
 * correcting bug when writing files with character columns with all missing, character length set to 1
 
 # 1.2.5 (github, pypi and conda 2023.11.24)
