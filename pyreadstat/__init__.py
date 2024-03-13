@@ -16,9 +16,11 @@
 
 from .pyreadstat import read_sas7bdat, read_xport, read_dta, read_sav, read_por, read_sas7bcat
 from .pyreadstat import write_sav, write_dta, write_xport, write_por
-from .pyreadstat import set_value_labels, set_catalog_to_sas
+#from .pyreadstat import set_value_labels, set_catalog_to_sas
+#from .pyreadstat import  set_catalog_to_sas
 from .pyreadstat import read_file_in_chunks, read_file_multiprocessing
 from ._readstat_parser import ReadstatError, metadata_container
+from .pyfunctions import set_value_labels, set_catalog_to_sas
 
-__version__ = "1.2.6"
+__version__ = "1.2.7"
 

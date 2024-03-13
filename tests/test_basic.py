@@ -579,7 +579,7 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_sav(sav_file,
                             apply_value_formats=True, user_missing=True,
                             formats_as_category=False)
-        df_sas['var1'].loc[1] = int(df_sas['var1'][1])
+        df_sas.loc[1, 'var1'] = int(df_sas['var1'][1])
         df_sas['var1'] = df_sas['var1'].astype(str)
         df_csv = pd.read_csv(labeled_csv)
         self.assertTrue(df_sas.equals(df_csv))
