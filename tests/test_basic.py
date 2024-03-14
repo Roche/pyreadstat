@@ -579,7 +579,7 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_sav(sav_file,
                             apply_value_formats=True, user_missing=True,
                             formats_as_category=False)
-        df_sas['var1'].loc[1] = int(df_sas['var1'][1])
+        df_sas.loc[1, 'var1'] = int(df_sas['var1'][1])
         df_sas['var1'] = df_sas['var1'].astype(str)
         df_csv = pd.read_csv(labeled_csv)
         self.assertTrue(df_sas.equals(df_csv))
@@ -624,6 +624,18 @@ class TestBasic(unittest.TestCase):
         df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
         df_single, meta_single = pyreadstat.read_sav(fpath)
         self.assertTrue(df_multi.equals(df_single))
+
+    def test_chunk_reader_multiprocess_dict(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True, output_format='dict')
+        alldfs = list()
+        for chunkdict, meta in reader:
+            df = pd.DataFrame(chunkdict)
+            alldfs.append(df)
+        df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
+        df_single, meta_single = pyreadstat.read_sav(fpath)
+        self.assertTrue(df_multi.equals(df_single))
+
 
     def test_multiprocess_reader_xport(self):
         fpath = os.path.join(self.basic_data_folder, "sample.xpt")
