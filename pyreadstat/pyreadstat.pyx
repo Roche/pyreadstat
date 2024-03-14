@@ -22,6 +22,7 @@
 import multiprocessing as mp
 
 import pandas as pd
+import numpy as np
 
 #from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
 #from readstat_api cimport readstat_parse_por, readstat_parse_xport
@@ -398,11 +399,11 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
 
 def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None,
+             formats_as_category=True, formats_as_ordered_category=False, list usecols=None,
              disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
              list extra_datetime_formats=None, list extra_date_formats=None):
     r"""
-    Read a SPSS por file
+    Read a SPSS por file. Files are assumed to be UTF-8 encoded, the encoding cannot be set to other.
 
     Parameters
     ----------
@@ -424,9 +425,6 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
-        encoding : str, optional
-            Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
-            iconv-compatible name
         usecols : list, optional
             a list with column names to read from the file. Only those columns will be imported. Case sensitive!
         disable_datetime_conversion : bool, optional
@@ -470,6 +468,8 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
     cdef bint no_datetime_conversion = 0
     if disable_datetime_conversion:
         no_datetime_conversion = 1
+
+    cdef str encoding = None
     
     cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
     cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_POR
@@ -686,7 +686,14 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
         raise
     finally:
         pool.close()
-    final = pd.concat(chunks, axis=0, ignore_index=True)
+    output_format = kwargs.get("output_format")
+    if output_format == 'dict':
+        keys = chunks[0].keys()
+        final = dict()
+        for key in keys:
+            final[key] = np.concatenate([chunk[key] for chunk in chunks])
+    else:
+        final = pd.concat(chunks, axis=0, ignore_index=True)
     return final, meta
 
 # Write API

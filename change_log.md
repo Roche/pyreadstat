@@ -1,9 +1,9 @@
-# 1.2.6 (github, pypi and conda 2024.03.xx)
+# 1.2.7 (github, pypi and conda 2024.03.14)
 * Fixing warnings in new pandas version 2.2.1 fixes #252
 * Remove string encoding for read_por fixes #253
 * Fix read in chunks when output is dict, fixes #251
 
-# 1.2.5 (github, pypi and conda 2023.12.20)
+# 1.2.6 (github, pypi and conda 2023.12.20)
 * correcting bug when writing files with character columns with all missing, character length set to 1
 
 # 1.2.5 (github, pypi and conda 2023.11.24)

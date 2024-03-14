@@ -15,9 +15,9 @@
         "include_dirs": [
             "pyreadstat",
             "src",
+            "src/stata",
             "src/spss",
             "src/sas",
-            "src/stata",
             "."
         ],
         "libraries": [
