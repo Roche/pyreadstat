@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.6 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.7 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/documentation_options.js?v=a5753347"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -25,11 +26,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> pyreadstat
+
+          
+          
+          <a href="#" class="icon icon-home">
+            pyreadstat
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -39,7 +44,21 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Welcome to pyreadstat’s documentation!</a></li>
 <li><a class="reference internal" href="#metadata-object-description">Metadata Object Description</a></li>
-<li><a class="reference internal" href="#module-pyreadstat.pyreadstat">Functions Documentation</a></li>
+<li><a class="reference internal" href="#module-pyreadstat.pyreadstat">Functions Documentation</a><ul>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_dta"><code class="docutils literal notranslate"><span class="pre">read_dta()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_file_in_chunks"><code class="docutils literal notranslate"><span class="pre">read_file_in_chunks()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_file_multiprocessing"><code class="docutils literal notranslate"><span class="pre">read_file_multiprocessing()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_por"><code class="docutils literal notranslate"><span class="pre">read_por()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_sas7bcat"><code class="docutils literal notranslate"><span class="pre">read_sas7bcat()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_sas7bdat"><code class="docutils literal notranslate"><span class="pre">read_sas7bdat()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_sav"><code class="docutils literal notranslate"><span class="pre">read_sav()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.read_xport"><code class="docutils literal notranslate"><span class="pre">read_xport()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.write_dta"><code class="docutils literal notranslate"><span class="pre">write_dta()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.write_por"><code class="docutils literal notranslate"><span class="pre">write_por()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.write_sav"><code class="docutils literal notranslate"><span class="pre">write_sav()</span></code></a></li>
+<li><a class="reference internal" href="#pyreadstat.pyreadstat.write_xport"><code class="docutils literal notranslate"><span class="pre">write_xport()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
@@ -56,8 +75,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Welcome to pyreadstat’s documentation!</li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to pyreadstat’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -68,12 +87,12 @@
            <div itemprop="articleBody">
              
   <section id="welcome-to-pyreadstat-s-documentation">
-<h1>Welcome to pyreadstat’s documentation!<a class="headerlink" href="#welcome-to-pyreadstat-s-documentation" title="Permalink to this headline">¶</a></h1>
+<h1>Welcome to pyreadstat’s documentation!<a class="headerlink" href="#welcome-to-pyreadstat-s-documentation" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 </section>
 <section id="metadata-object-description">
-<h1>Metadata Object Description<a class="headerlink" href="#metadata-object-description" title="Permalink to this headline">¶</a></h1>
+<h1>Metadata Object Description<a class="headerlink" href="#metadata-object-description" title="Link to this heading">¶</a></h1>
 <p>Each parsing function returns a metadata object in addition to a pandas dataframe. That
 object contains the following fields:</p>
 <blockquote>
@@ -120,13 +139,13 @@ missing values in SAS and STATA. This appears when using user_missing=True in re
 in the next section.</p>
 </section>
 <section id="module-pyreadstat.pyreadstat">
-<span id="functions-documentation"></span><h1>Functions Documentation<a class="headerlink" href="#module-pyreadstat.pyreadstat" title="Permalink to this headline">¶</a></h1>
+<span id="functions-documentation"></span><h1>Functions Documentation<a class="headerlink" href="#module-pyreadstat.pyreadstat" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_dta">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_dta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_value_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_dta" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_dta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_value_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_dta" title="Link to this definition">¶</a></dt>
 <dd><p>Read a STATA dta file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -156,11 +175,11 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
 user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
 dataframe is avoided.</p></li>
-<li><p><strong>extra_datetime_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
-<li><p><strong>extra_date_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
+<li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
+<li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
@@ -172,13 +191,13 @@ dataframe is avoided.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_file_in_chunks">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_in_chunks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_in_chunks" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_in_chunks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chunksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocess</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_in_chunks" title="Link to this definition">¶</a></dt>
 <dd><p>Returns a generator that will allow to read a file in chunks.</p>
 <p>If using multiprocessing, for Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata,
 the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
 be obtained by the user before running this function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_function</strong> (<em>pyreadstat function</em>) – a pyreadstat reading function</p></li>
 <li><p><strong>file_path</strong> (<em>string</em>) – path to the file to be read</p></li>
@@ -195,7 +214,7 @@ multiprocessing.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields</dt>
+<dt class="field-even">Yields<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</p></li>
 <li><p><em>metadata</em> – object with metadata.
@@ -208,13 +227,13 @@ Look at the documentation for more information.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_file_multiprocessing">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_multiprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_multiprocessing" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_file_multiprocessing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_file_multiprocessing" title="Link to this definition">¶</a></dt>
 <dd><p>Reads a file in parallel using multiprocessing.
 For Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata,
 the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
 be obtained by the user before running this function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>read_function</strong> (<em>pyreadstat function</em>) – a pyreadstat reading function</p></li>
 <li><p><strong>file_path</strong> (<em>string</em>) – path to the file to be read</p></li>
@@ -225,7 +244,7 @@ larger than the actual number of rows will work as well. Discarded if the number
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
@@ -237,10 +256,10 @@ larger than the actual number of rows will work as well. Discarded if the number
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_por">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_por</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_value_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_por" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a SPSS por file</p>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_por</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_value_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_por" title="Link to this definition">¶</a></dt>
+<dd><p>Read a SPSS por file. Files are assumed to be UTF-8 encoded, the encoding cannot be set to other.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -254,8 +273,6 @@ for their formatted version will be transformed into pandas categories.</p></li>
 <li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
 it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
 the value of formats_as_category.</p></li>
-<li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
-iconv-compatible name</p></li>
 <li><p><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</p></li>
 <li><p><strong>disable_datetime_conversion</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True pyreadstat will not attempt to convert dates, datetimes and times to python objects but those columns
 will remain as numbers. In order to convert them later to an appropiate python object, the user can use the
@@ -268,11 +285,11 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
 user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
 dataframe is avoided.</p></li>
-<li><p><strong>extra_datetime_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
-<li><p><strong>extra_date_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
+<li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
+<li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
@@ -284,7 +301,7 @@ dataframe is avoided.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_sas7bcat">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_sas7bcat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sas7bcat" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_sas7bcat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sas7bcat" title="Link to this definition">¶</a></dt>
 <dd><p>Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
 value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
 variable_to_label contains a map from variable name to the formats.
@@ -293,7 +310,7 @@ to read_sas7bdat directly.
 SAS catalog files are difficult ones, some of them can be read only in specific SAS version, may contain strange
 encodings etc. Therefore it may be that many catalog files are not readable from this application.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -303,7 +320,7 @@ Notice that for this function the resulting object is always empty, this is done
 but has no impact on performance.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data (no data in this case, so will be empty). If the output_parameter is other
 than ‘pandas’ then the object type will change accordingly altough the object will always be empty</p></li>
@@ -317,11 +334,11 @@ Look at the documentation for more information.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_sas7bdat">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_sas7bdat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sas7bdat" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_sas7bdat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sas7bdat" title="Link to this definition">¶</a></dt>
 <dd><p>Read a SAS sas7bdat file.
 It accepts the path to a sas7bcat.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded.</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -353,11 +370,11 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
 user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
 dataframe is avoided.</p></li>
-<li><p><strong>extra_datetime_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
-<li><p><strong>extra_date_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
+<li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
+<li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
 <li><p><em>metadata</em> – object with metadata. The members variables_value_labels will be empty unless a valid catalog file is
@@ -371,10 +388,10 @@ Look at the documentation for more information.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_sav">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_value_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sav" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_value_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_sav" title="Link to this definition">¶</a></dt>
 <dd><p>Read a SPSS sav or zsav (compressed) files</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -404,11 +421,11 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
 user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
 dataframe is avoided.</p></li>
-<li><p><strong>extra_datetime_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
-<li><p><strong>extra_date_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
+<li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
+<li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
@@ -420,10 +437,10 @@ dataframe is avoided.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.read_xport">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_xport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_xport" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">read_xport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadataonly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dates_as_pandas_datetime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">usecols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_datetime_conversion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_datetime_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_date_formats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.read_xport" title="Link to this definition">¶</a></dt>
 <dd><p>Read a SAS xport file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
@@ -444,11 +461,11 @@ beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
 user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
 dataframe is avoided.</p></li>
-<li><p><strong>extra_datetime_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
-<li><p><strong>extra_date_formats</strong> (<em>list of str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
+<li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
+<li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
@@ -459,67 +476,11 @@ dataframe is avoided.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pyreadstat.pyreadstat.set_catalog_to_sas">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">set_catalog_to_sas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sas_dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sas_metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">catalog_metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.set_catalog_to_sas" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes the values in the dataframe and sas_metadata according to the formats in the catalog.
-It will return a copy of the dataframe and metadata. If no appropriate formats were found, the result will
-be an unchanged copy of the original dataframe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sas_dataframe</strong> (<em>pandas dataframe</em>) – resulting from parsing a sas7bdat file</p></li>
-<li><p><strong>sas_metadata</strong> (<em>pyreadstat metadata object</em>) – resulting from parsing a sas7bdat file</p></li>
-<li><p><strong>catalog_metadata</strong> (<em>pyreadstat metadata object</em>) – resulting from parsing a sas7bcat (catalog) file</p></li>
-<li><p><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to True. If True the variables having formats will be transformed into pandas categories.</p></li>
-<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
-it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
-the value of formats_as_category.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>df_copy</strong> (<em>pandas dataframe</em>) – a copy of the original dataframe with the values changed, if appropriate formats were found, unaltered
-otherwise</p></li>
-<li><p><strong>metadata</strong> (<em>dict</em>) – a copy of the original sas_metadata enriched with catalog information if found, otherwise unaltered</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyreadstat.pyreadstat.set_value_labels">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">set_value_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formats_as_ordered_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.set_value_labels" title="Permalink to this definition">¶</a></dt>
-<dd><p>Changes the values in the dataframe according to the value formats in the metadata.
-It will return a copy of the dataframe. If no appropiate formats were found, the result will be an unchanged copy
-of the original dataframe.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataframe</strong> (<em>pandas dataframe</em>) – resulting from parsing a file</p></li>
-<li><p><strong>metadata</strong> (<em>dictionary</em>) – resulting from parsing a file</p></li>
-<li><p><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to True. If True the variables having formats will be transformed into pandas categories.</p></li>
-<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
-it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
-the value of formats_as_category.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>df_copy</strong> – a copy of the original dataframe with the values changed, if appropiate formats were found, unaltered
-otherwise</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pandas dataframe</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_dta">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_dta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_user_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_dta" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_dta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_user_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_dta" title="Link to this definition">¶</a></dt>
 <dd><p>Writes a pandas data frame to a STATA dta file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result dta file</p></li>
@@ -545,10 +506,10 @@ for more information.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_por">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_por</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_por" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_por</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_por" title="Link to this definition">¶</a></dt>
 <dd><p>Writes a pandas data frame to a SPSS POR file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to por</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result por file</p></li>
@@ -567,10 +528,10 @@ for more information.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_sav">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_display_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_sav" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_display_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_sav" title="Link to this definition">¶</a></dt>
 <dd><p>Writes a pandas data frame to a SPSS sav or zsav file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result sav or zsav file</p></li>
@@ -606,13 +567,13 @@ for more information.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_xport">
-<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_xport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_xport" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_xport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_xport" title="Link to this definition">¶</a></dt>
 <dd><p>Writes a pandas data frame to a SAS Xport (xpt) file.
 If no table_name is specified the dataset has by default the name DATASET (take it into account if
 reading the file from SAS.)
 Versions 5 and 8 are supported, default is 8.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to xport</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result xport file</p></li>
@@ -633,7 +594,7 @@ for more information.</p></li>
 
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>

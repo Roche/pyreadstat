@@ -680,7 +680,8 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', extra_date_forma
 You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459).
 This is absolutely necessary if you are handling old xport files with
 non-ascii characters. Those files do not have stamped the encoding in the
-file itself, therefore the encoding must be set manually.
+file itself, therefore the encoding must be set manually. For SPSS POR files it is not possible to set the encoding and
+files are assumed to be always encoded in UTF-8.
 
 
 ```python

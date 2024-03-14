@@ -779,9 +779,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             df2 = df.copy()
             for col_indx in range(col_count):
                 if pywriter_types[col_indx] == PYWRITER_DATETIME64_NS: 
-                    df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
+                    df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
+                    #df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
                 elif pywriter_types[col_indx] == PYWRITER_DATETIME64_US:
-                    df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
+                    df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
                     df2.loc[df2[df2.columns[col_indx]]==-9223056417655, df2.columns[col_indx]] = np.nan
 
         else:
