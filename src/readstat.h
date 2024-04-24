@@ -109,6 +109,16 @@ typedef enum readstat_error_e {
 
 const char *readstat_error_message(readstat_error_t error_code);
 
+typedef struct mr_set_s {
+    char   type;
+    char  *name;
+    char  *label;
+    int    is_dichotomy;
+    int    counted_value;
+    char **subvariables;
+    int    num_subvars;
+} mr_set_t;
+
 typedef struct readstat_metadata_s {
     int64_t     row_count;
     int64_t     var_count;
@@ -121,7 +131,10 @@ typedef struct readstat_metadata_s {
     const char *file_label;
     const char *file_encoding;
     unsigned int is64bit:1;
+    size_t multiple_response_sets_length;
+    mr_set_t *mr_sets;
 } readstat_metadata_t;
+
 
 /* If the row count is unknown (e.g. it's an XPORT or POR file, or an SAV
  * file created with non-conforming software), then readstat_get_row_count
@@ -138,6 +151,8 @@ readstat_endian_t readstat_get_endianness(readstat_metadata_t *metadata);
 const char *readstat_get_table_name(readstat_metadata_t *metadata);
 const char *readstat_get_file_label(readstat_metadata_t *metadata);
 const char *readstat_get_file_encoding(readstat_metadata_t *metadata);
+const mr_set_t *readstat_get_mr_sets(readstat_metadata_t *metadata);
+size_t readstat_get_multiple_response_sets_length(readstat_metadata_t *metadata);
 
 typedef struct readstat_value_s {
     union {

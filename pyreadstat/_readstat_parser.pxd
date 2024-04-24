@@ -88,6 +88,7 @@ cdef class data_container:
     cdef bint no_datetime_conversion
     cdef int ctime
     cdef int mtime
+    cdef list mr_sets
     
 cdef dict readstat_to_numpy_types
 

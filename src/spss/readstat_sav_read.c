@@ -14,6 +14,7 @@
 #include "../readstat_iconv.h"
 #include "../readstat_convert.h"
 #include "../readstat_malloc.h"
+#include "../CKHashTable.h"
 
 #include "readstat_sav.h"
 #include "readstat_sav_compress.h"
@@ -145,6 +146,187 @@ static readstat_error_t sav_parse_variable_display_parameter_record(sav_ctx_t *c
 static readstat_error_t sav_parse_machine_integer_info_record(const void *data, size_t data_len, sav_ctx_t *ctx);
 static readstat_error_t sav_parse_long_string_value_labels_record(const void *data, size_t size, size_t count, sav_ctx_t *ctx);
 static readstat_error_t sav_parse_long_string_missing_values_record(const void *data, size_t size, size_t count, sav_ctx_t *ctx);
+static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx);
+
+static mr_set_t parse_mr_line(const char *line) {
+    const char *equals_pos = strchr(line, '=');
+    mr_set_t result;
+
+    if (equals_pos != NULL && equals_pos[1] != '\0') {
+        result.type = equals_pos[1];
+        int name_length = equals_pos - line;
+        result.name = malloc(name_length + 1);
+        strncpy(result.name, line, name_length);
+        result.name[name_length] = '\0';
+        const char *next_part = equals_pos + 2;  // Start after the '=' and type character
+        if (result.type == 'D') {
+            result.is_dichotomy = 1;
+            const char *digit_start = next_part;
+            while (*next_part != ' ' && *next_part != '\0') {
+                next_part++;
+            }
+            int internal_count = (int)strtol(digit_start, NULL, 10);
+            if (*next_part == ' ') {
+                next_part++;
+            } else {
+                fprintf(stderr, "Expected a space after the internal count\n");
+                return result;
+            }
+            digit_start = next_part;
+            for (int i = 0; i < internal_count && isdigit(*next_part); i++) {
+                next_part++;
+            }
+            result.counted_value = (int)strtol(digit_start, NULL, 10);
+            printf("\nFinal counted value is: %d\n", result.counted_value);
+            if (*next_part != ' ' && *next_part != '\0') {
+                fprintf(stderr, "Expected a space or end of string after the counted value\n");
+                return result;
+            }
+        }
+        else if (result.type == 'C') {
+            result.is_dichotomy = 0;
+            result.counted_value = -1;
+        }
+        if (*next_part != ' ') {
+            fprintf(stderr, "Expected a space after type 'C'\n");
+            free(result.name);
+            result.name = NULL;
+            return result;
+        }
+        next_part++;
+        const char *digit_start = next_part;
+        while (isdigit(*next_part)) {
+            next_part++;
+        }
+        if (*next_part != ' ') {
+            fprintf(stderr, "Expected a space after the digits\n");
+            free(result.name);
+            result.name = NULL;
+            return result;
+        }
+        size_t count = strtoul(digit_start, NULL, 10);
+        next_part++; // Move past the space after the digits
+        printf("count: %zu\n", count);
+        if (strlen(next_part) < count) {
+            fprintf(stderr, "Not enough characters available to read the specified count\n");
+            free(result.name);
+            result.name = NULL;
+            return result;
+        }
+
+        // Allocate memory for label
+        result.label = malloc(count + 1);  // +1 for the null-terminator
+        if (result.label == NULL) {
+            fprintf(stderr, "Failed to allocate memory for label\n");
+            free(result.name);
+            result.name = NULL;
+            return result;
+        }
+
+        // Copy the specified number of characters into label
+        strncpy(result.label, next_part, count);
+        result.label[count] = '\0';  // Null-terminate the string
+
+        // Move the next_part pointer past the read characters
+        next_part += count;
+
+        // Output the actual label for debugging
+        printf("label: %s\n", result.label);
+
+        if (*next_part != ' ') {
+            fprintf(stderr, "Expected a space after the label\n");
+            free(result.label);
+            result.label = NULL;
+            return result;
+        }
+        next_part++; // Move past the space
+        char **subvariables = NULL;
+        int subvar_count = 0;
+        while (*next_part) {
+            if (*next_part == ' ') {  // Skip any extra spaces
+                next_part++;
+                continue;
+            }
+
+            const char *start = next_part;
+            while (*next_part && *next_part != ' ') {
+                next_part++;  // Move to the end of the current subvariable
+            }
+
+            size_t length = next_part - start;
+            char *subvariable = malloc(length + 1);  // Allocate memory for the subvariable
+            if (subvariable == NULL) {
+                fprintf(stderr, "Failed to allocate memory for a subvariable\n");
+                // Cleanup previously allocated subvariables
+                for (int i = 0; i < subvar_count; i++) {
+                    free(subvariables[i]);
+                }
+                free(subvariables);
+                free(result.label);
+                result.label = NULL;
+                return result;
+            }
+            strncpy(subvariable, start, length);
+            subvariable[length] = '\0';  // Null-terminate the string
+
+            // Allocate/resize the subvariables array
+            char **temp = realloc(subvariables, (subvar_count + 1) * sizeof(char *));
+            if (temp == NULL) {
+                fprintf(stderr, "Failed to allocate memory for subvariables array\n");
+                free(subvariable);
+                // Cleanup previously allocated subvariables
+                for (int i = 0; i < subvar_count; i++) {
+                    free(subvariables[i]);
+                }
+                free(subvariables);
+                free(result.label);
+                result.label = NULL;
+                return result;
+            }
+            subvariables = temp;
+            subvariables[subvar_count++] = subvariable;  // Add the new subvariable to the array
+
+            if (*next_part == ' ') {
+                next_part++;  // Move past the space
+            }
+        }
+
+        result.subvariables = subvariables;
+        result.num_subvars = subvar_count;
+
+    } else {
+        result.type = '\0'; // Use a default type or an error indicator
+        result.name = NULL;
+    }
+
+    return result;
+}
+
+static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx) {
+    readstat_error_t retval = READSTAT_OK;
+
+    char *mr_string = readstat_malloc(data_len);
+    if (mr_string == NULL) return READSTAT_ERROR_MALLOC;
+
+    if (ctx->io->read(mr_string, data_len, ctx->io->io_ctx) < data_len) {
+        retval = READSTAT_ERROR_PARSE;
+        free(mr_string);
+        mr_string = NULL;
+        return retval;
+    }
+
+    char *token = strtok(mr_string, "$\n");
+    int num_lines = 0;
+    while (token != NULL) {
+        ctx->mr_sets = realloc(ctx->mr_sets, (num_lines + 1) * sizeof(mr_set_t *));
+        ctx->mr_sets[num_lines] = parse_mr_line(token);
+        num_lines++;
+        token = strtok(NULL, "$\n");
+    }
+    ctx->multiple_response_sets_length = num_lines;
+
+    return retval;
+}
 
 static void sav_tag_missing_double(readstat_value_t *value, sav_ctx_t *ctx) {
     double fp_value = value->v.double_value;
@@ -1335,6 +1517,10 @@ static readstat_error_t sav_parse_records_pass1(sav_ctx_t *ctx) {
                     retval = sav_parse_machine_integer_info_record(data_buf, data_len, ctx);
                     if (retval != READSTAT_OK)
                         goto cleanup;
+                } else if (subtype == SAV_RECORD_SUBTYPE_MULTIPLE_RESPONSE_SETS) {
+                    retval = sav_read_multiple_response_sets(data_len, ctx);
+                    if (retval != READSTAT_OK)
+                        goto cleanup;
                 } else {
                     if (io->seek(data_len, READSTAT_SEEK_CUR, io->io_ctx) == -1) {
                         retval = READSTAT_ERROR_SEEK;
@@ -1661,6 +1847,8 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
             goto cleanup;
 
         metadata.file_label = ctx->file_label;
+        metadata.multiple_response_sets_length = ctx->multiple_response_sets_length;
+        metadata.mr_sets = ctx->mr_sets;
 
         if (ctx->handle.metadata(&metadata, ctx->user_ctx) != READSTAT_HANDLER_OK) {
             retval = READSTAT_ERROR_USER_ABORT;
@@ -1673,6 +1861,37 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
 
     if ((retval = sav_handle_variables(ctx)) != READSTAT_OK)
         goto cleanup;
+
+    ck_hash_table_t *var_dict = ck_hash_table_init(1024, 8);
+    for (size_t i = 0; i < ctx->varinfo_capacity; i++) {
+        spss_varinfo_t *current_varinfo = ctx->varinfo[i];
+        if (current_varinfo != NULL) {
+            ck_str_hash_insert(current_varinfo->name, current_varinfo, var_dict);
+        }
+    }
+    for (size_t i = 0; i < ctx->multiple_response_sets_length; i++) {
+        mr_set_t mr = ctx->mr_sets[i];
+        for (size_t j = 0; j < mr.num_subvars; j++) {
+            if (mr.type == 'C') {
+                char* sv_name_upper = malloc(strlen(mr.subvariables[i]) + 1);
+                for (int c = 0; mr.subvariables[j][c] != '\0'; c++) {
+                    sv_name_upper[c] = toupper((unsigned char) mr.subvariables[j][c]);
+                }
+                sv_name_upper[strlen(mr.subvariables[j])] = '\0';
+                spss_varinfo_t *info = (spss_varinfo_t *)ck_str_hash_lookup(sv_name_upper, var_dict);
+                if (info) {
+                    free(mr.subvariables[j]);
+                    mr.subvariables[j] = malloc(strlen(info->longname) + 1);
+                    if (mr.subvariables[j] == NULL) {
+                        continue;
+                    }
+                    strcpy(mr.subvariables[j], info->longname);
+                }
+            }
+        }
+    }
+    if (var_dict)
+        ck_hash_table_free(var_dict);
 
     if ((retval = sav_handle_fweight(ctx)) != READSTAT_OK)
         goto cleanup;

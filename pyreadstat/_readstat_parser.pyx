@@ -115,6 +115,7 @@ cdef class data_container:
         self.no_datetime_conversion = 0
         self.ctime = 0
         self.mtime = 0
+        self.mr_sets = list()
         
 class metadata_container:
     """
@@ -142,6 +143,7 @@ class metadata_container:
         self.variable_measure = dict()
         self.creation_time = None
         self.modification_time = None
+        self.mr_sets = []
 
 
 class ReadstatError(Exception):
@@ -361,7 +363,7 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     It also reads other metadata from the file.
     """
         
-    cdef int var_count, obs_count
+    cdef int var_count, obs_count, mr_len
     cdef  data_container dc = <data_container> ctx
     #cdef object row
     cdef char * flabel_orig
@@ -371,6 +373,11 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     cdef char * table
     cdef int ctime
     cdef int mtime
+    cdef int i = 0
+    cdef mr_set_t * mr_sets_orig
+    cdef list mr_sets = []
+    cdef str name
+    cdef list variable_list = []
 
     metaonly = dc.metaonly
     
@@ -385,6 +392,30 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     
     dc.n_obs = obs_count
     dc.n_vars = var_count
+
+    mr_len = <int>readstat_get_multiple_response_sets_length(metadata);
+    mr_sets_orig = readstat_get_mr_sets(metadata);
+    if mr_sets_orig != NULL:
+        i = 0
+        while i < mr_len:
+            name = <str>mr_sets_orig[i].name
+            variable_list = []
+            for j in range(mr_sets_orig[i].num_subvars):
+                variable_list.append(<str>mr_sets_orig[i].subvariables[j])
+            mr_dict = {
+                name: {
+                    'type': chr(mr_sets_orig[i].type),
+                    'is_dichotomy': mr_sets_orig[i].is_dichotomy,
+                    'counted_value': mr_sets_orig[i].counted_value if mr_sets_orig[i].counted_value != -1 else None,
+                    'label': <str>mr_sets_orig[i].label,
+                    'variable_list': variable_list
+                }
+            }
+            mr_sets.append(mr_dict)
+            i += 1
+        dc.mr_sets = mr_sets
+    else:
+        dc.mr_sets = None
     
     dc.col_data_len = [obs_count] * var_count
     dc.col_numpy_dtypes = [None] * var_count
@@ -966,6 +997,9 @@ cdef object data_container_extract_metadata(data_container data):
     is_unkown_number_rows = data.is_unkown_number_rows
     
     cdef object metadata = metadata_container()
+
+    # mr sets
+    metadata.mr_sets = data.mr_sets
 
     # number of rows
     metadata.number_columns = data.n_vars

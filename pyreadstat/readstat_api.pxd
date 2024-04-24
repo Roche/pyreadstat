@@ -55,7 +55,16 @@ cdef extern from "readstat.h":
         
     ctypedef struct readstat_metadata_t:
         pass
-        
+
+    ctypedef struct mr_set_t:
+        char type
+        char *name
+        char *label
+        int is_dichotomy
+        int counted_value
+        char **subvariables
+        int num_subvars
+
     ctypedef enum readstat_io_flags_t:
         pass
     
@@ -112,6 +121,7 @@ cdef extern from "readstat.h":
     ctypedef struct readstat_parser_t:
         pass
 
+
     ctypedef enum readstat_measure_t:
         READSTAT_MEASURE_UNKNOWN,
         READSTAT_MEASURE_NOMINAL = 1,
@@ -156,6 +166,8 @@ cdef extern from "readstat.h":
     cdef  int readstat_get_row_count(readstat_metadata_t *metadata);
     cdef int readstat_get_var_count(readstat_metadata_t *metadata);
     cdef char *readstat_get_file_label(readstat_metadata_t *metadata);
+    cdef size_t readstat_get_multiple_response_sets_length(readstat_metadata_t *metadata);
+    cdef mr_set_t *readstat_get_mr_sets(readstat_metadata_t *metadata);
     cdef char *readstat_get_file_encoding(readstat_metadata_t *metadata);
     cdef char *readstat_get_table_name(readstat_metadata_t *metadata);
     cdef int readstat_get_creation_time(readstat_metadata_t *metadata);
