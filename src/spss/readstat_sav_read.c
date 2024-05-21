@@ -300,7 +300,8 @@ static mr_set_t parse_mr_line(const char *line) {
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx) {
     readstat_error_t retval = READSTAT_OK;
 
-    char *mr_string = readstat_malloc(data_len);
+    char *mr_string = readstat_malloc(data_len + 1);
+    mr_string[data_len] = '\0';
     if (mr_string == NULL) return READSTAT_ERROR_MALLOC;
 
     if (ctx->io->read(mr_string, data_len, ctx->io->io_ctx) < data_len) {
@@ -1843,32 +1844,31 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
 
         metadata.file_label = ctx->file_label;
 
-	// Replace short MR names with long names
+        // Replace short MR names with long names
         ck_hash_table_t *var_dict = ck_hash_table_init(1024, 8);
-        for (size_t i = 0; i < ctx->varinfo_capacity; i++) {
+        for (size_t i = 0; i < ctx->var_count; i++) {
             spss_varinfo_t *current_varinfo = ctx->varinfo[i];
-            if (current_varinfo != NULL) {
+            if (current_varinfo != NULL && current_varinfo->name) {
                 ck_str_hash_insert(current_varinfo->name, current_varinfo, var_dict);
             }
         }
         for (size_t i = 0; i < ctx->multiple_response_sets_length; i++) {
             mr_set_t mr = ctx->mr_sets[i];
             for (size_t j = 0; j < mr.num_subvars; j++) {
-		if (mr.type == 'C') {
-                    char* sv_name_upper = malloc(strlen(mr.subvariables[i]) + 1);
-                    for (int c = 0; mr.subvariables[j][c] != '\0'; c++) {
-                        sv_name_upper[c] = toupper((unsigned char) mr.subvariables[j][c]);
-                    }
-		    spss_varinfo_t *info = (spss_varinfo_t *)ck_str_hash_lookup(sv_name_upper, var_dict);
-		    if (info) {
-		        free(mr.subvariables[j]);
-                        mr.subvariables[j] = info->longname;
-                    }
+                char* sv_name_upper = malloc(strlen(mr.subvariables[j]) + 1);
+                for (int c = 0; mr.subvariables[j][c] != '\0'; c++) {
+                    sv_name_upper[c] = toupper((unsigned char) mr.subvariables[j][c]);
                 }
+                spss_varinfo_t *info = (spss_varinfo_t *)ck_str_hash_lookup(sv_name_upper, var_dict);
+                if (info) {
+                    free(mr.subvariables[j]);
+                    mr.subvariables[j] = info->longname;
+                }
+            }
         }
-    }
-    if (var_dict)
-        ck_hash_table_free(var_dict);
+        if (var_dict)
+            ck_hash_table_free(var_dict);
+
         metadata.multiple_response_sets_length = ctx->multiple_response_sets_length;
         metadata.mr_sets = ctx->mr_sets;
 
