@@ -46,6 +46,7 @@ class TestBasic(unittest.TestCase):
         self.catalog_data_folder = os.path.join(self.data_folder, "sas_catalog")
         self.international_data_folder = os.path.join(self.data_folder, "ínternátionál")
         self.missing_data_folder = os.path.join(self.data_folder, "missing_data")
+        self.mr_data_folder = os.path.join(self.data_folder, "multiple_response")
         self.write_folder = os.path.join(self.data_folder, "write")
         if not os.path.isdir(self.write_folder):
             os.makedirs(self.write_folder)
@@ -593,6 +594,33 @@ class TestBasic(unittest.TestCase):
         mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
         self.assertTrue(df2.equals(mdf2))
         self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
+    
+    # test reading metadata for multiple response data
+
+    def test_sav_multiple_response(self):
+        """Assert MR data is correctly read from sav into metadata."""
+        _, meta = pyreadstat.read_sav(os.path.join(self.mr_data_folder, "simple_alltypes.sav"))
+        assert meta.mr_sets == {
+            "categorical_array": {
+                "type": "C",
+                "is_dichotomy": False,
+                "counted_value": None,
+                "label": "",
+                "variable_list": ["ca_subvar_1", "ca_subvar_2", "ca_subvar_3"]
+            },
+            "mymrset": {
+                "type": "D",
+                "is_dichotomy": True,
+                "counted_value": 1,
+                "label": "My multiple response set",
+                "variable_list": ["bool1", "bool2", "bool3"]
+            }
+        }
+    
+    def test_sav_without_multiple_response(self):
+        """Assert MR data is read as empty dict when not present in sav."""
+        _, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"))
+        assert meta.mr_sets == {}
 
     # read in chunks
 

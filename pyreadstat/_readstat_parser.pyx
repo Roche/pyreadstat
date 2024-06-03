@@ -411,8 +411,6 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
             } 
             i += 1
         dc.mr_sets = mr_sets
-    else:
-        dc.mr_sets = None
     
     dc.col_data_len = [obs_count] * var_count
     dc.col_numpy_dtypes = [None] * var_count
