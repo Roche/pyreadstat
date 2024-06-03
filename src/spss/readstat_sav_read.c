@@ -1848,7 +1848,7 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
         ck_hash_table_t *var_dict = ck_hash_table_init(1024, 8);
         for (size_t i = 0; i < ctx->var_count; i++) {
             spss_varinfo_t *current_varinfo = ctx->varinfo[i];
-            if (current_varinfo != NULL && current_varinfo->name) {
+            if (current_varinfo != NULL && current_varinfo->name[0] != '\0') {
                 ck_str_hash_insert(current_varinfo->name, current_varinfo, var_dict);
             }
         }
