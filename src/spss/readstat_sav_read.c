@@ -149,6 +149,38 @@ static readstat_error_t sav_parse_long_string_value_labels_record(const void *da
 static readstat_error_t sav_parse_long_string_missing_values_record(const void *data, size_t size, size_t count, sav_ctx_t *ctx);
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx);
 
+static readstat_error_t parse_mr_counted_value(const char **next_part, mr_set_t *result) {
+    readstat_error_t retval = READSTAT_OK;
+    if (result->type == 'D') {
+        result->is_dichotomy = 1;
+        const char *digit_start = (*next_part);
+        while (*(*next_part) != ' ' && *(*next_part) != '\0') {
+            (*next_part)++;
+        }
+        int internal_count = (int)strtol(digit_start, NULL, 10);
+        if (*(*next_part) != ' ') {
+            retval = READSTAT_ERROR_BAD_MR_STRING;
+            goto cleanup;
+        }
+        (*next_part)++;
+        digit_start = (*next_part);
+        for (int i = 0; i < internal_count && isdigit(*(*next_part)); i++) {
+            (*next_part)++;
+        }
+        result->counted_value = (int)strtol(digit_start, NULL, 10);
+        if (*(*next_part) != ' ' && *(*next_part) != '\0') {
+            retval = READSTAT_ERROR_BAD_MR_STRING;
+            goto cleanup;
+        }
+    }
+    else if (result->type == 'C') {
+        result->is_dichotomy = 0;
+        result->counted_value = -1;
+    }
+cleanup:
+    return retval;
+}
+
 static readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
     readstat_error_t retval = READSTAT_OK;
     *result = (mr_set_t){0};
@@ -161,40 +193,14 @@ static readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
 
     result->type = equals_pos[1];
     int name_length = equals_pos - line;
-    result->name = malloc(name_length + 1);
-    if (result->name == NULL) {
+    if ((result->name = malloc(name_length + 1)) == NULL) {
         retval = READSTAT_ERROR_MALLOC;
         goto cleanup;
     }
     strncpy(result->name, line, name_length);
     result->name[name_length] = '\0';
     const char *next_part = equals_pos + 2;  // Start after the '=' and type character
-    if (result->type == 'D') {
-        result->is_dichotomy = 1;
-        const char *digit_start = next_part;
-        while (*next_part != ' ' && *next_part != '\0') {
-            next_part++;
-        }
-        int internal_count = (int)strtol(digit_start, NULL, 10);
-        if (*next_part != ' ') {
-            retval = READSTAT_ERROR_BAD_MR_STRING;
-            goto cleanup;
-        }
-        next_part++;
-        digit_start = next_part;
-        for (int i = 0; i < internal_count && isdigit(*next_part); i++) {
-            next_part++;
-        }
-        result->counted_value = (int)strtol(digit_start, NULL, 10);
-        if (*next_part != ' ' && *next_part != '\0') {
-            retval = READSTAT_ERROR_BAD_MR_STRING;
-            goto cleanup;
-        }
-    }
-    else if (result->type == 'C') {
-        result->is_dichotomy = 0;
-        result->counted_value = -1;
-    }
+    if ((retval = parse_mr_counted_value(&next_part, result)) != READSTAT_OK) goto cleanup;
     if (*next_part != ' ') {
         retval = READSTAT_ERROR_BAD_MR_STRING;
         goto cleanup;
@@ -215,7 +221,6 @@ static readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
         goto cleanup;
     }
 
-    // Allocate memory for label
     result->label = malloc(count + 1);  // +1 for the null-terminator
     if (result->label == NULL) {
         retval = READSTAT_ERROR_MALLOC;
