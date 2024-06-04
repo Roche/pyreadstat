@@ -149,152 +149,139 @@ static readstat_error_t sav_parse_long_string_value_labels_record(const void *da
 static readstat_error_t sav_parse_long_string_missing_values_record(const void *data, size_t size, size_t count, sav_ctx_t *ctx);
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx);
 
-static mr_set_t parse_mr_line(const char *line) {
+static readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
+    readstat_error_t retval = READSTAT_OK;
+    *result = (mr_set_t){0};
+
     const char *equals_pos = strchr(line, '=');
-    mr_set_t result;
-
-    if (equals_pos != NULL && equals_pos[1] != '\0') {
-        result.type = equals_pos[1];
-        int name_length = equals_pos - line;
-        result.name = malloc(name_length + 1);
-        strncpy(result.name, line, name_length);
-        result.name[name_length] = '\0';
-        const char *next_part = equals_pos + 2;  // Start after the '=' and type character
-        if (result.type == 'D') {
-            result.is_dichotomy = 1;
-            const char *digit_start = next_part;
-            while (*next_part != ' ' && *next_part != '\0') {
-                next_part++;
-            }
-            int internal_count = (int)strtol(digit_start, NULL, 10);
-            if (*next_part == ' ') {
-                next_part++;
-            } else {
-                fprintf(stderr, "Expected a space after the internal count\n");
-                return result;
-            }
-            digit_start = next_part;
-            for (int i = 0; i < internal_count && isdigit(*next_part); i++) {
-                next_part++;
-            }
-            result.counted_value = (int)strtol(digit_start, NULL, 10);
-            if (*next_part != ' ' && *next_part != '\0') {
-                fprintf(stderr, "Expected a space or end of string after the counted value\n");
-                return result;
-            }
-        }
-        else if (result.type == 'C') {
-            result.is_dichotomy = 0;
-            result.counted_value = -1;
-        }
-        if (*next_part != ' ') {
-            fprintf(stderr, "Expected a space after type 'C'\n");
-            free(result.name);
-            result.name = NULL;
-            return result;
-        }
-        next_part++;
-        const char *digit_start = next_part;
-        while (isdigit(*next_part)) {
-            next_part++;
-        }
-        if (*next_part != ' ') {
-            fprintf(stderr, "Expected a space after the digits\n");
-            free(result.name);
-            result.name = NULL;
-            return result;
-        }
-        size_t count = strtoul(digit_start, NULL, 10);
-        next_part++; // Move past the space after the digits
-        if (strlen(next_part) < count) {
-            fprintf(stderr, "Not enough characters available to read the specified count\n");
-            free(result.name);
-            result.name = NULL;
-            return result;
-        }
-
-        // Allocate memory for label
-        result.label = malloc(count + 1);  // +1 for the null-terminator
-        if (result.label == NULL) {
-            fprintf(stderr, "Failed to allocate memory for label\n");
-            free(result.name);
-            result.name = NULL;
-            return result;
-        }
-
-        // Copy the specified number of characters into label
-        strncpy(result.label, next_part, count);
-        result.label[count] = '\0';  // Null-terminate the string
-
-        // Move the next_part pointer past the read characters
-        next_part += count;
-        if (*next_part != ' ') {
-            fprintf(stderr, "Expected a space after the label\n");
-            free(result.label);
-            result.label = NULL;
-            return result;
-        }
-        next_part++; // Move past the space
-        char **subvariables = NULL;
-        int subvar_count = 0;
-        while (*next_part) {
-            if (*next_part == ' ') {  // Skip any extra spaces
-                next_part++;
-                continue;
-            }
-
-            const char *start = next_part;
-            while (*next_part && *next_part != ' ') {
-                next_part++;  // Move to the end of the current subvariable
-            }
-
-            size_t length = next_part - start;
-            char *subvariable = malloc(length + 1);  // Allocate memory for the subvariable
-            if (subvariable == NULL) {
-                fprintf(stderr, "Failed to allocate memory for a subvariable\n");
-                // Cleanup previously allocated subvariables
-                for (int i = 0; i < subvar_count; i++) {
-                    free(subvariables[i]);
-                }
-                free(subvariables);
-                free(result.label);
-                result.label = NULL;
-                return result;
-            }
-            strncpy(subvariable, start, length);
-            subvariable[length] = '\0';  // Null-terminate the string
-
-            // Allocate/resize the subvariables array
-            char **temp = realloc(subvariables, (subvar_count + 1) * sizeof(char *));
-            if (temp == NULL) {
-                fprintf(stderr, "Failed to allocate memory for subvariables array\n");
-                free(subvariable);
-                // Cleanup previously allocated subvariables
-                for (int i = 0; i < subvar_count; i++) {
-                    free(subvariables[i]);
-                }
-                free(subvariables);
-                free(result.label);
-                result.label = NULL;
-                return result;
-            }
-            subvariables = temp;
-            subvariables[subvar_count++] = subvariable;  // Add the new subvariable to the array
-
-            if (*next_part == ' ') {
-                next_part++;  // Move past the space
-            }
-        }
-
-        result.subvariables = subvariables;
-        result.num_subvars = subvar_count;
-
-    } else {
-        result.type = '\0'; // Use a default type or an error indicator
-        result.name = NULL;
+    if (equals_pos == NULL || equals_pos[1] == '\0') {
+        retval = READSTAT_ERROR_BAD_MR_STRING;
+        goto cleanup;
     }
 
-    return result;
+    result->type = equals_pos[1];
+    int name_length = equals_pos - line;
+    result->name = malloc(name_length + 1);
+    if (result->name == NULL) {
+        retval = READSTAT_ERROR_MALLOC;
+        goto cleanup;
+    }
+    strncpy(result->name, line, name_length);
+    result->name[name_length] = '\0';
+    const char *next_part = equals_pos + 2;  // Start after the '=' and type character
+    if (result->type == 'D') {
+        result->is_dichotomy = 1;
+        const char *digit_start = next_part;
+        while (*next_part != ' ' && *next_part != '\0') {
+            next_part++;
+        }
+        int internal_count = (int)strtol(digit_start, NULL, 10);
+        if (*next_part != ' ') {
+            retval = READSTAT_ERROR_BAD_MR_STRING;
+            goto cleanup;
+        }
+        next_part++;
+        digit_start = next_part;
+        for (int i = 0; i < internal_count && isdigit(*next_part); i++) {
+            next_part++;
+        }
+        result->counted_value = (int)strtol(digit_start, NULL, 10);
+        if (*next_part != ' ' && *next_part != '\0') {
+            retval = READSTAT_ERROR_BAD_MR_STRING;
+            goto cleanup;
+        }
+    }
+    else if (result->type == 'C') {
+        result->is_dichotomy = 0;
+        result->counted_value = -1;
+    }
+    if (*next_part != ' ') {
+        retval = READSTAT_ERROR_BAD_MR_STRING;
+        goto cleanup;
+    }
+    next_part++;
+    const char *digit_start = next_part;
+    while (isdigit(*next_part)) {
+        next_part++;
+    }
+    if (*next_part != ' ') {
+        retval = READSTAT_ERROR_BAD_MR_STRING;
+        goto cleanup;
+    }
+    size_t count = strtoul(digit_start, NULL, 10);
+    next_part++; // Move past the space after the digits
+    if (strlen(next_part) < count) {
+        retval = READSTAT_ERROR_BAD_MR_STRING;
+        goto cleanup;
+    }
+
+    // Allocate memory for label
+    result->label = malloc(count + 1);  // +1 for the null-terminator
+    if (result->label == NULL) {
+        retval = READSTAT_ERROR_MALLOC;
+        goto cleanup;
+    }
+    strncpy(result->label, next_part, count);
+    result->label[count] = '\0';
+
+    next_part += count;
+    if (*next_part != ' ') {
+        retval = READSTAT_ERROR_BAD_MR_STRING;
+        goto cleanup;
+    }
+    next_part++;
+
+    char **subvariables = NULL;
+    int subvar_count = 0;
+    while (*next_part) {
+        if (*next_part == ' ') {  // Skip any extra spaces
+            next_part++;
+            continue;
+        }
+
+        const char *start = next_part;
+        while (*next_part && *next_part != ' ') {
+            next_part++;  // Move to the end of the current subvariable
+        }
+
+        size_t length = next_part - start;
+        char *subvariable = malloc(length + 1);  // Allocate memory for the subvariable
+        if (subvariable == NULL) {
+            retval = READSTAT_ERROR_MALLOC;
+            for (int i = 0; i < subvar_count; i++) {
+                free(subvariables[i]);
+            }
+            free(subvariables);
+            free(result->label);
+            result->label = NULL;
+            goto cleanup;
+        }
+        strncpy(subvariable, start, length);
+        subvariable[length] = '\0';  // Null-terminate the string
+
+        char **temp = realloc(subvariables, (subvar_count + 1) * sizeof(char *));
+        if (temp == NULL) {
+            retval = READSTAT_ERROR_MALLOC;
+            free(subvariable);
+            for (int i = 0; i < subvar_count; i++) {
+                free(subvariables[i]);
+            }
+            free(subvariables);
+            free(result->label);
+            result->label = NULL;
+            goto cleanup;
+        }
+        subvariables = temp;
+        subvariables[subvar_count++] = subvariable;  // Add the new subvariable to the array
+
+        if (*next_part == ' ') next_part++; // Move past the space
+    }
+
+    result->subvariables = subvariables;
+    result->num_subvars = subvar_count;
+
+cleanup:
+    return retval;
 }
 
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx) {
@@ -302,25 +289,28 @@ static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx
 
     char *mr_string = readstat_malloc(data_len + 1);
     mr_string[data_len] = '\0';
-    if (mr_string == NULL) return READSTAT_ERROR_MALLOC;
+    if (mr_string == NULL) {
+        retval = READSTAT_ERROR_MALLOC;
+        goto cleanup;
+    }
 
     if (ctx->io->read(mr_string, data_len, ctx->io->io_ctx) < data_len) {
         retval = READSTAT_ERROR_PARSE;
-        free(mr_string);
-        mr_string = NULL;
-        return retval;
+        goto cleanup;
     }
 
     char *token = strtok(mr_string, "$\n");
     int num_lines = 0;
     while (token != NULL) {
         ctx->mr_sets = realloc(ctx->mr_sets, (num_lines + 1) * sizeof(mr_set_t));
-        ctx->mr_sets[num_lines] = parse_mr_line(token);
+        retval = parse_mr_line(token, &ctx->mr_sets[num_lines]);
+        if (retval != READSTAT_OK) goto cleanup;
         num_lines++;
         token = strtok(NULL, "$\n");
     }
     ctx->multiple_response_sets_length = num_lines;
 
+cleanup:
     return retval;
 }
 
