@@ -293,11 +293,11 @@ static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx
     readstat_error_t retval = READSTAT_OK;
 
     char *mr_string = readstat_malloc(data_len + 1);
-    mr_string[data_len] = '\0';
     if (mr_string == NULL) {
         retval = READSTAT_ERROR_MALLOC;
         goto cleanup;
     }
+    mr_string[data_len] = '\0';
 
     if (ctx->io->read(mr_string, data_len, ctx->io->io_ctx) < data_len) {
         retval = READSTAT_ERROR_PARSE;
