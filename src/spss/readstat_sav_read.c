@@ -1851,6 +1851,11 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
             mr_set_t mr = ctx->mr_sets[i];
             for (size_t j = 0; j < mr.num_subvars; j++) {
                 char* sv_name_upper = malloc(strlen(mr.subvariables[j]) + 1);
+                if (sv_name_upper == NULL) {
+                    retval = READSTAT_ERROR_MALLOC;
+                    goto cleanup;
+                }
+                sv_name_upper[strlen(mr.subvariables[j])] = '\0';
                 for (int c = 0; mr.subvariables[j][c] != '\0'; c++) {
                     sv_name_upper[c] = toupper((unsigned char) mr.subvariables[j][c]);
                 }
