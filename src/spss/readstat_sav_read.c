@@ -307,7 +307,10 @@ static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx
     char *token = strtok(mr_string, "$\n");
     int num_lines = 0;
     while (token != NULL) {
-        ctx->mr_sets = realloc(ctx->mr_sets, (num_lines + 1) * sizeof(mr_set_t));
+        if ((ctx->mr_sets = realloc(ctx->mr_sets, (num_lines + 1) * sizeof(mr_set_t))) == NULL) {
+            retval = READSTAT_ERROR_MALLOC;
+            goto cleanup;
+        }
         retval = parse_mr_line(token, &ctx->mr_sets[num_lines]);
         if (retval != READSTAT_OK) goto cleanup;
         num_lines++;
