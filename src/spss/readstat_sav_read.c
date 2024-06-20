@@ -21,6 +21,7 @@
 #include "readstat_sav_compress.h"
 #include "readstat_sav_parse.h"
 #include "readstat_sav_parse_timestamp.h"
+#include "readstat_sav_parse_mr_name.h"
 
 #if HAVE_ZLIB
 #include "readstat_zsav_read.h"
@@ -149,145 +150,6 @@ static readstat_error_t sav_parse_long_string_value_labels_record(const void *da
 static readstat_error_t sav_parse_long_string_missing_values_record(const void *data, size_t size, size_t count, sav_ctx_t *ctx);
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx);
 
-static readstat_error_t parse_mr_counted_value(const char **next_part, mr_set_t *result) {
-    readstat_error_t retval = READSTAT_OK;
-    if (result->type == 'D') {
-        result->is_dichotomy = 1;
-        const char *digit_start = (*next_part);
-        while (*(*next_part) != ' ' && *(*next_part) != '\0') {
-            (*next_part)++;
-        }
-        int internal_count = (int)strtol(digit_start, NULL, 10);
-        if (*(*next_part) != ' ') {
-            retval = READSTAT_ERROR_BAD_MR_STRING;
-            goto cleanup;
-        }
-        (*next_part)++;
-        digit_start = (*next_part);
-        for (int i = 0; i < internal_count && isdigit(*(*next_part)); i++) {
-            (*next_part)++;
-        }
-        result->counted_value = (int)strtol(digit_start, NULL, 10);
-        if (*(*next_part) != ' ' && *(*next_part) != '\0') {
-            retval = READSTAT_ERROR_BAD_MR_STRING;
-            goto cleanup;
-        }
-    }
-    else if (result->type == 'C') {
-        result->is_dichotomy = 0;
-        result->counted_value = -1;
-    }
-cleanup:
-    return retval;
-}
-
-static readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
-    readstat_error_t retval = READSTAT_OK;
-    *result = (mr_set_t){0};
-
-    const char *equals_pos = strchr(line, '=');
-    if (equals_pos == NULL || equals_pos[1] == '\0') {
-        retval = READSTAT_ERROR_BAD_MR_STRING;
-        goto cleanup;
-    }
-
-    result->type = equals_pos[1];
-    int name_length = equals_pos - line;
-    if ((result->name = malloc(name_length + 1)) == NULL) {
-        retval = READSTAT_ERROR_MALLOC;
-        goto cleanup;
-    }
-    strncpy(result->name, line, name_length);
-    result->name[name_length] = '\0';
-    const char *next_part = equals_pos + 2;  // Start after the '=' and type character
-    if ((retval = parse_mr_counted_value(&next_part, result)) != READSTAT_OK) goto cleanup;
-    if (*next_part != ' ') {
-        retval = READSTAT_ERROR_BAD_MR_STRING;
-        goto cleanup;
-    }
-    next_part++;
-    const char *digit_start = next_part;
-    while (isdigit(*next_part)) {
-        next_part++;
-    }
-    if (*next_part != ' ') {
-        retval = READSTAT_ERROR_BAD_MR_STRING;
-        goto cleanup;
-    }
-    size_t count = strtoul(digit_start, NULL, 10);
-    next_part++; // Move past the space after the digits
-    if (strlen(next_part) < count) {
-        retval = READSTAT_ERROR_BAD_MR_STRING;
-        goto cleanup;
-    }
-
-    result->label = malloc(count + 1);  // +1 for the null-terminator
-    if (result->label == NULL) {
-        retval = READSTAT_ERROR_MALLOC;
-        goto cleanup;
-    }
-    strncpy(result->label, next_part, count);
-    result->label[count] = '\0';
-
-    next_part += count;
-    if (*next_part != ' ') {
-        retval = READSTAT_ERROR_BAD_MR_STRING;
-        goto cleanup;
-    }
-    next_part++;
-
-    char **subvariables = NULL;
-    int subvar_count = 0;
-    while (*next_part) {
-        if (*next_part == ' ') {  // Skip any extra spaces
-            next_part++;
-            continue;
-        }
-
-        const char *start = next_part;
-        while (*next_part && *next_part != ' ') {
-            next_part++;  // Move to the end of the current subvariable
-        }
-
-        size_t length = next_part - start;
-        char *subvariable = malloc(length + 1);  // Allocate memory for the subvariable
-        if (subvariable == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            for (int i = 0; i < subvar_count; i++) {
-                free(subvariables[i]);
-            }
-            free(subvariables);
-            free(result->label);
-            result->label = NULL;
-            goto cleanup;
-        }
-        strncpy(subvariable, start, length);
-        subvariable[length] = '\0';  // Null-terminate the string
-
-        char **temp = realloc(subvariables, (subvar_count + 1) * sizeof(char *));
-        if (temp == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            free(subvariable);
-            for (int i = 0; i < subvar_count; i++) {
-                free(subvariables[i]);
-            }
-            free(subvariables);
-            free(result->label);
-            result->label = NULL;
-            goto cleanup;
-        }
-        subvariables = temp;
-        subvariables[subvar_count++] = subvariable;  // Add the new subvariable to the array
-
-        if (*next_part == ' ') next_part++; // Move past the space
-    }
-
-    result->subvariables = subvariables;
-    result->num_subvars = subvar_count;
-
-cleanup:
-    return retval;
-}
 
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx) {
     readstat_error_t retval = READSTAT_OK;
@@ -298,9 +160,12 @@ static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx
         goto cleanup;
     }
     mr_string[data_len] = '\0';
-
     if (ctx->io->read(mr_string, data_len, ctx->io->io_ctx) < data_len) {
         retval = READSTAT_ERROR_PARSE;
+        goto cleanup;
+    }
+    if (mr_string[0] != '$') {
+        retval = READSTAT_ERROR_BAD_MR_STRING;
         goto cleanup;
     }
 
@@ -319,6 +184,7 @@ static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx
     ctx->multiple_response_sets_length = num_lines;
 
 cleanup:
+    free(mr_string);
     return retval;
 }
 
@@ -893,6 +759,10 @@ static readstat_error_t sav_process_row(unsigned char *buffer, size_t buffer_len
             }
             if (++offset == col_info->width) {
                 if (++segment_offset < var_info->n_segments) {
+                    if (raw_str_used == 0) {
+                        retval = READSTAT_ERROR_PARSE;
+                        goto done;
+                    }
                     raw_str_used--;
                 }
                 offset = 0;
@@ -1512,6 +1382,10 @@ static readstat_error_t sav_parse_records_pass1(sav_ctx_t *ctx) {
                     if (retval != READSTAT_OK)
                         goto cleanup;
                 } else if (subtype == SAV_RECORD_SUBTYPE_MULTIPLE_RESPONSE_SETS) {
+                    if (ctx->mr_sets != NULL) {
+                        retval = READSTAT_ERROR_BAD_MR_STRING;
+                        goto cleanup;
+                    }
                     retval = sav_read_multiple_response_sets(data_len, ctx);
                     if (retval != READSTAT_OK)
                         goto cleanup;
@@ -1865,8 +1739,17 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
                 spss_varinfo_t *info = (spss_varinfo_t *)ck_str_hash_lookup(sv_name_upper, var_dict);
                 if (info) {
                     free(mr.subvariables[j]);
-                    mr.subvariables[j] = info->longname;
+                    // mr.subvariables[j] = NULL;
+                    if ((mr.subvariables[j] = readstat_malloc(strlen(info->longname) + 1)) == NULL) {
+                        retval = READSTAT_ERROR_MALLOC;
+                        goto cleanup;
+                    }
+                    // mr.subvariables[j][strlen(info->longname)] = '\0';
+                    strcpy(mr.subvariables[j], info->longname);
+                    // mr.subvariables[j] = info->longname;
                 }
+                free(sv_name_upper);
+                // sv_name_upper = NULL;
             }
         }
         if (var_dict)
