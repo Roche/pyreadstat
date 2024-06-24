@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/types.h>
 #include <stdint.h>
 #include <math.h>
@@ -150,7 +149,6 @@ static readstat_error_t sav_parse_long_string_value_labels_record(const void *da
 static readstat_error_t sav_parse_long_string_missing_values_record(const void *data, size_t size, size_t count, sav_ctx_t *ctx);
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx);
 
-
 static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx_t *ctx) {
     readstat_error_t retval = READSTAT_OK;
 
@@ -169,19 +167,7 @@ static readstat_error_t sav_read_multiple_response_sets(size_t data_len, sav_ctx
         goto cleanup;
     }
 
-    char *token = strtok(mr_string, "$\n");
-    int num_lines = 0;
-    while (token != NULL) {
-        if ((ctx->mr_sets = realloc(ctx->mr_sets, (num_lines + 1) * sizeof(mr_set_t))) == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
-        retval = parse_mr_line(token, &ctx->mr_sets[num_lines]);
-        if (retval != READSTAT_OK) goto cleanup;
-        num_lines++;
-        token = strtok(NULL, "$\n");
-    }
-    ctx->multiple_response_sets_length = num_lines;
+    retval = parse_mr_string(mr_string, &ctx->mr_sets, &ctx->multiple_response_sets_length);
 
 cleanup:
     free(mr_string);
@@ -1727,7 +1713,7 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
         for (size_t i = 0; i < ctx->multiple_response_sets_length; i++) {
             mr_set_t mr = ctx->mr_sets[i];
             for (size_t j = 0; j < mr.num_subvars; j++) {
-                char* sv_name_upper = malloc(strlen(mr.subvariables[j]) + 1);
+                char* sv_name_upper = readstat_malloc(strlen(mr.subvariables[j]) + 1);
                 if (sv_name_upper == NULL) {
                     retval = READSTAT_ERROR_MALLOC;
                     goto cleanup;
