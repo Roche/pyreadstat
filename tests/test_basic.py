@@ -93,7 +93,7 @@ class TestBasic(unittest.TestCase):
         df_dates2 = df_dates1.copy()
         df_dates2["date"] = df_dates2["date"].apply(lambda x: x.date())
         self.df_sas_dates = df_dates2
-        self.df_sas_dates2 = pd.concat([self.df_sas_dates, pd.DataFrame([[np.NaN, pd.NaT, np.NaN]],columns=["date", "dtime", "time"])], ignore_index=True)
+        self.df_sas_dates2 = pd.concat([self.df_sas_dates, pd.DataFrame([[np.nan, pd.NaT, np.nan]],columns=["date", "dtime", "time"])], ignore_index=True)
 
         # missing data
         pandas_missing_sav_csv = os.path.join(self.basic_data_folder, "sample_missing.csv")
