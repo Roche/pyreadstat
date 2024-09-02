@@ -647,6 +647,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             raise PyreadstatError("path must be either str or bytes")
 
     filename_path = os.path.expanduser(filename_path)
+    dirname = os.path.dirname(filename_path)
+    if not os.path.isdir(dirname):
+        raise PyreadstatError(f"the destination folder {dirname} does not exist!")
+
     cdef int fd = open_file(filename_path)
     writer = readstat_writer_init()
 
