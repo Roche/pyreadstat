@@ -648,7 +648,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
     filename_path = os.path.expanduser(filename_path)
     dirname = os.path.dirname(filename_path)
-    if not os.path.isdir(dirname):
+    if dirname and  not os.path.isdir(dirname):
         raise PyreadstatError(f"the destination folder {dirname} does not exist!")
 
     cdef int fd = open_file(filename_path)
