@@ -16,6 +16,9 @@ If you would like to read R RData and Rds files into python in an easy way,
 take a look to [pyreadr](https://github.com/ofajardo/pyreadr), a wrapper
 around the C library [librdata](https://github.com/WizardMac/librdata)
 
+If you would like to effortlessly produce beautiful summaries from pandas dataframes take
+a look to [pysummaries](https://github.com/Genentech/pysummaries)!
+
 
 **DISCLAIMER**
 
