@@ -394,7 +394,7 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     dc.n_vars = var_count
 
     mr_len = <int>readstat_get_multiple_response_sets_length(metadata);
-    mr_sets_orig = readstat_get_mr_sets(metadata);
+    mr_sets_orig = readstat_get_multiple_response_sets(metadata);
     if mr_sets_orig != NULL:
         i = 0
         while i < mr_len:

@@ -167,7 +167,7 @@ cdef extern from "readstat.h":
     cdef int readstat_get_var_count(readstat_metadata_t *metadata);
     cdef char *readstat_get_file_label(readstat_metadata_t *metadata);
     cdef size_t readstat_get_multiple_response_sets_length(readstat_metadata_t *metadata);
-    cdef mr_set_t *readstat_get_mr_sets(readstat_metadata_t *metadata);
+    cdef mr_set_t *readstat_get_multiple_response_sets(readstat_metadata_t *metadata);
     cdef char *readstat_get_file_encoding(readstat_metadata_t *metadata);
     cdef char *readstat_get_table_name(readstat_metadata_t *metadata);
     cdef int readstat_get_creation_time(readstat_metadata_t *metadata);

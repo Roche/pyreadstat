@@ -152,7 +152,7 @@ readstat_endian_t readstat_get_endianness(readstat_metadata_t *metadata);
 const char *readstat_get_table_name(readstat_metadata_t *metadata);
 const char *readstat_get_file_label(readstat_metadata_t *metadata);
 const char *readstat_get_file_encoding(readstat_metadata_t *metadata);
-const mr_set_t *readstat_get_mr_sets(readstat_metadata_t *metadata);
+const mr_set_t *readstat_get_multiple_response_sets(readstat_metadata_t *metadata);
 size_t readstat_get_multiple_response_sets_length(readstat_metadata_t *metadata);
 
 typedef struct readstat_value_s {

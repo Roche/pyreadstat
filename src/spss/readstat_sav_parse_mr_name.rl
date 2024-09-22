@@ -1,7 +1,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "readstat.h"
+#include "../readstat.h"
+#include "../readstat_malloc.h"
 
 %%{
     machine mr_extractor;
@@ -142,7 +143,10 @@ readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
         mln[p - start - 1] = '\0';
         *mr_sets = realloc(*mr_sets, ((*n_mr_lines) + 1) * sizeof(mr_set_t));
         retval = parse_mr_line(mln, &(*mr_sets)[*n_mr_lines]);
-        if (retval != READSTAT_OK) goto cleanup;
+        if (retval != READSTAT_OK) {
+            if (mln == NULL) free(mln);
+            goto cleanup;
+        }
         (*n_mr_lines)++;
         start = p + 1;
     }

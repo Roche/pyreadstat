@@ -44,7 +44,7 @@ size_t readstat_get_multiple_response_sets_length(readstat_metadata_t *metadata)
     return metadata->multiple_response_sets_length;
 }
 
-const mr_set_t *readstat_get_mr_sets(readstat_metadata_t *metadata) {
+const mr_set_t *readstat_get_multiple_response_sets(readstat_metadata_t *metadata) {
     return metadata->mr_sets;
 }
 
