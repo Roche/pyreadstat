@@ -136,7 +136,6 @@ typedef struct readstat_metadata_s {
     mr_set_t *mr_sets;
 } readstat_metadata_t;
 
-
 /* If the row count is unknown (e.g. it's an XPORT or POR file, or an SAV
  * file created with non-conforming software), then readstat_get_row_count
  * returns -1.

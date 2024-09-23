@@ -1725,13 +1725,17 @@ readstat_error_t readstat_parse_sav(readstat_parser_t *parser, const char *path,
                 spss_varinfo_t *info = (spss_varinfo_t *)ck_str_hash_lookup(sv_name_upper, var_dict);
                 if (info) {
                     free(mr.subvariables[j]);
+                    // mr.subvariables[j] = NULL;
                     if ((mr.subvariables[j] = readstat_malloc(strlen(info->longname) + 1)) == NULL) {
                         retval = READSTAT_ERROR_MALLOC;
                         goto cleanup;
                     }
+                    // mr.subvariables[j][strlen(info->longname)] = '\0';
                     strcpy(mr.subvariables[j], info->longname);
+                    // mr.subvariables[j] = info->longname;
                 }
                 free(sv_name_upper);
+                // sv_name_upper = NULL;
             }
         }
         if (var_dict)

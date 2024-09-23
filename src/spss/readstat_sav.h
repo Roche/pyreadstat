@@ -112,7 +112,6 @@ typedef struct sav_ctx_s {
     unsigned int   bswap:1;
 } sav_ctx_t;
 
-
 #define SAV_RECORD_TYPE_VARIABLE                2
 #define SAV_RECORD_TYPE_VALUE_LABEL             3
 #define SAV_RECORD_TYPE_VALUE_LABEL_VARIABLES   4

@@ -1,3 +1,9 @@
+# 1.2.8 (github, pypi and conda 2024.09.24)
+* Added Multiple Reponse Data Sets for SAV files #259
+* Fixed pyreadstat not raising error if folder does not exists when writing #269
+* Fixed tests for numpy 2 changes # 266
+* Readstat sources updated to commit ba4392e9d48c4d997d2737719f4cf6320fb66990 on dev branch
+
 # 1.2.7 (github, pypi and conda 2024.03.14)
 * Fixing warnings in new pandas version 2.2.1 fixes #252
 * Remove string encoding for read_por fixes #253

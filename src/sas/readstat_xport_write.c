@@ -10,7 +10,7 @@
 #include "readstat_xport_parse_format.h"
 #include "ieee.h"
 
-#define XPORT_DEFAULT_VERISON   8
+#define XPORT_DEFAULT_VERSION   8
 #define RECORD_LEN 80
 
 #if defined _MSC_VER
@@ -531,7 +531,7 @@ static readstat_error_t xport_metadata_ok(void *writer_ctx) {
 readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *user_ctx, long row_count) {
 
     if (writer->version == 0)
-        writer->version = XPORT_DEFAULT_VERISON;
+        writer->version = XPORT_DEFAULT_VERSION;
 
     writer->callbacks.metadata_ok = &xport_metadata_ok;
     writer->callbacks.write_int8 = &xport_write_int8;

@@ -120,11 +120,12 @@ static readstat_charset_entry_t _charset_table[] = {
     { .code = 248,   .name = "SHIFT_JISX0213" },
 };
 
-static time_t sas_epoch() {
+static time_t sas_epoch(void) {
     return - 3653 * 86400; // seconds between 01-01-1960 and 01-01-1970
 }
 
-static time_t sas_convert_time(double time, time_t epoch) {
+static time_t sas_convert_time(double time, double time_diff, time_t epoch) {
+    time -= time_diff;
     time += epoch;
     if (isnan(time))
         return 0;
@@ -212,7 +213,7 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         goto cleanup;
     }
 
-    double creation_time, modification_time;
+    double creation_time, modification_time, creation_time_diff, modification_time_diff;
 
     if (io->read(&creation_time, sizeof(double), io->io_ctx) < sizeof(double)) {
         retval = READSTAT_ERROR_READ;
@@ -228,13 +229,22 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
     if (bswap)
         modification_time = byteswap_double(modification_time);
 
-    hinfo->creation_time = sas_convert_time(creation_time, epoch);
-    hinfo->modification_time = sas_convert_time(modification_time, epoch);
-
-    if (io->seek(16, READSTAT_SEEK_CUR, io->io_ctx) == -1) {
-        retval = READSTAT_ERROR_SEEK;
+    if (io->read(&creation_time_diff, sizeof(double), io->io_ctx) < sizeof(double)) {
+        retval = READSTAT_ERROR_READ;
         goto cleanup;
     }
+    if (bswap)
+        creation_time_diff = byteswap_double(creation_time_diff);
+    
+    if (io->read(&modification_time_diff, sizeof(double), io->io_ctx) < sizeof(double)) {
+        retval = READSTAT_ERROR_READ;
+        goto cleanup;
+    }
+    if (bswap)
+        modification_time_diff = byteswap_double(modification_time_diff);
+    
+    hinfo->creation_time = sas_convert_time(creation_time, creation_time_diff, epoch);
+    hinfo->modification_time = sas_convert_time(modification_time, modification_time_diff, epoch);
 
     uint32_t header_size, page_size;
 
