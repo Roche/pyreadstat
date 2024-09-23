@@ -52,6 +52,13 @@ object contains the following fields:
   * variable_storage_width: a dict with keys being variable names and values being the storage width
   * variable_display_width: a dict with keys being variable names and values being the display width
   * variable_measure: a dict with keys being variable names and values being the measure: nominal, ordinal, scale or unknown
+  * mr_sets: a dictionary representing the definitions of multiple-response (MR)
+    variables in the dataset (currently only supported for SAV format). MR variables
+    are arrays composed of several other variables. This metadata entry, `mr_sets`,
+    specifies which variables are combined to form each array. Each entry includes:
+    `type`, `is_dichotomy`, `counted_value`, `label`, and `variable_list`. The meaning
+    of these fields is based on the SPSS specification for multiple-response sets.
+
 
 There are two functions to deal with value labels: set_value_labels and set_catalog_to_sas. You can read about them
 in the next section.
