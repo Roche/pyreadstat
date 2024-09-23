@@ -60,7 +60,7 @@ static readstat_error_t sas7bcat_parse_value_labels(const char *value_start, siz
 
     /* Pass 1 -- find out the offset of the labels */
     for (i=0; i<label_count_capacity; i++) {
-        if (&lbp1[3] - value_start > value_labels_len || sas_read2(&lbp1[2], ctx->bswap) < 0) {
+        if (&lbp1[4] - value_start > value_labels_len || sas_read2(&lbp1[2], ctx->bswap) < 0) {
             retval = READSTAT_ERROR_PARSE;
             goto cleanup;
         }

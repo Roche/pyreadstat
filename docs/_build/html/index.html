@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.7 documentation</title>
+  <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.2.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -13,8 +13,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/documentation_options.js?v=a5753347"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/documentation_options.js?v=4d6f9085"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -133,6 +133,12 @@ missing values in SAS and STATA. This appears when using user_missing=True in re
 <li><p>variable_storage_width: a dict with keys being variable names and values being the storage width</p></li>
 <li><p>variable_display_width: a dict with keys being variable names and values being the display width</p></li>
 <li><p>variable_measure: a dict with keys being variable names and values being the measure: nominal, ordinal, scale or unknown</p></li>
+<li><p>mr_sets: a dictionary representing the definitions of multiple-response (MR)
+variables in the dataset (currently only supported for SAV format). MR variables
+are arrays composed of several other variables. This metadata entry, <cite>mr_sets</cite>,
+specifies which variables are combined to form each array. Each entry includes:
+<cite>type</cite>, <cite>is_dichotomy</cite>, <cite>counted_value</cite>, <cite>label</cite>, and <cite>variable_list</cite>. The meaning
+of these fields is based on the SPSS specification for multiple-response sets.</p></li>
 </ul>
 </div></blockquote>
 <p>There are two functions to deal with value labels: set_value_labels and set_catalog_to_sas. You can read about them

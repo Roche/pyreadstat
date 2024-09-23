@@ -56,6 +56,7 @@
             "./src/spss/readstat_sav.c",
             "./src/spss/readstat_sav_compress.c",
             "./src/spss/readstat_sav_parse.c",
+            "./src/spss/readstat_sav_parse_mr_name.c",
             "./src/spss/readstat_sav_parse_timestamp.c",
             "./src/spss/readstat_sav_read.c",
             "./src/spss/readstat_sav_write.c",
@@ -1709,6 +1710,7 @@ struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container {
   int no_datetime_conversion;
   int ctime;
   int mtime;
+  PyObject *mr_sets;
 };
 
 
