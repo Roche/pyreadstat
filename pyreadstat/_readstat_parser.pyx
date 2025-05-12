@@ -1067,7 +1067,7 @@ cdef object data_container_extract_metadata(data_container data):
 cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
                            bint no_datetime_conversion, long row_limit, long row_offset, str output_format, 
-                           list extra_datetime_formats, list extra_date_formats):
+                           list extra_datetime_formats, list extra_date_formats, list extra_time_formats):
     """
     Coordinates the activities to parse a file. This is the entry point 
     for the public methods
@@ -1125,6 +1125,15 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
             spss_datetime_formats.extend(extra_datetime_formats)
         elif file_format == FILE_FORMAT_STATA:
             stata_datetime_formats.extend(extra_datetime_formats)
+        else:
+            raise PyreadstatError("Unknown file format")
+    if extra_time_formats is not None:
+        if file_format == FILE_FORMAT_SAS:
+            sas_time_formats.extend(extra_time_formats)
+        elif file_format == FILE_FORMAT_SPSS:
+            spss_time_formats.extend(extra_time_formats)
+        elif file_format == FILE_FORMAT_STATA:
+            stata_time_formats.extend(extra_time_formats)
         else:
             raise PyreadstatError("Unknown file format")
     global sas_all_formats, spss_all_formats, stata_all_formats

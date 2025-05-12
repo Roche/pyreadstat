@@ -112,7 +112,7 @@ cdef object data_container_extract_metadata(data_container data)
 cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
                            bint no_datetime_conversion, long row_limit, long row_offset, str output_format, list extra_datetime_formats, 
-			   list extra_date_formats)
+			   list extra_date_formats, list extra_time_formats)
 
 # definitions for stuff about dates
 cdef list sas_date_formats 

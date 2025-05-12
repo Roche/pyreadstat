@@ -1,4 +1,7 @@
 # 1.2.8 (github, pypi and conda 2024.10.18)
+* added extra_time_formats, solves #283
+
+# 1.2.8 (github, pypi and conda 2024.10.18)
 * Added Multiple Reponse Data Sets for SAV files #259
 * Fixed pyreadstat not raising error if folder does not exists when writing #269
 * Fixed tests for numpy 2 changes # 266
