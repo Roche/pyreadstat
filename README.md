@@ -798,7 +798,7 @@ pyreadstat.write_sav(df, path, variable_format=formats)
 ```
 
 The appropiate formats to use are beyond the scope of this documentation. Probably you want to read a file
-produced in the original application and use meta.original_value_formats to get the formats. Otherwise look
+produced in the original application and use meta.original_variable\_types to get the formats. Otherwise look
 for the documentation of the original application.
 
 ##### SPSS
