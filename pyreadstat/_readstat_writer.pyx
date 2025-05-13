@@ -45,6 +45,7 @@ cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRI
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
 cdef dict pandas_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
                                       PYWRITER_CHARACTER: READSTAT_TYPE_STRING, PYWRITER_LOGICAL: READSTAT_TYPE_INT32,
+                                      PYWRITER_DTA_STR_REF: READSTAT_TYPE_STRING_REF,
                                       PYWRITER_OBJECT: READSTAT_TYPE_STRING, PYWRITER_DATE: READSTAT_TYPE_DOUBLE,
                                       PYWRITER_DATETIME: READSTAT_TYPE_DOUBLE, PYWRITER_TIME: READSTAT_TYPE_DOUBLE,
                                       PYWRITER_DATETIME64_NS: READSTAT_TYPE_DOUBLE, PYWRITER_DATETIME64_US: READSTAT_TYPE_DOUBLE}
@@ -57,6 +58,11 @@ cdef object date_0 = datetime.datetime(1970,1,1).date()
 
 cdef valid_user_missing_sas = [chr(x) for x in range(ord("A"), ord("Z")+1)] + ["_"]
 cdef valid_user_missing_stata = [chr(x) for x in range(ord("a"), ord("z")+1)]
+
+# max lenght of a string in dta before it has to use string_ref
+cdef int dta_old_max_width = 128
+cdef int dta_111_max_width = 244
+cdef int dta_117_max_width = 2045
 
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *:
@@ -178,12 +184,13 @@ cdef int check_series_all_same_types(object series, object type_to_check):
     return 1
 
 
-cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels):
+cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels, int dta_str_max_len):
     """
     From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
     as third.
     max_lenght is the max length of a string or string representation of an object, 0 for numeric types. is_missing flags
     wether the series has missing values (1) or not (0)
+    dta_str_max_len is the max length for a dta string, 0 if the file format is not dta
     """
 
     cdef int max_length
@@ -281,7 +288,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                     max_length = max(1, max_length)
                 else:
                     max_length = get_pandas_str_series_max_length(curseries, variable_value_labels.get(col_name))
-                result.append((PYWRITER_CHARACTER, max_length, is_missing))
+                if dta_str_max_len and max_length >= dta_str_max_len:
+                    result.append((PYWRITER_DTA_STR_REF, max_length, is_missing))
+                else:
+                    result.append((PYWRITER_CHARACTER, max_length, is_missing))
             elif curtype == datetime.date:
                 result.append((PYWRITER_DATE, 0, is_missing))
             elif curtype == datetime.datetime:
@@ -327,7 +337,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
             raise PyreadstatError(msg)
 
         if user_missing_tags and value in user_missing_tags:
-            if curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT:
+            if curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT or curpytype==PYWRITER_DTA_STR_REF:
                 msg = "missing_user_values not allowed for character variable %s" % variable_name
                 raise PyreadstatError(msg)
             
@@ -353,7 +363,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
                 raise PyreadstatError(msg)
             readstat_label_int32_value(label_set, int(value), label.encode("utf-8"))
 
-        elif curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT:
+        elif curpytype == PYWRITER_CHARACTER or curpytype == PYWRITER_OBJECT or curpytype==PYWRITER_DTA_STR_REF:
             value = str(value)
             readstat_label_string_value(label_set, value.encode("utf-8"), label.encode("utf-8"))
 
@@ -394,7 +404,7 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pyw
                     check_exit_status(readstat_variable_add_missing_double_range(variable, lo, hi))
                     range_values += 1
             elif type(hi) == str and type(lo) == str:
-                if vartype != PYWRITER_CHARACTER and vartype != PYWRITER_OBJECT:
+                if vartype != PYWRITER_CHARACTER and vartype != PYWRITER_OBJECT and vartype !=PYWRITER_DTA_STR_REF:
                     msg = "character missing_ranges value given for non character variable %s" %variablename
                     raise PyreadstatError(msg)
                 if hi == lo:
@@ -418,7 +428,7 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pyw
                 check_exit_status(readstat_variable_add_missing_double_value(variable, cur_range))
                 discrete_values += 1
             elif type(cur_range) == str:
-                if vartype != PYWRITER_CHARACTER and vartype != PYWRITER_OBJECT:
+                if vartype != PYWRITER_CHARACTER and vartype != PYWRITER_OBJECT or vartype==PYWRITER_DTA_STR_REF:
                     msg = "character missing_ranges value given for non character variable %s" %variablename
                     raise PyreadstatError(msg)
                 if len(cur_range) > 8:
@@ -586,6 +596,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
     cdef bytes file_label_bytes
     cdef char *file_labl
+    cdef int dta_str_max_len = 0
 
     cdef list col_names = df.columns.values.tolist()
     if len(col_names) != len(set(col_names)):
@@ -605,7 +616,15 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     if file_format == FILE_FORMAT_POR:
         col_names = [x.upper() for x in col_names]
 
-    cdef list col_types = get_pandas_column_types(df, missing_user_values, variable_value_labels)
+    if file_format == FILE_FORMAT_DTA:
+        if file_format_version >= 117:
+            dta_str_max_len = dta_117_max_width
+        elif file_format_version >= 111:
+            dta_str_max_len = dta_111_max_width
+        else:
+            dta_str_max_len = dta_old_max_width
+
+    cdef list col_types = get_pandas_column_types(df, missing_user_values, variable_value_labels, dta_str_max_len)
     cdef int row_count = len(df)
     cdef int col_count = len(col_names)
     cdef dict col_names_to_types = {k:v[0] for k,v in zip(col_names, col_types)}
@@ -701,7 +720,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         for col_indx in range(col_count):
             curtype, max_length, _ = col_types[col_indx]
             variable_name = col_names[col_indx]
-            variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
+            if curtype == PYWRITER_CHARACTER or curtype == PYWRITER_OBJECT:
+                variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
+            else:
+                variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], 0)
             if variable_format:
                 tempformat = variable_format.get(variable_name)
                 if tempformat:
@@ -832,6 +854,8 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                 elif curtype == PYWRITER_OBJECT:
                     curvalstr = str(curval)
                     check_exit_status(readstat_insert_string_value(writer, tempvar, curvalstr.encode("utf-8")))
+                elif curtype == PYWRITER_DTA_STR_REF:
+                    check_exit_status(readstat_insert_string_ref(writer, tempvar, readstat_add_string_ref(writer, curval.encode("utf-8"))))
                 elif curtype == PYWRITER_DATETIME64_NS or curtype ==  PYWRITER_DATETIME64_US:
                     check_exit_status(readstat_insert_double_value(writer, tempvar, <double>curval))
                 elif curtype in pyrwriter_datetimelike_types:

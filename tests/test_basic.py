@@ -957,6 +957,15 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sav(path)
         self.assertTrue(meta.variable_display_width['v1']==1000)
         self.assertTrue(len(df.iloc[0,0])==781)
+
+    def test_dta_write_longstr(self):
+        path = os.path.join(self.write_folder, "longstr.dta")
+        df_longstr = self.df_longstr
+        df_longstr.iloc[0,0] = df_longstr.iloc[0,0]*3
+        pyreadstat.write_dta(self.df_longstr, path)
+        df, meta = pyreadstat.read_dta(path)
+        self.assertTrue(len(df.iloc[0,0])==781)
+        
         
     def test_sas7bdat_file_label_linux(self):
         "testing file label for file produced on linux"
