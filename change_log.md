@@ -1,5 +1,6 @@
 # 1.2.8 (github, pypi and conda 2024.10.18)
 * added extra_time_formats, solves #283
+* changed empty oribinal_variable_type from 'NULL' to None solves #287
 
 # 1.2.8 (github, pypi and conda 2024.10.18)
 * Added Multiple Reponse Data Sets for SAV files #259

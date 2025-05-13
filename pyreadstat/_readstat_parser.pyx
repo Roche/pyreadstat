@@ -517,7 +517,8 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     # format, we have to transform it in something more usable
     var_format = readstat_variable_get_format(variable)
     if var_format == NULL:
-        col_format_original = "NULL"
+        #col_format_original = "NULL"
+        col_format_original = None
     else:
         col_format_original = <str>var_format
     file_format = dc.file_format
