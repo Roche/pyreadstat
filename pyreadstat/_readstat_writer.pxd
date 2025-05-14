@@ -72,12 +72,13 @@ ctypedef enum pywriter_variable_type:
     PYWRITER_TIME
     PYWRITER_DATETIME64_NS
     PYWRITER_DATETIME64_US
+    PYWRITER_DTA_STR_REF
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *
 cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, pywriter_variable_type curtype)
 cdef int get_pandas_str_series_max_length(object series, dict value_labels)
 cdef int check_series_all_same_types(object series, object type_to_check)
-cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels)
+cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels, int dta_str_max_len)
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx)
 #cdef void check_exit_status(readstat_error_t retcode) except *
 cdef int open_file(bytes filename_path)

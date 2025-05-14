@@ -270,9 +270,14 @@ cdef extern from "readstat.h":
     cdef readstat_error_t readstat_insert_float_value(readstat_writer_t *writer, const readstat_variable_t *variable, float value);
     cdef readstat_error_t readstat_insert_double_value(readstat_writer_t *writer, const readstat_variable_t *variable, double value);
     cdef readstat_error_t readstat_insert_string_value(readstat_writer_t *writer, const readstat_variable_t *variable, const char *value);
-    cdef readstat_error_t readstat_insert_string_ref(readstat_writer_t *writer, const readstat_variable_t *variable, readstat_string_ref_t *ref);
     cdef readstat_error_t readstat_insert_missing_value(readstat_writer_t *writer, const readstat_variable_t *variable);
     cdef readstat_error_t readstat_insert_tagged_missing_value(readstat_writer_t *writer, const readstat_variable_t *variable, char tag);
+    # String refs are used for creating a READSTAT_TYPE_STRING_REF column,
+    # which is only supported in Stata. String references can be shared
+    # across columns, and inserted with readstat_insert_string_ref().
+    cdef readstat_error_t readstat_insert_string_ref(readstat_writer_t *writer, const readstat_variable_t *variable, readstat_string_ref_t *ref);
+    cdef readstat_string_ref_t *readstat_add_string_ref(readstat_writer_t *writer, const char *string);
+    cdef readstat_string_ref_t *readstat_get_string_ref(readstat_writer_t *writer, int index);
 
     cdef readstat_error_t readstat_end_row(readstat_writer_t *writer);
 
