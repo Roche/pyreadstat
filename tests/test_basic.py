@@ -961,10 +961,11 @@ class TestBasic(unittest.TestCase):
     def test_dta_write_longstr(self):
         path = os.path.join(self.write_folder, "longstr.dta")
         df_longstr = self.df_longstr
+        # for dta string ref the threshold is 2045, so we need to make the string longer
         df_longstr.iloc[0,0] = df_longstr.iloc[0,0]*3
         pyreadstat.write_dta(self.df_longstr, path)
         df, meta = pyreadstat.read_dta(path)
-        self.assertTrue(len(df.iloc[0,0])==781)
+        self.assertTrue(df.equals(df_longstr.reset_index(drop=True)))
         
         
     def test_sas7bdat_file_label_linux(self):

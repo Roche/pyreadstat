@@ -255,7 +255,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                     #if not np.all(equal):
                     if not equal:
                         max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                        result.append((PYWRITER_OBJECT, max_length, 1))
+                        if dta_str_max_len and max_length >= dta_str_max_len:
+                            result.append((PYWRITER_DTA_STR_REF, max_length, 1))
+                        else:
+                            result.append((PYWRITER_OBJECT, max_length, 1))
                         continue
                 else:
                     if curuser_missing:
@@ -273,7 +276,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                 #if not np.all(equal):
                 if not equal:
                     max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                    result.append((PYWRITER_OBJECT, max_length, 0))
+                    if dta_str_max_len and max_length >= dta_str_max_len:
+                        result.append((PYWRITER_DTA_STR_REF, max_length, 1))
+                    else:
+                        result.append((PYWRITER_OBJECT, max_length, 0))
                     continue
             if curtype in int_types:
                 result.append((PYWRITER_INTEGER, 0, is_missing))
@@ -305,7 +311,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
                     max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
                 else:
                     max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                result.append((PYWRITER_OBJECT, max_length, is_missing))
+                if dta_str_max_len and max_length >= dta_str_max_len:
+                    result.append((PYWRITER_DTA_STR_REF, max_length, 1))
+                else:
+                    result.append((PYWRITER_OBJECT, max_length, is_missing))
 
         else:
             # generic object
@@ -313,7 +322,10 @@ cdef list get_pandas_column_types(object df, dict missing_user_values, dict vari
             is_missing = 0
             if np.any(pd.isna(curseries)):
                 is_missing = 1
-            result.append((PYWRITER_OBJECT, max_length, is_missing))
+            if dta_str_max_len and max_length >= dta_str_max_len:
+                result.append((PYWRITER_DTA_STR_REF, max_length, 1))
+            else:
+                result.append((PYWRITER_OBJECT, max_length, is_missing))
     return result
 
 cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value_labels, str labelset_name,
@@ -652,6 +664,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef list pywriter_types
     cdef object df2
     cdef float mulfac, conv2secs
+    cdef readstat_string_ref_t* strref
+    cdef dict strref_map = dict()
+    cdef int strref_cnt 
+    cdef object strref_indx
 
     if hasattr(os, 'fsencode'):
         try:
@@ -717,13 +733,11 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             if col_label_count != col_count:
                 raise PyreadstatError("length of column labels must be the same as number of columns")
      
+        strref_cnt = 0
         for col_indx in range(col_count):
             curtype, max_length, _ = col_types[col_indx]
             variable_name = col_names[col_indx]
-            if curtype == PYWRITER_CHARACTER or curtype == PYWRITER_OBJECT:
-                variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
-            else:
-                variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], 0)
+            variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
             if variable_format:
                 tempformat = variable_format.get(variable_name)
                 if tempformat:
@@ -731,6 +745,14 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             if curtype in pyrwriter_datetimelike_types and (variable_format is None or variable_name not in variable_format.keys()):
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
                 readstat_variable_set_format(variable, curformat)
+            # for STRING_REF we have to add to a dict here before start writing
+            if curtype == PYWRITER_DTA_STR_REF:
+                for curval in df[variable_name]:
+                    if curval not in strref_map:
+                        curvalstr = str(curval)
+                        strref = readstat_add_string_ref(writer, curvalstr.encode("utf-8"))
+                        strref_map[curvalstr] = strref_cnt
+                        strref_cnt += 1
             if col_label_count:
                 if column_labels[col_indx] is not None:
                     if type(column_labels[col_indx]) != str:
@@ -855,7 +877,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     curvalstr = str(curval)
                     check_exit_status(readstat_insert_string_value(writer, tempvar, curvalstr.encode("utf-8")))
                 elif curtype == PYWRITER_DTA_STR_REF:
-                    check_exit_status(readstat_insert_string_ref(writer, tempvar, readstat_add_string_ref(writer, curval.encode("utf-8"))))
+                    curvalstr = str(curval)
+                    strref_indx = strref_map[curvalstr]
+                    strref = readstat_get_string_ref(writer, strref_indx)
+                    check_exit_status(readstat_insert_string_ref(writer, tempvar, strref))
                 elif curtype == PYWRITER_DATETIME64_NS or curtype ==  PYWRITER_DATETIME64_US:
                     check_exit_status(readstat_insert_double_value(writer, tempvar, <double>curval))
                 elif curtype in pyrwriter_datetimelike_types:
