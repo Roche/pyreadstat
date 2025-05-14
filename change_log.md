@@ -1,6 +1,7 @@
-# 1.2.8 (github, pypi and conda 2024.10.18)
+# 1.2.9 (github, pypi and conda 2025.05.xx)
 * added extra_time_formats, solves #283
 * changed empty oribinal_variable_type from 'NULL' to None solves #287
+* implemented string_ref for large strings when writing DTA solves #268
 
 # 1.2.8 (github, pypi and conda 2024.10.18)
 * Added Multiple Reponse Data Sets for SAV files #259
