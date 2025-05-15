@@ -333,7 +333,8 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', usecols=["variab
 A challenge when reading large files is the time consumed in the operation. In order to alleviate this
 pyreadstat provides a function "read\_file\_multiprocessing" to read a file in parallel processes using
  the python multiprocessing library. As it reads the whole file in one go you need to have enough RAM for the operation. If
-that is not the case look at Reading rows in chunks (next section)
+that is not the case look at Reading rows in chunks (next section). Notice however that you can combine reading in parallel
+with reading in chunks as described in the next section.
 
 Speed ups in the process will depend on a number of factors such as number of processes available, RAM, 
 content of the file etc.
@@ -598,11 +599,17 @@ translated as NaN by default and to the correspoding string value if
 user_missing is set to True. meta.missing_ranges will show the string
 value as well.
 
-If the value in
+When writing a pandas dataframe to a sav file, if user defined missing values are not set, NaNs are translated to
+empty strings, as there is no other possibility to represent those missing values and user defined missing values
+are not set automatically.
+
+When reading a sav into a pandas dataframe, if the value in
 a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string. This
-is because the empty string is a valid character value in SPSS and pyreadstat preserves that property. You can convert
+is because the empty string is a valid character value in SPSS and pyreadstat preserves that property.
+
+This behaviour generates an asymetrical situation that has to be managed by the user. You can convert
 empty strings to nan very easily with pandas if you think it is appropiate
-for your dataset.
+for your dataset, or you can use defined missing values as described before.
 
 
 ##### SAS and STATA
@@ -640,7 +647,6 @@ df, meta = pyreadstat.read_dta("/path/to/file.dta", user_missing=True, apply_val
 ```
 
 Empty strings are still transtaled as empty strings and not as NaN.
-
 
 The information about what values are user missing is stored in the meta object, in the variable missing_user_values.
 This is a list listing all user defined missing values.

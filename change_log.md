@@ -1,7 +1,9 @@
-# 1.2.9 (github, pypi and conda 2025.05.xx)
+# 1.2.9 (github, pypi and conda 2025.05.15)
+* Better error reporting when writing a column with an empty name, solves #276
 * added extra_time_formats, solves #283
-* changed empty oribinal_variable_type from 'NULL' to None solves #287
+* changed empty original_variable_type from 'NULL' to None solves #287
 * implemented string_ref for large strings when writing DTA solves #268
+* updated Readstat sources to commit a000e9c88fee1a003a60b3a86ef5a0ed2b38e56e (March 24th 2025)
 
 # 1.2.8 (github, pypi and conda 2024.10.18)
 * Added Multiple Reponse Data Sets for SAV files #259
