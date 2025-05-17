@@ -1,4 +1,4 @@
-# 1.2.9 (github, pypi and conda 2025.05.15)
+# 1.2.9 (github, pypi and conda 2025.05.17)
 * Better error reporting when writing a column with an empty name, solves #276
 * added extra_time_formats, solves #283
 * changed empty original_variable_type from 'NULL' to None solves #287
