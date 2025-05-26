@@ -224,6 +224,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_pandas))
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
+        self.assertTrue(meta.number_rows==len(df))
         #self.assertTrue(meta.creation_time==datetime(2018, 8, 14, 10, 55, 46))
         #self.assertTrue(meta.modification_time==datetime(2018, 8, 14, 10, 55, 46))
 
@@ -231,10 +232,12 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt5"))
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(self.xptv5v8))
+        self.assertTrue(meta.number_rows==len(df))
 
     def test_xport_v8(self):
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sas.xpt8"))
         self.assertTrue(df.equals(self.xptv5v8))
+        self.assertTrue(meta.number_rows==len(df))
 
     def test_xport_metaonly(self):
         df, meta = pyreadstat.read_xport(os.path.join(self.basic_data_folder, "sample.xpt"))
