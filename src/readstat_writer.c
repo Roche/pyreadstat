@@ -436,6 +436,14 @@ void readstat_variable_set_format(readstat_variable_t *variable, const char *for
     }
 }
 
+void readstat_variable_set_informat(readstat_variable_t *variable, const char *informat) {
+    if (informat) {
+        snprintf(variable->informat, sizeof(variable->informat), "%s", informat);
+    } else {
+        memset(variable->informat, '\0', sizeof(variable->informat));
+    }
+}
+
 void readstat_variable_set_measure(readstat_variable_t *variable, readstat_measure_t measure) {
     variable->measure = measure;
 }

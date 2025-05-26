@@ -177,6 +177,7 @@ cdef extern from "readstat.h":
     cdef char *readstat_variable_get_name(readstat_variable_t *variable)
     cdef char *readstat_variable_get_label(readstat_variable_t *variable)
     cdef char *readstat_variable_get_format(readstat_variable_t *variable)
+    cdef char *readstat_variable_get_informat(const readstat_variable_t *variable);
     cdef readstat_type_t readstat_variable_get_type(const readstat_variable_t *variable);
     cdef readstat_measure_t readstat_variable_get_measure(const readstat_variable_t *variable);
     cdef readstat_alignment_t readstat_variable_get_alignment(const readstat_variable_t *variable)
@@ -239,6 +240,7 @@ cdef extern from "readstat.h":
 
     cdef void readstat_variable_set_label(readstat_variable_t *variable, const char *label)
     cdef void readstat_variable_set_format(readstat_variable_t *variable, const char *format);
+    cdef void readstat_variable_set_informat(readstat_variable_t *variable, const char *informat);
     cdef void readstat_variable_set_label_set(readstat_variable_t *variable, readstat_label_set_t *label_set);
     cdef void readstat_variable_set_measure(readstat_variable_t *variable, readstat_measure_t measure);
     cdef void readstat_variable_set_alignment(readstat_variable_t *variable, readstat_alignment_t alignment);

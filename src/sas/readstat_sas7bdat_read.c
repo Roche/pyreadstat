@@ -704,6 +704,9 @@ static readstat_variable_t *sas7bdat_init_variable(sas7bdat_ctx_t *ctx, int i,
         len += snprintf(variable->format + len, sizeof(variable->format) - len,
                 ".%d", ctx->col_info[i].format_digits);
     }
+    if (len) { // TODO where is the informat saved?
+        readstat_variable_set_informat(variable, variable->format);
+    }
     if ((retval = sas7bdat_copy_text_ref(variable->label, sizeof(variable->label), 
                     ctx->col_info[i].label_ref, ctx)) != READSTAT_OK) {
         goto cleanup;

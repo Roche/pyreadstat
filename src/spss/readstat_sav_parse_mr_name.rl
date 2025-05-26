@@ -8,11 +8,7 @@
     machine mr_extractor;
 
     action extract_mr_name {
-        mr_name = (char *)readstat_malloc(p - start + 1);
-        if (mr_name == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
+        mr_name = (char *)malloc(p - start + 1);
         memcpy(mr_name, start, p - start);
         mr_name[p - start] = '\0';
     }
@@ -24,25 +20,15 @@
 
     action extract_counted_value {
         int n_cv_digs = p - start;
-        char *n_dig_str = (char *)readstat_malloc(n_cv_digs + 1);
-        if (n_dig_str == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
+        char *n_dig_str = (char *)malloc(n_cv_digs + 1);
         memcpy(n_dig_str, start, n_cv_digs);
         n_dig_str[n_cv_digs] = '\0';
         int n_digs = strtol(n_dig_str, NULL, 10);
-        free(n_dig_str);
         if (n_digs != 0) {
-            char *cv = (char *)readstat_malloc(n_digs + 1);
-            if (cv == NULL) {
-                retval = READSTAT_ERROR_MALLOC;
-                goto cleanup;
-            }
+            char *cv = (char *)malloc(n_digs + 1);
             memcpy(cv, p + 1, n_digs);
             cv[n_digs] = '\0';
             mr_counted_value = strtol(cv, NULL, 10);
-            free(cv);
             p = p + 1 + n_digs;
             start = p + 1;
         }
@@ -52,20 +38,11 @@
     }
 
     action extract_label {
-        char *lbl_len_str = (char *)readstat_malloc(p - start + 1);
-        if (lbl_len_str == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
+        char *lbl_len_str = (char *)malloc(p - start + 1);
         memcpy(lbl_len_str, start, p - start);
         lbl_len_str[p - start] = '\0';
         int len = strtol(lbl_len_str, NULL, 10);
-        free(lbl_len_str);
-        mr_label = (char *)readstat_malloc(len + 1);
-        if (mr_label == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
+        mr_label = (char *)malloc(len + 1);
         memcpy(mr_label, p + 1, len);
         mr_label[len] = '\0';
         p = p + 1 + len;
@@ -74,25 +51,16 @@
 
     action extract_subvar {
         int len = p - start;
-        char *subvar = (char *)readstat_malloc(len + 1);
-        if (subvar == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
+        char *subvar = (char *)malloc(len + 1);
         memcpy(subvar, start, len);
         subvar[len] = '\0';
-        start = p + 1;    
-        char **new_subvariables = readstat_realloc(mr_subvariables, sizeof(char *) * (mr_subvar_count + 1));
-        if (new_subvariables == NULL) {
-            free(subvar);
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
-        mr_subvariables = new_subvariables;
+        start = p + 1;
+
+        mr_subvariables = realloc(mr_subvariables, sizeof(char *) * (mr_subvar_count + 1));
         mr_subvariables[mr_subvar_count++] = subvar;
     }
 
-    nc = (alnum | '_' | '.' ); # name character (including dots)
+    nc = (alnum | '_' | '.'); # name character (including dots)
     name = nc+ '=' > extract_mr_name;
     type = ('C' | 'D'){1} > extract_mr_type;
     counted_value = digit* ' ' > extract_counted_value;
@@ -170,23 +138,13 @@ readstat_error_t parse_mr_line(const char *line, mr_set_t *result) {
     machine mr_parser;
 
     action mr_line {
-        char *mln = (char *)readstat_malloc(p - start);
-        if (mln == NULL) {
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
+        char *mln = (char *)malloc(p - start);
         memcpy(mln, start + 1, p - start);
         mln[p - start - 1] = '\0';
-        mr_set_t *new_mr_sets = readstat_realloc(*mr_sets, ((*n_mr_lines) + 1) * sizeof(mr_set_t));
-        if (new_mr_sets == NULL) {
-            free(mln);
-            retval = READSTAT_ERROR_MALLOC;
-            goto cleanup;
-        }
-        *mr_sets = new_mr_sets;
+        *mr_sets = realloc(*mr_sets, ((*n_mr_lines) + 1) * sizeof(mr_set_t));
         retval = parse_mr_line(mln, &(*mr_sets)[*n_mr_lines]);
-        free(mln);
         if (retval != READSTAT_OK) {
+            if (mln == NULL) free(mln);
             goto cleanup;
         }
         (*n_mr_lines)++;

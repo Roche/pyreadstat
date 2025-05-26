@@ -108,7 +108,7 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
         copypad(namestr.nlabel, sizeof(namestr.nlabel), variable->label);
 
         if (variable->format[0]) {
-            xport_format_t format; 
+            xport_format_t format;
 
             retval = xport_parse_format(variable->format, strlen(variable->format),
                     &format, NULL, NULL);
@@ -119,16 +119,32 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
             namestr.nfl = format.width;
             namestr.nfd = format.decimals;
 
-            copypad(namestr.niform, sizeof(namestr.niform), format.name);
-            namestr.nifl = format.width;
-            namestr.nifd = format.decimals;
-
             if (strlen(format.name) > 8) {
                 any_has_long_format = 1;
                 needs_long_record = 1;
             }
-        } else if (variable->display_width) {
+        } else {
             namestr.nfl = variable->display_width;
+            namestr.nfd = variable->decimals;
+        }
+
+        if (variable->informat[0]) {
+            xport_format_t informat;
+
+            retval = xport_parse_format(variable->informat, strlen(variable->informat),
+                    &informat, NULL, NULL);
+
+            if (retval != READSTAT_OK)
+                goto cleanup;
+
+            copypad(namestr.niform, sizeof(namestr.niform), informat.name);
+            namestr.nifl = informat.width;
+            namestr.nifd = informat.decimals;
+
+            if (strlen(informat.name) > 8) {
+                any_has_long_format = 1;
+                needs_long_record = 1;
+            }
         }
 
         namestr.nfj = (variable->alignment == READSTAT_ALIGNMENT_RIGHT);
@@ -176,13 +192,14 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
             size_t label_len = strlen(variable->label);
             size_t name_len = strlen(variable->name);
             size_t format_len = strlen(variable->format);
+            size_t informat_len = strlen(variable->informat);
             int has_long_label = 0;
             int has_long_format = 0;
 
             has_long_label = (label_len > 40);
 
             if (variable->format[0]) {
-                xport_format_t format; 
+                xport_format_t format;
 
                 retval = xport_parse_format(variable->format, strlen(variable->format),
                         &format, NULL, NULL);
@@ -194,8 +211,21 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
                 }
             }
 
+            if (variable->informat[0]) {
+                xport_format_t informat;
+
+                retval = xport_parse_format(variable->informat, strlen(variable->informat),
+                        &informat, NULL, NULL);
+                if (retval != READSTAT_OK)
+                    goto cleanup;
+
+                if (strlen(informat.name) > 8) {
+                    has_long_format = 1;
+                }
+            }
+
             if (has_long_format) {
-                uint16_t labeldef[5] = { i+1, name_len, label_len, format_len, format_len };
+                uint16_t labeldef[5] = { i+1, name_len, label_len, format_len, informat_len };
 
                 if (machine_is_little_endian()) {
                     labeldef[0] = byteswap2(labeldef[0]);
@@ -221,7 +251,7 @@ static readstat_error_t xport_write_variables(readstat_writer_t *writer) {
                 if (retval != READSTAT_OK)
                     goto cleanup;
 
-                retval = readstat_write_string(writer, variable->format);
+                retval = readstat_write_string(writer, variable->informat);
                 if (retval != READSTAT_OK)
                     goto cleanup;
 

@@ -431,6 +431,11 @@ static readstat_error_t xport_read_labels_v9(xport_ctx_t *ctx, int label_count) 
                 format, format_len, ctx->converter);
         if (retval != READSTAT_OK)
             goto cleanup;
+
+        retval = readstat_convert(variable->informat, sizeof(variable->informat),
+                informat, informat_len, ctx->converter);
+        if (retval != READSTAT_OK)
+            goto cleanup;
     }
 
     retval = xport_skip_rest_of_record(ctx);
@@ -487,7 +492,13 @@ static readstat_error_t xport_read_variables(xport_ctx_t *ctx) {
 
         retval = xport_construct_format(variable->format, sizeof(variable->format),
                 namestr.nform, sizeof(namestr.nform),
-                variable->display_width, variable->decimals);
+                namestr.nfl, namestr.nfd);
+        if (retval != READSTAT_OK)
+            goto cleanup;
+
+        retval = xport_construct_format(variable->informat, sizeof(variable->informat),
+                namestr.niform, sizeof(namestr.niform),
+                namestr.nifl, namestr.nifd);
         if (retval != READSTAT_OK)
             goto cleanup;
 

@@ -769,6 +769,7 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
     cdef table_name = ""
     cdef dict missing_user_values = None
     cdef dict variable_alignment = None
+    cdef dict variable_informat = None
 
 
     # formats
@@ -781,7 +782,7 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
     
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, row_compression)
+        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression)
 
 def write_dta(df, dst_path, str file_label="", object column_labels=None, int version=15, 
             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
@@ -838,15 +839,15 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
     cdef dict variable_alignment = None
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
-    #cdef dict variable_format = None
+    cdef dict variable_informat = None
     cdef bint row_compression = 0
 
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
      note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
-     variable_display_width, variable_measure, variable_format, row_compression)
+     variable_display_width, variable_measure, variable_format, variable_informat, row_compression)
 
 def write_xport(df, dst_path, str file_label="", object column_labels=None, str table_name=None, int file_format_version = 8,
-    dict variable_format=None):
+    dict variable_format=None, dict variable_informat=None):
     """
     Writes a pandas data frame to a SAS Xport (xpt) file.
     If no table_name is specified the dataset has by default the name DATASET (take it into account if
@@ -874,6 +875,9 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
         sets the format of a variable. Must be a dictionary with keys being the variable names and 
         values being strings defining the format. See README, setting variable formats section,
         for more information.
+    variable_informat: dict, optional
+        sets the informat of a variable. Must be a dictionary with keys being the variable names and 
+        values being strings defining the format.
     """
 
     cdef dict variable_value_labels = None
@@ -887,7 +891,7 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
     cdef bint row_compression = 0
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
+        variable_alignment,variable_display_width, variable_measure, variable_format, variable_informat, row_compression)
 
 def write_por(df, dst_path, str file_label="", object column_labels=None, dict variable_format=None):
     """
@@ -922,8 +926,8 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
     cdef dict variable_display_width = None
     cdef dict variable_measure = None
     cdef str table_name = ""
-    #cdef dict variable_format = None
+    cdef dict variable_informat = None
     cdef bint row_compression = 0
     run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
         file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
+        variable_alignment,variable_display_width, variable_measure, variable_format, variable_informat,  row_compression)

@@ -205,6 +205,7 @@ typedef struct readstat_variable_s {
     int                     index;
     char                    name[300];
     char                    format[256];
+    char                    informat[256];
     char                    label[1024];
     readstat_label_set_t   *label_set;
     off_t                   offset;
@@ -287,6 +288,7 @@ int readstat_variable_get_index_after_skipping(const readstat_variable_t *variab
 const char *readstat_variable_get_name(const readstat_variable_t *variable);
 const char *readstat_variable_get_label(const readstat_variable_t *variable);
 const char *readstat_variable_get_format(const readstat_variable_t *variable);
+const char *readstat_variable_get_informat(const readstat_variable_t *variable);
 readstat_type_t readstat_variable_get_type(const readstat_variable_t *variable);
 readstat_type_class_t readstat_variable_get_type_class(const readstat_variable_t *variable);
 size_t readstat_variable_get_storage_width(const readstat_variable_t *variable);
@@ -538,6 +540,7 @@ readstat_variable_t *readstat_add_variable(readstat_writer_t *writer, const char
         size_t storage_width);
 void readstat_variable_set_label(readstat_variable_t *variable, const char *label);
 void readstat_variable_set_format(readstat_variable_t *variable, const char *format);
+void readstat_variable_set_informat(readstat_variable_t *variable, const char *informat);
 void readstat_variable_set_label_set(readstat_variable_t *variable, readstat_label_set_t *label_set);
 void readstat_variable_set_measure(readstat_variable_t *variable, readstat_measure_t measure);
 void readstat_variable_set_alignment(readstat_variable_t *variable, readstat_alignment_t alignment);

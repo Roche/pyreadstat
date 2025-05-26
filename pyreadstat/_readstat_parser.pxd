@@ -64,6 +64,7 @@ cdef class data_container:
     cdef list col_dytpes_isfloat
     cdef list col_formats
     cdef list col_formats_original
+    cdef list col_informats_original
     cdef object origin
     cdef py_file_format file_format
     cdef bint is_unkown_number_rows
