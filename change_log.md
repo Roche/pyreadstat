@@ -1,6 +1,6 @@
 # 1.3.0 (github, pypi and conda 2025.05.xx)
 * updated Readstat sources to commit xx 
-  solves #128, #165, #261
+  solves #128, #165, #261, #284, 
 
 # 1.2.9 (github, pypi and conda 2025.05.17)
 * Better error reporting when writing a column with an empty name, solves #276

@@ -309,9 +309,9 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         retval = READSTAT_ERROR_READ;
         goto cleanup;
     }
-    char major;
+    char major, revision_tag;
     int minor, revision;
-    if (sscanf(header_end.release, "%c.%04dM%1d", &major, &minor, &revision) != 3) {
+    if (sscanf(header_end.release, "%c.%04d%c%1d", &major, &minor, &revision_tag, &revision) != 4) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
@@ -323,6 +323,11 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         // Treat it as version 9 for all intents and purposes
         hinfo->major_version = 9;
     } else {
+        retval = READSTAT_ERROR_PARSE;
+        goto cleanup;
+    }
+    // revision_tag is usually M, but J has been observed in the wild (not created with SAS?)
+    if (revision_tag != 'M' && revision_tag != 'J') {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
