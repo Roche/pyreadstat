@@ -365,7 +365,7 @@ static readstat_error_t sav_read_variable_record(sav_ctx_t *ctx) {
         }
         ctx->var_offset++;
         ctx->varinfo[ctx->var_index-1]->width++;
-        return 0;
+        return retval;
     }
 
     if ((info = readstat_calloc(1, sizeof(spss_varinfo_t))) == NULL) {
@@ -731,28 +731,25 @@ static readstat_error_t sav_process_row(unsigned char *buffer, size_t buffer_len
             goto done;
         }
         if (var_info->type == READSTAT_TYPE_STRING) {
-            if (raw_str_used + 8 <= ctx->raw_string_len) {
+            // If we're in the last column of a segment, only read 7 bytes
+            // (Segments contain 255 bytes but have room for 256)
+            size_t read_len = 8 - (offset == 31);
+            if (raw_str_used + read_len <= ctx->raw_string_len) {
                 if (raw_str_is_utf8) {
                     /* Skip null bytes, see https://github.com/tidyverse/haven/issues/560  */
                     char c;
-                    for (int i=0; i<8; i++)
+                    for (int i=0; i<read_len; i++)
                         if ((c = buffer[data_offset+i]))
                             ctx->raw_string[raw_str_used++] = c;
                 } else {
-                    memcpy(ctx->raw_string + raw_str_used, &buffer[data_offset], 8);
-                    raw_str_used += 8;
+                    memcpy(ctx->raw_string + raw_str_used, &buffer[data_offset], read_len);
+                    raw_str_used += read_len;
                 }
             }
             if (++offset == col_info->width) {
-                if (++segment_offset < var_info->n_segments) {
-                    if (raw_str_used == 0) {
-                        retval = READSTAT_ERROR_PARSE;
-                        goto done;
-                    }
-                    raw_str_used--;
-                }
                 offset = 0;
                 col++;
+                segment_offset++;
             }
             if (segment_offset == var_info->n_segments) {
                 if (!ctx->variables[var_info->index]->skip) {
