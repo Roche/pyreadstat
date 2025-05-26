@@ -112,13 +112,13 @@ readstat_error_t sav_parse_long_variable_names_record(void *data, int count, sav
                 // been set when this record is processed. So just set the longname to every
                 // matching variable, ghost or real.
                 varlookup_t *iter_match = found;
-                while (strcmp(iter_match->name, temp_key) == 0 && iter_match >= table) {
+                while (iter_match >= table && strcmp(iter_match->name, temp_key) == 0) {
                     spss_varinfo_t *info = ctx->varinfo[iter_match->index];
                     snprintf(info->longname, sizeof(info->longname), "%*s", (int)str_len, temp_val);
                     iter_match--;
                 }
                 iter_match = found + 1;
-                while (strcmp(iter_match->name, temp_key) == 0 && iter_match - table < var_count) {
+                while (iter_match - table < var_count && strcmp(iter_match->name, temp_key) == 0) {
                     spss_varinfo_t *info = ctx->varinfo[iter_match->index];
                     snprintf(info->longname, sizeof(info->longname), "%*s", (int)str_len, temp_val);
                     iter_match++;
@@ -193,9 +193,24 @@ readstat_error_t sav_parse_very_long_string_record(void *data, int count, sav_ct
         action set_width {
             varlookup_t *found = bsearch(temp_key, table, var_count, sizeof(varlookup_t), &compare_key_varlookup);
             if (found) {
-                ctx->varinfo[found->index]->string_length = temp_val;
-                ctx->varinfo[found->index]->write_format.width = temp_val;
-                ctx->varinfo[found->index]->print_format.width = temp_val;
+                // See logic above; we need to apply this to all matching variables since ghost variable
+                // names may conflict with real variable names.
+                varlookup_t *first_match = found, *last_match = found;
+                varlookup_t *iter_match = found - 1;
+                while (iter_match >= table && strcmp(iter_match->name, temp_key) == 0) {
+                    first_match = iter_match;
+                    iter_match--;
+                }
+                iter_match = found + 1;
+                while (iter_match - table < var_count && strcmp(iter_match->name, temp_key) == 0) {
+                    last_match = iter_match;
+                    iter_match++;
+                }
+                for (iter_match=first_match; iter_match<=last_match; iter_match++) {
+                    ctx->varinfo[iter_match->index]->string_length = temp_val;
+                    ctx->varinfo[iter_match->index]->write_format.width = temp_val;
+                    ctx->varinfo[iter_match->index]->print_format.width = temp_val;
+                }
             }
         }
 

@@ -411,13 +411,13 @@ _match:
                 // been set when this record is processed. So just set the longname to every
                 // matching variable, ghost or real.
                 varlookup_t *iter_match = found;
-                while (strcmp(iter_match->name, temp_key) == 0 && iter_match >= table) {
+                while (iter_match >= table && strcmp(iter_match->name, temp_key) == 0) {
                     spss_varinfo_t *info = ctx->varinfo[iter_match->index];
                     snprintf(info->longname, sizeof(info->longname), "%*s", (int)str_len, temp_val);
                     iter_match--;
                 }
                 iter_match = found + 1;
-                while (strcmp(iter_match->name, temp_key) == 0 && iter_match - table < var_count) {
+                while (iter_match - table < var_count && strcmp(iter_match->name, temp_key) == 0) {
                     spss_varinfo_t *info = ctx->varinfo[iter_match->index];
                     snprintf(info->longname, sizeof(info->longname), "%*s", (int)str_len, temp_val);
                     iter_match++;
@@ -471,13 +471,13 @@ _again:
                 // been set when this record is processed. So just set the longname to every
                 // matching variable, ghost or real.
                 varlookup_t *iter_match = found;
-                while (strcmp(iter_match->name, temp_key) == 0 && iter_match >= table) {
+                while (iter_match >= table && strcmp(iter_match->name, temp_key) == 0) {
                     spss_varinfo_t *info = ctx->varinfo[iter_match->index];
                     snprintf(info->longname, sizeof(info->longname), "%*s", (int)str_len, temp_val);
                     iter_match--;
                 }
                 iter_match = found + 1;
-                while (strcmp(iter_match->name, temp_key) == 0 && iter_match - table < var_count) {
+                while (iter_match - table < var_count && strcmp(iter_match->name, temp_key) == 0) {
                     spss_varinfo_t *info = ctx->varinfo[iter_match->index];
                     snprintf(info->longname, sizeof(info->longname), "%*s", (int)str_len, temp_val);
                     iter_match++;
@@ -731,14 +731,29 @@ _match:
 	{
             varlookup_t *found = bsearch(temp_key, table, var_count, sizeof(varlookup_t), &compare_key_varlookup);
             if (found) {
-                ctx->varinfo[found->index]->string_length = temp_val;
-                ctx->varinfo[found->index]->write_format.width = temp_val;
-                ctx->varinfo[found->index]->print_format.width = temp_val;
+                // See logic above; we need to apply this to all matching variables since ghost variable
+                // names may conflict with real variable names.
+                varlookup_t *first_match = found, *last_match = found;
+                varlookup_t *iter_match = found - 1;
+                while (iter_match >= table && strcmp(iter_match->name, temp_key) == 0) {
+                    first_match = iter_match;
+                    iter_match--;
+                }
+                iter_match = found + 1;
+                while (iter_match - table < var_count && strcmp(iter_match->name, temp_key) == 0) {
+                    last_match = iter_match;
+                    iter_match++;
+                }
+                for (iter_match=first_match; iter_match<=last_match; iter_match++) {
+                    ctx->varinfo[iter_match->index]->string_length = temp_val;
+                    ctx->varinfo[iter_match->index]->write_format.width = temp_val;
+                    ctx->varinfo[iter_match->index]->print_format.width = temp_val;
+                }
             }
         }
 	break;
 	case 4:
-#line 202 "src/spss/readstat_sav_parse.rl"
+#line 217 "src/spss/readstat_sav_parse.rl"
 	{
             if ((*p) != '\0') {
                 unsigned char digit = (*p) - '0';
@@ -751,10 +766,10 @@ _match:
         }
 	break;
 	case 5:
-#line 213 "src/spss/readstat_sav_parse.rl"
+#line 228 "src/spss/readstat_sav_parse.rl"
 	{ temp_val = 0; }
 	break;
-#line 758 "src/spss/readstat_sav_parse.c"
+#line 773 "src/spss/readstat_sav_parse.c"
 		}
 	}
 
@@ -775,13 +790,28 @@ _again:
 	{
             varlookup_t *found = bsearch(temp_key, table, var_count, sizeof(varlookup_t), &compare_key_varlookup);
             if (found) {
-                ctx->varinfo[found->index]->string_length = temp_val;
-                ctx->varinfo[found->index]->write_format.width = temp_val;
-                ctx->varinfo[found->index]->print_format.width = temp_val;
+                // See logic above; we need to apply this to all matching variables since ghost variable
+                // names may conflict with real variable names.
+                varlookup_t *first_match = found, *last_match = found;
+                varlookup_t *iter_match = found - 1;
+                while (iter_match >= table && strcmp(iter_match->name, temp_key) == 0) {
+                    first_match = iter_match;
+                    iter_match--;
+                }
+                iter_match = found + 1;
+                while (iter_match - table < var_count && strcmp(iter_match->name, temp_key) == 0) {
+                    last_match = iter_match;
+                    iter_match++;
+                }
+                for (iter_match=first_match; iter_match<=last_match; iter_match++) {
+                    ctx->varinfo[iter_match->index]->string_length = temp_val;
+                    ctx->varinfo[iter_match->index]->write_format.width = temp_val;
+                    ctx->varinfo[iter_match->index]->print_format.width = temp_val;
+                }
             }
         }
 	break;
-#line 785 "src/spss/readstat_sav_parse.c"
+#line 815 "src/spss/readstat_sav_parse.c"
 		}
 	}
 	}
@@ -789,7 +819,7 @@ _again:
 	_out: {}
 	}
 
-#line 221 "src/spss/readstat_sav_parse.rl"
+#line 236 "src/spss/readstat_sav_parse.rl"
 
     
     if (cs < 11 || p != pe) {
