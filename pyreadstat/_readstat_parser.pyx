@@ -392,25 +392,6 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     
     dc.n_obs = obs_count
     dc.n_vars = var_count
-
-    mr_len = <int>readstat_get_multiple_response_sets_length(metadata);
-    mr_sets_orig = readstat_get_multiple_response_sets(metadata);
-    if mr_sets_orig != NULL:
-        i = 0
-        while i < mr_len:
-            name = <str>mr_sets_orig[i].name
-            variable_list = []
-            for j in range(mr_sets_orig[i].num_subvars):
-                variable_list.append(<str>mr_sets_orig[i].subvariables[j])
-            mr_sets[name] = {
-                'type': chr(mr_sets_orig[i].type),
-                'is_dichotomy': bool(mr_sets_orig[i].is_dichotomy),
-                'counted_value': mr_sets_orig[i].counted_value if mr_sets_orig[i].counted_value != -1 else None,
-                'label': <str>mr_sets_orig[i].label,
-                'variable_list': variable_list
-            } 
-            i += 1
-        dc.mr_sets = mr_sets
     
     dc.col_data_len = [obs_count] * var_count
     dc.col_numpy_dtypes = [None] * var_count
@@ -431,6 +412,29 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         
     dc.file_encoding = fencoding
     dc.file_label = flabel
+
+    mr_len = <int> readstat_get_multiple_response_sets_length(metadata);
+    mr_sets_orig = readstat_get_multiple_response_sets(metadata);
+    if mr_sets_orig != NULL:
+        i = 0
+        while i < mr_len:
+            name = <str> mr_sets_orig[i].name
+            if fencoding:
+                label = (<bytes> mr_sets_orig[i].label).decode(fencoding)
+            else:
+                label = <str> mr_sets_orig[i].label
+            variable_list = []
+            for j in range(mr_sets_orig[i].num_subvars):
+                variable_list.append(<str> mr_sets_orig[i].subvariables[j])
+            mr_sets[name] = {
+                'type': chr(mr_sets_orig[i].type),
+                'is_dichotomy': bool(mr_sets_orig[i].is_dichotomy),
+                'counted_value': mr_sets_orig[i].counted_value if mr_sets_orig[i].counted_value != -1 else None,
+                'label': label,
+                'variable_list': variable_list
+            }
+            i += 1
+        dc.mr_sets = mr_sets
 
     table = readstat_get_table_name(metadata)
     if table != NULL and table[0]:
