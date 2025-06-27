@@ -22,5 +22,5 @@ from .pyreadstat import read_file_in_chunks, read_file_multiprocessing
 from ._readstat_parser import ReadstatError, metadata_container
 from .pyfunctions import set_value_labels, set_catalog_to_sas
 
-__version__ = "1.2.9"
+__version__ = "1.3.0"
 

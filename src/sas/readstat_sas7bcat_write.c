@@ -76,8 +76,14 @@ static sas7bcat_block_t *sas7bcat_block_for_label_set(readstat_label_set_t *r_la
             memcpy(&lbp1[14], value_label->string_key, string_len);
         } else {
             uint64_t big_endian_value;
-            double double_value = -1.0 * value_label->double_key;
-            memcpy(&big_endian_value, &double_value, sizeof(double));
+            double double_value = value_label->double_key;
+            if (double_value >= 0.0) {
+                double_value *= -1.0;
+                memcpy(&big_endian_value, &double_value, sizeof(double));
+            } else {
+                memcpy(&big_endian_value, &double_value, sizeof(double));
+                big_endian_value = ~big_endian_value;
+            }
             if (machine_is_little_endian()) {
                 big_endian_value = byteswap8(big_endian_value);
             }

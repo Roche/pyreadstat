@@ -1,3 +1,7 @@
+# 1.3.0 (github, pypi and conda 2025.06.27)
+* updated Readstat sources to commit b2d5407d62caf3c33caadc0495c9f7684b6a0df7 
+  solves #128, #165, #261, #284, 
+
 # 1.2.9 (github, pypi and conda 2025.05.17)
 * Better error reporting when writing a column with an empty name, solves #276
 * added extra_time_formats, solves #283

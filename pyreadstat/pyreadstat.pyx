@@ -154,7 +154,6 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
-            Notice that number_rows will be None as xport files do not have the number of rows recorded in the file metadata.
         dates_as_pandas_datetime : bool, optional
             by default False. If true dates will be transformed to pandas datetime64 instead of date.
         encoding : str, optional
@@ -573,8 +572,8 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             in case multiprocess is true, how many workers/processes to spawn?
         num_rows: integer, optional
             number of rows in the dataset. If using multiprocessing it is obligatory for files where
-            the number of rows cannot be obtained from the medatata, such as xport, por and 
-            some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+            the number of rows cannot be obtained from the medatata, such as por and 
+            some defective xport and sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
             larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata or not using
             multiprocessing.
         kwargs : dict, optional
@@ -643,8 +642,8 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
         num_processes : integer, optional
             number of processes to spawn, by default the min 4 and the max cores on the computer
         num_rows: integer, optional
-            number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as xport, por and 
-            some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+            number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as por and 
+            some defective xport and sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
             larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata.
         kwargs : dict, optional
             any other keyword argument to pass to the read_function. 
@@ -660,8 +659,8 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
     if read_function in (read_sas7bcat,):
         raise Exception("read_sas7bcat is not supported")
 
-    if read_function in (read_xport, read_por) and num_rows is None:
-        raise Exception("num_rows must be specified for read_xport and read_por to be a number equal or larger than the number of rows in the dataset.")
+    if read_function == read_por and num_rows is None:
+        raise Exception("num_rows must be specified for read_por to be a number equal or larger than the number of rows in the dataset.")
 
     if not num_processes:
         # let's be conservative with the number of workers
