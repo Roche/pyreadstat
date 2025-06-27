@@ -79,10 +79,11 @@ if os.name == 'nt':
         library_dirs.append(os.path.join(python_dir, "Library", "lib"))
 else:
     libraries.extend(["m", "z"])
-    _platform = sys.platform
+    libraries.append("iconv")
+    #_platform = sys.platform
     # Mac: iconv needs to be linked statically
-    if _platform.lower().startswith("darwin"):
-        libraries.append("iconv")
+    #if _platform.lower().startswith("darwin"):
+        #libraries.append("iconv")
 
 # Extensions
 sources.sort()
