@@ -55,6 +55,29 @@ for dirname, _ , filenames in os.walk(source_dir_root):
 
 source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname not in omitted_source_dirs]
 
+def is_ubuntu():
+    """
+    Checks if the current operating system is Ubuntu.
+    
+    This function is safe to run on any OS. It returns False if not on Linux
+    or if the distribution is not Ubuntu.
+    """
+    if not sys.platform.startswith('linux'):
+        return False
+    
+    try:
+        with open('/etc/os-release', 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip().startswith('ID='):
+                    # The value might have quotes, which we strip
+                    distro_id = line.split('=', 1)[1].strip().strip('"\'')
+                    if distro_id == 'ubuntu':
+                        return True
+    except FileNotFoundError:
+        # If /etc/os-release doesn't exist, it's not a standard modern Linux.
+        return False
+        
+    return False
 
 data_files = []
 libraries = []
@@ -80,8 +103,8 @@ if os.name == 'nt':
 else:
     libraries.extend(["m", "z"])
     _platform = sys.platform
-    # Mac: iconv needs to be linked statically
-    if _platform.lower().startswith("darwin"):
+    # Mac and ubuntu: iconv needs to be linked statically
+    if _platform.lower().startswith("darwin") or is_ubuntu():
         libraries.append("iconv")
 
 # Extensions
@@ -139,7 +162,6 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Cython",
         "Programming Language :: C",
-        "License :: OSI Approved :: Apache Software License",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering",
         "Environment :: Console",
@@ -148,5 +170,5 @@ setup(
     packages=["pyreadstat"],
     data_files=data_files,
     install_requires=['pandas>=1.2.0'],
-    license="Apache License Version 2.0",
+    license="Apache-2.0",
 )

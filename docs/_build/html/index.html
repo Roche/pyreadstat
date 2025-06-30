@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,17 +7,13 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to pyreadstat’s documentation! &mdash; pyreadstat 1.3.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/documentation_options.js?v=1f29e9d3"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/documentation_options.js?v=1f29e9d3"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -214,8 +212,8 @@ be obtained by the user before running this function.</p>
 <li><p><strong>multiprocess</strong> (<em>bool</em><em>, </em><em>optional</em>) – use multiprocessing to read each chunk?</p></li>
 <li><p><strong>num_processes</strong> (<em>integer</em><em>, </em><em>optional</em>) – in case multiprocess is true, how many workers/processes to spawn?</p></li>
 <li><p><strong>num_rows</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of rows in the dataset. If using multiprocessing it is obligatory for files where
-the number of rows cannot be obtained from the medatata, such as xport, por and
-some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+the number of rows cannot be obtained from the medatata, such as por and
+some defective xport and sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
 larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata or not using
 multiprocessing.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function. row_limit and row_offset will be discarded if present.</p></li>
@@ -245,8 +243,8 @@ be obtained by the user before running this function.</p>
 <li><p><strong>read_function</strong> (<em>pyreadstat function</em>) – a pyreadstat reading function</p></li>
 <li><p><strong>file_path</strong> (<em>string</em>) – path to the file to be read</p></li>
 <li><p><strong>num_processes</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of processes to spawn, by default the min 4 and the max cores on the computer</p></li>
-<li><p><strong>num_rows</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as xport, por and
-some defective sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
+<li><p><strong>num_rows</strong> (<em>integer</em><em>, </em><em>optional</em>) – number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as por and
+some defective xport and sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
 larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata.</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – any other keyword argument to pass to the read_function.</p></li>
 </ul>
@@ -454,8 +452,7 @@ dataframe is avoided.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
-metadata object. The data frame will be set with the correct column names but no data.
-Notice that number_rows will be None as xport files do not have the number of rows recorded in the file metadata.</p></li>
+metadata object. The data frame will be set with the correct column names but no data.</p></li>
 <li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</p></li>
