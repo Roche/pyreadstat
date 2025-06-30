@@ -162,7 +162,6 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Cython",
         "Programming Language :: C",
-        "License :: OSI Approved :: Apache Software License",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering",
         "Environment :: Console",
@@ -171,5 +170,5 @@ setup(
     packages=["pyreadstat"],
     data_files=data_files,
     install_requires=['pandas>=1.2.0'],
-    license="Apache License Version 2.0",
+    license="Apache-2.0",
 )
