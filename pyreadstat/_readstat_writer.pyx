@@ -18,11 +18,13 @@
 import os
 import warnings
 import sys
+import math
 
 import numpy as np
 #cimport numpy as np
 import pandas as pd
 import narwhals as nw
+import narwhals.dtypes as nwd
 from pandas.api.types import is_datetime64_any_dtype, is_datetime64_ns_dtype
 import datetime
 import calendar
@@ -35,13 +37,18 @@ from _readstat_parser cimport check_exit_status
 
 #cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'), np.dtype('uint8'), np.dtype('uint16'),
              #np.int32, np.int16, np.int8, np.uint8, np.uint16}
-cdef set int_types = {nw.dtypes.Int64}
-cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
-cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
-               np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
-               pd.Float64Dtype(), pd.Float32Dtype()}
+cdef set int_mixed_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
+cdef set int_types = int_mixed_types
+#cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
+#cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
+               #np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
+               #pd.Float64Dtype(), pd.Float32Dtype()}
+cdef set float_types = {nwd.Float64, nwd.Float32, nwd.FloatType, nwd.Decimal}
 cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
-cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
+#cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
+cdef set str_types = {nwd.String}
+cdef set object_types = {nwd.Object}
+cdef set datetime_types = {nwd.Datetime}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64_NS,  PYWRITER_DATETIME64_US}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
@@ -173,14 +180,36 @@ cdef int get_pandas_str_series_max_length(object series, dict value_labels):
 
     return max_length
 
+cdef int get_narwhals_str_series_max_length(object series, dict value_labels):
+    """ For a pandas string series get the max length of the strings. Assumes there is no NaN among the elements. 
+    """
+    cdef str val
+    cdef bytes temp
+    cdef int max_length = 1
+    cdef int curlen
+    cdef list labels
+    for val in series:
+        temp = val.encode("utf-8")
+        curlen = len(temp)
+        if curlen > max_length:
+            max_length = curlen
+    if value_labels:
+        labels = list(value_labels.keys())
+        for lab in labels:
+            curlen = len(str(lab))
+            if curlen > max_length:
+                max_length = curlen
+
+    return max_length
+
 
 cdef int check_series_all_same_types(object series, object type_to_check):
     """
     1 if all elements in a series are of type type_to_check, 0 otherwise
     """
 
-    values = series.values
-    for val in values:
+    #values = series.values
+    for val in series:
         if type(val) != type_to_check:
             return 0
     return 1
@@ -195,12 +224,10 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
     """
 
     cdef int max_length
-
-    #cdef list types = df.dtypes.values.tolist()
-    #cdef list columns = df.columns.values.tolist()
-
+    cdef bint has_missing
     cdef list result = list()
     cdef int equal, is_missing
+
     if variable_value_labels is None:
         variable_value_labels = dict()
 
@@ -213,9 +240,46 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         if missing_user_values:
             curuser_missing = missing_user_values.get(col_name)
 
-        if col_type in int_types:
-            result.append((PYWRITER_INTEGER, 0,0))
+        has_missing = <bint>curseries.is_null().any()
+
+        if col_type in float_types:
+            result.append((PYWRITER_DOUBLE, 0, has_missing))
+        elif col_type in str_types:
+            if has_missing:
+                col = curseries.drop_nulls()
+                max_length = get_narwhals_str_series_max_length(col, variable_value_labels.get(col_name))
+                max_length = max(1, max_length)
+            else:
+                max_length = get_narwhals_str_series_max_length(curseries, variable_value_labels.get(col_name))
+            if dta_str_max_len and max_length >= dta_str_max_len:
+                result.append((PYWRITER_DTA_STR_REF, max_length, has_missing))
+            else:
+                result.append((PYWRITER_CHARACTER, max_length, has_missing))
+        elif col_type == nwd.Datetime: # in datetime_types:
+            if col_type.time_unit == 'us':
+                result.append((PYWRITER_DATETIME64_US, 0,has_missing))
+            elif col_type.time_unit == 'ns':
+                result.append((PYWRITER_DATETIME64_NS, 0,has_missing))
+            else:
+                result.append((PYWRITER_DATETIME, 0, has_missing))
+        # TODO: date and time narwhal types
+        elif col_type in object_types:
+            curtype = type(curseries[0])
+            equal = check_series_all_same_types(curseries, curtype)
+            # TODO: what to do if not equal
+            if curtype == datetime.date:
+                result.append((PYWRITER_DATE, 0, has_missing))
+            elif curtype == datetime.datetime:
+                result.append((PYWRITER_DATETIME, 0, has_missing))
+            elif curtype == datetime.time:
+                result.append((PYWRITER_TIME, 0, has_missing))
+            # TODO: what to do if another type
+        elif col_type in int_types:
+            # TODO: check what happens if NaN is introduced, also in polars
+            result.append((PYWRITER_INTEGER, 0,has_missing))
+
         continue
+
 
         # recover original type for categories
         if type(col_type) is pd.core.dtypes.dtypes.CategoricalDtype:
@@ -727,8 +791,8 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     combination of parameters, not checking them otherwise.
     """
 
-    if not isinstance(df, pd.DataFrame):
-        raise PyreadstatError("first argument must be a pandas data frame")
+    #if not isinstance(df, pd.DataFrame):
+        #raise PyreadstatError("first argument must be a pandas data frame")
 
     df = nw.from_native(df)
 
@@ -984,15 +1048,26 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             if file_format == FILE_FORMAT_DTA:
                 # stata stores in milliseconds
                 mulfac = 1000.0
-            df2 = df.copy()
+            #df2 = df.copy()
+            df2 = df.clone()
             for col_indx in range(col_count):
                 if pywriter_types[col_indx] == PYWRITER_DATETIME64_NS: 
-                    df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
-                    #df2.iloc[:, col_indx] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
+                    # TODO: this conversion is not working, cannot get rid of the sentinel value
+                    #df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
+                    df2 = df2.with_columns(nw.col(df2.columns[col_indx]).cast(nw.Int64))
+                    print(df2["dtime"])
+                    df2 = df2.with_columns(nw.when(nw.col(df2.columns[col_indx])==-9223372036854775808).then(float('NaN')))
+                    print(df2["dtime"])
+                    df2 = df2.with_columns((((nw.col(df2.columns[col_indx]).cast(nw.Float64))/1e9) + offset_secs) * mulfac)
+                    print(df2["dtime"])
                 elif pywriter_types[col_indx] == PYWRITER_DATETIME64_US:
-                    df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
-                    df2.loc[df2[df2.columns[col_indx]]==-9223056417655, df2.columns[col_indx]] = np.nan
-
+                    # TODO, check this conversion, what i the sentinel value?
+                    #df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
+                    df2 = df2.with_columns(((nw.col(df2.columns[col_indx]).cast(nw.Int64)/1e6) + offset_secs).cast(nw.Float64) * mulfac)
+                    #df2.loc[df2[df2.columns[col_indx]]==-9223056417655, df2.columns[col_indx]] = np.nan
+                    print(df2["dtime"])
+                    df2 = df2.with_columns(nw.col(df2.columns[col_indx]).replace_strict([-9223056417655], [float('NaN')]))
+                    print(df2["dtime"])
         else:
             df2 = df
 
@@ -1014,7 +1089,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                 
                 if is_missing:
                     #if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
-                    if pd.isna(curval):
+                    if curval is None or (type(curval)==float and math.isnan(curval)):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue
 
