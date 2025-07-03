@@ -38,16 +38,14 @@ from _readstat_parser cimport check_exit_status
 #cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'), np.dtype('uint8'), np.dtype('uint16'),
              #np.int32, np.int16, np.int8, np.uint8, np.uint16}
 cdef set int_mixed_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
-cdef set int_types = int_mixed_types
+cdef set int_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
 #cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
 #cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
                #np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
                #pd.Float64Dtype(), pd.Float32Dtype()}
 cdef set float_types = {nwd.Float64, nwd.Float32, nwd.FloatType, nwd.Decimal}
-cdef set numeric_types = int_types.union(float_types).union(int_mixed_types)
-#cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
-cdef set object_types = {nwd.Object}
-cdef set datetime_types = {nwd.Datetime}
+#cdef set numeric_types = int_types.union(float_types).union(int_types)
+cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
 cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64_NS,  PYWRITER_DATETIME64_US}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
@@ -234,11 +232,12 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         col_name = curseries.name
         col_type = curseries.dtype
 
-        max_length = 0
-        curuser_missing = None
-        if missing_user_values:
-            curuser_missing = missing_user_values.get(col_name)
+        # if categorical, let's use the type of the categories
+        # TODO: write a test for writing categorical!
+        if col_type == nwd.Categorical:
+            col_type = curseries.cat.get_categories().dtype
 
+        # we need to remove nulls for series inspection
         has_missing = <bint>curseries.is_null().any()
         if has_missing:
             curseries = curseries.drop_nulls()
@@ -248,15 +247,19 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         # it could also be that the type of the series is string because it contains only
         # missing values and missing_user_values.
         # we need to take out those before inspecting the object series futher
+        curuser_missing = None
+        if missing_user_values:
+            curuser_missing = missing_user_values.get(col_name)
         if curuser_missing:
             curseries = curseries.filter(~curseries.is_in(curuser_missing))
             if not len(curseries):
                 result.append((PYWRITER_DOUBLE, 0, 1))
                 continue
-
+        
+        max_length = 0
         curtype = None
         # let's deal first with object type
-        if col_type in object_types:
+        if col_type == nwd.Object:
             curtype = type(curseries[0])
             equal = check_series_all_same_types(curseries, curtype)
             # if all elements are equal, they could be a few we expect to be an object class
@@ -282,6 +285,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             continue
         elif col_type in int_types or curtype == int:
             # TODO: check what happens if NaN is introduced, also in polars
+            # THIS is failing right now! write a test!
             result.append((PYWRITER_INTEGER, 0,has_missing))
             continue
         elif col_type == nwd.Boolean or curtype == bool:
@@ -291,11 +295,6 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         # these types here should not contain missing_user_values,
         # for string we still check, as later we will raise an error
         elif col_type == nwd.String or curtype == str:
-            #if has_missing:
-                #col = curseries.drop_nulls()
-                #max_length = get_narwhals_str_series_max_length(col, variable_value_labels.get(col_name))
-                #max_length = max(1, max_length)
-            #else:
             max_length = get_narwhals_str_series_max_length(curseries, variable_value_labels.get(col_name))
             if dta_str_max_len and max_length >= dta_str_max_len:
                 result.append((PYWRITER_DTA_STR_REF, max_length, has_missing))
@@ -303,7 +302,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             else:
                 result.append((PYWRITER_CHARACTER, max_length, has_missing))
                 continue
-        elif col_type == nwd.Datetime: # in datetime_types:
+        elif col_type == nwd.Datetime:
             if col_type.time_unit == 'us':
                 result.append((PYWRITER_DATETIME64_US, 0,has_missing))
                 continue
@@ -314,7 +313,6 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
                 result.append((PYWRITER_DATETIME, 0, has_missing))
                 continue
         # TODO: date and time narwhal types
-        # TODO: categorical
 
         # if the object was not captured by any of the previous cases, we transform it to string
         max_length = get_narwhals_str_series_max_length(curseries.cast(nwd.String), variable_value_labels.get(col_name))
@@ -608,7 +606,6 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
         if curpytype == PYWRITER_DOUBLE:
             # TODO : here these checks are not working anymore because of nwd types!
             if type(value) != float and type(value) != int:
-                #if type(value) not in numeric_types:
                 msg = "variable_value_labels: type of Value %s in variable %s must be numeric" % (str(value), variable_name)
                 raise PyreadstatError(msg)
             readstat_label_double_value(label_set, value, label.encode("utf-8"))
@@ -657,7 +654,6 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pyw
                 msg = "dictionaries in missing_ranges must have the keys hi and lo"
                 raise PyreadstatError(msg)
             if type(hi) in (int, float)  and type(lo) in (int, float):
-            #if type(hi) in numeric_types  and type(lo) in numeric_types:
                 if vartype not in pywriter_numeric_types:
                     msg = "numeric missing_ranges value given for non numeric variable %s" %variablename
                     raise PyreadstatError(msg)
@@ -686,7 +682,6 @@ cdef void add_missing_ranges(list cur_ranges, readstat_variable_t *variable, pyw
                 raise PyreadstatError(msg)
         else:
             if type(cur_range) in (int, float):
-            #if type(cur_range) in numeric_types:
                 if vartype not in pywriter_numeric_types:
                     msg = "numeric missing_ranges value given for non numeric variable %s" %variablename
                     raise PyreadstatError(msg)
@@ -1124,7 +1119,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     curuser_missing = missing_user_values.get(col_names[col_indx])
                 
                 if is_missing:
-                    #if curval is None or (type(curval) in numeric_types and np.isnan(curval)):
+                    # TODO: problem! if type is pandas._libs.missing.NAType' it is not captured here and raises an error!
                     if curval is None or (type(curval)==float and math.isnan(curval)):
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue

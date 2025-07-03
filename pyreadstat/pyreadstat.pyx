@@ -21,7 +21,8 @@
 
 import multiprocessing as mp
 
-import pandas as pd
+#import pandas as pd
+import narwhals as nw
 import numpy as np
 
 #from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
@@ -33,6 +34,7 @@ from _readstat_parser import  PyreadstatError
 from _readstat_writer cimport run_write
 cimport _readstat_parser, _readstat_writer
 from worker import worker
+# TODO: narwhalify pyfunctions
 from pyfunctions import set_value_labels, set_catalog_to_sas
 
 # Public interface
@@ -703,7 +705,15 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
         for key in keys:
             final[key] = np.concatenate([chunk[key] for chunk in chunks])
     else:
-        final = pd.concat(chunks, axis=0, ignore_index=True)
+        #final = pd.concat(chunks, axis=0, ignore_index=True)
+        chunks = [nw.from_native(x) for x in chunks]
+        final = nw.concat(chunks, how='vertical')
+        ispandas = False
+        if final.implementation.is_pandas():
+            ispandas = True
+        final = final.to_native()
+        if ispandas:
+            final = final.reset_index(drop=True)
     return final, meta
 
 # Write API
