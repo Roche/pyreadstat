@@ -29,6 +29,7 @@ import warnings
 import sys
 
 import pandas as pd
+import narwhals as nw
 import numpy as np
 #from pandas._libs import Timestamp
 
@@ -955,10 +956,18 @@ cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
     cdef list dtypes
 
     dates_as_pandas = dc.dates_as_pandas
+    # TODO: this function should take the output_format as arguement to pass as backend to narwhals
+    output_format = "pandas"
 
     if dict_data:
-        data_frame = pd.DataFrame.from_dict(dict_data)
-        if dates_as_pandas:
+        #data_frame = pd.DataFrame.from_dict(dict_data)
+        data_frame = nw.from_dict(dict_data, backend=output_format)
+        natnamespace = nw.get_native_namespace(data_frame)
+        data_frame = data_frame.to_native()
+
+        if dates_as_pandas and output_format=="pandas":
+            # TODO: uncomment line below once I can create an empty dataframe with narwhals
+            #pd = natnamespace
             dtypes = data_frame.dtypes.tolist()
             # check that datetime columns are datetime type
             # this is needed in case all date values are nan
@@ -967,7 +976,9 @@ cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
                     data_frame[column] = pd.to_datetime(data_frame[column])
     else:
+        # TODO: how to do this with narwhals? from dict raies an error
         data_frame = pd.DataFrame()
+        #data_frame = nw.from_dict({}, backend="pandas")
 
     return data_frame
 
