@@ -1097,7 +1097,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     convfac = convfacs[pywriter_types[col_indx]]
                     df2 = df2.with_columns(nw.col(df2.columns[col_indx]).cast(nw.Int64))
                     df2 = df2.with_columns(nw.when(nw.col(df2.columns[col_indx])!=-9223372036854775808).then(nw.col(df2.columns[col_indx])))
-                    df2 = df2.with_columns((((nw.col(df2.columns[col_indx]).cast(nw.Float64))/convfac) + offset_secs) * mulfac)
+                    df2 = df2.with_columns((((nw.col(df2.columns[col_indx]).cast(nw.Float64))/convfac) + offset_secs).round() * mulfac)
                 #elif pywriter_types[col_indx] == PYWRITER_DATETIME64_US:
                     # TODO, check this conversion, what i the sentinel value?
                     #df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
