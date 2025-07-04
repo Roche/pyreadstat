@@ -22,10 +22,10 @@ import math
 
 import numpy as np
 #cimport numpy as np
-import pandas as pd
+#import pandas as pd
 import narwhals as nw
 import narwhals.dtypes as nwd
-from pandas.api.types import is_datetime64_any_dtype, is_datetime64_ns_dtype
+#from pandas.api.types import is_datetime64_any_dtype, is_datetime64_ns_dtype
 import datetime
 import calendar
 from datetime import timezone as _timezone
@@ -37,19 +37,18 @@ from _readstat_parser cimport check_exit_status
 
 #cdef set int_types = {int, np.dtype('int32'), np.dtype('int16'), np.dtype('int8'), np.dtype('uint8'), np.dtype('uint16'),
              #np.int32, np.int16, np.int8, np.uint8, np.uint16}
-cdef set int_mixed_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
+#cdef set int_mixed_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
 cdef set int_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
-#cdef set int_mixed_types = {pd.Int8Dtype(), pd.Int16Dtype(), pd.Int32Dtype(), pd.UInt8Dtype(), pd.UInt16Dtype()}
 #cdef set float_types = {float, np.dtype('int64'), np.dtype('uint64'), np.dtype('uint32'), np.dtype('float'),
                #np.dtype('float32'), np.int64, np.uint64, np.uint32, pd.Int64Dtype(), pd.UInt32Dtype(), pd.UInt64Dtype(),
                #pd.Float64Dtype(), pd.Float32Dtype()}
 cdef set float_types = {nwd.Float64, nwd.Float32, nwd.FloatType, nwd.Decimal}
 #cdef set numeric_types = int_types.union(float_types).union(int_types)
-cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
-cdef set nat_types = {datetime.datetime, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, datetime.time, datetime.date}
+#cdef set datetime_types = {datetime.datetime}#, np.datetime64, pd._libs.tslibs.timestamps.Timestamp, pd.DatetimeTZDtype, 'datetime64[ns, UTC]'}
+cdef set nat_types = {datetime.datetime, np.datetime64, datetime.time, datetime.date} #pd._libs.tslibs.timestamps.Timestamp,
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64_NS,  PYWRITER_DATETIME64_US}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME}
-cdef dict pandas_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
+cdef dict narwhals_to_readstat_types = {PYWRITER_DOUBLE: READSTAT_TYPE_DOUBLE, PYWRITER_INTEGER: READSTAT_TYPE_INT32,
                                       PYWRITER_CHARACTER: READSTAT_TYPE_STRING, PYWRITER_LOGICAL: READSTAT_TYPE_INT32,
                                       PYWRITER_DTA_STR_REF: READSTAT_TYPE_STRING_REF,
                                       PYWRITER_OBJECT: READSTAT_TYPE_STRING, PYWRITER_DATE: READSTAT_TYPE_DOUBLE,
@@ -87,8 +86,9 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
 
     if curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64_NS:
         # get timestamp in seconds
-        if type(curval) == pd._libs.tslibs.timestamps.Timestamp:
-            curval = curval.asm8
+        # TODO: test this!
+        #if type(curval) == pd._libs.tslibs.timestamps.Timestamp:
+            #curval = curval.asm8
 
         if type(curval) == datetime.datetime:
             #tstamp = curval.replace(tzinfo=timezone.utc).timestamp() # works only in python 3
@@ -153,30 +153,6 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
     else:
         raise PyreadstatError("Unknown pywriter variable format")
 
-
-cdef int get_pandas_str_series_max_length(object series, dict value_labels):
-    """ For a pandas string series get the max length of the strings. Assumes there is no NaN among the elements. 
-    """
-    values = series.values
-    cdef str val
-    cdef bytes temp
-    cdef int max_length = 1
-    cdef int curlen
-    cdef list labels
-    for val in values:
-        temp = val.encode("utf-8")
-        curlen = len(temp)
-        if curlen > max_length:
-            max_length = curlen
-    if value_labels:
-        labels = list(value_labels.keys())
-        for lab in labels:
-            curlen = len(str(lab))
-            if curlen > max_length:
-                max_length = curlen
-
-    return max_length
-
 cdef int get_narwhals_str_series_max_length(object series, dict value_labels):
     """ For a pandas string series get the max length of the strings. Assumes there is no NaN among the elements. 
     """
@@ -204,8 +180,6 @@ cdef int check_series_all_same_types(object series, object type_to_check):
     """
     1 if all elements in a series are of type type_to_check, 0 otherwise
     """
-
-    #values = series.values
     for val in series:
         if type(val) != type_to_check:
             return 0
@@ -238,7 +212,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             col_type = curseries.cat.get_categories().dtype
 
         # we need to remove nulls for series inspection
-        has_missing = <bint>curseries.is_null().any()
+        has_missing = <bint>curseries.null_count()>0
         if has_missing:
             curseries = curseries.drop_nulls()
         
@@ -258,8 +232,8 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         
         max_length = 0
         curtype = None
-        # let's deal first with object type
-        if col_type == nwd.Object:
+        # let's deal first with object type, Enum could also be anything
+        if col_type == nwd.Object or col_type==nwd.Enum:
             curtype = type(curseries[0])
             equal = check_series_all_same_types(curseries, curtype)
             # if all elements are equal, they could be a few we expect to be an object class
@@ -284,12 +258,11 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             result.append((PYWRITER_DOUBLE, 0, has_missing))
             continue
         elif col_type in int_types or curtype == int:
-            # TODO: check what happens if NaN is introduced, also in polars
-            # THIS is failing right now! write a test!
+            # TODO: write a test for this
             result.append((PYWRITER_INTEGER, 0,has_missing))
             continue
         elif col_type == nwd.Boolean or curtype == bool:
-            # TODO: check what happens if NaN is introduced, also in polars
+            # TODO: write a test for this
             result.append((PYWRITER_LOGICAL, 0,has_missing))
             continue
         # these types here should not contain missing_user_values,
@@ -312,7 +285,13 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             else:
                 result.append((PYWRITER_DATETIME, 0, has_missing))
                 continue
-        # TODO: date and time narwhal types
+        elif col_type == nwd.Date:
+            # TODO: test Date and Time
+            result.append((PYWRITER_DATE, 0, has_missing))
+            continue
+        elif col_type == nwd.Time:
+            result.append((PYWRITER_TIME, 0, has_missing))
+            continue
 
         # if the object was not captured by any of the previous cases, we transform it to string
         max_length = get_narwhals_str_series_max_length(curseries.cast(nwd.String), variable_value_labels.get(col_name))
@@ -322,256 +301,6 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             result.append((PYWRITER_OBJECT, max_length, has_missing))
         continue
 
-
-        continue
-
-
-        # recover original type for categories
-        if type(col_type) is pd.core.dtypes.dtypes.CategoricalDtype:
-            col_type = np.asarray(curseries).dtype
-        # np.datetime64[ns]
-        elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types or is_datetime64_any_dtype(df[col_name]):
-            is_missing = 1 if np.any(pd.isna(curseries)) else 0
-            if str(col_type).startswith('datetime64[us'):
-                result.append((PYWRITER_DATETIME64_US, 0, is_missing))    
-            else:
-                result.append((PYWRITER_DATETIME, 0, is_missing))
-        elif col_type == object or col_type == 'string' or col_type in int_mixed_types:
-            is_missing = 0
-            if curuser_missing:
-                #curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
-                curseries = curseries.filter(~curseries.is_in(curuser_missing))
-                if not len(curseries):
-                    result.append((PYWRITER_DOUBLE, 0, 1))
-                    continue
-            if np.any(pd.isna(curseries)):
-                if col_type in int_mixed_types:
-                    result.append((PYWRITER_INTEGER, 0, 1))
-                    continue
-                col = curseries.dropna().reset_index(drop=True)
-                is_missing = 1
-                if len(col):
-                    curtype = type(col[0])
-                    equal = check_series_all_same_types(col, curtype)
-                    #equal = col.apply(lambda x: type(x) == curtype)
-                    #if not np.all(equal):
-                    if not equal:
-                        max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                        if dta_str_max_len and max_length >= dta_str_max_len:
-                            result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-                        else:
-                            result.append((PYWRITER_OBJECT, max_length, 1))
-                        continue
-                else:
-                    if curuser_missing:
-                        result.append((PYWRITER_DOUBLE, 0, 1))
-                    else:
-                        result.append((PYWRITER_LOGICAL, 0, 1))
-                    continue
-            else:
-                if col_type in int_mixed_types:
-                    result.append((PYWRITER_INTEGER, 0, 0))
-                    continue
-                curtype = type(curseries.iloc[0])
-                equal = check_series_all_same_types(curseries, curtype)
-                #equal = curseries.apply(lambda x: type(x) == curtype)
-                #if not np.all(equal):
-                if not equal:
-                    max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                    if dta_str_max_len and max_length >= dta_str_max_len:
-                        result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-                    else:
-                        result.append((PYWRITER_OBJECT, max_length, 0))
-                    continue
-            if curtype in int_types:
-                result.append((PYWRITER_INTEGER, 0, is_missing))
-            elif curtype in float_types:
-                result.append((PYWRITER_DOUBLE, 0, is_missing))
-            elif curtype == bool:
-                result.append((PYWRITER_LOGICAL, 0, is_missing))
-            elif curtype == str:
-                if is_missing:
-                    col = curseries.dropna().reset_index(drop=True)
-                    max_length = get_pandas_str_series_max_length(col, variable_value_labels.get(col_name))
-                    max_length = max(1, max_length)
-                else:
-                    max_length = get_pandas_str_series_max_length(curseries, variable_value_labels.get(col_name))
-                if dta_str_max_len and max_length >= dta_str_max_len:
-                    result.append((PYWRITER_DTA_STR_REF, max_length, is_missing))
-                else:
-                    result.append((PYWRITER_CHARACTER, max_length, is_missing))
-            elif curtype == datetime.date:
-                result.append((PYWRITER_DATE, 0, is_missing))
-            elif curtype == datetime.datetime:
-                result.append((PYWRITER_DATETIME, 0, is_missing))
-            elif curtype == datetime.time:
-                result.append((PYWRITER_TIME, 0, is_missing))
-            else:
-                curseries = curseries.astype(str)
-                if is_missing:
-                    col = curseries.dropna().reset_index(drop=True)
-                    max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                else:
-                    max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                if dta_str_max_len and max_length >= dta_str_max_len:
-                    result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-                else:
-                    result.append((PYWRITER_OBJECT, max_length, is_missing))
-
-        else:
-            # generic object
-            max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-            is_missing = 0
-            if np.any(pd.isna(curseries)):
-                is_missing = 1
-            if dta_str_max_len and max_length >= dta_str_max_len:
-                result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-            else:
-                result.append((PYWRITER_OBJECT, max_length, is_missing))
-    return result
-
-cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels, int dta_str_max_len):
-    """
-    From a pandas data frame, get a list with tuples column types as first element, max_length as second and is_missing
-    as third.
-    max_lenght is the max length of a string or string representation of an object, 0 for numeric types. is_missing flags
-    wether the series has missing values (1) or not (0)
-    dta_str_max_len is the max length for a dta string, 0 if the file format is not dta
-    """
-
-    cdef int max_length
-
-    cdef list types = df.dtypes.values.tolist()
-    cdef list columns = df.columns.values.tolist()
-
-    cdef list result = list()
-    cdef int equal, is_missing
-    if variable_value_labels is None:
-        variable_value_labels = dict()
-
-    for indx, (col_name, col_type) in enumerate(zip(columns, types)):
-
-        max_length = 0
-        curseries = df.iloc[:, indx]
-        curuser_missing = None
-        if missing_user_values:
-            curuser_missing = missing_user_values.get(col_name)
-
-        # recover original type for categories
-        if type(col_type) is pd.core.dtypes.dtypes.CategoricalDtype:
-            col_type = np.asarray(curseries).dtype
-        if col_type in int_types:
-            result.append((PYWRITER_INTEGER, 0,0))
-        elif col_type in float_types:
-            if np.any(pd.isna(curseries)):
-                result.append((PYWRITER_DOUBLE, 0, 1))
-            else:
-                result.append((PYWRITER_DOUBLE, 0, 0))
-        elif col_type == bool:
-            result.append((PYWRITER_LOGICAL, 0,0))
-        # np.datetime64[ns]
-        elif is_datetime64_ns_dtype(df[col_name]):
-            if np.any(pd.isna(curseries)):
-                result.append((PYWRITER_DATETIME64_NS, 0,1))
-            else:
-                result.append((PYWRITER_DATETIME64_NS, 0,0))
-        elif col_type == np.dtype('<M8[ns]') or col_type in datetime_types or is_datetime64_any_dtype(df[col_name]):
-            is_missing = 1 if np.any(pd.isna(curseries)) else 0
-            if str(col_type).startswith('datetime64[us'):
-                result.append((PYWRITER_DATETIME64_US, 0, is_missing))    
-            else:
-                result.append((PYWRITER_DATETIME, 0, is_missing))
-        elif col_type == object or col_type == 'string' or col_type in int_mixed_types:
-            is_missing = 0
-            if curuser_missing:
-                curseries = curseries[~curseries.isin(curuser_missing)].reset_index(drop=True)
-                if not len(curseries):
-                    result.append((PYWRITER_DOUBLE, 0, 1))
-                    continue
-            if np.any(pd.isna(curseries)):
-                if col_type in int_mixed_types:
-                    result.append((PYWRITER_INTEGER, 0, 1))
-                    continue
-                col = curseries.dropna().reset_index(drop=True)
-                is_missing = 1
-                if len(col):
-                    curtype = type(col[0])
-                    equal = check_series_all_same_types(col, curtype)
-                    #equal = col.apply(lambda x: type(x) == curtype)
-                    #if not np.all(equal):
-                    if not equal:
-                        max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                        if dta_str_max_len and max_length >= dta_str_max_len:
-                            result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-                        else:
-                            result.append((PYWRITER_OBJECT, max_length, 1))
-                        continue
-                else:
-                    if curuser_missing:
-                        result.append((PYWRITER_DOUBLE, 0, 1))
-                    else:
-                        result.append((PYWRITER_LOGICAL, 0, 1))
-                    continue
-            else:
-                if col_type in int_mixed_types:
-                    result.append((PYWRITER_INTEGER, 0, 0))
-                    continue
-                curtype = type(curseries.iloc[0])
-                equal = check_series_all_same_types(curseries, curtype)
-                #equal = curseries.apply(lambda x: type(x) == curtype)
-                #if not np.all(equal):
-                if not equal:
-                    max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                    if dta_str_max_len and max_length >= dta_str_max_len:
-                        result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-                    else:
-                        result.append((PYWRITER_OBJECT, max_length, 0))
-                    continue
-            if curtype in int_types:
-                result.append((PYWRITER_INTEGER, 0, is_missing))
-            elif curtype in float_types:
-                result.append((PYWRITER_DOUBLE, 0, is_missing))
-            elif curtype == bool:
-                result.append((PYWRITER_LOGICAL, 0, is_missing))
-            elif curtype == str:
-                if is_missing:
-                    col = curseries.dropna().reset_index(drop=True)
-                    max_length = get_pandas_str_series_max_length(col, variable_value_labels.get(col_name))
-                    max_length = max(1, max_length)
-                else:
-                    max_length = get_pandas_str_series_max_length(curseries, variable_value_labels.get(col_name))
-                if dta_str_max_len and max_length >= dta_str_max_len:
-                    result.append((PYWRITER_DTA_STR_REF, max_length, is_missing))
-                else:
-                    result.append((PYWRITER_CHARACTER, max_length, is_missing))
-            elif curtype == datetime.date:
-                result.append((PYWRITER_DATE, 0, is_missing))
-            elif curtype == datetime.datetime:
-                result.append((PYWRITER_DATETIME, 0, is_missing))
-            elif curtype == datetime.time:
-                result.append((PYWRITER_TIME, 0, is_missing))
-            else:
-                curseries = curseries.astype(str)
-                if is_missing:
-                    col = curseries.dropna().reset_index(drop=True)
-                    max_length = get_pandas_str_series_max_length(col.astype(str), variable_value_labels.get(col_name))
-                else:
-                    max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-                if dta_str_max_len and max_length >= dta_str_max_len:
-                    result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-                else:
-                    result.append((PYWRITER_OBJECT, max_length, is_missing))
-
-        else:
-            # generic object
-            max_length = get_pandas_str_series_max_length(curseries.astype(str), variable_value_labels.get(col_name))
-            is_missing = 0
-            if np.any(pd.isna(curseries)):
-                is_missing = 1
-            if dta_str_max_len and max_length >= dta_str_max_len:
-                result.append((PYWRITER_DTA_STR_REF, max_length, 1))
-            else:
-                result.append((PYWRITER_OBJECT, max_length, is_missing))
     return result
 
 cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value_labels, str labelset_name,
@@ -585,7 +314,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
     cdef readstat_type_t curtype
     cdef double double_val
     
-    curtype = pandas_to_readstat_types[curpytype]
+    curtype = narwhals_to_readstat_types[curpytype]
     label_set = readstat_add_label_set(writer, curtype, labelset_name.encode("utf-8"))
 
     for value, label in value_labels.items():
@@ -604,7 +333,6 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
 
 
         if curpytype == PYWRITER_DOUBLE:
-            # TODO : here these checks are not working anymore because of nwd types!
             if type(value) != float and type(value) != int:
                 msg = "variable_value_labels: type of Value %s in variable %s must be numeric" % (str(value), variable_name)
                 raise PyreadstatError(msg)
@@ -629,7 +357,7 @@ cdef readstat_label_set_t *set_value_label(readstat_writer_t *writer, dict value
 
         elif curpytype in (PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64_NS, PYWRITER_DATETIME64_US):
             if type(value) not in nat_types:
-                msg = "variable_value_labels: type of Value %s in variable %s must match the type of the column in pandas and be of type date, datetime or time" % (str(value), variable_name)
+                msg = "variable_value_labels: type of Value %s in variable %s must match the type of the column in dataframe and be of type date, datetime or time" % (str(value), variable_name)
                 raise PyreadstatError(msg)
             double_val = convert_datetimelike_to_number(file_format, curpytype, value) 
             readstat_label_double_value(label_set, double_val, label.encode("utf-8"))
@@ -828,7 +556,12 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     #if not isinstance(df, pd.DataFrame):
         #raise PyreadstatError("first argument must be a pandas data frame")
 
+    cdef object natnamespace
+    cdef bint is_pandas
+
     df = nw.from_native(df)
+    natnamespace = nw.get_native_namespace(df)
+    is_pandas = df.implementation.is_pandas()
 
     if variable_value_labels:
         for k,v in variable_value_labels.items():
@@ -993,7 +726,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         for col_indx in range(col_count):
             curtype, max_length, _ = col_types[col_indx]
             variable_name = col_names[col_indx]
-            variable = readstat_add_variable(writer, variable_name.encode("utf-8"), pandas_to_readstat_types[curtype], max_length)
+            variable = readstat_add_variable(writer, variable_name.encode("utf-8"), narwhals_to_readstat_types[curtype], max_length)
             if variable_format:
                 tempformat = variable_format.get(variable_name)
                 if tempformat:
@@ -1119,8 +852,15 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     curuser_missing = missing_user_values.get(col_names[col_indx])
                 
                 if is_missing:
-                    # TODO: problem! if type is pandas._libs.missing.NAType' it is not captured here and raises an error!
-                    if curval is None or (type(curval)==float and math.isnan(curval)):
+                    # For pandas we need isna because values can be Nan, NA, NAT, None
+                    if is_pandas:
+                        pd = natnamespace
+                        check_if_missing = pd.isna(curval)
+                    # for other libraries the value would be None
+                    else:
+                        check_if_missing = curval is None
+                    #if curval is None or (type(curval)==float and math.isnan(curval)):
+                    if check_if_missing:
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue
 

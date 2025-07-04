@@ -3,7 +3,8 @@ Functions written in pure python
 """
 from copy import deepcopy
 
-import pandas as pd
+#import pandas as pd
+import narwhals as nw
 
 # Functions to deal with value labels
 
@@ -33,14 +34,20 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
             otherwise
     """
 
-    df_copy = dataframe.copy()
+    #df_copy = dataframe.copy()
+    df_copy = nw.from_native(dataframe).clone()
 
     if metadata.value_labels and metadata.variable_to_label:
         for var_name, label_name in metadata.variable_to_label.items():
             labels = metadata.value_labels.get(label_name)
             if labels:
                 if var_name in df_copy.columns:
-                    df_copy[var_name] = df_copy[var_name].apply(lambda x: labels.get(x, x))
+                    # replace_strict requires that all the values are in the map. Could not get map_batches or when/then/otherwise to work
+                    unvals = df_copy[var_name].unique()
+                    for uval in unvals:
+                        if uval not in labels:
+                            labels[uval] = uval
+                    df_copy = df_copy.with_columns(nw.col(var_name).replace_strict(labels))
                     if formats_as_ordered_category:
                         categories = list(set(labels.values()))
                         original_values = list(labels.keys())
@@ -51,16 +58,20 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                             if not revdict.get(curcat):
                                 revdict[curcat] = orival
                         categories.sort(key=revdict.get)
-                        df_copy[var_name] = pd.Categorical(
-                            df_copy[var_name],
-                            ordered = True,
-                            categories = categories
-                        )
+                        df_copy = df_copy.with_columns(nw.col(var_name).cast(nw.Enum(categories)))
+                        # TODO: check the test ordered categories, why high<low<medium?
+                        #df_copy[var_name] = nw.Categorical(
+                            #df_copy[var_name],
+                            #ordered = True,
+                            #categories = categories
+                        #)
                     elif formats_as_category:
-                        df_copy[var_name] = df_copy[var_name].astype("category")
+                        # TODO: check that this is correct in the test
+                        df_copy = df_copy.with_columns(nw.col(var_name).cast(nw.Categorical))
+                        #df_copy[var_name] = df_copy[var_name].astype("category")
 
 
-    return df_copy
+    return df_copy.to_native()
 
 def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as_category=True,  
                        formats_as_ordered_category=False):
@@ -108,7 +119,8 @@ def set_catalog_to_sas(sas_dataframe, sas_metadata, catalog_metadata, formats_as
         metadata.variable_value_labels = variable_value_labels
 
     else:
-        df_copy = sas_dataframe.copy()
+        #df_copy = sas_dataframe.copy()
+        df_copy = nw.from_native(sas_dataframe).clone().to_native()
         metadata = deepcopy(sas_metadata)
 
     return df_copy, metadata

@@ -960,7 +960,6 @@ cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
     output_format = "pandas"
 
     if dict_data:
-        #data_frame = pd.DataFrame.from_dict(dict_data)
         data_frame = nw.from_dict(dict_data, backend=output_format)
         natnamespace = nw.get_native_namespace(data_frame)
         data_frame = data_frame.to_native()
