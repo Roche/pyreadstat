@@ -568,7 +568,7 @@ cdef int close_file(int fd):
         return close(fd)
 
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
-                   int file_format_version, str note, str table_name, dict variable_value_labels, 
+                   int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format, bint row_compression) except *:
     """
@@ -701,7 +701,13 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             check_exit_status(readstat_writer_set_file_label(writer, file_labl))
 
         if note:
-            readstat_add_note(writer, note.encode("utf-8"))
+            if type(note) == str:
+                note = [note]
+            if type(note) == list:
+                for line in note:
+                    readstat_add_note(writer, line.encode("utf-8"))
+            else:
+                raise PyreadstatError(f"note should be either str or list, got {type(note)}")
 
         if file_format_version > -1:
             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))

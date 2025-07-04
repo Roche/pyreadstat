@@ -708,7 +708,7 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
 
 # Write API
 
-def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
+def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
                 dict variable_measure=None, dict variable_format=None):
     """
@@ -731,8 +731,8 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
         if true a zsav will be written, by default False, a sav is written
     row_compress : boolean, optional
         if true it applies row compression, by default False, compress and row_compress cannot be both true at the same time
-    note : str, optional
-        a note to add to the file
+    note : str or list of str, optional
+        a note or list of notes to add to the file
     variable_value_labels : dict, optional
         value labels, a dictionary with key variable name and value a dictionary with key values and
         values labels. Variable names must match variable names in the dataframe otherwise will be

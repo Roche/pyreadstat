@@ -10210,7 +10210,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_15read_file_multiprocessing(
 /* "pyreadstat/pyreadstat.pyx":711
  * # Write API
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
 */
@@ -10223,7 +10223,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_10pyreadstat_10pyreadstat_17write_sav, "\n    Writes a pandas data frame to a SPSS sav or zsav file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str or pathlib.Path\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list or dict, optional\n        labels for columns (variables), if list must be the same length as the number of columns. Variables with no\n        labels must be represented by None. If dict values must be variable names and values variable labels.\n        In such case there is no need to include all variables; labels for non existent\n        variables will be ignored with no warning or error.\n    compress : boolean, optional\n        if true a zsav will be written, by default False, a sav is written\n    row_compress : boolean, optional\n        if true it applies row compression, by default False, compress and row_compress cannot be both true at the same time\n    note : str, optional\n        a note to add to the file\n    variable_value_labels : dict, optional\n        value labels, a dictionary with key variable name and value a dictionary with key values and\n        values labels. Variable names must match variable names in the dataframe otherwise will be\n        ignored. Value types must match the type of the column in the dataframe.\n    missing_ranges : dict, optional\n        user defined missing values. Must be a dictionary with keys as variable names matching variable\n        names in the dataframe. The values must be a list. Each element in that list can either be\n        either a discrete numeric or string value (max 3 per variable) or a dictionary with keys 'hi' and 'lo' to\n        indicate the upper and lower range for numeric values (max 1 range value + 1 discrete value per\n        variable). hi and lo may also be the same value in which case it will be interpreted as a discrete\n        missing value.""\n        For this to be effective, values in the dataframe must be the same as reported here and not NaN.\n    variable_display_width : dict, optional\n        set the display width for variables. Must be a dictonary with keys being variable names and\n        values being integers.\n    variable_measure: dict, optional\n        sets the measure type for a variable. Must be a dictionary with keys being variable names and\n        values being strings one of \"nominal\", \"ordinal\", \"scale\" or \"unknown\" (default).\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ");
+PyDoc_STRVAR(__pyx_doc_10pyreadstat_10pyreadstat_17write_sav, "\n    Writes a pandas data frame to a SPSS sav or zsav file.\n\n    Parameters\n    ----------\n    df : pandas data frame\n        pandas data frame to write to sav or zsav\n    dst_path : str or pathlib.Path\n        full path to the result sav or zsav file\n    file_label : str, optional\n        a label for the file\n    column_labels : list or dict, optional\n        labels for columns (variables), if list must be the same length as the number of columns. Variables with no\n        labels must be represented by None. If dict values must be variable names and values variable labels.\n        In such case there is no need to include all variables; labels for non existent\n        variables will be ignored with no warning or error.\n    compress : boolean, optional\n        if true a zsav will be written, by default False, a sav is written\n    row_compress : boolean, optional\n        if true it applies row compression, by default False, compress and row_compress cannot be both true at the same time\n    note : str or list of str, optional\n        a note or list of notes to add to the file\n    variable_value_labels : dict, optional\n        value labels, a dictionary with key variable name and value a dictionary with key values and\n        values labels. Variable names must match variable names in the dataframe otherwise will be\n        ignored. Value types must match the type of the column in the dataframe.\n    missing_ranges : dict, optional\n        user defined missing values. Must be a dictionary with keys as variable names matching variable\n        names in the dataframe. The values must be a list. Each element in that list can either be\n        either a discrete numeric or string value (max 3 per variable) or a dictionary with keys 'hi' and 'lo' to\n        indicate the upper and lower range for numeric values (max 1 range value + 1 discrete value per\n        variable). hi and lo may also be the same value in which case it will be interpreted as a ""discrete\n        missing value.\n        For this to be effective, values in the dataframe must be the same as reported here and not NaN.\n    variable_display_width : dict, optional\n        set the display width for variables. Must be a dictonary with keys being variable names and\n        values being integers.\n    variable_measure: dict, optional\n        sets the measure type for a variable. Must be a dictionary with keys being variable names and\n        values being strings one of \"nominal\", \"ordinal\", \"scale\" or \"unknown\" (default).\n    variable_format: dict, optional\n        sets the format of a variable. Must be a dictionary with keys being the variable names and \n        values being strings defining the format. See README, setting variable formats section,\n        for more information.\n    ");
 static PyMethodDef __pyx_mdef_10pyreadstat_10pyreadstat_18write_sav = {"write_sav", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_10pyreadstat_10pyreadstat_18write_sav, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_10pyreadstat_10pyreadstat_17write_sav};
 static PyObject *__pyx_pw_10pyreadstat_10pyreadstat_18write_sav(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
@@ -10326,11 +10326,11 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject *)Py_None));
       if (!values[4]) values[4] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
       if (!values[5]) values[5] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
-      if (!values[6]) values[6] = __Pyx_NewRef(((PyObject*)Py_None));
+      if (!values[6]) values[6] = __Pyx_NewRef(((PyObject *)Py_None));
 
       /* "pyreadstat/pyreadstat.pyx":712
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,             # <<<<<<<<<<<<<<
  *                 dict variable_measure=None, dict variable_format=None):
  *     """
@@ -10340,7 +10340,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[9]) values[9] = __Pyx_NewRef(((PyObject*)Py_None));
 
       /* "pyreadstat/pyreadstat.pyx":713
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
@@ -10406,18 +10406,18 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       /* "pyreadstat/pyreadstat.pyx":711
  * # Write API
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
 */
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject *)Py_None));
       if (!values[4]) values[4] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
       if (!values[5]) values[5] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
-      if (!values[6]) values[6] = __Pyx_NewRef(((PyObject*)Py_None));
+      if (!values[6]) values[6] = __Pyx_NewRef(((PyObject *)Py_None));
 
       /* "pyreadstat/pyreadstat.pyx":712
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,             # <<<<<<<<<<<<<<
  *                 dict variable_measure=None, dict variable_format=None):
  *     """
@@ -10427,7 +10427,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[9]) values[9] = __Pyx_NewRef(((PyObject*)Py_None));
 
       /* "pyreadstat/pyreadstat.pyx":713
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):             # <<<<<<<<<<<<<<
  *     """
@@ -10442,7 +10442,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_column_labels = values[3];
     __pyx_v_compress = values[4];
     __pyx_v_row_compress = values[5];
-    __pyx_v_note = ((PyObject*)values[6]);
+    __pyx_v_note = values[6];
     __pyx_v_variable_value_labels = ((PyObject*)values[7]);
     __pyx_v_missing_ranges = ((PyObject*)values[8]);
     __pyx_v_variable_display_width = ((PyObject*)values[9]);
@@ -10463,7 +10463,6 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_label), (&PyUnicode_Type), 1, "file_label", 1))) __PYX_ERR(0, 711, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_note), (&PyUnicode_Type), 1, "note", 1))) __PYX_ERR(0, 711, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_variable_value_labels), (&PyDict_Type), 1, "variable_value_labels", 1))) __PYX_ERR(0, 712, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_missing_ranges), (&PyDict_Type), 1, "missing_ranges", 1))) __PYX_ERR(0, 712, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_variable_display_width), (&PyDict_Type), 1, "variable_display_width", 1))) __PYX_ERR(0, 712, __pyx_L1_error)
@@ -10474,7 +10473,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   /* "pyreadstat/pyreadstat.pyx":711
  * # Write API
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
 */
@@ -10971,7 +10970,7 @@ static PyObject *__pyx_pf_10pyreadstat_10pyreadstat_17write_sav(CYTHON_UNUSED Py
   /* "pyreadstat/pyreadstat.pyx":711
  * # Write API
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
 */
@@ -13106,7 +13105,7 @@ __Pyx_RefNannySetupContext("PyInit_pyreadstat", 0);
   /* "pyreadstat/pyreadstat.pyx":711
  * # Write API
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
 */
@@ -13479,7 +13478,7 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   /* "pyreadstat/pyreadstat.pyx":711
  * # Write API
  * 
- * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,             # <<<<<<<<<<<<<<
+ * def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,             # <<<<<<<<<<<<<<
  *                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
  *                 dict variable_measure=None, dict variable_format=None):
 */
