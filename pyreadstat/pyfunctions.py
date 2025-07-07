@@ -1,7 +1,7 @@
 """
 Functions written in pure python
 """
-from copy import deepcopy
+from copy import deepcopy, copy
 
 #import pandas as pd
 import narwhals as nw
@@ -41,6 +41,7 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
         for var_name, label_name in metadata.variable_to_label.items():
             labels = metadata.value_labels.get(label_name)
             if labels:
+                labels = deepcopy(labels)
                 if var_name in df_copy.columns:
                     # replace_strict requires that all the values are in the map. Could not get map_batches or when/then/otherwise to work
                     unvals = df_copy[var_name].unique()
