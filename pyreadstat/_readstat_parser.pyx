@@ -28,7 +28,7 @@ import os
 import warnings
 import sys
 
-import pandas as pd
+#import pandas as pd
 import narwhals as nw
 import numpy as np
 #from pandas._libs import Timestamp
@@ -117,6 +117,7 @@ cdef class data_container:
         self.ctime = 0
         self.mtime = 0
         self.mr_sets = dict()
+        self.output_format = ""
         
 class metadata_container:
     """
@@ -453,7 +454,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef char * var_name, 
     cdef char * var_label
     cdef char * var_format
-    cdef str col_name, col_label, label_name, col_format_original
+    cdef str col_name, col_label, label_name, col_format_original, output_format
     cdef py_datetime_format col_format_final
     cdef readstat_type_t var_type
     cdef py_file_format file_format
@@ -472,6 +473,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef int dupcolcnt
 
     cdef  data_container dc = <data_container> ctx
+    output_format = dc.output_format
     
     # get variable name, label, format and type and put into our data container
     var_name = readstat_variable_get_name(variable)
@@ -548,12 +550,18 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     metaonly = dc.metaonly
     # pre-allocate data
     if metaonly:
-        row = np.empty(1, dtype=curnptype)
+        if output_format == "pandas":
+            row = np.empty(1, dtype=curnptype)
+        else:
+            row = list()
     else:
         obs_count = dc.n_obs
-        row = np.empty(obs_count, dtype=curnptype)
-        if iscurnptypeobject or iscurnptypefloat:
-            row.fill(np.nan)
+        if output_format == "pandas":
+            row = np.empty(obs_count, dtype=curnptype)
+            if iscurnptypeobject or iscurnptypefloat:
+                row.fill(np.nan)
+        else:
+            row = [None] * obs_count
     dc.col_data.append(row)
     
     # missing values
@@ -624,15 +632,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef object buf_list
     cdef bint iscurnptypeobject
     cdef bint iscurnptypefloat
-
     cdef int missing_tag
-
     cdef object pyvalue
     cdef set curset
     cdef object curnptype
+    cdef str output_format
     
     # extract variables we need from data container
     dc = <data_container> ctx
+    output_format = dc.output_format
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
@@ -646,11 +654,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             dc.max_n_obs = obs_index + 1
         var_max_rows = dc.col_data_len[index]
         if var_max_rows <= obs_index:
-            curnptype = dc.col_numpy_dtypes[index]
-            buf_list = np.empty(100000, dtype=curnptype)
-            if iscurnptypeobject or iscurnptypefloat:
-                buf_list.fill(np.nan)
-            dc.col_data[index] = np.append(dc.col_data[index], buf_list)
+            if output_format == "pandas":
+                curnptype = dc.col_numpy_dtypes[index]
+                buf_list = np.empty(100000, dtype=curnptype)
+                if iscurnptypeobject or iscurnptypefloat:
+                    buf_list.fill(np.nan)
+                dc.col_data[index] = np.append(dc.col_data[index], buf_list)
+            else:
+                buf_list = [None] * 100000
+                dc.col_data[index].extend(buf_list) 
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
 
@@ -658,18 +670,19 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     if readstat_value_is_missing(value, variable):
         # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
-            if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
-                # already allocated
-                pass
-                #dc.col_data[index][obs_index] = np.nan
-            # for any type except float, the numpy type will be object as now we have nans
-            else:
-                dc.col_numpy_dtypes[index] = object
-                dc.col_dtypes_isobject[index] = 1
-                iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
-                dc.col_data[index][obs_index:] = np.nan
-                #dc.col_data[index][obs_index] = NAN
+            if output_format == "pandas":
+                if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
+                    # already allocated
+                    pass
+                    #dc.col_data[index][obs_index] = np.nan
+                # for any type except float, the numpy type will be object as now we have nans
+                else:
+                    dc.col_numpy_dtypes[index] = object
+                    dc.col_dtypes_isobject[index] = 1
+                    iscurnptypeobject = 1
+                    dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
+                    dc.col_data[index][obs_index:] = np.nan
+                    #dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -680,14 +693,17 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
             # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
-            if iscurnptypeobject == 1:
-                dc.col_data[index][obs_index] =  chr(missing_tag) 
+            if output_format == "pandas":
+                if iscurnptypeobject == 1:
+                    dc.col_data[index][obs_index] =  chr(missing_tag) 
+                else:
+                    dc.col_numpy_dtypes[index] = object
+                    dc.col_dtypes_isobject[index] = 1
+                    dc.col_dytpes_isfloat[index] = 0
+                    iscurnptypeobject = 1
+                    dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
+                    dc.col_data[index][obs_index] =  chr(missing_tag)
             else:
-                dc.col_numpy_dtypes[index] = object
-                dc.col_dtypes_isobject[index] = 1
-                dc.col_dytpes_isfloat[index] = 0
-                iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
                 dc.col_data[index][obs_index] =  chr(missing_tag)
             curset = dc.missing_user_values.get(index)
             if curset is None:
@@ -943,30 +959,28 @@ cdef object data_container_to_dict(data_container data):
 
     return final_container
 
-
-cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
+cdef object dict_to_dataframe(object dict_data, data_container dc):
     """
     Transforms a dict of numpy arrays to a pandas data frame
     """
 
     cdef bint dates_as_pandas
     cdef int index
-    cdef str column
+    cdef str column, output_format
     cdef py_datetime_format var_format
     cdef list dtypes
 
     dates_as_pandas = dc.dates_as_pandas
-    # TODO: this function should take the output_format as arguement to pass as backend to narwhals
-    output_format = "pandas"
+    output_format = dc.output_format
 
     if dict_data:
+        #if output_format == "polars":
         data_frame = nw.from_dict(dict_data, backend=output_format)
         natnamespace = nw.get_native_namespace(data_frame)
         data_frame = data_frame.to_native()
 
         if dates_as_pandas and output_format=="pandas":
-            # TODO: uncomment line below once I can create an empty dataframe with narwhals
-            #pd = natnamespace
+            pd = natnamespace
             dtypes = data_frame.dtypes.tolist()
             # check that datetime columns are datetime type
             # this is needed in case all date values are nan
@@ -974,13 +988,23 @@ cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
                 var_format = dc.col_formats[index]
                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
                     data_frame[column] = pd.to_datetime(data_frame[column])
+
     else:
-        # TODO: how to do this with narwhals? from dict raies an error
-        data_frame = pd.DataFrame()
-        #data_frame = nw.from_dict({}, backend="pandas")
+        # creating an empty dataframe can currently not be done in narwhals
+        if output_format == "pandas":
+            try:
+                import pandas as pd
+                data_frame = pd.DataFrame()
+            except:
+                raise
+        elif output_format == "polars":
+            try:
+                import polars as pl
+                data_frame = pl.DataFrame()
+            except:
+                raise
 
     return data_frame
-
 
 cdef object data_container_extract_metadata(data_container data):
     """
@@ -1116,9 +1140,10 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     if output_format is None:
         output_format = 'pandas'
-    allowed_formats = {'pandas', 'dict'}
+    allowed_formats = {'pandas', 'dict', 'polars'}
     if output_format not in allowed_formats:
         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
+
 
     if extra_date_formats is not None:
         if file_format == FILE_FORMAT_SAS:
@@ -1160,6 +1185,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     data.file_format = file_format
     data.metaonly = metaonly
     data.dates_as_pandas = dates_as_pandas
+    data.output_format = output_format
 
     if encoding:
         data.user_encoding = encoding
@@ -1187,8 +1213,10 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     data_dict = data_container_to_dict(data)
     if output_format == 'dict':
         data_frame = data_dict
-    elif output_format == 'pandas':
-        data_frame = dict_to_pandas_dataframe(data_dict, data)
+    else:
+        #elif output_format == 'pandas':
+        data_frame = dict_to_dataframe(data_dict, data)
+        #data_frame = dict_to_pandas_dataframe(data_dict, data)
     metadata = data_container_extract_metadata(data)
 
     return data_frame, metadata

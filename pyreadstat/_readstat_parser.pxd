@@ -89,6 +89,7 @@ cdef class data_container:
     cdef int ctime
     cdef int mtime
     cdef dict mr_sets
+    cdef str output_format
     
 cdef dict readstat_to_numpy_types
 
@@ -107,7 +108,7 @@ cdef void check_exit_status(readstat_error_t retcode) except *
 
 cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset) except *
 cdef object data_container_to_dict(data_container data)
-cdef object dict_to_pandas_dataframe(object final_container, data_container data)
+cdef object dict_to_dataframe(object dict_data, data_container dc)
 cdef object data_container_extract_metadata(data_container data)
 cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
