@@ -48,6 +48,11 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                     for uval in unvals:
                         if uval not in labels:
                             labels[uval] = uval
+                    # in polars you cannot mix data types in the same colum with replace_strict or any other means
+                    # TODO: document this in the README!
+                    if not df_copy.implementation.is_pandas(): 
+                        if not all([type(v)==type(list(labels.values())[0]) for v in labels.values()]):
+                            labels = {k:str(v) for k,v in labels.items()}
                     df_copy = df_copy.with_columns(nw.col(var_name).replace_strict(labels))
                     if formats_as_ordered_category:
                         categories = list(set(labels.values()))

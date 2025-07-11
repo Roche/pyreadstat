@@ -681,29 +681,38 @@ class TestBasic(unittest.TestCase):
         df_sas, meta = pyreadstat.read_sav(sav_file,
                             apply_value_formats=True, user_missing=True,
                             formats_as_category=False, output_format=self.backend)
+        df_sas = nw.from_native(df_sas)
+        # in pandas the column will be object with 'missing' and 2.0
+        if self.backend == "pandas":
+            df_sas = df_sas.with_columns(nw.when(nw.col('var1')==2.0).then(nw.lit('2')).otherwise(nw.col('var1')).alias('var1')).to_native()
+        # in polars it will be a string column with 'missing and '2.0'
+        else:
+            df_sas = df_sas.with_columns(nw.when(nw.col('var1')=='2.0').then(nw.lit('2')).otherwise(nw.col('var1')).alias('var1')).to_native()
         #df_sas.loc[1, 'var1'] = int(df_sas['var1'][1])
         #df_sas['var1'] = df_sas['var1'].astype(str)
         df_csv = nw.read_csv(labeled_csv, backend=self.backend, **kwds).to_native()
-        import pdb;pdb.set_trace()
         self.assertTrue(df_sas.equals(df_csv))
-
-class UUU():
         
     def test_sav_missing_char(self):
-        df, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"))
-        mdf = pd.DataFrame([[np.nan], ["a"]], columns=["mychar"])
+        df, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), output_format=self.backend)
+        if self.backend == "pandas":
+            temp = np.nan
+        else:
+            temp = None
+        #mdf = pd.DataFrame([[np.nan], ["a"]], columns=["mychar"])
+        mdf = nw.from_dict({"mychar": [temp, "a"]}, backend=self.backend).to_native()
         self.assertTrue(df.equals(mdf))
         self.assertTrue(meta.missing_ranges == {})
-        df2, meta2 = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), user_missing=True)
-        mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
+        df2, meta2 = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), user_missing=True, output_format=self.backend)
+        #mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
+        mdf2 = nw.from_dict({"mychar": [ "Z", "a"]}, backend=self.backend).to_native()
         self.assertTrue(df2.equals(mdf2))
         self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
-    
-    # test reading metadata for multiple response data
 
+    # test reading metadata for multiple response data
     def test_sav_multiple_response(self):
         """Assert MR data is correctly read from sav into metadata."""
-        _, meta = pyreadstat.read_sav(os.path.join(self.mr_data_folder, "simple_alltypes.sav"))
+        _, meta = pyreadstat.read_sav(os.path.join(self.mr_data_folder, "simple_alltypes.sav"), output_format=self.backend)
         assert meta.mr_sets == {
             "categorical_array": {
                 "type": "C",
@@ -723,38 +732,44 @@ class UUU():
     
     def test_sav_without_multiple_response(self):
         """Assert MR data is read as empty dict when not present in sav."""
-        _, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"))
+        _, meta = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), output_format=self.backend)
         assert meta.mr_sets == {}
+
 
     # read in chunks
 
     def test_chunk_reader(self):
         fpath = os.path.join(self.basic_data_folder, "sample.sas7bdat")
-        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 2, offset=1, limit=2, disable_datetime_conversion=True)
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sas7bdat, fpath, chunksize= 2, offset=1, limit=2, disable_datetime_conversion=True, output_format=self.backend)
         
         for df, meta in reader:
             pass
         
-        currow = self.df_nodates_sastata.iloc[1:3,:].reset_index(drop=True)
+        currow = nw.from_native(self.df_nodates_sastata)[1:3].to_native()
+        if self.backend == "pandas":
+            currow = currow.reset_index(drop=True)
         self.assertTrue(df.equals(currow))
 
     # read multiprocessing
 
     def test_multiprocess_reader(self):
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
-        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath) 
-        df_single, meta_single = pyreadstat.read_sav(fpath)
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, output_format=self.backend) 
+        df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
         self.assertTrue(df_multi.equals(df_single))
         self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
 
     def test_chunk_reader_multiprocess(self):
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
-        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True)
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True, output_format=self.backend)
         alldfs = list()
         for df, meta in reader:
-            alldfs.append(df)
-        df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
-        df_single, meta_single = pyreadstat.read_sav(fpath)
+            alldfs.append(nw.from_native(df))
+        df_multi = nw.concat(alldfs, how='vertical').to_native() 
+        #df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
+        if self.backend == "pandas":
+            df_multi = df_multi.reset_index(drop=True)
+        df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
         self.assertTrue(df_multi.equals(df_single))
 
     def test_chunk_reader_multiprocess_dict(self):
@@ -762,18 +777,26 @@ class UUU():
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True, output_format='dict')
         alldfs = list()
         for chunkdict, meta in reader:
-            df = pd.DataFrame(chunkdict)
+            #df = pd.DataFrame(chunkdict)
+            if self.backend != "pandas":
+                # we need lists not numpy arrays for polars!
+                chunkdict = {k:v.tolist() for k,v in chunkdict.items()}
+            df = nw.from_dict(chunkdict, backend=self.backend)
             alldfs.append(df)
-        df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
-        df_single, meta_single = pyreadstat.read_sav(fpath)
+        #df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
+        df_multi = nw.concat(alldfs, how='vertical').to_native() 
+        if self.backend == "pandas":
+            df_multi = df_multi.reset_index(drop=True)
+        df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
+        #import pdb;pdb.set_trace()
         self.assertTrue(df_multi.equals(df_single))
-
 
     def test_multiprocess_reader_xport(self):
         fpath = os.path.join(self.basic_data_folder, "sample.xpt")
-        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_xport, fpath, num_rows=1000) 
-        df_single, meta_single = pyreadstat.read_xport(fpath)
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_xport, fpath, num_rows=1000, output_format=self.backend) 
+        df_single, meta_single = pyreadstat.read_xport(fpath, output_format=self.backend)
         self.assertTrue(df_multi.equals(df_single))
+
 
     # writing
 
@@ -790,7 +813,7 @@ class UUU():
         pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
             variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
             variable_measure=variable_measure) #, variable_alignment=variable_alignment)
-        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        df, meta = pyreadstat.read_sav(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
@@ -813,7 +836,7 @@ class UUU():
         pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
             variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
             variable_measure=variable_measure) #, variable_alignment=variable_alignment)
-        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        df, meta = pyreadstat.read_sav(path, user_missing=True, output_format=self.backend)
         os.remove(os.path.expanduser(path))
         self.assertTrue(df.equals(self.df_pandas))
 
@@ -826,14 +849,16 @@ class UUU():
         path = os.path.join(self.write_folder, "basic_write.zsav")
         pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, compress=True, note=file_note,
                      variable_value_labels=variable_value_labels, missing_ranges=missing_ranges)
-        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        df, meta = pyreadstat.read_sav(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertEqual(meta.notes[0], file_note)
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
+class UUU():
     def test_dta_write_basic(self):
+        #df_pandas = self.df_pandas.copy()
         df_pandas = self.df_pandas.copy()
         df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
         df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int32)
