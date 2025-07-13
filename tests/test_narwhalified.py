@@ -181,9 +181,10 @@ class TestBasic(unittest.TestCase):
             self.df_sas_dates = df_dates2
             self.df_sas_dates2 = pd.concat([self.df_sas_dates, pd.DataFrame([[np.nan, pd.NaT, np.nan]],columns=["date", "dtime", "time"])], ignore_index=True)
         else:
-            df_dates2 = df_dates_raw.clone()
+            df_dates2 = df_dates_raw.clone()#.with_columns(nw.col("time").cast(nw.Time))
             self.df_sas_dates = df_dates2.to_native()
-            self.df_sas_dates2 = nw.concat([df_dates2, nw.from_dict({"date":[None], "dtime":[None], "time":[None]}, backend=backend)]).to_native()
+            #schema = {"date": nw.Date, "dtime": nw.Datetime("ns"), "time": nw.Time()}
+            self.df_sas_dates2 = nw.concat([df_dates2, nw.from_dict({"date":[None], "dtime":[None], "time":[None]}, backend=backend)]).to_native() #, schema=schema
 
         return
 
@@ -856,22 +857,23 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.notes[0], file_note)
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
-class UUU():
     def test_dta_write_basic(self):
         #df_pandas = self.df_pandas.copy()
-        df_pandas = self.df_pandas.copy()
-        df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
-        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int32)
+        df_pandas = nw.from_native(self.df_pandas).clone()
+        df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Int64)).to_native()
+        #df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
+        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int32)
 
         file_label = "basic write"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
         variable_value_labels = {'mylabl': {1: 'Male', 2: 'Female'}, 'myord': {1: 'low', 2: 'medium', 3: 'high'}}
         path = os.path.join(self.write_folder, "basic_write.dta")
         pyreadstat.write_dta(df_pandas, path, file_label=file_label, column_labels=col_labels, version=12, variable_value_labels=variable_value_labels)
-        df, meta = pyreadstat.read_dta(path)
+        df, meta = pyreadstat.read_dta(path, output_format=self.backend)
 
-        df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
-        df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
+        df_pandas = nw.from_native(df_pandas).with_columns(nw.col("myord", "mylabl").cast(nw.Int64)).to_native()
+        #df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
+        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
 
         self.assertTrue(df.equals(df_pandas))
         self.assertEqual(meta.file_label, file_label)
@@ -879,20 +881,27 @@ class UUU():
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_dta_write_user_missing(self):
-        df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
-        df_csv2 = pd.DataFrame([[3,"a"],["labeled","b"]], columns=["Var1", "Var2"])
+        #df_csv = pl.from_dict({"Var1": [3, "a"], "Var2":["a", "b"]}, strict=True, schema={"Var1":pl.Object, "Var2":pl.String})
+        #df_csv2 = pl.from_dict({"Var1": [3, "a"], "Var2":["labeles", "b"]}, strict=False)
+        df_csv = nw.from_dict({"Var1": [3, "a"], "Var2":["a", "b"]}, backend=self.backend, schema={"Var1":nw.Object, "Var2":nw.String})
+        df_csv2 = nw.from_dict({"Var1": [3, "a"], "Var2":["labeles", "b"]}, backend=self.backend, schema={"Var1":nw.Object, "Var2":nw.String})
+        #df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
+        #df_csv2 = pd.DataFrame([[3,"a"],["labeled","b"]], columns=["Var1", "Var2"])
+        #import pdb;pdb.set_trace()
 
         missing_user_values = {'Var1': ['a']}
         variable_value_labels = {'Var1':{'a':'labeled'}}
         path = os.path.join(self.write_folder, "user_missing_write.dta")
         pyreadstat.write_dta(df_csv, path, version=12, missing_user_values=missing_user_values, variable_value_labels=variable_value_labels)
         
-        df_dta, meta = pyreadstat.read_dta(path, user_missing=True)
+        df_dta, meta = pyreadstat.read_dta(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df_csv.equals(df_dta))
         self.assertDictEqual(meta.missing_user_values, missing_user_values)
         
-        df_dta2, meta2 = pyreadstat.read_dta(path, user_missing=True, apply_value_formats=True, formats_as_category=False)
+        df_dta2, meta2 = pyreadstat.read_dta(path, user_missing=True, apply_value_formats=True, formats_as_category=False, output_format=self.backend)
         self.assertTrue(df_csv2.equals(df_dta2))
+
+class UUU():
 
     def test_xport_write_basic_v8(self):
         file_label = "basic write"
