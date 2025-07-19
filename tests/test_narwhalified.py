@@ -41,7 +41,7 @@ class TestBasic(unittest.TestCase):
 
     def _prepare_data(self):
         
-        backend = 'polars'
+        backend = 'pandas'
         self.backend = backend
 
         self.script_folder = os.path.dirname(os.path.realpath(__file__))
@@ -194,22 +194,22 @@ class TestBasic(unittest.TestCase):
         # long string
 
         self.df_longstr = nw.from_dict({
-                "v1": {
-                    "10001": """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac pretium sem. Fusce aliquet
+                "v1": [
+                     """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac pretium sem. Fusce aliquet
                     augue rhoncus consequat pulvinar. In est ex, porta congue diam sed, laoreet suscipit purus. Phasellus mollis
                     lobortis tellus at vehicula. Etiam egestas augue id massa bibendum volutpat id et ipsum. Praesent ut lorem
                     rhoncus, pharetra risus sed, pharetra sem. In pulvinar egestas erat, id condimentum tortor tempus sed. Duis
                     ornare lacus ut ligula congue, non convallis urna dignissim. Etiam vehicula turpis sit amet nisi finibus
                     laoreet. Duis molestie consequat nulla, non lobortis est tempus sit amet. Quisque elit est,
-                    congue non commodo vitae, porttitor ac erat. """,
-                    "10002": "fgsdghshsgh",
-                    "10003": "gsfdgsdg",
-                },
-                "v2": {
-                    "10001": "gsfdgsfdgsfg",
-                    "10002": "fgsdghshsgh",
-                    "10003": "gsfdgsdg",
-                },
+                    congue non commodo vitae, porttitor ac erat. """ *3,
+                     "fgsdghshsgh",
+                     "gsfdgsdg",
+                ],
+                "v2": [
+                     "gsfdgsfdgsfg",
+                     "fgsdghshsgh",
+                     "gsfdgsdg",
+                ],
 
             }, backend=backend).to_native()
 
@@ -1111,77 +1111,64 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.readstat_variable_types['Finished'],'double')
 
     def test_sav_write_longstr(self):
-        # TODO! failing in polars, detection of string failing?
-        if self.backend == "polars":
-            self.assertTrue(True)
-            return
         path = os.path.join(self.write_folder, "longstr.sav")
         pyreadstat.write_sav(self.df_longstr, path, variable_display_width={"v1": 1000})
         df, meta = pyreadstat.read_sav(path, output_format=self.backend)
         self.assertTrue(meta.variable_display_width['v1']==1000)
-        self.assertTrue(len(nw.from_native(df)[0,0])==781)
+        self.assertTrue(len(nw.from_native(df)[0,0])==2345)
 
-class UUU():
     def test_dta_write_longstr(self):
         path = os.path.join(self.write_folder, "longstr.dta")
         df_longstr = self.df_longstr
-        # for dta string ref the threshold is 2045, so we need to make the string longer
-        if self.backend == "polars":
-            first_col = df_longstr.columns[0]
-            df_longstr = df_longstr.with_columns(
-                pl.when(pl.int_range(0, pl.count()) == 0)
-                .then(pl.col(first_col) * 3)
-                .otherwise(pl.col(first_col))
-                .alias(first_col)
-            )
-        elif self.backend=="polars":
-            df_longstr.iloc[0,0] = df_longstr.iloc[0,0]*3
         pyreadstat.write_dta(self.df_longstr, path)
         df, meta = pyreadstat.read_dta(path, output_format=self.backend)
-        self.assertTrue(df.equals(df_longstr.reset_index(drop=True)))
+        self.assertTrue(df.equals(df_longstr))
         
         
     def test_sas7bdat_file_label_linux(self):
         "testing file label for file produced on linux"
         path = os.path.join(self.basic_data_folder, "test_file_label_linux.sas7bdat")
-        df, meta = pyreadstat.read_sas7bdat(path)
+        df, meta = pyreadstat.read_sas7bdat(path, output_format=self.backend)
         self.assertEqual(meta.file_label, "mytest label")
         self.assertEqual(meta.table_name, "TEST_DATA")
 
     def test_sas7bdat_extra_date_formats(self):
         "testing extra date format argument"
         path = os.path.join(self.basic_data_folder, "date_test.sas7bdat")
-        df, meta = pyreadstat.read_sas7bdat(path, extra_date_formats=["MMYY", "YEAR"])
-        self.assertEqual(df['yr'].iloc[0], date(2023,1,1))
-        self.assertEqual(df['dtc4'].iloc[0], date(2023,7,1))
+        df, meta = pyreadstat.read_sas7bdat(path, extra_date_formats=["MMYY", "YEAR"], output_format=self.backend)
+        self.assertEqual(nw.from_native(df)['yr'][0], date(2023,1,1))
+        self.assertEqual(nw.from_native(df)['dtc4'][0], date(2023,7,1))
 
     def test_sas7bdat_file_label_windows(self):
         "testing file label for file produced on windows"
         path = os.path.join(self.basic_data_folder, "test_file_label_win.sas7bdat")
-        df, meta = pyreadstat.read_sas7bdat(path)
+        df, meta = pyreadstat.read_sas7bdat(path, output_format=self.backend)
         self.assertEqual(meta.file_label, "mytest label")
         self.assertEqual(meta.table_name, "TEST_DATA")
 
     def test_sav_write_variable_formats(self):
         "testing variable formats for SAV files"
         path = os.path.join(self.write_folder, "variable_format.sav")
-        df = pd.DataFrame({'restricted':[1023, 10], 'integer':[1,2]})
+        #df = pd.DataFrame({'restricted':[1023, 10], 'integer':[1,2]})
+        df = nw.from_dict({'restricted':[1023, 10], 'integer':[1,2]}, backend=self.backend)
         formats = {'restricted':'restricted_integer', 'integer':'integer'}
         pyreadstat.write_sav(df, path, variable_format=formats)
-        df2, meta2 = pyreadstat.read_sav(path)
+        df2, meta2 = pyreadstat.read_sav(path, output_format=self.backend)
         self.assertEqual(meta2.original_variable_types['restricted'], "N4")
         self.assertEqual(meta2.original_variable_types['integer'], "F1.0")
 
     def test_sav_ordered_categories(self):
         path = os.path.join(self.basic_data_folder, "ordered_category.sav")
-        df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True)
-        self.assertTrue(df.Col1.cat.ordered)
-        self.assertListEqual(list(df.Col1.cat.categories), ['high', 'low', 'medium'])
+        df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True, output_format=self.backend)
+        # TODO: is it possible to know if the categories are ordered? maybe only in pandas?
+        if self.backend == "pandas":
+            self.assertTrue(df["Col1"].cat.ordered)
+        self.assertListEqual(list(nw.from_native(df)["Col1"].cat.get_categories().to_list()), ['high', 'low', 'medium'])
 
     def test_sav_pathlib(self):
         if is_pathlib_available:
             path = Path(self.basic_data_folder).joinpath("sample.sav")
-            df, meta = pyreadstat.read_sav(path)
+            df, meta = pyreadstat.read_sav(path, output_format=self.backend)
             self.assertTrue(df.equals(self.df_pandas))
 
     def test_sav_write_pathlib(self):
@@ -1198,7 +1185,7 @@ class UUU():
             pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
                 variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
                 variable_measure=variable_measure) #, variable_alignment=variable_alignment)
-            df, meta = pyreadstat.read_sav(path, user_missing=True)
+            df, meta = pyreadstat.read_sav(path, user_missing=True, output_format=self.backend)
             self.assertTrue(df.equals(self.df_pandas))
             self.assertEqual(meta.file_label, file_label)
             self.assertListEqual(meta.column_labels, col_labels)
@@ -1216,25 +1203,29 @@ class UUU():
         missing_ranges = {'mychar':['a'], 'myord': [{'hi':2, 'lo':1}]}
         path = os.path.join(self.write_folder, "dictlabel_write.sav")
         pyreadstat.write_sav(self.df_pandas, path, column_labels=col_lab_dict)
-        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        df, meta = pyreadstat.read_sav(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertListEqual(meta.column_labels, col_labels)
     
     def test_dta_write_single_value_user_missing(self):
-        df = pd.DataFrame({"var": ["a", "a", "a", "a"]})
+        df = nw.from_dict({"var": ["a", "a", "a", "a"]}, backend=self.backend).to_native()
         missing_user_values = {"var": ["a"]}
         path = os.path.join(self.write_folder, "singleusermissing.dta")
         pyreadstat.write_dta(df=df, dst_path=path, missing_user_values=missing_user_values,version=12) 
-        df2, meta2 = pyreadstat.read_dta(path, user_missing=True)
+        df2, meta2 = pyreadstat.read_dta(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df.equals(df2))
 
     def test_dta_write_only_missing_and_user_missing(self):
-        df = pd.DataFrame({"var": [np.nan, "a", "b"]})
+        if self.backend=="pandas":
+            temp = np.nan
+        else:
+            temp = None
+        df = nw.from_dict({"var": [temp, "a", "b"]}, backend=self.backend).to_native()
         path = os.path.join(self.write_folder, "onlymissing_and_usermissing.dta")
         variable_value_labels={"var": {1: "Val 1", 2: "Val 2", 3: "Val 3", "a": "Missing A", "b": "Missing B", } }
         missing_user_values={"var": ["a", "b"]}
         pyreadstat.write_dta(df, path, variable_value_labels=variable_value_labels, missing_user_values=missing_user_values,version=12)
-        df2, meta2 = pyreadstat.read_dta(path, user_missing=True, )
+        df2, meta2 = pyreadstat.read_dta(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df.equals(df2))
 
     def test_sav_outputformat_dict(self):
@@ -1247,7 +1238,10 @@ class UUU():
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
-        padic = self.df_pandas.to_dict(orient='list')
+        kwds = {}
+        if self.backend == "pandas":
+            kwds['orient'] = 'list'
+        padic = self.df_pandas.to_dict(**kwds)
         for colname, data in df.items():
             curdfcol = df[colname]
             for indx, val in enumerate(data):
@@ -1268,7 +1262,7 @@ class UUU():
         pyreadstat.write_sav(self.df_pandas, path, file_label=file_label, column_labels=col_labels, note=file_note, 
             variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
             variable_measure=variable_measure, row_compress=True) #, variable_alignment=variable_alignment)
-        df, meta = pyreadstat.read_sav(path, user_missing=True)
+        df, meta = pyreadstat.read_sav(path, user_missing=True, output_format=self.backend)
         self.assertTrue(df.equals(self.df_pandas))
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
