@@ -41,7 +41,7 @@ class TestBasic(unittest.TestCase):
 
     def _prepare_data(self):
         
-        backend = 'pandas'
+        backend = 'polars'
         self.backend = backend
 
         self.script_folder = os.path.dirname(os.path.realpath(__file__))
@@ -189,7 +189,7 @@ class TestBasic(unittest.TestCase):
         if backend == "pandas":
             self.df_charnan = pd.DataFrame([[0,np.nan,np.nan],[1,"test", timedelta]], columns = ["integer", "string", "object"])
         else:
-            self.df_charnan = nw.from_dict({'integer': [0, 1], "string": [None, "test"], "object": [None, timedelta]}, backend=backend)
+            self.df_charnan = nw.from_dict({'integer': [0, 1], "string": [None, "test"], "object": [None, timedelta]}, backend=backend).to_native()
 
         # long string
 
@@ -976,22 +976,28 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_sav_write_charnan(self):
-        # TODO: polars failing in _readstat_writer L297: cast to string from object fails
+        # TODO: this is failing in polars because of mixing numbers and strings, 
+        # cannot cast object to str for test to pass
         if self.backend == "polars":
             self.assertTrue(True)
             return
         path = os.path.join(self.write_folder, "charnan.sav")
         pyreadstat.write_sav(self.df_charnan, path)
         df, meta = pyreadstat.read_sav(path, output_format=self.backend)
-        df2 = self.df_charnan
-        df2.iloc[0,1] = ""
-        df2.iloc[0,2] = ""
-        df2['integer'] = df2["integer"].astype(float)
-        df2['object'] = df2['object'].astype(str)
+        df2 = nw.from_native(self.df_charnan)
+        df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
+        df2 = df2.with_columns(nw.col("integer").cast(nw.Int64))
+        df2 = df2.with_columns(nw.col("object").cast(nw.String))
+        df2 = df2.to_native()
+        #df2.iloc[0,1] = ""
+        #df2.iloc[0,2] = ""
+        #df2['integer'] = df2["integer"].astype(float)
+        #df2['object'] = df2['object'].astype(str)
         self.assertTrue(df2.equals(df))
 
     def test_zsav_write_charnan(self):
-        # TODO: polars failing in _readstat_writer L297: cast to string from object fails
+        # TODO: this is failing in polars because of mixing numbers and strings, 
+        # cannot cast object to str for test to pass
         if self.backend == "polars":
             self.assertTrue(True)
             return
@@ -1006,7 +1012,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df2.equals(df))
 
     def test_xport_write_charnan(self):
-        # TODO: polars failing in _readstat_writer L297: cast to string from object fails
+        # TODO: this is failing in polars because of mixing numbers and strings, 
+        # cannot cast object to str for test to pass
         if self.backend == "polars":
             self.assertTrue(True)
             return
@@ -1022,7 +1029,8 @@ class TestBasic(unittest.TestCase):
 
 
     def test_por_write_charnan(self):
-        # TODO: polars failing in _readstat_writer L297: cast to string from object fails
+        # TODO: this is failing in polars because of mixing numbers and strings, 
+        # cannot cast object to str for test to pass
         if self.backend == "polars":
             self.assertTrue(True)
             return
@@ -1038,7 +1046,8 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df2.equals(df))
 
     def test_dta_write_charnan(self):
-        # TODO: polars failing in _readstat_writer L297: cast to string from object fails
+        # TODO: this is failing in polars because of mixing numbers and strings, 
+        # cannot cast object to str for test to pass
         if self.backend == "polars":
             self.assertTrue(True)
             return

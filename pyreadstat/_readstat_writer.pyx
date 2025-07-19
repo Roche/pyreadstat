@@ -153,15 +153,17 @@ cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, py
     else:
         raise PyreadstatError("Unknown pywriter variable format")
 
-cdef int get_narwhals_str_series_max_length(object series, dict value_labels):
-    """ For a pandas string series get the max length of the strings. Assumes there is no NaN among the elements. 
+cdef int get_narwhals_str_series_max_length(object series, dict value_labels, bint isobject):
+    """ For a string series get the max length of the strings. Assumes there is no NaN among the elements. 
     """
-    cdef str val
+    cdef object val
     cdef bytes temp
     cdef int max_length = 1
     cdef int curlen
     cdef list labels
     for val in series:
+        if isobject:
+            val = str(val)
         temp = val.encode("utf-8")
         curlen = len(temp)
         if curlen > max_length:
@@ -268,7 +270,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         # these types here should not contain missing_user_values,
         # for string we still check, as later we will raise an error
         elif col_type == nwd.String or curtype == str:
-            max_length = get_narwhals_str_series_max_length(curseries, variable_value_labels.get(col_name))
+            max_length = get_narwhals_str_series_max_length(curseries, variable_value_labels.get(col_name), 0)
             if dta_str_max_len and max_length >= dta_str_max_len:
                 result.append((PYWRITER_DTA_STR_REF, max_length, has_missing))
                 continue
@@ -294,7 +296,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             continue
 
         # if the object was not captured by any of the previous cases, we transform it to string
-        max_length = get_narwhals_str_series_max_length(curseries.cast(nwd.String), variable_value_labels.get(col_name))
+        max_length = get_narwhals_str_series_max_length(curseries, variable_value_labels.get(col_name), 1)
         if dta_str_max_len and max_length >= dta_str_max_len:
             result.append((PYWRITER_DTA_STR_REF, max_length, has_missing))
         else:

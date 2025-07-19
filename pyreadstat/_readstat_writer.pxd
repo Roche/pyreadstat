@@ -76,7 +76,7 @@ ctypedef enum pywriter_variable_type:
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *
 cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, pywriter_variable_type curtype)
-cdef int get_narwhals_str_series_max_length(object series, dict value_labels)
+cdef int get_narwhals_str_series_max_length(object series, dict value_labels, bint isobject)
 cdef int check_series_all_same_types(object series, object type_to_check)
 cdef list get_narwhals_column_types(object df, dict missing_user_values, dict variable_value_labels, int dta_str_max_len)
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx)
