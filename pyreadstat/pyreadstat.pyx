@@ -16,7 +16,6 @@
 # limitations under the License.
 # #############################################################################
 
-# TODO:
 ## if want to profile: # cython: profile=True
 
 import multiprocessing as mp
@@ -34,7 +33,6 @@ from _readstat_parser import  PyreadstatError
 from _readstat_writer cimport run_write
 cimport _readstat_parser, _readstat_writer
 from worker import worker
-# TODO: narwhalify pyfunctions
 from pyfunctions import set_value_labels, set_catalog_to_sas
 
 # Public interface

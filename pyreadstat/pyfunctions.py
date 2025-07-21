@@ -3,7 +3,6 @@ Functions written in pure python
 """
 from copy import deepcopy, copy
 
-#import pandas as pd
 import narwhals as nw
 
 # Functions to deal with value labels
@@ -34,7 +33,6 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
             otherwise
     """
 
-    #df_copy = dataframe.copy()
     df_copy = nw.from_native(dataframe).clone()
 
     if metadata.value_labels and metadata.variable_to_label:
@@ -44,16 +42,19 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                 labels = deepcopy(labels)
                 if var_name in df_copy.columns:
                     # replace_strict requires that all the values are in the map. Could not get map_batches or when/then/otherwise to work
-                    unvals = df_copy[var_name].unique()
+                    # unique does not work for polars Object
+                    unvals = list(set(df_copy[var_name].to_list()))
+                    #unvals = df_copy[var_name].unique()
                     for uval in unvals:
                         if uval not in labels:
                             labels[uval] = uval
-                    # in polars you cannot mix data types in the same colum with replace_strict or any other means
-                    # TODO: document this in the README!
-                    if not df_copy.implementation.is_pandas(): 
-                        if not all([type(v)==type(list(labels.values())[0]) for v in labels.values()]):
-                            labels = {k:str(v) for k,v in labels.items()}
-                    df_copy = df_copy.with_columns(nw.col(var_name).replace_strict(labels))
+                    if not df_copy.implementation.is_pandas() and (df_copy[var_name].dtype==nw.Object or not all([type(v)==type(list(labels.values())[0]) for v in labels.values()])):
+                        # polars is very difficult to convince to mix strings and numbers, so we have to do it this way
+                        temp = [labels[x] for x in df_copy[var_name]]
+                        newser = nw.new_series(name=var_name, values= temp, dtype=nw.Object, backend=df_copy.implementation) 
+                        df_copy = df_copy.with_columns(newser.alias(var_name))
+                    else:
+                        df_copy = df_copy.with_columns(nw.col(var_name).replace_strict(labels))
                     if formats_as_ordered_category:
                         categories = list(set(labels.values()))
                         original_values = list(labels.keys())
@@ -65,16 +66,8 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                                 revdict[curcat] = orival
                         categories.sort(key=revdict.get)
                         df_copy = df_copy.with_columns(nw.col(var_name).cast(nw.Enum(categories)))
-                        # TODO: check the test ordered categories, why high<low<medium?
-                        #df_copy[var_name] = nw.Categorical(
-                            #df_copy[var_name],
-                            #ordered = True,
-                            #categories = categories
-                        #)
                     elif formats_as_category:
-                        # TODO: check that this is correct in the test
                         df_copy = df_copy.with_columns(nw.col(var_name).cast(nw.Categorical))
-                        #df_copy[var_name] = df_copy[var_name].astype("category")
 
 
     return df_copy.to_native()

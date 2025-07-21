@@ -203,6 +203,7 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     Transforms a tstamp integer value to a date, time or datetime pyton object.
     tstamp could represent number of days, seconds or milliseconds
     """
+    #TODO: for polars enable vectorized transformation!
     
     cdef object tdelta
     cdef int days
@@ -964,18 +965,41 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
     Transforms a dict of numpy arrays to a pandas data frame
     """
 
-    cdef bint dates_as_pandas
+    cdef bint dates_as_pandas, allsame
     cdef int index
-    cdef str column, output_format
+    cdef str column, output_format, col_name
     cdef py_datetime_format var_format
-    cdef list dtypes
+    cdef list dtypes, sertypes
+    cdef dict schema = None
 
     dates_as_pandas = dc.dates_as_pandas
     output_format = dc.output_format
 
     if dict_data:
-        #if output_format == "polars":
-        data_frame = nw.from_dict(dict_data, backend=output_format)
+        #schema = None
+        # in polars if missing user values we need to explicitly set the type 
+        # of that column to Object if not all the elements are of the same type
+        if output_format != "pandas" and dc.missing_user_values:
+            schema = dict()
+            for indx in range(0, len(dc.col_names)):
+                col_name = dc.col_names[indx]
+                if indx in dc.missing_user_values.keys():
+                    sertypes = [type(x) for x in dict_data[col_name] if x is not None]
+                    # all missing, let polars decide
+                    if not sertypes:
+                        schema[col_name] = None
+                        continue
+                    allsame = all([x==sertypes[0] for x in sertypes])
+                    # all the same: let polars decide
+                    if allsame:
+                        schema[col_name] = None
+                    # not all the same type, has to be Object
+                    else:
+                        schema[col_name] = nw.Object
+                else:
+                    schema[col_name] = None
+
+        data_frame = nw.from_dict(dict_data, backend=output_format, schema=schema)
         natnamespace = nw.get_native_namespace(data_frame)
         data_frame = data_frame.to_native()
 

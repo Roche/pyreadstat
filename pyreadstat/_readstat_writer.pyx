@@ -227,7 +227,10 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         if missing_user_values:
             curuser_missing = missing_user_values.get(col_name)
         if curuser_missing:
-            curseries = curseries.filter(~curseries.is_in(curuser_missing))
+            if not df.implementation.is_pandas() and col_type == nwd.Object:
+                curseries = [x for x in curseries if x not in curuser_missing]
+            else:
+                curseries = curseries.filter(~curseries.is_in(curuser_missing))
             if not len(curseries):
                 result.append((PYWRITER_DOUBLE, 0, 1))
                 continue

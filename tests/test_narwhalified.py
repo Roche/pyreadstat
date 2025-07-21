@@ -424,7 +424,6 @@ class TestBasic(unittest.TestCase):
 
     def test_sav_formatted(self):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.sav"), apply_value_formats=True, formats_as_category=True, output_format=self.backend)
-        #df.columns = self.df_pandas_formatted.columns
         self.assertTrue(df.equals(self.df_pandas_formatted))
         self.assertTrue(meta.number_columns == len(self.df_pandas_formatted.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas_formatted))
@@ -686,9 +685,9 @@ class TestBasic(unittest.TestCase):
             df_sas = df_sas.with_columns(nw.when(nw.col('var1')==2.0).then(nw.lit('2')).otherwise(nw.col('var1')).alias('var1')).to_native()
         # in polars it will be a string column with 'missing and '2.0'
         else:
+            new_ser = nw.new_series(name="var1", values=[str(x) for x in df_sas["var1"]], dtype=nw.String, backend=self.backend)
+            df_sas = df_sas.with_columns(new_ser.alias("var1"))
             df_sas = df_sas.with_columns(nw.when(nw.col('var1')=='2.0').then(nw.lit('2')).otherwise(nw.col('var1')).alias('var1')).to_native()
-        #df_sas.loc[1, 'var1'] = int(df_sas['var1'][1])
-        #df_sas['var1'] = df_sas['var1'].astype(str)
         df_csv = nw.read_csv(labeled_csv, backend=self.backend, **kwds).to_native()
         self.assertTrue(df_sas.equals(df_csv))
         
@@ -751,6 +750,7 @@ class TestBasic(unittest.TestCase):
 
     # read multiprocessing
 
+    # TODO: check os.fork warning
     def test_multiprocess_reader(self):
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
         df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, output_format=self.backend) 
@@ -787,7 +787,6 @@ class TestBasic(unittest.TestCase):
         if self.backend == "pandas":
             df_multi = df_multi.reset_index(drop=True)
         df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
-        #import pdb;pdb.set_trace()
         self.assertTrue(df_multi.equals(df_single))
 
     def test_multiprocess_reader_xport(self):
@@ -879,17 +878,13 @@ class TestBasic(unittest.TestCase):
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_dta_write_user_missing(self):
-        # TODO: this is failing in polars because of mixing numbers and strings, 
-        # also fails in pandas because of nw bug in schema nw.Object
-        self.assertTrue(True)
-        return
-        #df_csv = pl.from_dict({"Var1": [3, "a"], "Var2":["a", "b"]}, strict=True, schema={"Var1":pl.Object, "Var2":pl.String})
-        #df_csv2 = pl.from_dict({"Var1": [3, "a"], "Var2":["labeles", "b"]}, strict=False)
-        df_csv = nw.from_dict({"Var1": [3, "a"], "Var2":["a", "b"]}, backend=self.backend, schema={"Var1":nw.Object, "Var2":nw.String})
-        df_csv2 = nw.from_dict({"Var1": [3, "a"], "Var2":["labeles", "b"]}, backend=self.backend, schema={"Var1":nw.Object, "Var2":nw.String})
-        #df_csv = pd.DataFrame([[3,"a"],["a","b"]], columns=["Var1", "Var2"])
-        #df_csv2 = pd.DataFrame([[3,"a"],["labeled","b"]], columns=["Var1", "Var2"])
-        #import pdb;pdb.set_trace()
+        # bug in nw, nw.Object is not translated to pd.Object
+        if self.backend == "pandas":
+            df_csv = pd.DataFrame.from_dict({"Var1": [3, "a"], "Var2":["a", "b"]})
+            df_csv2 = pd.DataFrame.from_dict({"Var1": [3, "labeled"], "Var2":["a", "b"]})
+        else:
+            df_csv = nw.from_dict({"Var1": [3, "a"], "Var2":["a", "b"]}, backend=self.backend, schema={"Var1":nw.Object, "Var2":nw.String}).to_native()
+            df_csv2 = nw.from_dict({"Var1": [3, "labeled"], "Var2":["a", "b"]}, backend=self.backend, schema={"Var1":nw.Object, "Var2":nw.String}).to_native()
 
         missing_user_values = {'Var1': ['a']}
         variable_value_labels = {'Var1':{'a':'labeled'}}
@@ -897,10 +892,22 @@ class TestBasic(unittest.TestCase):
         pyreadstat.write_dta(df_csv, path, version=12, missing_user_values=missing_user_values, variable_value_labels=variable_value_labels)
         
         df_dta, meta = pyreadstat.read_dta(path, user_missing=True, output_format=self.backend)
+        # in polars comparing two series of type object always gives error
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="Var1", values=[str(x) for x in df_csv["Var1"]], dtype=nw.String, backend=self.backend)
+            df_csv = nw.from_native(df_csv).with_columns(new_ser.alias("Var1")).to_native()
+            new_ser = nw.new_series(name="Var1", values=[str(x) for x in df_dta["Var1"]], dtype=nw.String, backend=self.backend)
+            df_dta = nw.from_native(df_dta).with_columns(new_ser.alias("Var1")).to_native()
+            
         self.assertTrue(df_csv.equals(df_dta))
         self.assertDictEqual(meta.missing_user_values, missing_user_values)
         
         df_dta2, meta2 = pyreadstat.read_dta(path, user_missing=True, apply_value_formats=True, formats_as_category=False, output_format=self.backend)
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="Var1", values=[str(x) for x in df_csv2["Var1"]], dtype=nw.String, backend=self.backend)
+            df_csv2 = nw.from_native(df_csv2).with_columns(new_ser.alias("Var1")).to_native()
+            new_ser = nw.new_series(name="Var1", values=[str(x) for x in df_dta2["Var1"]], dtype=nw.String, backend=self.backend)
+            df_dta2 = nw.from_native(df_dta2).with_columns(new_ser.alias("Var1")).to_native()
         self.assertTrue(df_csv2.equals(df_dta2))
 
 
@@ -976,89 +983,79 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(self.df_sas_dates2))
 
     def test_sav_write_charnan(self):
-        # TODO: this is failing in polars because of mixing numbers and strings, 
-        # cannot cast object to str for test to pass
-        if self.backend == "polars":
-            self.assertTrue(True)
-            return
         path = os.path.join(self.write_folder, "charnan.sav")
         pyreadstat.write_sav(self.df_charnan, path)
         df, meta = pyreadstat.read_sav(path, output_format=self.backend)
         df2 = nw.from_native(self.df_charnan)
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="object", values=[str(x) if x is not None else None for x in df2["object"]], dtype=nw.String, backend=self.backend)
+            df2 = df2.with_columns(new_ser.alias("object"))
         df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
-        df2 = df2.with_columns(nw.col("integer").cast(nw.Int64))
-        df2 = df2.with_columns(nw.col("object").cast(nw.String))
+        df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
+        if self.backend == "pandas":
+            df2 = df2.with_columns(nw.col("object").cast(nw.String))
         df2 = df2.to_native()
-        #df2.iloc[0,1] = ""
-        #df2.iloc[0,2] = ""
-        #df2['integer'] = df2["integer"].astype(float)
-        #df2['object'] = df2['object'].astype(str)
         self.assertTrue(df2.equals(df))
 
     def test_zsav_write_charnan(self):
-        # TODO: this is failing in polars because of mixing numbers and strings, 
-        # cannot cast object to str for test to pass
-        if self.backend == "polars":
-            self.assertTrue(True)
-            return
         path = os.path.join(self.write_folder, "charnan_zsav.sav")
         pyreadstat.write_sav(self.df_charnan, path, compress=True)
         df, meta = pyreadstat.read_sav(path, output_format=self.backend)
-        df2 = self.df_charnan
-        df2.iloc[0,1] = ""
-        df2.iloc[0,2] = ""
-        df2['integer'] = df2["integer"].astype(float)
-        df2['object'] = df2['object'].astype(str)
+        df2 = nw.from_native(self.df_charnan)
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="object", values=[str(x) if x is not None else None for x in df2["object"]], dtype=nw.String, backend=self.backend)
+            df2 = df2.with_columns(new_ser.alias("object"))
+        df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
+        df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
+        if self.backend == "pandas":
+            df2 = df2.with_columns(nw.col("object").cast(nw.String))
+        df2 = df2.to_native()
         self.assertTrue(df2.equals(df))
 
     def test_xport_write_charnan(self):
-        # TODO: this is failing in polars because of mixing numbers and strings, 
-        # cannot cast object to str for test to pass
-        if self.backend == "polars":
-            self.assertTrue(True)
-            return
         path = os.path.join(self.write_folder, "charnan.xpt")
         pyreadstat.write_xport(self.df_charnan, path)
-        df, meta = pyreadstat.read_xport(path)
-        df2 = self.df_charnan
-        df2.iloc[0,1] = ""
-        df2.iloc[0,2] = ""
-        df2['integer'] = df2["integer"].astype(float)
-        df2['object'] = df2['object'].astype(str)
+        df, meta = pyreadstat.read_xport(path, output_format=self.backend)
+        df2 = nw.from_native(self.df_charnan)
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="object", values=[str(x) if x is not None else None for x in df2["object"]], dtype=nw.String, backend=self.backend)
+            df2 = df2.with_columns(new_ser.alias("object"))
+        df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
+        df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
+        if self.backend == "pandas":
+            df2 = df2.with_columns(nw.col("object").cast(nw.String))
+        df2 = df2.to_native()
         self.assertTrue(df2.equals(df))
 
-
     def test_por_write_charnan(self):
-        # TODO: this is failing in polars because of mixing numbers and strings, 
-        # cannot cast object to str for test to pass
-        if self.backend == "polars":
-            self.assertTrue(True)
-            return
         path = os.path.join(self.write_folder, "charnan_zsav.por")
         pyreadstat.write_por(self.df_charnan, path)
-        df, meta = pyreadstat.read_por(path)
+        df, meta = pyreadstat.read_por(path, output_format=self.backend)
         df.columns = [x.lower() for x in df.columns]
-        df2 = self.df_charnan
-        df2.iloc[0,1] = ""
-        df2.iloc[0,2] = ""
-        df2['integer'] = df2["integer"].astype(float)
-        df2['object'] = df2['object'].astype(str)
+        df2 = nw.from_native(self.df_charnan)
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="object", values=[str(x) if x is not None else None for x in df2["object"]], dtype=nw.String, backend=self.backend)
+            df2 = df2.with_columns(new_ser.alias("object"))
+        df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
+        df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
+        if self.backend == "pandas":
+            df2 = df2.with_columns(nw.col("object").cast(nw.String))
+        df2 = df2.to_native()
         self.assertTrue(df2.equals(df))
 
     def test_dta_write_charnan(self):
-        # TODO: this is failing in polars because of mixing numbers and strings, 
-        # cannot cast object to str for test to pass
-        if self.backend == "polars":
-            self.assertTrue(True)
-            return
         path = os.path.join(self.write_folder, "charnan.dta")
         pyreadstat.write_dta(self.df_charnan, path)
-        df, meta = pyreadstat.read_dta(path)
-        df2 = self.df_charnan
-        df2.iloc[0,1] = ""
-        df2.iloc[0,2] = ""
-        #df2['integer'] = df2["integer"].astype(float)
-        df2['object'] = df2['object'].astype(str)
+        df, meta = pyreadstat.read_dta(path, output_format=self.backend)
+        df2 = nw.from_native(self.df_charnan)
+        if self.backend != "pandas":
+            new_ser = nw.new_series(name="object", values=[str(x) if x is not None else None for x in df2["object"]], dtype=nw.String, backend=self.backend)
+            df2 = df2.with_columns(new_ser.alias("object"))
+        df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
+        #df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
+        if self.backend == "pandas":
+            df2 = df2.with_columns(nw.col("object").cast(nw.String))
+        df2 = df2.to_native()
         self.assertTrue(df2.equals(df))
 
     def test_set_value_labels(self):
@@ -1169,9 +1166,11 @@ class TestBasic(unittest.TestCase):
     def test_sav_ordered_categories(self):
         path = os.path.join(self.basic_data_folder, "ordered_category.sav")
         df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True, output_format=self.backend)
-        # TODO: is it possible to know if the categories are ordered? maybe only in pandas?
+        # in polars it is enum, it is ordered by default
         if self.backend == "pandas":
             self.assertTrue(df["Col1"].cat.ordered)
+        else:
+            self.assertTrue(type(nw.from_native(df)["Col1"].dtype)==nw.Enum)
         self.assertListEqual(list(nw.from_native(df)["Col1"].cat.get_categories().to_list()), ['high', 'low', 'medium'])
 
     def test_sav_pathlib(self):
