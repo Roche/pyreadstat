@@ -20,6 +20,7 @@ import unittest
 import os
 import sys
 import shutil
+import multiprocessing as mp
 
 import pandas as pd
 import narwhals as nw
@@ -41,7 +42,8 @@ class TestBasic(unittest.TestCase):
 
     def _prepare_data(self):
         
-        backend = 'polars'
+        #backend = 'polars'
+        global backend
         self.backend = backend
 
         self.script_folder = os.path.dirname(os.path.realpath(__file__))
@@ -749,8 +751,6 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df.equals(currow))
 
     # read multiprocessing
-
-    # TODO: check os.fork warning
     def test_multiprocess_reader(self):
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
         df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, output_format=self.backend) 
@@ -1285,10 +1285,22 @@ if __name__ == '__main__':
     import sys
 
     if "--inplace" in sys.argv:
-
         script_folder = os.path.split(os.path.split(os.path.realpath(__file__))[0])[0]
         sys.path.insert(0, script_folder)
         sys.argv.remove('--inplace')
+
+    backend = "pandas"
+    for arg in sys.argv:
+        if arg.startswith("--backend"):
+            backend = arg.split("=")[1]
+            sys.argv.remove(arg)
+    # to avoid os.fork warnings when using polars
+    #mp.set_start_method('forkserver') can also be 'spawn'
+    # very slow, prefer to get the warning
+    # TODO: document this in Readme:
+    # DeprecationWarning: This process (pid=2314) is multi-threaded, use of fork() may lead to deadlocks in the child self.pid = os.fork()
+
+    print(f"Using backend: {backend}")
 
     import pyreadstat
 
