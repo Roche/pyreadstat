@@ -86,20 +86,9 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
 
     if curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64_NS:
         # get timestamp in seconds
-        # TODO: test this!
-        #if type(curval) == pd._libs.tslibs.timestamps.Timestamp:
-            #curval = curval.asm8
-
         if type(curval) == datetime.datetime:
             #tstamp = curval.replace(tzinfo=timezone.utc).timestamp() # works only in python 3
             tstamp = calendar.timegm(curval.replace(tzinfo=_timezone.utc).timetuple())
-        elif type(curval) == np.datetime64:
-            if curval.dtype.name == "datetime64[ns]":
-                tstamp = round(<double>curval.astype(float)/1e9)
-            elif curval.dtype.name == "datetime64[us]":
-                tstamp = round(<double>curval.astype(float)/1e6)
-            elif curval.dtype.name == "datetime64[ms]":
-                tstamp = round(<double>curval.astype(float)/1e3)
 
         tstamp += offset_secs
         if file_format == FILE_FORMAT_DTA:
@@ -209,7 +198,6 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         col_type = curseries.dtype
 
         # if categorical, let's use the type of the categories
-        # TODO: write a test for writing categorical!
         if col_type == nwd.Categorical:
             col_type = curseries.cat.get_categories().dtype
 
@@ -289,7 +277,6 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
                 result.append((PYWRITER_DATETIME, 0, has_missing))
                 continue
         elif col_type == nwd.Date:
-            # TODO: test Date and Time
             result.append((PYWRITER_DATE, 0, has_missing))
             continue
         elif col_type == nwd.Time:
@@ -808,6 +795,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
         # vectorized transform of datetime64ns columns
         pywriter_types = [x[0] for x in col_types]
+        # TODO: do also for date and time?
         hasdatetime64 = PYWRITER_DATETIME64_NS in pywriter_types or PYWRITER_DATETIME64_US in pywriter_types
         if hasdatetime64:
             if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
@@ -819,22 +807,14 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                 # stata stores in milliseconds
                 mulfac = 1000.0
             convfacs = {PYWRITER_DATETIME64_NS: 1e9, PYWRITER_DATETIME64_US: 1e6}
-            #df2 = df.copy()
+            # TODO: instead of cloning store in dict?
             df2 = df.clone()
             for col_indx in range(col_count):
                 if pywriter_types[col_indx] == PYWRITER_DATETIME64_NS or pywriter_types[col_indx] == PYWRITER_DATETIME64_US: 
-                    # TODO: Test US
-                    #df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(object).astype(np.float64)/1e9) + offset_secs) * mulfac
                     convfac = convfacs[pywriter_types[col_indx]]
                     df2 = df2.with_columns(nw.col(df2.columns[col_indx]).cast(nw.Int64))
                     df2 = df2.with_columns(nw.when(nw.col(df2.columns[col_indx])!=-9223372036854775808).then(nw.col(df2.columns[col_indx])))
                     df2 = df2.with_columns((((nw.col(df2.columns[col_indx]).cast(nw.Float64))/convfac) + offset_secs).round() * mulfac)
-                #elif pywriter_types[col_indx] == PYWRITER_DATETIME64_US:
-                    # TODO, check this conversion, what i the sentinel value?
-                    #df2[df2.columns[col_indx]] = (np.round(df2.iloc[:, col_indx].values.astype(np.float64)/1e6) + offset_secs) * mulfac
-                    #df2 = df2.with_columns(((nw.col(df2.columns[col_indx]).cast(nw.Int64)/1e6) + offset_secs).cast(nw.Float64) * mulfac)
-                    #df2.loc[df2[df2.columns[col_indx]]==-9223056417655, df2.columns[col_indx]] = np.nan
-                    #df2 = df2.with_columns(nw.col(df2.columns[col_indx]).replace_strict([-9223056417655], [float('NaN')]))
         else:
             df2 = df
 

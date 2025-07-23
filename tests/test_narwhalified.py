@@ -1244,7 +1244,7 @@ class TestBasic(unittest.TestCase):
             df = pd.DataFrame.from_dict({'a': [ 1, 2, None]},dtype='Int32')
         else:
             df = nw.from_dict({'a': [ 1, 2, None]}, backend=self.backend, schema={'a': nw.Int32}).to_native()
-        path = os.path.join(self.write_folder, "missingint.sav")
+        path = os.path.join(self.write_folder, "missingint.dta")
         pyreadstat.write_dta(df, path)
         df2, meta2 = pyreadstat.read_dta(path, output_format=self.backend)
         if self.backend == "pandas":
@@ -1256,7 +1256,7 @@ class TestBasic(unittest.TestCase):
             df = pd.DataFrame.from_dict({'a': [ True, False, None]},dtype='boolean')
         else:
             df = nw.from_dict({'a': [ True, False, None]}, backend=self.backend, schema={'a': nw.Boolean}).to_native()
-        path = os.path.join(self.write_folder, "missingbool.sav")
+        path = os.path.join(self.write_folder, "missingbool.dta")
         pyreadstat.write_dta(df, path)
         df2, meta2 = pyreadstat.read_dta(path, output_format=self.backend)
         if self.backend == "pandas":
@@ -1265,6 +1265,13 @@ class TestBasic(unittest.TestCase):
             df2 = nw.from_native(df2).with_columns(nw.col("a").cast(nw.Boolean)).to_native()
         self.assertTrue(df.equals(df2))
 
+    def test_sav_write_formatted(self):
+        path = os.path.join(self.write_folder, "formatted.sav")
+        pyreadstat.write_sav(self.df_pandas_formatted, path)
+        df, meta = pyreadstat.read_sav(path,  output_format=self.backend)
+        df2 = nw.from_native(self.df_pandas_formatted)
+        df2 = df2.with_columns(nw.col("myord", "mylabl").cast(nw.String)).to_native()
+        self.assertTrue(df.equals(df2))
 
 if __name__ == '__main__':
 
