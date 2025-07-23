@@ -70,10 +70,14 @@ ctypedef enum pywriter_variable_type:
     PYWRITER_DATE
     PYWRITER_DATETIME
     PYWRITER_TIME
+    PYWRITER_DATE64
     PYWRITER_DATETIME64
+    PYWRITER_TIME64
     PYWRITER_DTA_STR_REF
 
 cdef void vectorized_convert_datetime_to_number(object df, dict datetime_dict, dst_file_format file_format, list pywriter_types, list pywriter_timeunits, int col_count)
+cdef void vectorized_convert_date_to_number(object df, dict datetime_dict, dst_file_format file_format, list pywriter_types,  int col_count)
+cdef void vectorized_convert_time_to_number(object df, dict datetime_dict, dst_file_format file_format, list pywriter_types,  int col_count)
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *
 cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, pywriter_variable_type curtype)
 cdef int get_narwhals_str_series_max_length(object series, dict value_labels, bint isobject)
