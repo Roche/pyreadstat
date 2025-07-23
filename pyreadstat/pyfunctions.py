@@ -41,10 +41,12 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
             if labels:
                 labels = deepcopy(labels)
                 if var_name in df_copy.columns:
-                    # replace_strict requires that all the values are in the map. Could not get map_batches or when/then/otherwise to work
                     # unique does not work for polars Object
-                    unvals = list(set(df_copy[var_name].to_list()))
-                    #unvals = df_copy[var_name].unique()
+                    if not df_copy.implementation.is_pandas() and df_copy[var_name].dtype == nw.Object:
+                        unvals = list(set(df_copy[var_name].to_list()))
+                    else:
+                        unvals = df_copy[var_name].unique()
+                    # replace_strict requires that all the values are in the map. Could not get map_batches or when/then/otherwise to work
                     for uval in unvals:
                         if uval not in labels:
                             labels[uval] = uval

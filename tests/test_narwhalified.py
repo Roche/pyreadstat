@@ -72,36 +72,25 @@ class TestBasic(unittest.TestCase):
             df_pandas["dtime"] = [datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.000000') if type(x) == str else float('nan') for x in df_pandas["dtime"]]
             df_pandas["mytime"] = [datetime.strptime(x, '%H:%M:%S.000000').time() if type(x) == str else float('nan') for x in df_pandas["mytime"]]
             df_pandas = nw.from_native(df_pandas)
-        #df_pandas["myord"] = df_pandas["myord"].astype(float)
-        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(float)
-        #df_pandas = df_pandas.with_columns(pl.col("myord", "mylabl").cast(pl.Float64))
         df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Float64))
         self.df_pandas = df_pandas.to_native()
         # skip some columns
         self.usecols = ['mynum', 'myord']
-        #cols_to_drop = list(set(df_pandas.columns.values.tolist()) - set(self.usecols))
         cols_to_drop = list(set(df_pandas.columns) - set(self.usecols))
-        #self.df_usecols = df_pandas.drop(cols_to_drop, axis=1)
         self.df_usecols = df_pandas.drop(cols_to_drop).to_native()#, axis=1)
 
         # no dates
         nodates_spss_csv = os.path.join(self.basic_data_folder, "sample_nodate_spss.csv")
-        #df_nodates_spss = pd.read_csv(nodates_spss_csv)
         df_nodates_spss = nw.read_csv(nodates_spss_csv, backend=backend)
         df_nodates_spss = df_nodates_spss.with_columns(nw.col("myord", "mylabl").cast(nw.Float64))
-        #df_nodates_spss["myord"] = df_nodates_spss["myord"].astype(float)
-        #df_nodates_spss["mylabl"] = df_nodates_spss["mylabl"].astype(float)
         self.df_nodates_spss = df_nodates_spss.to_native()
 
         nodates_sastata_csv = os.path.join(self.basic_data_folder, "sample_nodate_sas_stata.csv")
         df_nodates_sastata = nw.read_csv(nodates_sastata_csv, backend=backend)
-        #df_nodates_sastata["myord"] = df_nodates_sastata["myord"].astype(float)
-        #df_nodates_sastata["mylabl"] = df_nodates_sastata["mylabl"].astype(float)
         df_nodates_sastata = df_nodates_sastata.with_columns(nw.col("myord", "mylabl").cast(nw.Float64))
         self.df_nodates_sastata = df_nodates_sastata.to_native()
 
         # xport files v5 vs v8
-        #self.xptv5v8 = pd.DataFrame([[float(x)] for x in range(1,11)], columns=["i"])
         self.xptv5v8 = nw.from_dict({'i': [float(x) for x in range(1,11)]}, backend=backend).to_native()
         # formatted
         mylabl_format = {1.0:"Male", 2.0:"Female"}
@@ -110,22 +99,15 @@ class TestBasic(unittest.TestCase):
         df_pandas_formatted = df_pandas_formatted.with_columns(nw.col("mylabl").replace_strict(mylabl_format))
         df_pandas_formatted = df_pandas_formatted.with_columns(nw.col("myord").replace_strict(myord_format))
         df_pandas_formatted = df_pandas_formatted.with_columns(nw.col("myord", "mylabl").cast(nw.Categorical))
-        #df_pandas_formatted["mylabl"] = df_pandas_formatted["mylabl"].apply(lambda x: mylabl_format[x])
-                                                   #df_pandas_formatted["myord"] = df_pandas_formatted["myord"].apply(lambda x: myord_format[x])
-        #df_pandas_formatted["mylabl"] = df_pandas_formatted["mylabl"].astype("category")
-        #df_pandas_formatted["myord"] = df_pandas_formatted["myord"].astype("category")
         self.df_pandas_formatted = df_pandas_formatted.to_native()
         # sas formatted
         sas_formatted = os.path.join(self.catalog_data_folder, "sas_formatted.csv")
         df_sas = nw.read_csv(sas_formatted, backend=backend)
         df_sas = df_sas.with_columns(nw.col("SEXA", "SEXB").cast(nw.Categorical))
-        #df_sas["SEXA"] = df_sas["SEXA"].astype("category")
-        #df_sas["SEXB"] = df_sas["SEXB"].astype("category")
         self.df_sas_format = df_sas.to_native()
 
         # missing data
         pandas_missing_sav_csv = os.path.join(self.basic_data_folder, "sample_missing.csv")
-        #df_missing_sav = pd.read_csv(pandas_missing_sav_csv, na_values="#NULL!", keep_default_na=False)
         kwds = {}
         if backend == "pandas":
             kwds["na_values"] = "#NULL!"
@@ -146,7 +128,6 @@ class TestBasic(unittest.TestCase):
         self.df_missing_sav = df_missing_sav
         # user missing
         pandas_missing_user_sav_csv = os.path.join(self.basic_data_folder, "sample_missing_user.csv")
-        #df_user_missing_sav = pd.read_csv(pandas_missing_user_sav_csv, na_values="#NULL!", keep_default_na=False)
         df_user_missing_sav = nw.read_csv(pandas_missing_user_sav_csv, backend=backend, **kwds)
         df_user_missing_sav = df_user_missing_sav.to_native()
         if backend == "pandas":
@@ -160,7 +141,6 @@ class TestBasic(unittest.TestCase):
 
         # dates
         sas_dates = os.path.join(self.basic_data_folder, "dates.csv")
-        #df_dates1 = pd.read_csv(sas_dates)
         kwds = {}
         if backend == "polars":
             kwds["try_parse_dates"] = True
@@ -271,7 +251,6 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sas7bdat(os.path.join(self.basic_data_folder, "sample.sas7bdat"), row_limit = 2, row_offset =1, output_format=self.backend)
         df_pandas = nw.from_native(self.df_pandas)[1:3].to_native()
         if self.backend == "pandas":
-            #df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
             df_pandas = df_pandas.reset_index(drop=True)
             df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
         self.assertTrue(df.equals(df_pandas))
@@ -326,7 +305,6 @@ class TestBasic(unittest.TestCase):
         df.columns = [x.lower() for x in df.columns]
         df_pandas = nw.from_native(self.df_pandas)[1:3].to_native()
         if self.backend == "pandas":
-            #df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
             df_pandas = df_pandas.reset_index(drop=True)
             df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
         self.assertTrue(df.equals(df_pandas))
@@ -336,12 +314,9 @@ class TestBasic(unittest.TestCase):
     def test_dta(self):
         # discard dtime and arrange time
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), output_format=self.backend)
-        #df_pandas = self.df_pandas.copy()
         df_pandas = nw.from_native(self.df_pandas).clone()
         df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Int64))
         df_pandas = df_pandas.to_native()
-        #df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
-        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
         self.assertTrue(df.equals(df_pandas))
         self.assertTrue(meta.number_columns == len(df_pandas.columns))
         self.assertTrue(meta.number_rows == len(df_pandas))
@@ -378,24 +353,17 @@ class TestBasic(unittest.TestCase):
         df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Int64))
         df_pandas = df_pandas.with_columns(nw.col("dtime", "mytime")*1000)
         df_pandas = df_pandas.to_native()
-        #df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
-        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
-        #df_pandas["dtime"] = df_pandas["dtime"] * 1000
-        #df_pandas["mytime"] = df_pandas["mytime"] * 1000
         self.assertTrue(df.equals(df_pandas))
 
     def test_dta_chunks(self):
         # discard dtime and arrange time
         df, meta = pyreadstat.read_dta(os.path.join(self.basic_data_folder, "sample.dta"), row_limit = 2, row_offset =1, output_format = self.backend)
         df_pandas = nw.from_native(self.df_pandas)[1:3]
-        #df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
         df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Int64))
         df_pandas = df_pandas.to_native()
         if self.backend == "pandas":
             df_pandas = df_pandas.reset_index(drop=True)
             df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
-        #df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
-        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
         self.assertTrue(df.equals(df_pandas))
         self.assertTrue(meta.number_columns == len(df_pandas.columns))
         self.assertTrue(meta.number_rows == len(df_pandas))
@@ -514,7 +482,6 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sav(os.path.join(self.basic_data_folder, "sample.zsav"), row_limit = 2, row_offset =1, output_format=self.backend)
         df_pandas = nw.from_native(self.df_pandas)[1:3].to_native()
         if self.backend == "pandas":
-            #df_pandas = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
             df_pandas = df_pandas.reset_index(drop=True)
             df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
         self.assertTrue(df.equals(df_pandas))
@@ -561,7 +528,6 @@ class TestBasic(unittest.TestCase):
         #df_pandas_por = self.df_pandas[["mynum"]]
         df.columns = [x.lower() for x in df.columns]
         self.assertTrue(df.equals(df_pandas_por))
-        #self.assertTrue(meta.number_columns == len(df_pandas_por.columns.values.tolist()))
         self.assertTrue(meta.number_columns == len(df_pandas_por.columns))
 
     def test_por_nodates(self):
@@ -573,7 +539,6 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_por(os.path.join(self.basic_data_folder, "sample.por"), row_limit = 2, row_offset =1, output_format=self.backend)
         df_pandas_por = nw.from_native(self.df_pandas)[1:3].to_native()
         if self.backend == "pandas":
-            #df_pandas_por = self.df_pandas.iloc[1:3,:].reset_index(drop=True)
             df_pandas_por = df_pandas_por.reset_index(drop=True)
             df_pandas_por['dtime'] = pd.to_datetime(df_pandas_por.dtime)
         df.columns = [x.lower() for x in df.columns]
@@ -699,12 +664,10 @@ class TestBasic(unittest.TestCase):
             temp = np.nan
         else:
             temp = None
-        #mdf = pd.DataFrame([[np.nan], ["a"]], columns=["mychar"])
         mdf = nw.from_dict({"mychar": [temp, "a"]}, backend=self.backend).to_native()
         self.assertTrue(df.equals(mdf))
         self.assertTrue(meta.missing_ranges == {})
         df2, meta2 = pyreadstat.read_sav(os.path.join(self.missing_data_folder, "missing_char.sav"), user_missing=True, output_format=self.backend)
-        #mdf2 = pd.DataFrame([["Z"], ["a"]], columns=["mychar"])
         mdf2 = nw.from_dict({"mychar": [ "Z", "a"]}, backend=self.backend).to_native()
         self.assertTrue(df2.equals(mdf2))
         self.assertTrue(meta2.missing_ranges['mychar'][0]=={'lo': "Z", 'hi': "Z"})
@@ -765,7 +728,6 @@ class TestBasic(unittest.TestCase):
         for df, meta in reader:
             alldfs.append(nw.from_native(df))
         df_multi = nw.concat(alldfs, how='vertical').to_native() 
-        #df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
         if self.backend == "pandas":
             df_multi = df_multi.reset_index(drop=True)
         df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
@@ -776,13 +738,11 @@ class TestBasic(unittest.TestCase):
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True, output_format='dict')
         alldfs = list()
         for chunkdict, meta in reader:
-            #df = pd.DataFrame(chunkdict)
             if self.backend != "pandas":
                 # we need lists not numpy arrays for polars!
                 chunkdict = {k:v.tolist() for k,v in chunkdict.items()}
             df = nw.from_dict(chunkdict, backend=self.backend)
             alldfs.append(df)
-        #df_multi = pd.concat(alldfs, axis=0, ignore_index=True) 
         df_multi = nw.concat(alldfs, how='vertical').to_native() 
         if self.backend == "pandas":
             df_multi = df_multi.reset_index(drop=True)
@@ -1155,7 +1115,6 @@ class TestBasic(unittest.TestCase):
     def test_sav_write_variable_formats(self):
         "testing variable formats for SAV files"
         path = os.path.join(self.write_folder, "variable_format.sav")
-        #df = pd.DataFrame({'restricted':[1023, 10], 'integer':[1,2]})
         df = nw.from_dict({'restricted':[1023, 10], 'integer':[1,2]}, backend=self.backend)
         formats = {'restricted':'restricted_integer', 'integer':'integer'}
         pyreadstat.write_sav(df, path, variable_format=formats)
@@ -1279,6 +1238,33 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.variable_display_width['mychar'], variable_display_width['mychar'])
         #self.assertDictEqual(meta.variable_alignment, variable_alignment)
         self.assertEqual(meta.variable_measure["mychar"], variable_measure["mychar"])
+
+    def test_dta_write_int_missing(self):
+        if self.backend == "pandas":
+            df = pd.DataFrame.from_dict({'a': [ 1, 2, None]},dtype='Int32')
+        else:
+            df = nw.from_dict({'a': [ 1, 2, None]}, backend=self.backend, schema={'a': nw.Int32}).to_native()
+        path = os.path.join(self.write_folder, "missingint.sav")
+        pyreadstat.write_dta(df, path)
+        df2, meta2 = pyreadstat.read_dta(path, output_format=self.backend)
+        if self.backend == "pandas":
+            df2["a"] = df2["a"].astype('Int32')
+        self.assertTrue(df.equals(df2))
+
+    def test_dta_write_bool_missing(self):
+        if self.backend == "pandas":
+            df = pd.DataFrame.from_dict({'a': [ True, False, None]},dtype='boolean')
+        else:
+            df = nw.from_dict({'a': [ True, False, None]}, backend=self.backend, schema={'a': nw.Boolean}).to_native()
+        path = os.path.join(self.write_folder, "missingbool.sav")
+        pyreadstat.write_dta(df, path)
+        df2, meta2 = pyreadstat.read_dta(path, output_format=self.backend)
+        if self.backend == "pandas":
+            df2["a"] = df2["a"].astype('boolean')
+        else:
+            df2 = nw.from_native(df2).with_columns(nw.col("a").cast(nw.Boolean)).to_native()
+        self.assertTrue(df.equals(df2))
+
 
 if __name__ == '__main__':
 

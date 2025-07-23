@@ -263,11 +263,9 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             result.append((PYWRITER_DOUBLE, 0, has_missing))
             continue
         elif col_type in int_types or curtype == int:
-            # TODO: write a test for this
             result.append((PYWRITER_INTEGER, 0,has_missing))
             continue
         elif col_type == nwd.Boolean or curtype == bool:
-            # TODO: write a test for this
             result.append((PYWRITER_LOGICAL, 0,has_missing))
             continue
         # these types here should not contain missing_user_values,
