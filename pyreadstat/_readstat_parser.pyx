@@ -19,19 +19,17 @@
 from cpython.datetime cimport import_datetime, timedelta_new, datetime_new, total_seconds
 from cpython.exc cimport PyErr_Occurred
 from cpython.object cimport PyObject
-from libc.math cimport NAN, floor
+from libc.math cimport  floor #NAN,
 
-#from datetime import timedelta, datetime
 from collections import OrderedDict
 import datetime
 import os
 import warnings
 import sys
 
-#import pandas as pd
-import narwhals as nw
+import narwhals.stable.v1 as nw
+#import narwhals as nw
 import numpy as np
-#from pandas._libs import Timestamp
 
 from readstat_api cimport *
 
@@ -210,7 +208,6 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     Transforms a tstamp integer value to a date, time or datetime pyton object.
     tstamp could represent number of days, seconds or milliseconds
     """
-    #TODO: for polars enable vectorized transformation!
     
     cdef object tdelta
     cdef int days
@@ -1215,6 +1212,16 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     allowed_formats = {'pandas', 'dict', 'polars'}
     if output_format not in allowed_formats:
         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
+    if output_format == "pandas":
+        try:
+            import pandas
+        except:
+            raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
+    if output_format == "polars":
+        try:
+            import polars
+        except:
+            raise PyreadstatError("You requested polars as output_format but cannot import polars")
 
 
     if extra_date_formats is not None:

@@ -169,6 +169,6 @@ setup(
     ext_modules=extensions,
     packages=["pyreadstat"],
     data_files=data_files,
-    install_requires=['pandas>=1.2.0'],
+    install_requires=['narwhals>=1.47', 'numpy'],
     license="Apache-2.0",
 )

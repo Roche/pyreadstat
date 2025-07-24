@@ -20,14 +20,10 @@
 
 import multiprocessing as mp
 
-#import pandas as pd
-import narwhals as nw
+#import narwhals as nw
+import narwhals.stable.v1 as nw
 import numpy as np
 
-#from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
-#from readstat_api cimport readstat_parse_por, readstat_parse_xport
-#from readstat_api cimport readstat_parse_sas7bcat
-#from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
 from _readstat_parser cimport py_file_format, py_file_extension, run_conversion
 from _readstat_parser import  PyreadstatError
 from _readstat_writer cimport run_write

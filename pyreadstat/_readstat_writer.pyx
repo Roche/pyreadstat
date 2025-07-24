@@ -18,22 +18,22 @@
 import os
 import warnings
 import sys
-import math
+import datetime
+#import calendar
+from datetime import timezone
+#from datetime import timezone as _timezone
+#from libc.math cimport round, NAN
 
 import numpy as np
-import narwhals as nw
-import narwhals.dtypes as nwd
-import datetime
-import calendar
-from datetime import timezone as _timezone
-from libc.math cimport round, NAN
+import narwhals.stable.v1 as nw
+#import narwhals.dtypes as nw
 
 from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
 from _readstat_parser cimport check_exit_status
 
-cdef set int_types = {nwd.Int128, nwd.Int64, nwd.Int32, nwd.Int16, nwd.Int8, nwd.UInt128, nwd.UInt64, nwd.UInt32, nwd.UInt16, nwd.UInt8, nwd.IntegerType}
-cdef set float_types = {nwd.Float64, nwd.Float32, nwd.FloatType, nwd.Decimal}
+cdef set int_types = {nw.Int128, nw.Int64, nw.Int32, nw.Int16, nw.Int8, nw.UInt128, nw.UInt64, nw.UInt32, nw.UInt16, nw.UInt8, }
+cdef set float_types = {nw.Float64, nw.Float32, nw.Decimal}
 cdef set nat_types = {datetime.datetime, np.datetime64, datetime.time, datetime.date} #pd._libs.tslibs.timestamps.Timestamp,
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64, PYWRITER_DATE64, PYWRITER_TIME64}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, 
@@ -144,8 +144,8 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
     if curtype == PYWRITER_DATETIME or curtype == PYWRITER_DATETIME64:
         # get timestamp in seconds
         if type(curval) == datetime.datetime:
-            #tstamp = curval.replace(tzinfo=timezone.utc).timestamp() # works only in python 3
-            tstamp = calendar.timegm(curval.replace(tzinfo=_timezone.utc).timetuple())
+            tstamp = curval.replace(tzinfo=timezone.utc).timestamp() # works only in python 3
+            #tstamp = calendar.timegm(curval.replace(tzinfo=_timezone.utc).timetuple())
 
         tstamp += offset_secs
         if file_format == FILE_FORMAT_DTA:
@@ -255,7 +255,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         col_type = curseries.dtype
 
         # if categorical, let's use the type of the categories
-        if col_type == nwd.Categorical:
+        if col_type == nw.Categorical:
             col_type = curseries.cat.get_categories().dtype
 
         # we need to remove nulls for series inspection
@@ -272,7 +272,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         if missing_user_values:
             curuser_missing = missing_user_values.get(col_name)
         if curuser_missing:
-            if not df.implementation.is_pandas() and col_type == nwd.Object:
+            if not df.implementation.is_pandas() and col_type == nw.Object:
                 curseries = [x for x in curseries if x not in curuser_missing]
             else:
                 curseries = curseries.filter(~curseries.is_in(curuser_missing))
@@ -283,7 +283,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         max_length = 0
         curtype = None
         # let's deal first with object type, Enum could also be anything
-        if col_type == nwd.Object or col_type==nwd.Enum:
+        if col_type == nw.Object or col_type==nw.Enum:
             curtype = type(curseries[0])
             equal = check_series_all_same_types(curseries, curtype)
             # if all elements are equal, they could be a few we expect to be an object class
@@ -310,12 +310,12 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         elif col_type in int_types or curtype == int:
             result.append((PYWRITER_INTEGER, 0,has_missing, None))
             continue
-        elif col_type == nwd.Boolean or curtype == bool:
+        elif col_type == nw.Boolean or curtype == bool:
             result.append((PYWRITER_LOGICAL, 0,has_missing, None))
             continue
         # these types here should not contain missing_user_values,
         # for string we still check, as later we will raise an error
-        elif col_type == nwd.String or curtype == str:
+        elif col_type == nw.String or curtype == str:
             max_length = get_narwhals_str_series_max_length(curseries, variable_value_labels.get(col_name), 0)
             if dta_str_max_len and max_length >= dta_str_max_len:
                 result.append((PYWRITER_DTA_STR_REF, max_length, has_missing, None))
@@ -323,7 +323,7 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             else:
                 result.append((PYWRITER_CHARACTER, max_length, has_missing, None))
                 continue
-        elif col_type == nwd.Datetime:
+        elif col_type == nw.Datetime:
             if col_type.time_unit == 'us':
                 result.append((PYWRITER_DATETIME64, 0,has_missing, 'us'))
                 continue
@@ -336,10 +336,10 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
             else:
                 result.append((PYWRITER_DATETIME, 0, has_missing, None))
                 continue
-        elif col_type == nwd.Date:
+        elif col_type == nw.Date:
             result.append((PYWRITER_DATE64, 0, has_missing, None))
             continue
-        elif col_type == nwd.Time:
+        elif col_type == nw.Time:
             result.append((PYWRITER_TIME64, 0, has_missing, None))
             continue
 
@@ -607,11 +607,15 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         #raise PyreadstatError("first argument must be a pandas data frame")
 
     cdef object natnamespace
-    cdef bint is_pandas
+    cdef bint is_pandas, is_polars
 
     df = nw.from_native(df)
     natnamespace = nw.get_native_namespace(df)
     is_pandas = df.implementation.is_pandas()
+    is_polars = df.implementation.is_polars()
+    if not is_pandas and not is_polars:
+        msg = "dataframe must be pandas or polars dataframe"
+        raise PyreadstatError(msg)
 
     if variable_value_labels:
         for k,v in variable_value_labels.items():
@@ -893,7 +897,6 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     # for other libraries the value would be None
                     else:
                         check_if_missing = curval is None
-                    #if curval is None or (type(curval)==float and math.isnan(curval)):
                     if check_if_missing:
                         check_exit_status(readstat_insert_missing_value(writer, tempvar))
                         continue
