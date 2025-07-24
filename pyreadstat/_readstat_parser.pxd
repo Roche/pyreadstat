@@ -65,6 +65,7 @@ cdef class data_container:
     cdef list col_formats
     cdef list col_formats_original
     cdef object origin
+    cdef double unix_to_origin_secs
     cdef py_file_format file_format
     cdef bint is_unkown_number_rows
     cdef str file_label
@@ -95,7 +96,8 @@ cdef dict readstat_to_numpy_types
 
 # definitions of functions
 cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format)
-cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin, bint dates_as_pandas)
+cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin,
+                               bint dates_as_pandas, str output_format, double unix_to_origin_secs)
 
 cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READSTAT_HANDLER_ABORT
 cdef int handle_variable(int index, readstat_variable_t *variable, 

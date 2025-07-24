@@ -16,7 +16,7 @@
 # limitations under the License.
 # #############################################################################
 
-from cpython.datetime cimport import_datetime, timedelta_new, datetime_new
+from cpython.datetime cimport import_datetime, timedelta_new, datetime_new, total_seconds
 from cpython.exc cimport PyErr_Occurred
 from cpython.object cimport PyObject
 from libc.math cimport NAN, floor
@@ -38,6 +38,8 @@ from readstat_api cimport *
 # necessary to work with the datetime C API
 import_datetime()
 
+cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
+
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10", 
                                 "DDMMYYB", "DDMMYYB10", "DDMMYYC", "DDMMYYC10", "DDMMYYD", "DDMMYYD10",
                                 "DDMMYYN6", "DDMMYYN8", "DDMMYYP", "DDMMYYP10", "DDMMYYS", "DDMMYYS10",
@@ -54,6 +56,7 @@ cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "TIME5", "TO
 #cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 cdef list sas_all_formats
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+cdef object sas_secs_from_unix = total_seconds(unix_origin - sas_origin)
 
 cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
 cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
@@ -61,6 +64,7 @@ cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 #cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef list spss_all_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
+cdef object spss_secs_from_unix = total_seconds(unix_origin - spss_origin)
 
 cdef list stata_datetime_formats = ["%tC", "%tc"]
 cdef list stata_date_formats = ["%td", "%d", "%tdD_m_Y", "%tdCCYY-NN-DD"]
@@ -68,6 +72,7 @@ cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 #cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef list stata_all_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+cdef object stata_secs_from_unix = total_seconds(unix_origin - stata_origin)
 
 cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: object, READSTAT_TYPE_STRING_REF: object,
                                      READSTAT_TYPE_INT8: np.int64, READSTAT_TYPE_INT16: np.int64, READSTAT_TYPE_INT32:np.int64,
@@ -94,6 +99,7 @@ cdef class data_container:
         self.col_formats = list()
         self.col_formats_original = list()
         self.origin = None
+        self.unix_to_origin_secs = 0
         self.is_unkown_number_rows = 0
         self.file_encoding = None
         self.file_label = None
@@ -198,7 +204,8 @@ cdef py_datetime_format transform_variable_format(str var_format, py_file_format
         else:
             return DATE_FORMAT_NOTADATE
 
-cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin, bint dates_as_pandas):
+cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin,
+                               bint dates_as_pandas, str output_format, double unix_to_origin_secs):
     """
     Transforms a tstamp integer value to a date, time or datetime pyton object.
     tstamp could represent number of days, seconds or milliseconds
@@ -212,7 +219,20 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     cdef int usecs
     cdef object mydat
 
+    # For polars we are going to return an epoch from unix origin, 
+    # later we will transform that to datetime or date with polars from_epoch
+    # for any other we return a python datetime, date or time object. 
+    # polars also works with these objects, but it is slower
     if var_format == DATE_FORMAT_DATE:
+        if output_format == "polars":
+            # we want to return days from unix
+            if file_format == FILE_FORMAT_SPSS:
+                # tstamp is in seconds
+                return (tstamp - unix_to_origin_secs)/86400
+            else:
+                # tstamp is in days
+                return tstamp - (unix_to_origin_secs/86400)
+
         if file_format == FILE_FORMAT_SPSS:
             # tstamp is in seconds
             days = <int> (floor(tstamp / 86400))
@@ -230,6 +250,15 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
         else:
             return mydat.date()
     elif var_format == DATE_FORMAT_DATETIME:
+        if output_format == "polars":
+            # we want to return seconds from unix
+            if file_format == FILE_FORMAT_STATA:
+                # tstamp is in millisecons
+                return (tstamp/1000) - unix_to_origin_secs
+            else:
+                # tstamp in seconds
+                return tstamp - unix_to_origin_secs
+
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
             days = <int> (floor(tstamp / 86400000))
@@ -291,12 +320,15 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef long py_long_value
     cdef double py_float_value
     cdef double tstamp
+    cdef str output_format
 
     var_type = dc.col_dtypes[index]
     var_format = dc.col_formats[index]
     origin = dc.origin
+    unix_to_origin_secs = dc.unix_to_origin_secs
     dates_as_pandas = dc.dates_as_pandas
     file_format = dc.file_format
+    output_format = dc.output_format
 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
@@ -342,14 +374,14 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             result = py_long_value
         else:
             tstamp = <double> py_long_value
-            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas, output_format, unix_to_origin_secs)
     elif pyformat == VAR_FORMAT_FLOAT:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
         else:
             #tstamp = <int> py_float_value
             tstamp = py_float_value
-            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas, output_format, unix_to_origin_secs)
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
@@ -969,7 +1001,7 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
     cdef int index
     cdef str column, output_format, col_name
     cdef py_datetime_format var_format
-    cdef list dtypes, sertypes
+    cdef list dtypes, sertypes, datetime_cols, date_cols
     cdef dict schema = None
 
     dates_as_pandas = dc.dates_as_pandas
@@ -1012,6 +1044,22 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
                 var_format = dc.col_formats[index]
                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
                     data_frame[column] = pd.to_datetime(data_frame[column])
+
+        if output_format == "polars" and not dc.no_datetime_conversion:
+            # datetime and date vectorized conversion
+            pl = natnamespace
+            datetime_cols = list()
+            date_cols = list()
+            for index, column in enumerate(data_frame.columns):
+                var_format = dc.col_formats[index]
+                if var_format == DATE_FORMAT_DATETIME:
+                    datetime_cols.append(column)
+                if var_format == DATE_FORMAT_DATE:
+                    date_cols.append(column)
+            if datetime_cols:
+                data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*datetime_cols), time_unit='s'))
+            if date_cols:
+                data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*date_cols), time_unit='d'))
 
     else:
         # creating an empty dataframe can currently not be done in narwhals
@@ -1216,14 +1264,18 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     
     if file_format == FILE_FORMAT_SAS:
         origin = sas_origin
+        unix_to_origin_secs = sas_secs_from_unix 
     elif file_format == FILE_FORMAT_SPSS:
         origin = spss_origin
+        unix_to_origin_secs = spss_secs_from_unix 
     elif file_format == FILE_FORMAT_STATA:
         origin = stata_origin
+        unix_to_origin_secs = stata_secs_from_unix 
     else:
         raise PyreadstatError("Unknown file format")
     
     data.origin = origin
+    data.unix_to_origin_secs = unix_to_origin_secs
 
     if usecols is not None:
         data.filter_cols = 1
@@ -1238,9 +1290,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     if output_format == 'dict':
         data_frame = data_dict
     else:
-        #elif output_format == 'pandas':
         data_frame = dict_to_dataframe(data_dict, data)
-        #data_frame = dict_to_pandas_dataframe(data_dict, data)
     metadata = data_container_extract_metadata(data)
 
     return data_frame, metadata
