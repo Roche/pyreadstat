@@ -624,7 +624,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef object natnamespace
     cdef bint is_pandas, is_polars
 
-    df = nw.from_native(df)
+    df = nw.from_native(df, eager_only=True)
     natnamespace = nw.get_native_namespace(df)
     is_pandas = df.implementation.is_pandas()
     is_polars = df.implementation.is_polars()
