@@ -25,8 +25,7 @@ from datetime import timezone
 #from libc.math cimport round, NAN
 
 import numpy as np
-import narwhals.stable.v1 as nw
-#import narwhals.dtypes as nw
+import narwhals.stable.v2 as nw
 
 from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError

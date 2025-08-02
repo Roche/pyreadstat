@@ -27,8 +27,7 @@ import os
 import warnings
 import sys
 
-import narwhals.stable.v1 as nw
-#import narwhals as nw
+import narwhals.stable.v2 as nw
 import numpy as np
 
 from readstat_api cimport *
@@ -1059,19 +1058,7 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
                 data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*date_cols), time_unit='d'))
 
     else:
-        # creating an empty dataframe can currently not be done in narwhals
-        if output_format == "pandas":
-            try:
-                import pandas as pd
-                data_frame = pd.DataFrame()
-            except:
-                raise
-        elif output_format == "polars":
-            try:
-                import polars as pl
-                data_frame = pl.DataFrame()
-            except:
-                raise
+        data_frame = nw.from_dict(dict_data, backend=output_format).to_native()
 
     return data_frame
 

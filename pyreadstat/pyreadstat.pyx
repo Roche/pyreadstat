@@ -20,8 +20,7 @@
 
 import multiprocessing as mp
 
-#import narwhals as nw
-import narwhals.stable.v1 as nw
+import narwhals.stable.v2 as nw
 import numpy as np
 
 from _readstat_parser cimport py_file_format, py_file_extension, run_conversion

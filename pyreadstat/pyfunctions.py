@@ -3,7 +3,7 @@ Functions written in pure python
 """
 from copy import deepcopy, copy
 
-import narwhals as nw
+import narwhals.stable.v2 as nw
 
 # Functions to deal with value labels
 
