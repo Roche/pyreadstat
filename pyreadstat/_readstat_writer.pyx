@@ -31,8 +31,8 @@ from readstat_api cimport *
 from _readstat_parser import ReadstatError, PyreadstatError
 from _readstat_parser cimport check_exit_status
 
-cdef set int_types = {nw.Int128, nw.Int64, nw.Int32, nw.Int16, nw.Int8, nw.UInt128, nw.UInt64, nw.UInt32, nw.UInt16, nw.UInt8, }
-cdef set float_types = {nw.Float64, nw.Float32, nw.Decimal}
+cdef set int_types = {nw.Int32, nw.Int16, nw.Int8, nw.UInt16, nw.UInt8, }
+cdef set float_types = {nw.Float64, nw.Float32, nw.Decimal, nw.Int128, nw.Int64, nw.UInt128, nw.UInt64, nw.UInt32}
 cdef set nat_types = {datetime.datetime, np.datetime64, datetime.time, datetime.date} #pd._libs.tslibs.timestamps.Timestamp,
 cdef set pyrwriter_datetimelike_types = {PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, PYWRITER_DATETIME64, PYWRITER_DATE64, PYWRITER_TIME64}
 cdef set pywriter_numeric_types = {PYWRITER_DOUBLE, PYWRITER_INTEGER, PYWRITER_LOGICAL, PYWRITER_DATE, PYWRITER_DATETIME, PYWRITER_TIME, 

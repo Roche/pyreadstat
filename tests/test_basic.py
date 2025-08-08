@@ -889,7 +889,7 @@ class TestBasic(unittest.TestCase):
         df2 = self.df_charnan
         df2.iloc[0,1] = ""
         df2.iloc[0,2] = ""
-        #df2['integer'] = df2["integer"].astype(float)
+        df2['integer'] = df2["integer"].astype(float)
         df2['object'] = df2['object'].astype(str)
         self.assertTrue(df2.equals(df))
 

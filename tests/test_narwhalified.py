@@ -815,11 +815,8 @@ class TestBasic(unittest.TestCase):
         self.assertDictEqual(meta.variable_value_labels, variable_value_labels)
 
     def test_dta_write_basic(self):
-        #df_pandas = self.df_pandas.copy()
         df_pandas = nw.from_native(self.df_pandas).clone()
-        df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Int64)).to_native()
-        #df_pandas["myord"] = df_pandas["myord"].astype(np.int32)
-        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int32)
+        df_pandas = df_pandas.with_columns(nw.col("myord", "mylabl").cast(nw.Int32)).to_native()
 
         file_label = "basic write"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
@@ -829,8 +826,6 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_dta(path, output_format=self.backend)
 
         df_pandas = nw.from_native(df_pandas).with_columns(nw.col("myord", "mylabl").cast(nw.Int64)).to_native()
-        #df_pandas["myord"] = df_pandas["myord"].astype(np.int64)
-        #df_pandas["mylabl"] = df_pandas["mylabl"].astype(np.int64)
 
         self.assertTrue(df.equals(df_pandas))
         self.assertEqual(meta.file_label, file_label)
@@ -1012,7 +1007,7 @@ class TestBasic(unittest.TestCase):
             new_ser = nw.new_series(name="object", values=[str(x) if x is not None else None for x in df2["object"]], dtype=nw.String, backend=self.backend)
             df2 = df2.with_columns(new_ser.alias("object"))
         df2 = df2.with_columns(nw.col("string", "object").fill_null(""))
-        #df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
+        df2 = df2.with_columns(nw.col("integer").cast(nw.Float64))
         if self.backend == "pandas":
             df2 = df2.with_columns(nw.col("object").cast(nw.String))
         df2 = df2.to_native()
