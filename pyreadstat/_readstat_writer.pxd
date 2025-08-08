@@ -87,6 +87,9 @@ cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx)
 #cdef void check_exit_status(readstat_error_t retcode) except *
 cdef int open_file(bytes filename_path)
 cdef int close_file(int fd)
+cdef bytes filepath_to_bytes(object filename_path)
+cdef void initial_checks(bint is_pandas, bint is_polars, dict variable_value_labels, dict missing_user_values,
+                        dst_file_format file_format, list col_names, bytes filename_bytes) except *
 
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
                    int file_format_version, object note, str table_name, dict variable_value_labels, 

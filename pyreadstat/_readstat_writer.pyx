@@ -579,23 +579,21 @@ cdef void _check_exit_status(readstat_error_t retcode) except *:
         err_message = <str> err_readstat
         raise ReadstatError(err_message)
 
-cdef int open_file(bytes filename_path):
+cdef int open_file(bytes filename_bytes):
 
     cdef int fd
     cdef int flags
     cdef Py_ssize_t length
 
-    cdef bytes filename_bytes
     cdef char *path
 
     if os.name == "nt":
-        filename_str = os.fsdecode(filename_path)
+        filename_str = os.fsdecode(filename_bytes)
         u16_path = PyUnicode_AsWideCharString(filename_str, &length)
         flags = _O_WRONLY | _O_CREAT | _O_BINARY | _O_TRUNC
         fd = _wsopen(u16_path, flags, _SH_DENYRW, _S_IREAD | _S_IWRITE)
     else:
-        #filename_bytes = filename_path.encode("utf-8")
-        path = <char *> filename_path
+        path = <char *> filename_bytes
         flags = O_WRONLY | O_CREAT | O_TRUNC
         fd = open(path, flags, 0644)
 
@@ -607,26 +605,12 @@ cdef int close_file(int fd):
     else:
         return close(fd)
 
-cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
-                   int file_format_version, object note, str table_name, dict variable_value_labels, 
-                   dict missing_ranges, dict missing_user_values, dict variable_alignment,
-                   dict variable_display_width, dict variable_measure, dict variable_format, bint row_compression) except *:
+cdef void initial_checks(bint is_pandas, bint is_polars, dict variable_value_labels, dict missing_user_values,
+                        dst_file_format file_format, list col_names, bytes filename_bytes) except *:
     """
-    main entry point for writing all formats. Some parameters are specific for certain file type
-    and are even incompatible between them. This function relies on the caller to select the right
-    combination of parameters, not checking them otherwise.
+    Running some checks before starting writing
     """
 
-    #if not isinstance(df, pd.DataFrame):
-        #raise PyreadstatError("first argument must be a pandas data frame")
-
-    cdef object natnamespace
-    cdef bint is_pandas, is_polars
-
-    df = nw.from_native(df, eager_only=True)
-    natnamespace = nw.get_native_namespace(df)
-    is_pandas = df.implementation.is_pandas()
-    is_polars = df.implementation.is_polars()
     if not is_pandas and not is_polars:
         msg = "dataframe must be pandas or polars dataframe"
         raise PyreadstatError(msg)
@@ -637,11 +621,13 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                 msg = "variable_value_labels: value for key %s must be dict, got %s" % (k, str(type(v)))
                 raise PyreadstatError(msg)
 
+    cdef list valid_user_missing
     if missing_user_values:
         if file_format == FILE_FORMAT_DTA:
             valid_user_missing = valid_user_missing_stata
         elif file_format == FILE_FORMAT_SAS7BDAT or file_format == FILE_FORMAT_SAS7BCAT:
             valid_user_missing = valid_user_missing_sas
+
         for key, missing_values in missing_user_values.items():
             if not isinstance(missing_values, list):
                 msg = "missing_user_values: values in dictionary must be list"
@@ -651,17 +637,6 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     msg = "missing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s instead" % str(val)
                     raise PyreadstatError(msg)
 
-    cdef readstat_error_t retcode
-    cdef char *err_readstat
-    cdef str err_message
-
-    cdef readstat_writer_t *writer
-
-    cdef bytes file_label_bytes
-    cdef char *file_labl
-    cdef int dta_str_max_len = 0
-
-    cdef list col_names = df.columns
     if len(col_names) != len(set(col_names)):
         msg = "Non unique column names detected in the dataframe!"
         raise PyreadstatError(msg)
@@ -675,6 +650,71 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             raise PyreadstatError("variable name '%s' starts with an illegal (non-alphabetic) character: '%s' (ordinal %s)" % (variable_name, variable_name[0], ord(variable_name[0])))
         if " " in variable_name:
             raise PyreadstatError("variable name '%s' contains a space, which is not allowed" % variable_name)
+
+    dirname = os.path.dirname(filename_bytes)
+    if dirname and  not os.path.isdir(dirname):
+        raise PyreadstatError(f"the destination folder {dirname} does not exist!")
+
+cdef bytes filepath_to_bytes(object filename_path):
+    """
+    transforms an object with the path to the filename to bytes
+    """
+    if hasattr(os, 'fsencode'):
+        try:
+            filename_bytes = os.fsencode(filename_path)
+        except UnicodeError:
+            warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
+            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
+    else:
+        if type(filename_path) == str:
+            filename_bytes = filename_path.encode('utf-8')
+        elif type(filename_path) == bytes:
+            filename_bytes = filename_path
+        else:
+            raise PyreadstatError("path must be either str or bytes")
+    return filename_bytes
+
+
+cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
+                   int file_format_version, object note, str table_name, dict variable_value_labels, 
+                   dict missing_ranges, dict missing_user_values, dict variable_alignment,
+                   dict variable_display_width, dict variable_measure, dict variable_format, bint row_compression) except *:
+    """
+    main entry point for writing all formats. Some parameters are specific for certain file type
+    and are even incompatible between them. This function relies on the caller to select the right
+    combination of parameters, not checking them otherwise.
+    """
+
+    cdef object natnamespace
+    cdef object pd = None
+    cdef bint is_pandas, is_polars
+    cdef bytes filename_bytes
+    cdef list col_names
+
+    filename_bytes = filepath_to_bytes(filename_path)
+    filename_bytes = os.path.expanduser(filename_bytes)
+
+    df = nw.from_native(df, eager_only=True)
+    natnamespace = nw.get_native_namespace(df)
+    is_pandas = df.implementation.is_pandas()
+    is_polars = df.implementation.is_polars()
+    col_names = df.columns
+    if is_pandas:
+        pd = natnamespace
+
+    initial_checks(is_pandas, is_polars, variable_value_labels, missing_user_values, file_format,
+                         col_names, filename_bytes) 
+
+    cdef readstat_error_t retcode
+    cdef char *err_readstat
+    cdef str err_message
+
+    cdef readstat_writer_t *writer
+
+    cdef bytes file_label_bytes
+    cdef char *file_labl
+    cdef int dta_str_max_len = 0
+
 
     if file_format == FILE_FORMAT_POR:
         col_names = [x.upper() for x in col_names]
@@ -720,26 +760,8 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
     cdef int strref_cnt 
     cdef object strref_indx
 
-    if hasattr(os, 'fsencode'):
-        try:
-            filename_path = os.fsencode(filename_path)
-        except UnicodeError:
-            warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
-            filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
-    else:
-        if type(filename_path) == str:
-            filename_bytes = filename_path.encode('utf-8')
-        elif type(filename_path) == bytes:
-            filename_bytes = filename_path
-        else:
-            raise PyreadstatError("path must be either str or bytes")
 
-    filename_path = os.path.expanduser(filename_path)
-    dirname = os.path.dirname(filename_path)
-    if dirname and  not os.path.isdir(dirname):
-        raise PyreadstatError(f"the destination folder {dirname} does not exist!")
-
-    cdef int fd = open_file(filename_path)
+    cdef int fd = open_file(filename_bytes)
     writer = readstat_writer_init()
 
     try:
@@ -794,7 +816,9 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         for col_indx in range(col_count):
             curtype, max_length, _,_ = col_types[col_indx]
             variable_name = col_names[col_indx]
+            # add variable
             variable = readstat_add_variable(writer, variable_name.encode("utf-8"), narwhals_to_readstat_types[curtype], max_length)
+            # add format
             if variable_format:
                 tempformat = variable_format.get(variable_name)
                 if tempformat:
@@ -802,6 +826,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             if curtype in pyrwriter_datetimelike_types and (variable_format is None or variable_name not in variable_format.keys()):
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
                 readstat_variable_set_format(variable, curformat)
+            # prepare string_ref
             # for STRING_REF we have to add to a dict here before start writing
             if curtype == PYWRITER_DTA_STR_REF:
                 for curval in df[variable_name]:
@@ -810,6 +835,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                         strref = readstat_add_string_ref(writer, curvalstr.encode("utf-8"))
                         strref_map[curvalstr] = strref_cnt
                         strref_cnt += 1
+            # labels
             if col_label_count:
                 if column_labels[col_indx] is not None:
                     if type(column_labels[col_indx]) != str:
@@ -827,6 +853,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                     label_set = set_value_label(writer, value_labels, labelset_name,
                         col_names_to_types[variable_name], file_format, variable_name, curuser_missing)
                     readstat_variable_set_label_set(variable, label_set)
+            # missing ranges
             if missing_ranges:
                 cur_ranges = missing_ranges.get(variable_name)
                 if cur_ranges:
@@ -908,7 +935,6 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                 if is_missing:
                     # For pandas we need isna because values can be Nan, NA, NAT, None
                     if is_pandas:
-                        pd = natnamespace
                         check_if_missing = pd.isna(curval)
                     # for other libraries the value would be None
                     else:
