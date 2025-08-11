@@ -2,6 +2,7 @@
 Functions written in pure python
 """
 from copy import deepcopy, copy
+import warnings
 
 import narwhals.stable.v2 as nw
 
@@ -55,6 +56,10 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                         temp = [labels[x] for x in df_copy[var_name]]
                         newser = nw.new_series(name=var_name, values= temp, dtype=nw.Object, backend=df_copy.implementation) 
                         df_copy = df_copy.with_columns(newser.alias(var_name))
+                        if formats_as_category or formats_as_ordered_category:
+                            msg = f"You requested formats_as_category=True or formats_as_ordered_category=True, but it was not possible to cast variable '{var_name}' to category"
+                            warnings.warn(msg, RuntimeWarning)
+                            return df_copy.to_native()
                     else:
                         df_copy = df_copy.with_columns(nw.col(var_name).replace_strict(labels))
                     if formats_as_ordered_category:
