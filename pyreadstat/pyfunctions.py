@@ -51,7 +51,7 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                     for uval in unvals:
                         if uval not in labels:
                             labels[uval] = uval
-                    if not df_copy.implementation.is_pandas() and (df_copy[var_name].dtype==nw.Object or not all([type(v)==type(list(labels.values())[0]) for v in labels.values()])):
+                    if not df_copy.implementation.is_pandas() and (df_copy[var_name].dtype==nw.Object or not all([type(v)==type(list(labels.values())[0]) for v in labels.values() if v is not None])):
                         # polars is very difficult to convince to mix strings and numbers, so we have to do it this way
                         temp = [labels[x] for x in df_copy[var_name]]
                         newser = nw.new_series(name=var_name, values= temp, dtype=nw.Object, backend=df_copy.implementation) 
