@@ -51,7 +51,7 @@ def set_value_labels(dataframe, metadata, formats_as_category=True, formats_as_o
                         if uval not in labels:
                             labels[uval] = uval
                     # if all values are null, there will be nothing to replace. However we cannot do replace_strict on null dtype, it raises an error
-                    if not df_copy.implementation.is_pandas() and all([x is None for x in df_copy[var_name]]):
+                    if not df_copy.implementation.is_pandas() and (len(df_copy[var_name])==df_copy[var_name].null_count()):
                         continue
                     # replace_strict requires that all the values are in the map. Could not get map_batches or when/then/otherwise to work
                     elif not df_copy.implementation.is_pandas() and (df_copy[var_name].dtype==nw.Object or not all([type(v)==type(list(labels.values())[0]) for v in labels.values() if v is not None])):
