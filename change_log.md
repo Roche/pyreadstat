@@ -1,4 +1,4 @@
-# 1.3.1 (github, pypi and conda 2025.xx.xx)
+# 1.3.1 (github, pypi and conda 2025.08.14)
 * make list of notes writable, solves #292
 * enable support for polars, solves #282
 

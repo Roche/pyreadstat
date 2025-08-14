@@ -154,12 +154,12 @@ in the next section.</p>
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
-<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
+<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.</p></li>
 <li><p><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
 if any appropiate are found.</p></li>
 <li><p><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
-for their formatted version will be transformed into pandas categories.</p></li>
-<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+for their formatted version will be transformed into categories.</p></li>
+<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into ordered categories/enum.
 it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
 the value of formats_as_category.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -176,8 +176,8 @@ there are datetimes that are beyond the limits of python datetime (which is limi
 beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
 <li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
-<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
-user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default), ‘polars’ or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
+user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
 dataframe is avoided.</p></li>
 <li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
 <li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
@@ -186,7 +186,7 @@ dataframe is avoided.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe or dict</em>) – a dataframe or dict with the data.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
 </ul>
 </p>
@@ -221,7 +221,7 @@ multiprocessing.</p></li>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe</em>) – a dataframe with the data</p></li>
 <li><p><em>metadata</em> – object with metadata.
 Look at the documentation for more information.</p></li>
 <li><p><strong>it</strong> (<em>generator</em>) – A generator that reads the file in chunks.</p></li>
@@ -251,7 +251,7 @@ larger than the actual number of rows will work as well. Discarded if the number
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe</em>) – a dataframe with the data</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
 </ul>
 </p>
@@ -270,12 +270,12 @@ larger than the actual number of rows will work as well. Discarded if the number
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.
 Notice that number_rows will be None as por files do not have the number of rows recorded in the file metadata.</p></li>
-<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
+<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.</p></li>
 <li><p><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
 if any appropiate are found.</p></li>
 <li><p><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
-for their formatted version will be transformed into pandas categories.</p></li>
-<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+for their formatted version will be transformed into categories.</p></li>
+<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into ordered categories/enum.
 it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
 the value of formats_as_category.</p></li>
 <li><p><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</p></li>
@@ -287,8 +287,8 @@ there are datetimes that are beyond the limits of python datetime (which is limi
 beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
 <li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
-<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
-user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default), ‘polars’ or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
+user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
 dataframe is avoided.</p></li>
 <li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
 <li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
@@ -297,7 +297,7 @@ dataframe is avoided.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe or dict</em>) – a dataframe or dict with the data.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
 </ul>
 </p>
@@ -321,15 +321,14 @@ encodings etc. Therefore it may be that many catalog files are not readable from
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. The string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</p></li>
-<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned.
+<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default), ‘polars’ or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned.
 Notice that for this function the resulting object is always empty, this is done for consistency with other functions
 but has no impact on performance.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data (no data in this case, so will be empty). If the output_parameter is other
-than ‘pandas’ then the object type will change accordingly altough the object will always be empty</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe or dict</em>) – a dataframe with the data (no data in this case, so will be always empty).</p></li>
 <li><p><em>metadata</em> – object with metadata. The member value_labels is the one that contains the formats.
 Look at the documentation for more information.</p></li>
 </ul>
@@ -349,14 +348,14 @@ It accepts the path to a sas7bcat.</p>
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded.</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
-<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
+<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.</p></li>
 <li><p><strong>catalog_file</strong> (<em>str</em><em>, </em><em>optional</em>) – path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values
 by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,
 Use read_sas7bcat to parse the catalog independently
 of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.</p></li>
 <li><p><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – Will take effect only if the catalog_file was specified. If True the variables whose values were replaced
-by the formats will be transformed into pandas categories.</p></li>
-<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+by the formats will be transformed into categories.</p></li>
+<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into ordered categories/enums.
 it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
 the value of formats_as_category.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -373,8 +372,8 @@ there are datetimes that are beyond the limits of python datetime (which is limi
 beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
 <li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
-<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
-user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default), ‘polars’ or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
+user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
 dataframe is avoided.</p></li>
 <li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
 <li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
@@ -383,7 +382,7 @@ dataframe is avoided.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe or dict</em>) – a dataframe or dict with the data.</p></li>
 <li><p><em>metadata</em> – object with metadata. The members variables_value_labels will be empty unless a valid catalog file is
 supplied.
 Look at the documentation for more information.</p></li>
@@ -403,12 +402,12 @@ Look at the documentation for more information.</p></li>
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In Python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
-<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
+<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.</p></li>
 <li><p><strong>apply_value_formats</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true it will change values in the dataframe for they value labels in the metadata,
 if any appropiate are found.</p></li>
 <li><p><strong>formats_as_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
-for their formatted version will be transformed into pandas categories.</p></li>
-<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+for their formatted version will be transformed into categories.</p></li>
+<li><p><strong>formats_as_ordered_category</strong> (<em>bool</em><em>, </em><em>optional</em>) – defaults to False. If True the variables having formats will be transformed into ordered categories/enum.
 it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
 the value of formats_as_category.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
@@ -425,8 +424,8 @@ there are datetimes that are beyond the limits of python datetime (which is limi
 beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
 <li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
-<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
-user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default), ‘polars’ or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
+user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
 dataframe is avoided.</p></li>
 <li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
 <li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
@@ -435,7 +434,7 @@ dataframe is avoided.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe or dict</em>) – a dataframe or dict with the data.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
 </ul>
 </p>
@@ -453,7 +452,7 @@ dataframe is avoided.</p></li>
 <li><p><strong>filename_path</strong> (<em>str</em><em>, </em><em>bytes</em><em> or </em><em>Path-like object</em>) – path to the file. In python 2.7 the string is assumed to be utf-8 encoded</p></li>
 <li><p><strong>metadataonly</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
 metadata object. The data frame will be set with the correct column names but no data.</p></li>
-<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date.</p></li>
+<li><p><strong>dates_as_pandas_datetime</strong> (<em>bool</em><em>, </em><em>optional</em>) – by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.</p></li>
 <li><p><strong>encoding</strong> (<em>str</em><em>, </em><em>optional</em>) – Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
 iconv-compatible name</p></li>
 <li><p><strong>usecols</strong> (<em>list</em><em>, </em><em>optional</em>) – a list with column names to read from the file. Only those columns will be imported. Case sensitive!</p></li>
@@ -465,8 +464,8 @@ there are datetimes that are beyond the limits of python datetime (which is limi
 beyond that will rise an Overflow error in pyreadstat).</p></li>
 <li><p><strong>row_limit</strong> (<em>int</em><em>, </em><em>optional</em>) – maximum number of rows to read. The default is 0 meaning unlimited.</p></li>
 <li><p><strong>row_offset</strong> (<em>int</em><em>, </em><em>optional</em>) – start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.</p></li>
-<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default) or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
-user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+<li><p><strong>output_format</strong> (<em>str</em><em>, </em><em>optional</em>) – one of ‘pandas’ (default), ‘polars’ or ‘dict’. If ‘dict’ a dictionary with numpy arrays as values will be returned, the
+user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
 dataframe is avoided.</p></li>
 <li><p><strong>extra_datetime_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python datetime objects</p></li>
 <li><p><strong>extra_date_formats</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – formats to be parsed as python date objects</p></li>
@@ -475,7 +474,7 @@ dataframe is avoided.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>data_frame</strong> (<em>pandas dataframe</em>) – a pandas data frame with the data. If the output_format is other than ‘pandas’ the object type will change accordingly.</p></li>
+<li><p><strong>data_frame</strong> (<em>dataframe or dict</em>) – a dataframe or dict with the data.</p></li>
 <li><p><em>metadata</em> – object with metadata. Look at the documentation for more information.</p></li>
 </ul>
 </p>
@@ -486,11 +485,11 @@ dataframe is avoided.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_dta">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_dta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_user_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_dta" title="Link to this definition">¶</a></dt>
-<dd><p>Writes a pandas data frame to a STATA dta file</p>
+<dd><p>Writes a dataframe to a STATA dta file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
+<li><p><strong>df</strong> (<em>dataframe</em>) – dataframe to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result dta file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
 <li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
@@ -515,11 +514,11 @@ for more information.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_por">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_por</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_por" title="Link to this definition">¶</a></dt>
-<dd><p>Writes a pandas data frame to a SPSS POR file.</p>
+<dd><p>Writes a dataframe to a SPSS POR file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to por</p></li>
+<li><p><strong>df</strong> (<em>dataframe</em>) – data frame to write to por</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result por file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
 <li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
@@ -537,11 +536,11 @@ for more information.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_sav">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_sav</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">note</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_value_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing_ranges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_display_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_sav" title="Link to this definition">¶</a></dt>
-<dd><p>Writes a pandas data frame to a SPSS sav or zsav file.</p>
+<dd><p>Writes a dataframe to a SPSS sav or zsav file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to sav or zsav</p></li>
+<li><p><strong>df</strong> (<em>dataframe</em>) – dataframe to write to sav or zsav</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result sav or zsav file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
 <li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
@@ -576,14 +575,14 @@ for more information.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyreadstat.pyreadstat.write_xport">
 <span class="sig-prename descclassname"><span class="pre">pyreadstat.pyreadstat.</span></span><span class="sig-name descname"><span class="pre">write_xport</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_format_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyreadstat.pyreadstat.write_xport" title="Link to this definition">¶</a></dt>
-<dd><p>Writes a pandas data frame to a SAS Xport (xpt) file.
+<dd><p>Writes a dataframe to a SAS Xport (xpt) file.
 If no table_name is specified the dataset has by default the name DATASET (take it into account if
 reading the file from SAS.)
 Versions 5 and 8 are supported, default is 8.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<em>pandas data frame</em>) – pandas data frame to write to xport</p></li>
+<li><p><strong>df</strong> (<em>dataframe</em>) – dataframe to write to xport</p></li>
 <li><p><strong>dst_path</strong> (<em>str</em><em> or </em><em>pathlib.Path</em>) – full path to the result xport file</p></li>
 <li><p><strong>file_label</strong> (<em>str</em><em>, </em><em>optional</em>) – a label for the file</p></li>
 <li><p><strong>column_labels</strong> (<em>list</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – labels for columns (variables), if list must be the same length as the number of columns. Variables with no
