@@ -1268,6 +1268,32 @@ class TestBasic(unittest.TestCase):
         df2 = df2.with_columns(nw.col("myord", "mylabl").cast(nw.String)).to_native()
         self.assertTrue(df.equals(df2))
 
+    def test_sav_write_formatted_nulls(self):
+        """
+        apply format when some columns have some nulls or all nulls
+        all nulls raises a warning in polars
+        """
+        labels = {'a': {1:'a', 2: 'b'}, 'b': {1:'c'}, 'c': {1:'d'}}
+        data = {'a': [1,2,3], 'b':[1, 1, None], 'c': [None, None, None]}
+        df = nw.from_dict(data, schema={'a':nw.Float64, 'b':nw.Float64, 'c': nw.Float64}, backend=self.backend).to_native()
+        path = os.path.join(self.write_folder, "formatted_nulls.sav")
+        pyreadstat.write_sav(df, path, variable_value_labels=labels) 
+        schema = dict()
+        null = np.nan
+        if self.backend != "pandas":
+            schema={'a':nw.String, 'b':nw.Categorical, 'c': None}
+            null = None
+        data_result = {'a': ['a','b', '3.0'], 'b':['c', 'c', null], 'c': [null, null, null]}
+        df_control = nw.from_dict(data_result, schema=schema, backend=self.backend).to_native()
+        df2, meta2 = pyreadstat.read_sav(path, apply_value_formats=True, output_format=self.backend)
+        new_ser = nw.new_series(name="a", values=[str(x) for x in df2["a"]], dtype=nw.String, backend=self.backend)
+        df2 = nw.from_native(df2).with_columns(new_ser.alias("a")).to_native()
+        if self.backend == "pandas":
+            df_control = nw.from_native(df_control).with_columns(nw.col('b').cast(nw.Categorical)).to_native()
+            df_control['c'] = df_control['c'].astype(object).astype("category")
+        self.assertTrue(df2.equals(df_control))
+
+
 if __name__ == '__main__':
 
     import sys
