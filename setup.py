@@ -141,16 +141,16 @@ for e in extensions:
 extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
 
 long_description = """ A Python package to read and write SAS
-(sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas data frames. It is a wrapper
+(sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas and polars data frames. It is a wrapper
 around the C library readstat.<br>
 Please visit out project home page for more information:<br>
 https://github.com/Roche/pyreadstat"""
 
-short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas data frames."
+short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas and polars data frames."
 
 setup(
     name='pyreadstat',
-    version='1.3.0',
+    version='1.3.1',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",
@@ -169,6 +169,6 @@ setup(
     ext_modules=extensions,
     packages=["pyreadstat"],
     data_files=data_files,
-    install_requires=['pandas>=1.2.0'],
+    install_requires=['narwhals>=2.0', 'numpy'],
     license="Apache-2.0",
 )

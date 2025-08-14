@@ -1,7 +1,7 @@
 # pyreadstat
 
 A python package to read and write sas (sas7bdat, sas7bcat, xport), spps (sav, zsav, por) and stata (dta) data files
-into/from pandas dataframes.
+into/from pandas and polars dataframes.
 <br>
 
 This module is a wrapper around the excellent [Readstat](https://github.com/WizardMac/ReadStat) C library by
@@ -133,7 +133,8 @@ brings a big hit in performance. The situation can be improved tough by reading 
 
 ## Dependencies
 
-The module depends on pandas, which you normally have installed if you got Anaconda (highly recommended.)
+The module depends on numpy and narwhals, a package to interface with pandas and polars. In addition you will need to have installed
+either pandas or polars.
 
 In order to compile from source you will need a C compiler (see installation).
 Only if you want to do changes to the cython source code, you will need cython (normally not necessary).
@@ -222,7 +223,7 @@ the folder build, otherwise you may be installing the old compilation again).
 
 #### Reading files
 
-Pass the path to a file to any of the functions provided by pyreadstat. It will return a pandas data frame and a metadata
+Pass the path to a file to any of the functions provided by pyreadstat. It will return a pandas or polars data frame and a metadata
 object. <br>
 The dataframe uses the column names. The metadata object contains the column names, column labels, number_rows,
 number_columns, file label
@@ -234,7 +235,8 @@ For example, in order to read a sas7bdat file:
 ```python
 import pyreadstat
 
-df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat')
+# output format by default is pandas. You can use polars to get a polars dataframe.
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', output_format="pandas")
 
 # done! let's see what we got
 print(df.head())
@@ -257,25 +259,38 @@ df.columns = meta.column_labels
 df.columns = meta.column_names
 ```
 
+As mentioned before you can very easily read into a polars dataframe by using the output_format argument:
+
+```python
+import pyreadstat
+
+# this time df will be polars
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', output_format="polars")
+
+# done! let's see what we got
+print(df.head())
+```
+
 #### Writing files
 
 Pyreadstat can write STATA (dta), SPSS (sav and zsav, por currently nor supported) and SAS (Xport, sas7bdat and sas7bcat
-currently not supported) files from pandas data frames.
+currently not supported) files from pandas or polars dataframes.
 
-write functions take as first argument a pandas data frame (other data structures are not supported), as a second argument
+write functions take as first argument a pandas or polars dataframe (other data structures are not supported), as a second argument
 the path to the destination file. Optionally you can also pass a file label and a list with column labels.
 
 ```python
 import pandas as pd
 import pyreadstat
 
+# this would work the same for a polars dataframe
 df = pd.DataFrame([[1,2.0,"a"],[3,4.0,"b"]], columns=["v1", "v2", "v3"])
 # column_labels can also be a dictionary with variable name as key and label as value
 column_labels = ["Variable 1", "Variable 2", "Variable 3"]
 pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_labels=column_labels)
 ```
 
-Some special arguments are available depending on the function. write_sav can take also notes as string, wheter to
+Some special arguments are available depending on the function. write_sav can take also notes as string or list of strings, wheter to
 compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
 write_xport a name for the dataset. User defined missing values and value labels are also supported. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
@@ -434,7 +449,7 @@ function. The original values will be replaced by the values in the catalog.
 ```python
 import pyreadstat
 
-# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column. There is also formats_as_ordered_category to get an ordered category, this by default is False.
+# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas/polars category column. There is also formats_as_ordered_category to get an ordered category, this by default is False.
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', catalog_file='/path/to/a/file.sas7bcat', formats_as_category=True, formats_as_ordered_category=False)
 ```
 
@@ -449,7 +464,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat')
 # read_sas7bdat returns an emtpy data frame and the catalog
 df_empty, catalog = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bcat')
 # enrich the dataframe with the catalog
-# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column. formats_as_ordered_category is by default False meaning by default categories are not ordered.
+# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas/polars category column. formats_as_ordered_category is by default False meaning by default categories are not ordered.
 df_enriched, meta_enriched = pyreadstat.set_catalog_to_sas(df, meta, catalog, 
                              formats_as_category=True, formats_as_ordered_category=False)
 ```
@@ -461,7 +476,7 @@ when reading the file using the option apply_value_formats, ...
 import pyreadstat
 
 # apply_value_formats is by default False, so you have to set it to True manually if you want the labels
-# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas category column. formats_as_ordered_category is by default False meaning by default categories are not ordered.
+# formats_as_category is by default True, and it means the replaced values will be transformed to a pandas/polars category column. formats_as_ordered_category is by default False meaning by default categories are not ordered.
 df, meta = pyreadstat.read_sav("/path/to/sav/file.sav", apply_value_formats=True, 
                                 formats_as_category=True, formats_as_ordered_category=False)
 ```
@@ -530,9 +545,9 @@ example if one has a categorical variable representing if the person passed a te
 1 for pass, and as user defined missing variables 2 for did not show up for the test, 3 for unable to process the results,
 etc.
 
-**By default both cases are represented by NaN when
+**By default both cases are represented by NaN in pandas and null in polars when
 read with pyreadstat**. Notice that the only possible missing value in pandas is NaN (Not a Number) for both string and numeric
-variables, date, datetime and time variables have NaT (Not a Time).
+variables, date, datetime and time variables have NaT (Not a Time). Polars use null for all datatypes.
 
 ##### SPSS
 
@@ -599,16 +614,16 @@ translated as NaN by default and to the correspoding string value if
 user_missing is set to True. meta.missing_ranges will show the string
 value as well.
 
-When writing a pandas dataframe to a sav file, if user defined missing values are not set, NaNs are translated to
+When writing a dataframe to a sav file, if user defined missing values are not set, NaNs are translated to
 empty strings, as there is no other possibility to represent those missing values and user defined missing values
 are not set automatically.
 
-When reading a sav into a pandas dataframe, if the value in
-a character variable is an empty string (''), it will not be translated to NaN, but will stay as an empty string. This
+When reading a sav into a dataframe, if the value in
+a character variable is an empty string (''), it will not be translated to NaN/null, but will stay as an empty string. This
 is because the empty string is a valid character value in SPSS and pyreadstat preserves that property.
 
 This behaviour generates an asymetrical situation that has to be managed by the user. You can convert
-empty strings to nan very easily with pandas if you think it is appropiate
+empty strings to nan very easily if you think it is appropiate
 for your dataset, or you can use defined missing values as described before.
 
 
@@ -700,7 +715,7 @@ df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', encoding="LATIN1
 ```
 
 You can preserve the original pandas behavior regarding dates (meaning dates are converted to pandas datetime) with the
-dates_as_pandas_datetime option
+dates_as_pandas_datetime option. This option is effective for pandas only, not for polars.
 
 ```python
 import pyreadstat
@@ -708,18 +723,10 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_datetime=True)
 ```
 
-You can get a dictionary of numpy arrays instead of a pandas dataframe when reading any file format.
-In order to do that, set the parameter output_format='dict' (default is 'pandas'). This is useful if
-you want to transform the data to some other format different to pandas, as transforming the data to pandas is a costly
-process both in terms of speed and memory. Here for example an efficient way to transform the data to a polars dataframe:
-
-```python
-import pyreadstat
-import polars
-
-dicdata, meta = pyreadstat.read_sav('/path/to/a/file.sav', output_format='dict')
-df = polars.DataFrame(dicdata)
-```
+You can get a dictionary of numpy arrays instead of a pandas or polars dataframe when reading any file format.
+In order to do that, set the parameter output_format='dict' (default is 'pandas', the other option is 'polars'). This is useful if
+you want to transform the data to some other format different to pandas/polars, as transforming the data to pandas is a costly
+process both in terms of speed and memory.
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
@@ -727,7 +734,7 @@ For more information, please check the [Module documentation](https://ofajardo.g
 
 #### File specific options
 
-Some special arguments are available depending on the function. write_sav can take also notes as string, wheter to
+Some special arguments are available depending on the function. write_sav can take also notes as string or list of strings, wheter to
 compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
 write_xport a name for the dataset. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
@@ -735,7 +742,7 @@ write_xport a name for the dataset. See the
 #### Writing value labels
 
 The argument variable_value_labels can be passed to write_sav and write_dta to write value labels. This argument must be a
-dictionary where keys are variable names (names must match column names in the pandas data frame). Values are another dictionary where
+dictionary where keys are variable names (names must match column names in the dataframe). Values are another dictionary where
 keys are the value present in the dataframe and values are the labels (strings).
 
 ```python
@@ -812,7 +819,7 @@ for the documentation of the original application.
 In the case of SPSS we have some presets for some formats:
 * restricted_integer: with leading zeros, equivalent to N + variable width (e.g N4)
 * integer: Numeric with no decimal places, equivalent to F + variable width + ".0" (0 decimal positions). A 
-  pandas column of type integer will also be translated into this format automatically.
+  column of type integer will also be translated into this format automatically.
 
 ```python
 import pandas as pd
@@ -828,12 +835,12 @@ There is some information about the possible formats [here](https://www.gnu.org/
 
 #### Variable type conversion
 
-The following rules are used in order to convert from pandas/numpy/python types to the target file types:
+The following rules are used in order to convert from pandas/polars/numpy/python types to the target file types:
 
 | Python Type         | Converted Type    |
 | ------------------- | --------- |
-| np.int32 or lower   | integer (stata), numeric (spss, sas) |
-| int, np.int64, np.float  | double (stata), numeric (spss, sas)   |
+| np.int32/pl.int32 or lower   | integer (stata), numeric (spss, sas) |
+| int, np.int64, pl.int64, np.float, pl.float64  | double (stata), numeric (spss, sas)   |
 | str                 | character |
 | bool                | integer (stata), numeric (spss, sas) |
 | datetime, date, time | numeric with datetime/date/time formatting |

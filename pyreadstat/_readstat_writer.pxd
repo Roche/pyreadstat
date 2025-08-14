@@ -70,21 +70,28 @@ ctypedef enum pywriter_variable_type:
     PYWRITER_DATE
     PYWRITER_DATETIME
     PYWRITER_TIME
-    PYWRITER_DATETIME64_NS
-    PYWRITER_DATETIME64_US
+    PYWRITER_DATE64
+    PYWRITER_DATETIME64
+    PYWRITER_TIME64
     PYWRITER_DTA_STR_REF
 
+cdef object vectorized_convert_datetime_to_number(object df, dst_file_format file_format, list pywriter_types, list pywriter_timeunits, int col_count)
+cdef object vectorized_convert_date_to_number(object df, dst_file_format file_format, list pywriter_types,  int col_count)
+cdef object vectorized_convert_time_to_number(object df, dst_file_format file_format, list pywriter_types,  int col_count)
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *
 cdef char * get_datetimelike_format_for_readstat(dst_file_format file_format, pywriter_variable_type curtype)
-cdef int get_pandas_str_series_max_length(object series, dict value_labels)
+cdef int get_narwhals_str_series_max_length(object series, dict value_labels, bint isobject)
 cdef int check_series_all_same_types(object series, object type_to_check)
-cdef list get_pandas_column_types(object df, dict missing_user_values, dict variable_value_labels, int dta_str_max_len)
+cdef list get_narwhals_column_types(object df, dict missing_user_values, dict variable_value_labels, int dta_str_max_len)
 cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx)
 #cdef void check_exit_status(readstat_error_t retcode) except *
 cdef int open_file(bytes filename_path)
 cdef int close_file(int fd)
+cdef bytes filepath_to_bytes(object filename_path)
+cdef void initial_checks(bint is_pandas, bint is_polars, dict variable_value_labels, dict missing_user_values,
+                        dst_file_format file_format, list col_names, bytes filename_bytes) except *
 
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
-                   int file_format_version, str note, str table_name, dict variable_value_labels, 
+                   int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format, bint row_compression) except *

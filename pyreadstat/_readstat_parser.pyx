@@ -16,26 +16,26 @@
 # limitations under the License.
 # #############################################################################
 
-from cpython.datetime cimport import_datetime, timedelta_new, datetime_new
+from cpython.datetime cimport import_datetime, timedelta_new, datetime_new, total_seconds
 from cpython.exc cimport PyErr_Occurred
 from cpython.object cimport PyObject
-from libc.math cimport NAN, floor
+from libc.math cimport  floor #NAN,
 
-#from datetime import timedelta, datetime
 from collections import OrderedDict
 import datetime
 import os
 import warnings
 import sys
 
-import pandas as pd
+import narwhals.stable.v2 as nw
 import numpy as np
-#from pandas._libs import Timestamp
 
 from readstat_api cimport *
 
 # necessary to work with the datetime C API
 import_datetime()
+
+cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10", 
                                 "DDMMYYB", "DDMMYYB10", "DDMMYYC", "DDMMYYC10", "DDMMYYD", "DDMMYYD10",
@@ -53,6 +53,7 @@ cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "TIME5", "TO
 #cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 cdef list sas_all_formats
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+cdef object sas_secs_from_unix = total_seconds(unix_origin - sas_origin)
 
 cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
 cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
@@ -60,6 +61,7 @@ cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
 #cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef list spss_all_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
+cdef object spss_secs_from_unix = total_seconds(unix_origin - spss_origin)
 
 cdef list stata_datetime_formats = ["%tC", "%tc"]
 cdef list stata_date_formats = ["%td", "%d", "%tdD_m_Y", "%tdCCYY-NN-DD"]
@@ -67,6 +69,7 @@ cdef list stata_time_formats = ["%tcHH:MM:SS", "%tcHH:MM"]
 #cdef list stata_all_formats = stata_datetime_formats + stata_date_formats + stata_time_formats
 cdef list stata_all_formats
 cdef object stata_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
+cdef object stata_secs_from_unix = total_seconds(unix_origin - stata_origin)
 
 cdef dict readstat_to_numpy_types = {READSTAT_TYPE_STRING: object, READSTAT_TYPE_STRING_REF: object,
                                      READSTAT_TYPE_INT8: np.int64, READSTAT_TYPE_INT16: np.int64, READSTAT_TYPE_INT32:np.int64,
@@ -93,6 +96,7 @@ cdef class data_container:
         self.col_formats = list()
         self.col_formats_original = list()
         self.origin = None
+        self.unix_to_origin_secs = 0
         self.is_unkown_number_rows = 0
         self.file_encoding = None
         self.file_label = None
@@ -116,6 +120,7 @@ cdef class data_container:
         self.ctime = 0
         self.mtime = 0
         self.mr_sets = dict()
+        self.output_format = ""
         
 class metadata_container:
     """
@@ -196,7 +201,8 @@ cdef py_datetime_format transform_variable_format(str var_format, py_file_format
         else:
             return DATE_FORMAT_NOTADATE
 
-cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin, bint dates_as_pandas):
+cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin,
+                               bint dates_as_pandas, str output_format, double unix_to_origin_secs):
     """
     Transforms a tstamp integer value to a date, time or datetime pyton object.
     tstamp could represent number of days, seconds or milliseconds
@@ -209,7 +215,20 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
     cdef int usecs
     cdef object mydat
 
+    # For polars we are going to return an epoch from unix origin, 
+    # later we will transform that to datetime or date with polars from_epoch
+    # for any other we return a python datetime, date or time object. 
+    # polars also works with these objects, but it is slower
     if var_format == DATE_FORMAT_DATE:
+        if output_format == "polars":
+            # we want to return days from unix
+            if file_format == FILE_FORMAT_SPSS:
+                # tstamp is in seconds
+                return (tstamp - unix_to_origin_secs)/86400
+            else:
+                # tstamp is in days
+                return tstamp - (unix_to_origin_secs/86400)
+
         if file_format == FILE_FORMAT_SPSS:
             # tstamp is in seconds
             days = <int> (floor(tstamp / 86400))
@@ -227,6 +246,15 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
         else:
             return mydat.date()
     elif var_format == DATE_FORMAT_DATETIME:
+        if output_format == "polars":
+            # we want to return seconds from unix
+            if file_format == FILE_FORMAT_STATA:
+                # tstamp is in millisecons
+                return (tstamp/1000) - unix_to_origin_secs
+            else:
+                # tstamp in seconds
+                return tstamp - unix_to_origin_secs
+
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
             days = <int> (floor(tstamp / 86400000))
@@ -288,12 +316,15 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef long py_long_value
     cdef double py_float_value
     cdef double tstamp
+    cdef str output_format
 
     var_type = dc.col_dtypes[index]
     var_format = dc.col_formats[index]
     origin = dc.origin
+    unix_to_origin_secs = dc.unix_to_origin_secs
     dates_as_pandas = dc.dates_as_pandas
     file_format = dc.file_format
+    output_format = dc.output_format
 
     # transform to values cython can deal with
     if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
@@ -339,14 +370,14 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
             result = py_long_value
         else:
             tstamp = <double> py_long_value
-            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas, output_format, unix_to_origin_secs)
     elif pyformat == VAR_FORMAT_FLOAT:
         if var_format == DATE_FORMAT_NOTADATE or dc.no_datetime_conversion:
             result = py_float_value
         else:
             #tstamp = <int> py_float_value
             tstamp = py_float_value
-            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas)
+            result = transform_datetime(var_format, tstamp, file_format, origin, dates_as_pandas, output_format, unix_to_origin_secs)
     #elif pyformat == VAR_FORMAT_MISSING:
     #    pass
     else:
@@ -452,7 +483,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef char * var_name, 
     cdef char * var_label
     cdef char * var_format
-    cdef str col_name, col_label, label_name, col_format_original
+    cdef str col_name, col_label, label_name, col_format_original, output_format
     cdef py_datetime_format col_format_final
     cdef readstat_type_t var_type
     cdef py_file_format file_format
@@ -471,6 +502,7 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef int dupcolcnt
 
     cdef  data_container dc = <data_container> ctx
+    output_format = dc.output_format
     
     # get variable name, label, format and type and put into our data container
     var_name = readstat_variable_get_name(variable)
@@ -547,12 +579,18 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     metaonly = dc.metaonly
     # pre-allocate data
     if metaonly:
-        row = np.empty(1, dtype=curnptype)
+        if output_format == "pandas":
+            row = np.empty(1, dtype=curnptype)
+        else:
+            row = list()
     else:
         obs_count = dc.n_obs
-        row = np.empty(obs_count, dtype=curnptype)
-        if iscurnptypeobject or iscurnptypefloat:
-            row.fill(np.nan)
+        if output_format == "pandas":
+            row = np.empty(obs_count, dtype=curnptype)
+            if iscurnptypeobject or iscurnptypefloat:
+                row.fill(np.nan)
+        else:
+            row = [None] * obs_count
     dc.col_data.append(row)
     
     # missing values
@@ -623,15 +661,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     cdef object buf_list
     cdef bint iscurnptypeobject
     cdef bint iscurnptypefloat
-
     cdef int missing_tag
-
     cdef object pyvalue
     cdef set curset
     cdef object curnptype
+    cdef str output_format
     
     # extract variables we need from data container
     dc = <data_container> ctx
+    output_format = dc.output_format
     index = readstat_variable_get_index_after_skipping(variable)
     max_n_obs = dc.max_n_obs
     is_unkown_number_rows = dc.is_unkown_number_rows
@@ -645,11 +683,15 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             dc.max_n_obs = obs_index + 1
         var_max_rows = dc.col_data_len[index]
         if var_max_rows <= obs_index:
-            curnptype = dc.col_numpy_dtypes[index]
-            buf_list = np.empty(100000, dtype=curnptype)
-            if iscurnptypeobject or iscurnptypefloat:
-                buf_list.fill(np.nan)
-            dc.col_data[index] = np.append(dc.col_data[index], buf_list)
+            if output_format == "pandas":
+                curnptype = dc.col_numpy_dtypes[index]
+                buf_list = np.empty(100000, dtype=curnptype)
+                if iscurnptypeobject or iscurnptypefloat:
+                    buf_list.fill(np.nan)
+                dc.col_data[index] = np.append(dc.col_data[index], buf_list)
+            else:
+                buf_list = [None] * 100000
+                dc.col_data[index].extend(buf_list) 
             var_max_rows += 100000
             dc.col_data_len[index] = var_max_rows
 
@@ -657,18 +699,19 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
     if readstat_value_is_missing(value, variable):
         # The user does not want to retrieve missing values
         if not dc.usernan or readstat_value_is_system_missing(value):
-            if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
-                # already allocated
-                pass
-                #dc.col_data[index][obs_index] = np.nan
-            # for any type except float, the numpy type will be object as now we have nans
-            else:
-                dc.col_numpy_dtypes[index] = object
-                dc.col_dtypes_isobject[index] = 1
-                iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
-                dc.col_data[index][obs_index:] = np.nan
-                #dc.col_data[index][obs_index] = NAN
+            if output_format == "pandas":
+                if iscurnptypefloat == 1 or iscurnptypeobject == 1: 
+                    # already allocated
+                    pass
+                    #dc.col_data[index][obs_index] = np.nan
+                # for any type except float, the numpy type will be object as now we have nans
+                else:
+                    dc.col_numpy_dtypes[index] = object
+                    dc.col_dtypes_isobject[index] = 1
+                    iscurnptypeobject = 1
+                    dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
+                    dc.col_data[index][obs_index:] = np.nan
+                    #dc.col_data[index][obs_index] = NAN
         elif readstat_value_is_defined_missing(value, variable):
             # SPSS missing values
             pyvalue = convert_readstat_to_python_value(value, index, dc)
@@ -679,14 +722,17 @@ cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_va
             missing_tag = <int> readstat_value_tag(value)
             # In SAS missing values are A to Z or _ in stata a to z
             # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
-            if iscurnptypeobject == 1:
-                dc.col_data[index][obs_index] =  chr(missing_tag) 
+            if output_format == "pandas":
+                if iscurnptypeobject == 1:
+                    dc.col_data[index][obs_index] =  chr(missing_tag) 
+                else:
+                    dc.col_numpy_dtypes[index] = object
+                    dc.col_dtypes_isobject[index] = 1
+                    dc.col_dytpes_isfloat[index] = 0
+                    iscurnptypeobject = 1
+                    dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
+                    dc.col_data[index][obs_index] =  chr(missing_tag)
             else:
-                dc.col_numpy_dtypes[index] = object
-                dc.col_dtypes_isobject[index] = 1
-                dc.col_dytpes_isfloat[index] = 0
-                iscurnptypeobject = 1
-                dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
                 dc.col_data[index][obs_index] =  chr(missing_tag)
             curset = dc.missing_user_values.get(index)
             if curset is None:
@@ -942,23 +988,51 @@ cdef object data_container_to_dict(data_container data):
 
     return final_container
 
-
-cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
+cdef object dict_to_dataframe(object dict_data, data_container dc):
     """
     Transforms a dict of numpy arrays to a pandas data frame
     """
 
-    cdef bint dates_as_pandas
+    cdef bint dates_as_pandas, allsame
     cdef int index
-    cdef str column
+    cdef str column, output_format, col_name
     cdef py_datetime_format var_format
-    cdef list dtypes
+    cdef list dtypes, sertypes, datetime_cols, date_cols
+    cdef dict schema = None
 
     dates_as_pandas = dc.dates_as_pandas
+    output_format = dc.output_format
 
     if dict_data:
-        data_frame = pd.DataFrame.from_dict(dict_data)
-        if dates_as_pandas:
+        #schema = None
+        # in polars if missing user values we need to explicitly set the type 
+        # of that column to Object if not all the elements are of the same type
+        if output_format != "pandas" and dc.missing_user_values:
+            schema = dict()
+            for indx in range(0, len(dc.col_names)):
+                col_name = dc.col_names[indx]
+                if indx in dc.missing_user_values.keys():
+                    sertypes = [type(x) for x in dict_data[col_name] if x is not None]
+                    # all missing, let polars decide
+                    if not sertypes:
+                        schema[col_name] = None
+                        continue
+                    allsame = all([x==sertypes[0] for x in sertypes])
+                    # all the same: let polars decide
+                    if allsame:
+                        schema[col_name] = None
+                    # not all the same type, has to be Object
+                    else:
+                        schema[col_name] = nw.Object
+                else:
+                    schema[col_name] = None
+
+        data_frame = nw.from_dict(dict_data, backend=output_format, schema=schema)
+        natnamespace = nw.get_native_namespace(data_frame)
+        data_frame = data_frame.to_native()
+
+        if dates_as_pandas and output_format=="pandas":
+            pd = natnamespace
             dtypes = data_frame.dtypes.tolist()
             # check that datetime columns are datetime type
             # this is needed in case all date values are nan
@@ -966,11 +1040,27 @@ cdef object dict_to_pandas_dataframe(object dict_data, data_container dc):
                 var_format = dc.col_formats[index]
                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
                     data_frame[column] = pd.to_datetime(data_frame[column])
+
+        if output_format == "polars" and not dc.no_datetime_conversion:
+            # datetime and date vectorized conversion
+            pl = natnamespace
+            datetime_cols = list()
+            date_cols = list()
+            for index, column in enumerate(data_frame.columns):
+                var_format = dc.col_formats[index]
+                if var_format == DATE_FORMAT_DATETIME:
+                    datetime_cols.append(column)
+                if var_format == DATE_FORMAT_DATE:
+                    date_cols.append(column)
+            if datetime_cols:
+                data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*datetime_cols), time_unit='s'))
+            if date_cols:
+                data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*date_cols), time_unit='d'))
+
     else:
-        data_frame = pd.DataFrame()
+        data_frame = nw.from_dict(dict_data, backend=output_format).to_native()
 
     return data_frame
-
 
 cdef object data_container_extract_metadata(data_container data):
     """
@@ -1106,9 +1196,20 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     if output_format is None:
         output_format = 'pandas'
-    allowed_formats = {'pandas', 'dict'}
+    allowed_formats = {'pandas', 'dict', 'polars'}
     if output_format not in allowed_formats:
         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
+    if output_format == "pandas":
+        try:
+            import pandas
+        except:
+            raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
+    if output_format == "polars":
+        try:
+            import polars
+        except:
+            raise PyreadstatError("You requested polars as output_format but cannot import polars")
+
 
     if extra_date_formats is not None:
         if file_format == FILE_FORMAT_SAS:
@@ -1150,20 +1251,25 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     data.file_format = file_format
     data.metaonly = metaonly
     data.dates_as_pandas = dates_as_pandas
+    data.output_format = output_format
 
     if encoding:
         data.user_encoding = encoding
     
     if file_format == FILE_FORMAT_SAS:
         origin = sas_origin
+        unix_to_origin_secs = sas_secs_from_unix 
     elif file_format == FILE_FORMAT_SPSS:
         origin = spss_origin
+        unix_to_origin_secs = spss_secs_from_unix 
     elif file_format == FILE_FORMAT_STATA:
         origin = stata_origin
+        unix_to_origin_secs = stata_secs_from_unix 
     else:
         raise PyreadstatError("Unknown file format")
     
     data.origin = origin
+    data.unix_to_origin_secs = unix_to_origin_secs
 
     if usecols is not None:
         data.filter_cols = 1
@@ -1177,8 +1283,8 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     data_dict = data_container_to_dict(data)
     if output_format == 'dict':
         data_frame = data_dict
-    elif output_format == 'pandas':
-        data_frame = dict_to_pandas_dataframe(data_dict, data)
+    else:
+        data_frame = dict_to_dataframe(data_dict, data)
     metadata = data_container_extract_metadata(data)
 
     return data_frame, metadata

@@ -1,3 +1,7 @@
+# 1.3.1 (github, pypi and conda 2025.08.14)
+* make list of notes writable, solves #292
+* enable support for polars, solves #282
+
 # 1.3.0 (github, pypi and conda 2025.06.27)
 * updated Readstat sources to commit b2d5407d62caf3c33caadc0495c9f7684b6a0df7 
   solves #128, #165, #261, #284, 

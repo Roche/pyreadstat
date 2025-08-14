@@ -16,18 +16,13 @@
 # limitations under the License.
 # #############################################################################
 
-# TODO:
 ## if want to profile: # cython: profile=True
 
 import multiprocessing as mp
 
-import pandas as pd
+import narwhals.stable.v2 as nw
 import numpy as np
 
-#from readstat_api cimport readstat_parse_sas7bdat, readstat_parse_dta, readstat_parse_sav
-#from readstat_api cimport readstat_parse_por, readstat_parse_xport
-#from readstat_api cimport readstat_parse_sas7bcat
-#from readstat_api cimport readstat_begin_writing_dta, readstat_begin_writing_por, readstat_begin_writing_sav
 from _readstat_parser cimport py_file_format, py_file_extension, run_conversion
 from _readstat_parser import  PyreadstatError
 from _readstat_writer cimport run_write
@@ -55,7 +50,7 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
         dates_as_pandas_datetime : bool, optional
-            by default False. If true dates will be transformed to pandas datetime64 instead of date.
+            by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
         catalog_file : str, optional
             path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values
             by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,
@@ -63,9 +58,9 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.
         formats_as_category : bool, optional
             Will take effect only if the catalog_file was specified. If True the variables whose values were replaced
-            by the formats will be transformed into pandas categories.
+            by the formats will be transformed into categories.
         formats_as_ordered_category : bool, optional
-            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            defaults to False. If True the variables having formats will be transformed into ordered categories/enums.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
         encoding : str, optional
@@ -89,8 +84,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
-            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -102,8 +97,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
+        data_frame : dataframe or dict
+            a dataframe or dict with the data.
         metadata
             object with metadata. The members variables_value_labels will be empty unless a valid catalog file is
             supplied.
@@ -155,7 +150,7 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
         dates_as_pandas_datetime : bool, optional
-            by default False. If true dates will be transformed to pandas datetime64 instead of date.
+            by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
@@ -173,8 +168,8 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
-            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -185,8 +180,8 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
+        data_frame : dataframe or dict
+            a dataframe or dict with the data.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -230,15 +225,15 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
         dates_as_pandas_datetime : bool, optional
-            by default False. If true dates will be transformed to pandas datetime64 instead of date.
+            by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
         apply_value_formats : bool, optional
             by default False. If true it will change values in the dataframe for they value labels in the metadata,
             if any appropiate are found.
         formats_as_category : bool, optional
             by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
-            for their formatted version will be transformed into pandas categories.
+            for their formatted version will be transformed into categories.
         formats_as_ordered_category : bool, optional
-            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            defaults to False. If True the variables having formats will be transformed into ordered categories/enum.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
         encoding : str, optional
@@ -262,8 +257,8 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
-            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -274,8 +269,8 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
+        data_frame : dataframe or dict
+            a dataframe or dict with the data.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -325,15 +320,15 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
         dates_as_pandas_datetime : bool, optional
-            by default False. If true dates will be transformed to pandas datetime64 instead of date.
+            by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
         apply_value_formats : bool, optional
             by default False. If true it will change values in the dataframe for they value labels in the metadata,
             if any appropiate are found.
         formats_as_category : bool, optional
             by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
-            for their formatted version will be transformed into pandas categories.
+            for their formatted version will be transformed into categories.
         formats_as_ordered_category : bool, optional
-            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            defaults to False. If True the variables having formats will be transformed into ordered categories/enum.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
         encoding : str, optional
@@ -357,8 +352,8 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
-            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -369,8 +364,8 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
+        data_frame : dataframe or dict
+            a dataframe or dict with the data.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -421,15 +416,15 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             metadata object. The data frame will be set with the correct column names but no data.
             Notice that number_rows will be None as por files do not have the number of rows recorded in the file metadata.
         dates_as_pandas_datetime : bool, optional
-            by default False. If true dates will be transformed to pandas datetime64 instead of date.
+            by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
         apply_value_formats : bool, optional
             by default False. If true it will change values in the dataframe for they value labels in the metadata,
             if any appropiate are found.
         formats_as_category : bool, optional
             by default True. Takes effect only if apply_value_formats is True. If True, variables with values changed
-            for their formatted version will be transformed into pandas categories.
+            for their formatted version will be transformed into categories.
         formats_as_ordered_category : bool, optional
-            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            defaults to False. If True the variables having formats will be transformed into ordered categories/enum.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
         usecols : list, optional
@@ -446,8 +441,8 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         row_offset : int, optional
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
-            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a pandas
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -458,8 +453,8 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data. If the output_format is other than 'pandas' the object type will change accordingly.
+        data_frame : dataframe or dict
+            a dataframe or dict with the data.
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -510,15 +505,14 @@ def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
         output_format : str, optional
-            one of 'pandas' (default) or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned. 
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned. 
             Notice that for this function the resulting object is always empty, this is done for consistency with other functions
             but has no impact on performance.
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data (no data in this case, so will be empty). If the output_parameter is other
-            than 'pandas' then the object type will change accordingly altough the object will always be empty
+        data_frame : dataframe or dict
+            a dataframe with the data (no data in this case, so will be always empty).
         metadata :
             object with metadata. The member value_labels is the one that contains the formats.
             Look at the documentation for more information.
@@ -581,8 +575,8 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
 
     Yields
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data
+        data_frame : dataframe
+            a dataframe with the data
         metadata :
             object with metadata. 
             Look at the documentation for more information.
@@ -650,8 +644,8 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
 
     Returns
     -------
-        data_frame : pandas dataframe
-            a pandas data frame with the data
+        data_frame : dataframe
+            a dataframe with the data
         metadata :
             object with metadata. Look at the documentation for more information.
     """
@@ -703,21 +697,29 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
         for key in keys:
             final[key] = np.concatenate([chunk[key] for chunk in chunks])
     else:
-        final = pd.concat(chunks, axis=0, ignore_index=True)
+        #final = pd.concat(chunks, axis=0, ignore_index=True)
+        chunks = [nw.from_native(x) for x in chunks]
+        final = nw.concat(chunks, how='vertical')
+        ispandas = False
+        if final.implementation.is_pandas():
+            ispandas = True
+        final = final.to_native()
+        if ispandas:
+            final = final.reset_index(drop=True)
     return final, meta
 
 # Write API
 
-def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, str note=None,
+def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
                 dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
                 dict variable_measure=None, dict variable_format=None):
     """
-    Writes a pandas data frame to a SPSS sav or zsav file.
+    Writes a dataframe to a SPSS sav or zsav file.
 
     Parameters
     ----------
-    df : pandas data frame
-        pandas data frame to write to sav or zsav
+    df : dataframe
+        dataframe to write to sav or zsav
     dst_path : str or pathlib.Path
         full path to the result sav or zsav file
     file_label : str, optional
@@ -731,8 +733,8 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
         if true a zsav will be written, by default False, a sav is written
     row_compress : boolean, optional
         if true it applies row compression, by default False, compress and row_compress cannot be both true at the same time
-    note : str, optional
-        a note to add to the file
+    note : str or list of str, optional
+        a note or list of notes to add to the file
     variable_value_labels : dict, optional
         value labels, a dictionary with key variable name and value a dictionary with key values and
         values labels. Variable names must match variable names in the dataframe otherwise will be
@@ -786,12 +788,12 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
 def write_dta(df, dst_path, str file_label="", object column_labels=None, int version=15, 
             dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
     """
-    Writes a pandas data frame to a STATA dta file
+    Writes a dataframe to a STATA dta file
 
     Parameters
     ----------
-    df : pandas data frame
-        pandas data frame to write to sav or zsav
+    df : dataframe
+        dataframe to write to sav or zsav
     dst_path : str or pathlib.Path
         full path to the result dta file
     file_label : str, optional
@@ -848,15 +850,15 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
 def write_xport(df, dst_path, str file_label="", object column_labels=None, str table_name=None, int file_format_version = 8,
     dict variable_format=None):
     """
-    Writes a pandas data frame to a SAS Xport (xpt) file.
+    Writes a dataframe to a SAS Xport (xpt) file.
     If no table_name is specified the dataset has by default the name DATASET (take it into account if
     reading the file from SAS.)
     Versions 5 and 8 are supported, default is 8.
 
     Parameters
     ----------
-    df : pandas data frame
-        pandas data frame to write to xport
+    df : dataframe
+        dataframe to write to xport
     dst_path : str or pathlib.Path
         full path to the result xport file
     file_label : str, optional
@@ -891,12 +893,12 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
 
 def write_por(df, dst_path, str file_label="", object column_labels=None, dict variable_format=None):
     """
-    Writes a pandas data frame to a SPSS POR file.
+    Writes a dataframe to a SPSS POR file.
 
     Parameters
     ----------
-    df : pandas data frame
-        pandas data frame to write to por
+    df : dataframe
+        data frame to write to por
     dst_path : str or pathlib.Path
         full path to the result por file
     file_label : str, optional

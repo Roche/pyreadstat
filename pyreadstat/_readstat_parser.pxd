@@ -65,6 +65,7 @@ cdef class data_container:
     cdef list col_formats
     cdef list col_formats_original
     cdef object origin
+    cdef double unix_to_origin_secs
     cdef py_file_format file_format
     cdef bint is_unkown_number_rows
     cdef str file_label
@@ -89,12 +90,14 @@ cdef class data_container:
     cdef int ctime
     cdef int mtime
     cdef dict mr_sets
+    cdef str output_format
     
 cdef dict readstat_to_numpy_types
 
 # definitions of functions
 cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format)
-cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin, bint dates_as_pandas)
+cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_file_format file_format, object origin,
+                               bint dates_as_pandas, str output_format, double unix_to_origin_secs)
 
 cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READSTAT_HANDLER_ABORT
 cdef int handle_variable(int index, readstat_variable_t *variable, 
@@ -107,7 +110,7 @@ cdef void check_exit_status(readstat_error_t retcode) except *
 
 cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset) except *
 cdef object data_container_to_dict(data_container data)
-cdef object dict_to_pandas_dataframe(object final_container, data_container data)
+cdef object dict_to_dataframe(object dict_data, data_container dc)
 cdef object data_container_extract_metadata(data_container data)
 cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,
                            str encoding, bint metaonly, bint dates_as_pandas, list usecols, bint usernan,
