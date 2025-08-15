@@ -300,7 +300,7 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 
 | Function in this package | Purpose |
 | ------------------- | ----------- |
-| read_sas7dat        | read SAS sas7bdat files |
+| read_sas7bdat        | read SAS sas7bdat files |
 | read_xport          | read SAS Xport (XPT) files |
 | read_sas7bcat       | read SAS catalog files |
 | read_dta            | read STATA dta files |
