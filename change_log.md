@@ -1,3 +1,6 @@
+# 1.3.3 (github, pypi and conda 2026.01.xx)
+* bumped narwhals requirement version to 2.10.1
+
 # 1.3.2 (github, pypi and conda 2025.11.05)
 * correction to writing objects, solves #306
 * Pipeline to produce wheels migrated to cibuildwheel
