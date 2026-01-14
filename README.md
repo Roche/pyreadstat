@@ -749,8 +749,19 @@ with zipfile.ZipFile('archive.zip') as zf:
         df, meta = pyreadstat.read_sav(f)
 ```
 
-This approach avoids extracting large files to disk, which can significantly improve performance and reduce
-disk space requirements when working with compressed archives.
+**Reading from a remote URL:**
+
+```python
+import io
+import requests
+import pyreadstat
+
+response = requests.get('https://example.com/data.sav')
+df, meta = pyreadstat.read_sav(io.BytesIO(response.content))
+```
+
+This approach avoids downloading large files to disk, which can significantly improve performance and reduce
+disk space requirements when working with remote data or compressed archives.
 
 ### More writing options
 

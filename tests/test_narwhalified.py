@@ -23,6 +23,7 @@ import shutil
 import multiprocessing as mp
 import tempfile
 import zipfile
+import io
 
 import pandas as pd
 import narwhals as nw
@@ -1338,6 +1339,20 @@ class TestBasic(unittest.TestCase):
                     
                     self.assertEqual(len(df.columns), len(self.df_pandas.columns))
                     self.assertEqual(len(df), len(self.df_pandas))
+
+    def test_read_sav_bytesio(self):
+        """Test reading SAV file from BytesIO (simulates remote/streaming data)"""
+        sav_file = os.path.join(self.basic_data_folder, "sample.sav")
+        
+        with open(sav_file, "rb") as f:
+            file_bytes = f.read()
+        
+        buffer = io.BytesIO(file_bytes)
+        df, meta = pyreadstat.read_sav(buffer, output_format=self.backend)
+        
+        self.assertEqual(len(df.columns), len(self.df_pandas.columns))
+        self.assertEqual(len(df), len(self.df_pandas))
+        self.assertListEqual(list(df.columns), list(self.df_pandas.columns))
 
 
 if __name__ == '__main__':
