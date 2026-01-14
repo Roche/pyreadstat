@@ -21,6 +21,8 @@ import os
 import sys
 import shutil
 import multiprocessing as mp
+import tempfile
+import zipfile
 
 import pandas as pd
 import narwhals as nw
@@ -1321,6 +1323,21 @@ class TestBasic(unittest.TestCase):
         pyreadstat.write_sav(df, path)
         df2, meta = pyreadstat.read_sav(path,  output_format=self.backend)
         self.assertTrue(df_ori.to_native().equals(df2))
+
+    def test_read_sav_file_handle(self):
+        """Test reading SAV file from file-like object (e.g., zip archive)"""
+        sav_file = os.path.join(self.basic_data_folder, "sample.sav")
+        
+        with tempfile.NamedTemporaryFile(suffix=".zip", delete=True) as tmp:
+            with zipfile.ZipFile(tmp.name, "w", zipfile.ZIP_DEFLATED) as zf:
+                zf.write(sav_file, "sample.sav")
+            
+            with zipfile.ZipFile(tmp.name, "r") as zf:
+                with zf.open("sample.sav", "r") as fh:
+                    df, meta = pyreadstat.read_sav(fh, output_format=self.backend)
+                    
+                    self.assertEqual(len(df.columns), len(self.df_pandas.columns))
+                    self.assertEqual(len(df), len(self.df_pandas))
 
 
 if __name__ == '__main__':
