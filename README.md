@@ -50,6 +50,7 @@ the original applications in this regard.**
       + [SAS and STATA](#sas-and-stata)
     - [Reading datetime and date columns](#reading-datetime-and-date-columns)
     - [Other options](#other-options)
+    - [Reading from file-like objects](#reading-from-file-like-objects)
   + [More writing options](#more-writing-options)
     - [File specific options](#file-specific-options)
     - [Writing value labels](#writing-value-labels)
@@ -729,6 +730,38 @@ you want to transform the data to some other format different to pandas/polars, 
 process both in terms of speed and memory.
 
 For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
+
+#### Reading from file-like objects
+
+pyreadstat can read directly from file-like objects instead of file paths. This is useful for:
+- Reading from zip archives without extracting to disk
+- Reading from in-memory buffers (BytesIO)
+- Streaming from remote sources
+
+**Reading from a zip archive:**
+
+```python
+import zipfile
+import pyreadstat
+
+with zipfile.ZipFile('archive.zip') as zf:
+    with zf.open('data.sav') as f:
+        df, meta = pyreadstat.read_sav(f)
+```
+
+**Reading from a remote URL:**
+
+```python
+import io
+import requests
+import pyreadstat
+
+response = requests.get('https://example.com/data.sav')
+df, meta = pyreadstat.read_sav(io.BytesIO(response.content))
+```
+
+This approach avoids downloading large files to disk, which can significantly improve performance and reduce
+disk space requirements when working with remote data or compressed archives.
 
 ### More writing options
 
