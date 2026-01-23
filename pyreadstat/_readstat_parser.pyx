@@ -19,7 +19,8 @@
 from cpython.datetime cimport import_datetime, timedelta_new, datetime_new, total_seconds
 from cpython.exc cimport PyErr_Occurred
 from cpython.object cimport PyObject
-from libc.math cimport  floor #NAN,
+from libc.math cimport floor
+from libc.string cimport memcpy
 
 from collections import OrderedDict
 import datetime
@@ -864,6 +865,54 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         return -1
 
 
+cdef object _file_object_ctx = None
+
+cdef int pyobject_open_handler(const char *path, void *io_ctx) noexcept:
+    """File is already open - this is a no-op"""
+    return 0
+
+cdef int pyobject_close_handler(void *io_ctx) noexcept:
+    """User manages file lifetime - this is a no-op"""
+    return 0
+
+cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexcept:
+    """Bridge Python file.read() to C read operation"""
+    global _file_object_ctx
+    cdef bytes data
+    cdef ssize_t bytes_read
+    cdef char *data_ptr
+    
+    try:
+        file_obj = _file_object_ctx
+        data = file_obj.read(nbyte)
+        bytes_read = len(data)
+        if bytes_read > 0:
+            data_ptr = <char*>data
+            memcpy(buf, data_ptr, bytes_read)
+        return bytes_read
+    except:
+        return -1
+
+cdef readstat_off_t pyobject_seek_handler(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx) noexcept:
+    """Bridge Python file.seek() to C seek operation"""
+    global _file_object_ctx
+    cdef int py_whence
+    
+    try:
+        file_obj = _file_object_ctx
+        if whence == READSTAT_SEEK_SET:
+            py_whence = 0
+        elif whence == READSTAT_SEEK_CUR:
+            py_whence = 1
+        else:  # READSTAT_SEEK_END
+            py_whence = 2
+        
+        file_obj.seek(offset, py_whence)
+        return file_obj.tell()
+    except:
+        return -1
+
+
 cdef void check_exit_status(readstat_error_t retcode) except *:
     """
     transforms a readstat exit status to a python error if status is not READSTAT OK
@@ -877,10 +926,13 @@ cdef void check_exit_status(readstat_error_t retcode) except *:
         raise ReadstatError(err_message)
 
 
-cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset) except *:
+cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset, object file_obj=None) except *:
     """
-    Runs the parsing of the file by readstat library
+    Runs the parsing of the file by readstat library.
+    
+    If file_obj is provided, it will be used instead of filename for I/O operations.
     """
+    global _file_object_ctx
     
     cdef readstat_parser_t *parser
     cdef readstat_error_t error
@@ -889,6 +941,10 @@ cdef void run_readstat_parser(char * filename, data_container data, py_file_exte
     cdef readstat_value_handler value_handler
     cdef readstat_value_label_handler value_label_handler
     cdef readstat_note_handler note_handler
+    cdef readstat_open_handler open_handler
+    cdef readstat_close_handler close_handler
+    cdef readstat_read_handler read_handler
+    cdef readstat_seek_handler seek_handler
 
     cdef void *ctx
     cdef str err_message
@@ -914,8 +970,19 @@ cdef void run_readstat_parser(char * filename, data_container data, py_file_exte
     check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))
     check_exit_status(readstat_set_note_handler(parser, note_handler))
 
-    # on windows we need a custom open handler in order to deal with internation characters in the path.
-    if os.name == "nt":
+    # Set up custom I/O handlers for file objects
+    if file_obj is not None:
+        _file_object_ctx = file_obj
+        open_handler = <readstat_open_handler> pyobject_open_handler
+        close_handler = <readstat_close_handler> pyobject_close_handler
+        read_handler = <readstat_read_handler> pyobject_read_handler
+        seek_handler = <readstat_seek_handler> pyobject_seek_handler
+        readstat_set_open_handler(parser, open_handler)
+        readstat_set_close_handler(parser, close_handler)
+        readstat_set_read_handler(parser, read_handler)
+        readstat_set_seek_handler(parser, seek_handler)
+    elif os.name == "nt":
+        # on windows we need a custom open handler in order to deal with internation characters in the path.
         open_handler = <readstat_open_handler> handle_open
         readstat_set_open_handler(parser, open_handler)
 
@@ -1039,7 +1106,7 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
             for index, column in enumerate(data_frame.columns):
                 var_format = dc.col_formats[index]
                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
-                    data_frame[column] = pd.to_datetime(data_frame[column])
+                    data_frame.loc[:, column] = pd.to_datetime(data_frame[column])
 
         if output_format == "polars" and not dc.no_datetime_conversion:
             # datetime and date vectorized conversion
@@ -1161,7 +1228,10 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
                            list extra_datetime_formats, list extra_date_formats, list extra_time_formats):
     """
     Coordinates the activities to parse a file. This is the entry point 
-    for the public methods
+    for the public methods.
+    
+    filename_path can be a file path (str, bytes, Path-like) or a file-like object
+    with read() and seek() methods.
     """
     
     cdef bytes filename_bytes
@@ -1171,8 +1241,13 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     cdef set allowed_formats
     cdef object data_dict
     cdef object data_frame
+    cdef object file_obj = None
 
-    if hasattr(os, 'fsencode'):
+    # Check if filename_path is a file-like object
+    if hasattr(filename_path, 'read') and hasattr(filename_path, 'seek'):
+        file_obj = filename_path
+        filename_bytes = b""  # Empty path - will be ignored when file_obj is used
+    elif hasattr(os, 'fsencode'):
         try:
             filename_bytes = os.fsencode(filename_path)
         except UnicodeError:
@@ -1189,10 +1264,11 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
             raise PyreadstatError("path must be str, bytes or unicode")
         filename_bytes = filename_path.encode('utf-8')
 
-
-    filename_bytes = os.path.expanduser(filename_bytes)
-    if not os.path.isfile(filename_bytes):
-        raise PyreadstatError("File {0} does not exist!".format(filename_path))
+    # Only check file existence for path-based reads
+    if file_obj is None:
+        filename_bytes = os.path.expanduser(filename_bytes)
+        if not os.path.isfile(filename_bytes):
+            raise PyreadstatError("File {0} does not exist!".format(filename_path))
 
     if output_format is None:
         output_format = 'pandas'
@@ -1279,7 +1355,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
     data.no_datetime_conversion = no_datetime_conversion
     
     # go!
-    run_readstat_parser(filename, data, file_extension, row_limit, row_offset)    
+    run_readstat_parser(filename, data, file_extension, row_limit, row_offset, file_obj)    
     data_dict = data_container_to_dict(data)
     if output_format == 'dict':
         data_frame = data_dict

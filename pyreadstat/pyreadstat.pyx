@@ -44,8 +44,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
     
     Parameters
     ----------
-        filename_path : str, bytes or Path-like object
-            path to the file. In python 2.7 the string is assumed to be utf-8 encoded.
+        filename_path : str, bytes, Path-like object or file-like object
+            path to the file or file-like object. In python 2.7 the string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -144,8 +144,8 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
 
     Parameters
     ----------
-        filename_path : str, bytes or Path-like object
-            path to the file. In python 2.7 the string is assumed to be utf-8 encoded
+        filename_path : str, bytes, Path-like object or file-like object
+            path to the file or file-like object. In python 2.7 the string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -219,8 +219,8 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Parameters
     ----------
-        filename_path : str, bytes or Path-like object
-            path to the file. In Python 2.7 the string is assumed to be utf-8 encoded
+        filename_path : str, bytes, Path-like object or file-like object
+            path to the file or file-like object. In python 2.7 the string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -314,8 +314,8 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Parameters
     ----------
-        filename_path : str, bytes or Path-like object
-            path to the file. In Python 2.7 the string is assumed to be utf-8 encoded
+        filename_path : str, bytes, Path-like object or file-like object
+            path to the file or file-like object. In python 2.7 the string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -409,8 +409,8 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
     Parameters
     ----------
-        filename_path : str, bytes or Path-like object
-            path to the file. In Python 2.7 the string is assumed to be utf-8 encoded
+        filename_path : str, bytes, Path-like object or file-like object
+            path to the file or file-like object. In python 2.7 the string is assumed to be utf-8 encoded.
         metadataonly : bool, optional
             by default False. IF true, no data will be read but only metadata, so that you can get all elements in the
             metadata object. The data frame will be set with the correct column names but no data.
@@ -499,8 +499,8 @@ def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
 
     Parameters
     ----------
-        filename_path : str, bytes or Path-like object
-            path to the file. The string is assumed to be utf-8 encoded
+        filename_path : str, bytes, Path-like object or file-like object
+            path to the file or file-like object. In python 2.7 the string is assumed to be utf-8 encoded.
         encoding : str, optional
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
