@@ -31,6 +31,7 @@ try:
 except:
     pass
 
+is_pandas_version_newer_than_2 = int(pd.__version__.split(".")[0])>2
 
 class TestBasic(unittest.TestCase):
     """
@@ -671,6 +672,10 @@ class TestBasic(unittest.TestCase):
         fpath = os.path.join(self.basic_data_folder, "sample.xpt")
         df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_xport, fpath, num_rows=1000) 
         df_single, meta_single = pyreadstat.read_xport(fpath)
+        if is_pandas_version_newer_than_2:
+            # because in multi there are NaN values in a chunk these columns get object type
+            df_single['DTIME'] = df_single['DTIME'].astype(object)
+            df_single['MYCHAR'] = df_single['MYCHAR'].astype(object)
         self.assertTrue(df_multi.equals(df_single))
 
     # writing

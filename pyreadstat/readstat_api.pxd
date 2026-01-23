@@ -66,7 +66,9 @@ cdef extern from "readstat.h":
         int num_subvars
 
     ctypedef enum readstat_io_flags_t:
-        pass
+        READSTAT_SEEK_SET,
+        READSTAT_SEEK_CUR,
+        READSTAT_SEEK_END
     
     ctypedef enum readstat_error_t:
         READSTAT_OK,
@@ -146,7 +148,9 @@ cdef extern from "readstat.h":
     cdef void readstat_parser_free(readstat_parser_t *parser)
 
     ctypedef int (*readstat_open_handler)(const char *path, void *io_ctx);
+    ctypedef int (*readstat_close_handler)(void *io_ctx);
     ctypedef readstat_off_t (*readstat_seek_handler)(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx);
+    ctypedef ssize_t (*readstat_read_handler)(void *buf, size_t nbyte, void *io_ctx);
     ctypedef int (*readstat_metadata_handler)(readstat_metadata_t *metadata, void *ctx);
     ctypedef int (*readstat_variable_handler)(int index, readstat_variable_t *variable, char *val_labels, void *ctx);
     ctypedef int (*readstat_value_handler)(int obs_index, readstat_variable_t *variable, readstat_value_t value, void *ctx);
@@ -154,7 +158,10 @@ cdef extern from "readstat.h":
     ctypedef int (*readstat_note_handler)(int note_index, const char *note, void *ctx);
 
     cdef readstat_error_t readstat_set_open_handler(readstat_parser_t *parser, readstat_open_handler open_handler);
+    cdef readstat_error_t readstat_set_close_handler(readstat_parser_t *parser, readstat_close_handler close_handler);
     cdef readstat_error_t readstat_set_seek_handler(readstat_parser_t *parser, readstat_seek_handler seek_handler);
+    cdef readstat_error_t readstat_set_read_handler(readstat_parser_t *parser, readstat_read_handler read_handler);
+    cdef readstat_error_t readstat_set_io_ctx(readstat_parser_t *parser, void *io_ctx);
     cdef readstat_error_t readstat_set_metadata_handler(readstat_parser_t *parser, readstat_metadata_handler metadata_handler);
     cdef readstat_error_t readstat_set_note_handler(readstat_parser_t *parser, readstat_note_handler note_handler);
     cdef readstat_error_t readstat_set_variable_handler(readstat_parser_t *parser, readstat_variable_handler variable_handler)

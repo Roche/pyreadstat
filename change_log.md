@@ -1,5 +1,8 @@
-# 1.3.3 (github, pypi and conda 2026.01.xx)
+# 1.3.3 (github, pypi and conda 2026.01.23)
 * bumped narwhals requirement version to 2.10.1
+* Added reading from file handles, solves #308
+* Adapted code and tests to work with pandas 3.0
+* Updated Readstat sources to a4984d5276e6591087d13b20655b30f023d3c3b0
 
 # 1.3.2 (github, pypi and conda 2025.11.05)
 * correction to writing objects, solves #306

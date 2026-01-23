@@ -49,6 +49,7 @@ the original applications in this regard.**
       + [SPSS](#spss)
       + [SAS and STATA](#sas-and-stata)
     - [Reading datetime and date columns](#reading-datetime-and-date-columns)
+    - [Reading from file-like objects](#reading-from-file-like-objects)
     - [Other options](#other-options)
   + [More writing options](#more-writing-options)
     - [File specific options](#file-specific-options)
@@ -698,6 +699,38 @@ import pyreadstat
 
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', extra_date_formats=["YEAR", "MMYY"])
 ```
+
+#### Reading from file-like objects
+
+pyreadstat can read directly from file-like objects instead of file paths. This is useful for:
+- Reading from zip archives without extracting to disk
+- Reading from in-memory buffers (BytesIO)
+- Streaming from remote sources
+
+**Reading from a zip archive:**
+
+```python
+import zipfile
+import pyreadstat
+
+with zipfile.ZipFile('archive.zip') as zf:
+    with zf.open('data.sav') as f:
+        df, meta = pyreadstat.read_sav(f)
+```
+
+**Reading from a remote URL:**
+
+```python
+import io
+import requests
+import pyreadstat
+
+response = requests.get('https://example.com/data.sav')
+df, meta = pyreadstat.read_sav(io.BytesIO(response.content))
+```
+
+This approach avoids downloading large files to disk, which can significantly improve performance and reduce
+disk space requirements when working with remote data or compressed archives.
 
 #### Other options
 
