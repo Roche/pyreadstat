@@ -1339,17 +1339,19 @@ class TestBasic(unittest.TestCase):
     def test_read_sav_file_handle(self):
         """Test reading SAV file from file-like object (e.g., zip archive)"""
         sav_file = os.path.join(self.basic_data_folder, "sample.sav")
+        zip_file = os.path.join(self.write_folder, "sample.zip")
         
-        with tempfile.NamedTemporaryFile(suffix=".zip", delete=True, dir=self.write_folder) as tmp:
-            with zipfile.ZipFile(tmp.name, "w", zipfile.ZIP_DEFLATED) as zf:
-                zf.write(sav_file, "sample.sav")
+        #with tempfile.NamedTemporaryFile(suffix=".zip", delete=True, dir=self.write_folder) as tmp:
+        with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.write(sav_file, "sample.sav")
             
-            with zipfile.ZipFile(tmp.name, "r") as zf:
-                with zf.open("sample.sav", "r") as fh:
-                    df, meta = pyreadstat.read_sav(fh, output_format=self.backend)
-                    
-                    self.assertEqual(len(df.columns), len(self.df_pandas.columns))
-                    self.assertEqual(len(df), len(self.df_pandas))
+        #with zipfile.ZipFile(tmp.name, "r") as zf:
+        with zipfile.ZipFile(zip_file, "r") as zf:
+            with zf.open("sample.sav", "r") as fh:
+                df, meta = pyreadstat.read_sav(fh, output_format=self.backend)
+                
+                self.assertEqual(len(df.columns), len(self.df_pandas.columns))
+                self.assertEqual(len(df), len(self.df_pandas))
 
     def test_read_sav_bytesio(self):
         """Test reading SAV file from BytesIO (simulates remote/streaming data)"""
