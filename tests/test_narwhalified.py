@@ -1340,7 +1340,7 @@ class TestBasic(unittest.TestCase):
         """Test reading SAV file from file-like object (e.g., zip archive)"""
         sav_file = os.path.join(self.basic_data_folder, "sample.sav")
         
-        with tempfile.NamedTemporaryFile(suffix=".zip", delete=True, delete_on_close=False) as tmp:
+        with tempfile.NamedTemporaryFile(suffix=".zip", delete=True, dir=self.write_folder) as tmp:
             with zipfile.ZipFile(tmp.name, "w", zipfile.ZIP_DEFLATED) as zf:
                 zf.write(sav_file, "sample.sav")
             
