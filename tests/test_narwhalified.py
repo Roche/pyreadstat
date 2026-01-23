@@ -1339,19 +1339,20 @@ class TestBasic(unittest.TestCase):
     def test_read_sav_file_handle(self):
         """Test reading SAV file from file-like object (e.g., zip archive)"""
         sav_file = os.path.join(self.basic_data_folder, "sample.sav")
-        zip_file = os.path.join(self.write_folder, "sample.zip")
         
         #with tempfile.NamedTemporaryFile(suffix=".zip", delete=True, dir=self.write_folder) as tmp:
-        with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zf:
-            zf.write(sav_file, "sample.sav")
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_file = os.path.join(tmp_dir, "sample.zip")
+            with zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED) as zf:
+                zf.write(sav_file, "sample.sav")
             
-        #with zipfile.ZipFile(tmp.name, "r") as zf:
-        with zipfile.ZipFile(zip_file, "r") as zf:
-            with zf.open("sample.sav", "r") as fh:
-                df, meta = pyreadstat.read_sav(fh, output_format=self.backend)
-                
-                self.assertEqual(len(df.columns), len(self.df_pandas.columns))
-                self.assertEqual(len(df), len(self.df_pandas))
+            #with zipfile.ZipFile(tmp.name, "r") as zf:
+            with zipfile.ZipFile(zip_file, "r") as zf:
+                with zf.open("sample.sav", "r") as fh:
+                    df, meta = pyreadstat.read_sav(fh, output_format=self.backend)
+                    
+                    self.assertEqual(len(df.columns), len(self.df_pandas.columns))
+                    self.assertEqual(len(df), len(self.df_pandas))
 
     def test_read_sav_bytesio(self):
         """Test reading SAV file from BytesIO (simulates remote/streaming data)"""
@@ -1366,6 +1367,34 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(len(df.columns), len(self.df_pandas.columns))
         self.assertEqual(len(df), len(self.df_pandas))
         self.assertListEqual(list(df.columns), list(self.df_pandas.columns))
+
+    def test_sas7bdat_bytesio_chunk(self):
+        sas7bdat_file = os.path.join(self.basic_data_folder, "sample.sas7bdat")
+
+        with open(sas7bdat_file, "rb") as f:
+            file_bytes = f.read()
+        
+        buffer = io.BytesIO(file_bytes)
+
+        df, meta = pyreadstat.read_sas7bdat(buffer, row_limit = 2, row_offset =1, output_format=self.backend)
+        df_pandas = nw.from_native(self.df_pandas)[1:3].to_native()
+        if self.backend == "pandas":
+            df_pandas = df_pandas.reset_index(drop=True)
+            df_pandas["dtime"] = pd.to_datetime(df_pandas["dtime"])
+        self.assertTrue(df.equals(df_pandas))
+        self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
+        self.assertTrue(meta.number_rows == len(df_pandas))
+
+    def test_multiprocess_reader_bytesio(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        with open(fpath, "rb") as f:
+            file_bytes = f.read()
+        
+        buffer = io.BytesIO(file_bytes)
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, buffer, output_format=self.backend) 
+        df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
+        self.assertTrue(df_multi.equals(df_single))
+        self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
 
 
 if __name__ == '__main__':
