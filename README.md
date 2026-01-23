@@ -49,8 +49,8 @@ the original applications in this regard.**
       + [SPSS](#spss)
       + [SAS and STATA](#sas-and-stata)
     - [Reading datetime and date columns](#reading-datetime-and-date-columns)
-    - [Other options](#other-options)
     - [Reading from file-like objects](#reading-from-file-like-objects)
+    - [Other options](#other-options)
   + [More writing options](#more-writing-options)
     - [File specific options](#file-specific-options)
     - [Writing value labels](#writing-value-labels)
@@ -700,37 +700,6 @@ import pyreadstat
 df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', extra_date_formats=["YEAR", "MMYY"])
 ```
 
-#### Other options
-
-You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459).
-This is absolutely necessary if you are handling old xport files with
-non-ascii characters. Those files do not have stamped the encoding in the
-file itself, therefore the encoding must be set manually. For SPSS POR files it is not possible to set the encoding and
-files are assumed to be always encoded in UTF-8.
-
-
-```python
-import pyreadstat
-
-df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', encoding="LATIN1")
-```
-
-You can preserve the original pandas behavior regarding dates (meaning dates are converted to pandas datetime) with the
-dates_as_pandas_datetime option. This option is effective for pandas only, not for polars.
-
-```python
-import pyreadstat
-
-df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_datetime=True)
-```
-
-You can get a dictionary of numpy arrays instead of a pandas or polars dataframe when reading any file format.
-In order to do that, set the parameter output_format='dict' (default is 'pandas', the other option is 'polars'). This is useful if
-you want to transform the data to some other format different to pandas/polars, as transforming the data to pandas is a costly
-process both in terms of speed and memory.
-
-For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
-
 #### Reading from file-like objects
 
 pyreadstat can read directly from file-like objects instead of file paths. This is useful for:
@@ -762,6 +731,37 @@ df, meta = pyreadstat.read_sav(io.BytesIO(response.content))
 
 This approach avoids downloading large files to disk, which can significantly improve performance and reduce
 disk space requirements when working with remote data or compressed archives.
+
+#### Other options
+
+You can set the encoding of the original file manually. The encoding must be a [iconv-compatible encoding](https://gist.github.com/hakre/4188459).
+This is absolutely necessary if you are handling old xport files with
+non-ascii characters. Those files do not have stamped the encoding in the
+file itself, therefore the encoding must be set manually. For SPSS POR files it is not possible to set the encoding and
+files are assumed to be always encoded in UTF-8.
+
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', encoding="LATIN1")
+```
+
+You can preserve the original pandas behavior regarding dates (meaning dates are converted to pandas datetime) with the
+dates_as_pandas_datetime option. This option is effective for pandas only, not for polars.
+
+```python
+import pyreadstat
+
+df, meta = pyreadstat.read_sas7bdat('/path/to/a/file.sas7bdat', dates_as_pandas_datetime=True)
+```
+
+You can get a dictionary of numpy arrays instead of a pandas or polars dataframe when reading any file format.
+In order to do that, set the parameter output_format='dict' (default is 'pandas', the other option is 'polars'). This is useful if
+you want to transform the data to some other format different to pandas/polars, as transforming the data to pandas is a costly
+process both in terms of speed and memory.
+
+For more information, please check the [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html).
 
 ### More writing options
 
