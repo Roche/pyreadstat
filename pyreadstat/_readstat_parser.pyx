@@ -1106,7 +1106,7 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
             for index, column in enumerate(data_frame.columns):
                 var_format = dc.col_formats[index]
                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
-                    data_frame[column] = pd.to_datetime(data_frame[column])
+                    data_frame.loc[:, column] = pd.to_datetime(data_frame[column])
 
         if output_format == "polars" and not dc.no_datetime_conversion:
             # datetime and date vectorized conversion

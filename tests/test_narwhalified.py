@@ -37,6 +37,7 @@ try:
 except:
     pass
 
+is_pandas_version_newer_than_2 = int(pd.__version__.split(".")[0])>2
 
 class TestBasic(unittest.TestCase):
     """
@@ -756,6 +757,10 @@ class TestBasic(unittest.TestCase):
         fpath = os.path.join(self.basic_data_folder, "sample.xpt")
         df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_xport, fpath, num_rows=1000, output_format=self.backend) 
         df_single, meta_single = pyreadstat.read_xport(fpath, output_format=self.backend)
+        if is_pandas_version_newer_than_2 and self.backend=="pandas":
+            # because in multi there are NaN values in a chunk these columns get object type
+            df_single['DTIME'] = df_single['DTIME'].astype(object)
+            df_single['MYCHAR'] = df_single['MYCHAR'].astype(object)
         self.assertTrue(df_multi.equals(df_single))
 
 
@@ -1291,9 +1296,12 @@ class TestBasic(unittest.TestCase):
         df2, meta2 = pyreadstat.read_sav(path, apply_value_formats=True, output_format=self.backend)
         new_ser = nw.new_series(name="a", values=[str(x) for x in df2["a"]], dtype=nw.String, backend=self.backend)
         df2 = nw.from_native(df2).with_columns(new_ser.alias("a")).to_native()
+        cat_type = object
+        if is_pandas_version_newer_than_2:
+            cat_type = str
         if self.backend == "pandas":
             df_control = nw.from_native(df_control).with_columns(nw.col('b').cast(nw.Categorical)).to_native()
-            df_control['c'] = df_control['c'].astype(object).astype("category")
+            df_control['c'] = df_control['c'].astype(cat_type).astype("category")
         self.assertTrue(df2.equals(df_control))
 
     def test_sav_write_mixed_types(self):
@@ -1303,6 +1311,9 @@ class TestBasic(unittest.TestCase):
             kwds["try_parse_dates"] = True
         df_ori = nw.read_csv(csv_path, backend=self.backend, **kwds)
         df = df_ori.clone()
+        time_unit = "ns"
+        if is_pandas_version_newer_than_2:
+            time_unit = "us"
         if self.backend != "pandas":
             # convince polars to take columns with mixed types
             temp = [0 if x=="0" else x for x in df["col_other"]]
@@ -1317,8 +1328,8 @@ class TestBasic(unittest.TestCase):
                                    .then(nw.lit(datetime.strptime('2814-01-01 00:00:00', '%Y-%m-%d %H:%M:%S')))
                                    .otherwise(nw.col('total_time'))
                                    .alias('total_time'))
-            df = df.with_columns(nw.col("datestamp").cast(nw.Datetime(time_unit="ns")))
-            df_ori = df_ori.with_columns(nw.col("datestamp").cast(nw.Datetime(time_unit="ns")))
+            df = df.with_columns(nw.col("datestamp").cast(nw.Datetime(time_unit=time_unit)))
+            df_ori = df_ori.with_columns(nw.col("datestamp").cast(nw.Datetime(time_unit=time_unit)))
         df = df.to_native()
         path = os.path.join(self.write_folder, "mixed_types.sav")
         pyreadstat.write_sav(df, path)
