@@ -16,6 +16,8 @@
 # limitations under the License.
 # #############################################################################
 
+## if want to profile: # cython: profile=True
+
 from cpython.datetime cimport import_datetime, timedelta_new, datetime_new, total_seconds
 from cpython.exc cimport PyErr_Occurred
 from cpython.object cimport PyObject
@@ -1365,3 +1367,56 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     return data_frame, metadata
     
+def parser_entry_point(filename_path, str parser_format=None,
+                       metadataonly=False, dates_as_pandas_datetime=False, 
+             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None, 
+             list extra_date_formats=None, list extra_time_formats=None):
+
+
+    cdef py_file_format file_format
+    cdef py_file_extension file_extension
+
+    if parser_format == "sav/zsav":
+        file_format = FILE_FORMAT_SPSS
+        file_extension = FILE_EXT_SAV
+    elif parser_format == "sas7bdat":
+        file_format = FILE_FORMAT_SAS
+        file_extension = FILE_EXT_SAS7BDAT
+    elif parser_format == "xport":
+        file_format = FILE_FORMAT_SAS
+        file_extension = FILE_EXT_XPORT
+    elif parser_format == "dta":
+        file_format = FILE_FORMAT_STATA
+        file_extension = FILE_EXT_DTA
+    elif parser_format == "por":
+        file_format = FILE_FORMAT_SPSS
+        file_extension = FILE_EXT_POR
+    elif parser_format == "sas7bcat":
+        file_format = FILE_FORMAT_SAS
+        file_extension = FILE_EXT_SAS7BCAT
+    else:
+        raise PyreadstatError("wrong parser format")
+
+    cdef bint metaonly = 0
+    if metadataonly:
+        metaonly = 1
+
+    cdef bint dates_as_pandas = 0
+    if dates_as_pandas_datetime:
+        dates_as_pandas = 1
+
+    cdef bint usernan = 0
+    if user_missing:
+        usernan = 1
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
+    
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
+                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
+
+    return data_frame, metadata
+

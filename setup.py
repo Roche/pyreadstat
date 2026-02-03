@@ -115,14 +115,7 @@ else:
 
 # Extensions
 sources.sort()
-extensions = [Extension("pyreadstat.pyreadstat",
-                    sources=["pyreadstat/pyreadstat" + ext] + sources,
-                    # this dot here is important for cython to find the pxd files
-                    include_dirs =include_dirs,
-                    libraries=libraries,
-                    library_dirs=library_dirs,
-                    extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"] ),
-                Extension("pyreadstat._readstat_parser",
+extensions = [Extension("pyreadstat._readstat_parser",
                     sources=["pyreadstat/_readstat_parser" + ext] + sources,
                     include_dirs = include_dirs,
                     library_dirs=library_dirs,
@@ -156,7 +149,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.3.3',
+    version='1.3.4',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

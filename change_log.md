@@ -1,3 +1,6 @@
+# 1.3.4 (github, pypi and conda 2026.xx.xx)
+* Refactored pyreadstat.pyx to pyreadstat.py solves #299
+
 # 1.3.3 (github, pypi and conda 2026.01.23)
 * bumped narwhals requirement version to 2.10.1
 * Added reading from file handles, solves #308

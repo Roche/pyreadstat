@@ -1,5 +1,3 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
-
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -16,28 +14,24 @@
 # limitations under the License.
 # #############################################################################
 
-## if want to profile: # cython: profile=True
-
 import multiprocessing as mp
 
 import narwhals.stable.v2 as nw
 import numpy as np
 
-from _readstat_parser cimport py_file_format, py_file_extension, run_conversion
-from _readstat_parser import  PyreadstatError
-from _readstat_writer cimport run_write
-cimport _readstat_parser, _readstat_writer
-from worker import worker
-from pyfunctions import set_value_labels, set_catalog_to_sas
+from ._readstat_parser import  PyreadstatError, parser_entry_point
+from ._readstat_writer import writer_entry_point
+from .worker import worker
+from .pyfunctions import set_value_labels, set_catalog_to_sas
 
 # Public interface
 
 # Parsing functions
 
 def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
-                  formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-                  disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
-                  list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+                  formats_as_category=True, formats_as_ordered_category=False, encoding=None, usecols=None, user_missing=False,
+                  disable_datetime_conversion=False, row_limit=0, row_offset=0, output_format=None,
+                  extra_datetime_formats=None, extra_date_formats=None, extra_time_formats=None):
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
@@ -104,29 +98,16 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             supplied.
             Look at the documentation for more information.
     """
+    parser_format = "sas7bdat"
+    data_frame, metadata = parser_entry_point(filename_path, parser_format,
+                                              metadataonly=metadataonly, dates_as_pandas_datetime=dates_as_pandas_datetime,
+             formats_as_category=formats_as_category, formats_as_ordered_category=formats_as_ordered_category,
+                                              encoding=encoding, usecols=usecols, user_missing=user_missing,
+             disable_datetime_conversion=disable_datetime_conversion, row_limit=row_limit, row_offset=row_offset,
+                                              output_format=output_format, extra_datetime_formats=extra_datetime_formats, 
+             extra_date_formats=extra_date_formats, extra_time_formats=extra_time_formats)
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-    if user_missing:
-        usernan = 1
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAS7BDAT
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "sas7bdat"
+    metadata.file_format = parser_format
 
     if catalog_file:
         _ , catalog = read_sas7bcat(catalog_file, encoding=encoding)
@@ -136,9 +117,9 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
     return data_frame, metadata
 
 
-def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
-               list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0,
-               str output_format=None, list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, encoding=None,
+               usecols=None, disable_datetime_conversion=False, row_limit=0, row_offset=0,
+               output_format=None, extra_datetime_formats=None, extra_date_formats=None, extra_time_formats=None):
     r"""
     Read a SAS xport file.
 
@@ -185,35 +166,23 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "xport"
+    data_frame, metadata = parser_entry_point(filename_path, parser_format,
+                                              metadataonly=metadataonly, dates_as_pandas_datetime=dates_as_pandas_datetime,
+                                              encoding=encoding, usecols=usecols,
+             disable_datetime_conversion=disable_datetime_conversion, row_limit=row_limit, row_offset=row_offset,
+                                              output_format=output_format, extra_datetime_formats=extra_datetime_formats, 
+             extra_date_formats=extra_date_formats, extra_time_formats=extra_time_formats)
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_XPORT
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "xport"
+    metadata.file_format = parser_format
 
     return data_frame, metadata
 
 
 def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
-             list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+             formats_as_category=True, formats_as_ordered_category=False, encoding=None, usecols=None, user_missing=False,
+             disable_datetime_conversion=False, row_limit=0, row_offset=0, output_format=None,
+             extra_datetime_formats=None, extra_date_formats=None, extra_time_formats=None):
     r"""
     Read a STATA dta file
 
@@ -274,29 +243,16 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "dta"
+    data_frame, metadata = parser_entry_point(filename_path, parser_format=parser_format,
+                                              metadataonly=metadataonly, dates_as_pandas_datetime=dates_as_pandas_datetime,
+             formats_as_category=formats_as_category, formats_as_ordered_category=formats_as_ordered_category,
+                                              encoding=encoding, usecols=usecols, user_missing=user_missing,
+             disable_datetime_conversion=disable_datetime_conversion, row_limit=row_limit, row_offset=row_offset,
+                                              output_format=output_format, extra_datetime_formats=extra_datetime_formats, 
+             extra_date_formats=extra_date_formats, extra_time_formats=extra_time_formats)
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-    if user_missing:
-        usernan = 1
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_DTA
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "dta"
+    metadata.file_format = parser_format
 
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category,
@@ -306,9 +262,9 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
 
 def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None, 
-             list extra_date_formats=None, list extra_time_formats=None):
+             formats_as_category=True, formats_as_ordered_category=False, encoding=None, usecols=None, user_missing=False,
+             disable_datetime_conversion=False, row_limit=0, row_offset=0, output_format=None, extra_datetime_formats=None, 
+             extra_date_formats=None, extra_time_formats=None):
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -369,29 +325,17 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "sav/zsav"
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
+    data_frame, metadata = parser_entry_point(filename_path, parser_format=parser_format,
+                                              metadataonly=metadataonly, dates_as_pandas_datetime=dates_as_pandas_datetime,
+             formats_as_category=formats_as_category, formats_as_ordered_category=formats_as_ordered_category,
+                                              encoding=encoding, usecols=usecols, user_missing=user_missing,
+             disable_datetime_conversion=disable_datetime_conversion, row_limit=row_limit, row_offset=row_offset,
+                                              output_format=output_format, extra_datetime_formats=extra_datetime_formats, 
+             extra_date_formats=extra_date_formats, extra_time_formats=extra_time_formats)
 
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-    if user_missing:
-        usernan = 1
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAV
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "sav/zsav"
+    metadata.file_format = parser_format
 
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category,
@@ -401,9 +345,9 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
 
 
 def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, list usecols=None,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
-             list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+             formats_as_category=True, formats_as_ordered_category=False, usecols=None,
+             disable_datetime_conversion=False, row_limit=0, row_offset=0, output_format=None,
+             extra_datetime_formats=None, extra_date_formats=None, extra_time_formats=None):
     r"""
     Read a SPSS por file. Files are assumed to be UTF-8 encoded, the encoding cannot be set to other.
 
@@ -458,36 +402,24 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "por"
+    data_frame, metadata = parser_entry_point(filename_path, parser_format=parser_format,
+                                              metadataonly=metadataonly, dates_as_pandas_datetime=dates_as_pandas_datetime,
+             formats_as_category=formats_as_category, formats_as_ordered_category=formats_as_ordered_category,
+                                               usecols=usecols, 
+             disable_datetime_conversion=disable_datetime_conversion, row_limit=row_limit, row_offset=row_offset,
+                                              output_format=output_format, extra_datetime_formats=extra_datetime_formats, 
+             extra_date_formats=extra_date_formats, extra_time_formats=extra_time_formats)
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-
-    cdef str encoding = None
+    metadata.file_format = parser_format
     
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_POR
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "por"
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
 
     return data_frame, metadata
 
 
-def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
+def read_sas7bcat(filename_path, encoding=None, output_format=None):
     r"""
     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
     value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
@@ -517,23 +449,13 @@ def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
             object with metadata. The member value_labels is the one that contains the formats.
             Look at the documentation for more information.
     """
-    cdef bint metaonly = 1
-    cdef bint dates_as_pandas = 0
-    cdef list usecols = None
-    cdef bint usernan = 0
-    cdef bint no_datetime_conversion = 0
-    cdef long row_limit=0
-    cdef long row_offset=0
-    cdef list extra_datetime_formats=None
-    cdef list extra_date_formats=None
-    cdef list extra_time_formats=None
+    parser_format = "sas7bcat"
+    data_frame, metadata = parser_entry_point(filename_path, parser_format=parser_format,
+                                              encoding=encoding, 
+                                              output_format=output_format, 
+             )
 
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAS7BCAT
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, row_limit, row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "sas7bcat"
+    metadata.file_format = parser_format
 
     return data_frame, metadata
 
@@ -710,9 +632,9 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
 
 # Write API
 
-def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
-                dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
-                dict variable_measure=None, dict variable_format=None):
+def write_sav(df, dst_path, file_label="", column_labels=None, compress=False, row_compress=False, note=None,
+                variable_value_labels=None, missing_ranges=None, variable_display_width=None,
+                variable_measure=None, variable_format=None):
     """
     Writes a dataframe to a SPSS sav or zsav file.
 
@@ -758,20 +680,7 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
         values being strings defining the format. See README, setting variable formats section,
         for more information.
     """
-
-    cdef int file_format_version = 2
-    cdef str var_width
-    cdef bint row_compression = 0
-    if compress and row_compress:
-        raise PyreadstatError("compress and row_compress cannot be both True")
-    if compress:
-        file_format_version = 3
-    if row_compress:
-        row_compression = 1
-    cdef table_name = ""
-    cdef dict missing_user_values = None
-    cdef dict variable_alignment = None
-
+    writer_format = "sav"
 
     # formats
     formats_presets = {'restricted_integer':'N{var_width}', 'integer':'F{var_width}.0'}
@@ -781,12 +690,13 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
                 var_width = str(len(str(max(df[col_name]))))
                 variable_format[col_name] = formats_presets[col_format].format(var_width=var_width) 
     
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
-        file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, row_compression)
+    writer_entry_point(df, dst_path, writer_format=writer_format, file_label=file_label, column_labels=column_labels,
+                       compress=compress, row_compress=row_compress, note=note,
+                variable_value_labels=variable_value_labels, missing_ranges=missing_ranges, variable_display_width=variable_display_width,
+                variable_measure=variable_measure, variable_format=variable_format)
 
-def write_dta(df, dst_path, str file_label="", object column_labels=None, int version=15, 
-            dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
+def write_dta(df, dst_path, file_label="", column_labels=None, version=15, 
+            variable_value_labels=None, missing_user_values=None, variable_format=None):
     """
     Writes a dataframe to a STATA dta file
 
@@ -819,36 +729,15 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
         for more information.
     """
 
-    if version == 15:
-        file_format_version = 119
-    elif version == 14:
-        file_format_version = 118
-    elif version == 13:
-        file_format_version = 117
-    elif version == 12:
-        file_format_version = 115
-    elif version in {10, 11}:
-        file_format_version = 114
-    elif version in {8, 9}:
-        file_format_version = 113
-    else:
-        raise Exception("Version not supported")
+    writer_format = "dta"
+    writer_entry_point(df, dst_path, writer_format=writer_format, file_label=file_label, column_labels=column_labels,
+                       version=version,
+                variable_value_labels=variable_value_labels, 
+                missing_user_values=missing_user_values,
+               variable_format=variable_format)
 
-    cdef str note = ""
-    cdef str table_name = ""
-    cdef dict missing_ranges = None
-    cdef dict variable_alignment = None
-    cdef dict variable_display_width = None
-    cdef dict variable_measure = None
-    #cdef dict variable_format = None
-    cdef bint row_compression = 0
-
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
-     note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
-     variable_display_width, variable_measure, variable_format, row_compression)
-
-def write_xport(df, dst_path, str file_label="", object column_labels=None, str table_name=None, int file_format_version = 8,
-    dict variable_format=None):
+def write_xport(df, dst_path, file_label="", column_labels=None, table_name=None, file_format_version = 8,
+    variable_format=None):
     """
     Writes a dataframe to a SAS Xport (xpt) file.
     If no table_name is specified the dataset has by default the name DATASET (take it into account if
@@ -878,20 +767,13 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
         for more information.
     """
 
-    cdef dict variable_value_labels = None
-    cdef str note = ""
-    cdef dict missing_ranges = None
-    cdef dict missing_user_values = None
-    cdef dict variable_alignment = None
-    cdef dict variable_display_width = None
-    cdef dict variable_measure = None
-    #cdef dict variable_format = None
-    cdef bint row_compression = 0
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
-        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
+    writer_format = "xport"
+    writer_entry_point(df, dst_path, writer_format=writer_format, file_label=file_label, column_labels=column_labels,
+                       version=file_format_version,
+                       table_name=table_name,
+                variable_format=variable_format)
 
-def write_por(df, dst_path, str file_label="", object column_labels=None, dict variable_format=None):
+def write_por(df, dst_path, file_label="", column_labels=None, variable_format=None):
     """
     Writes a dataframe to a SPSS POR file.
 
@@ -914,18 +796,7 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
         for more information.
     """
 
-    # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
-    cdef str note=None
-    cdef int file_format_version = 0
-    cdef dict variable_value_labels=None
-    cdef dict missing_ranges = None
-    cdef dict missing_user_values = None
-    cdef dict variable_alignment = None
-    cdef dict variable_display_width = None
-    cdef dict variable_measure = None
-    cdef str table_name = ""
-    #cdef dict variable_format = None
-    cdef bint row_compression = 0
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
-        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
+    writer_format = "por"
+    writer_entry_point(df, dst_path, writer_format=writer_format, file_label=file_label, column_labels=column_labels,
+               variable_format=variable_format)
+

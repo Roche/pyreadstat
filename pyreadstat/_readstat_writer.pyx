@@ -991,3 +991,58 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         close_file(fd)
 
     return 0
+
+def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
+                       int version=0,
+                       str table_name=None,
+                       object column_labels=None, compress=False, row_compress=False, object note=None,
+                dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
+                dict variable_measure=None,
+                dict missing_user_values=None,
+                dict variable_format=None,
+                dict variable_alignment = None,
+                       ):
+
+
+    cdef int file_format_version = 0
+    cdef bint row_compression = 0
+
+    cdef dst_file_format writer_file_format
+
+    if writer_format == "sav":
+        writer_file_format = FILE_FORMAT_SAV
+        file_format_version = 2
+        if compress and row_compress:
+            raise PyreadstatError("compress and row_compress cannot be both True")
+        if compress:
+            file_format_version = 3
+        if row_compress:
+            row_compression = 1
+    elif writer_format == "dta":
+        writer_file_format = FILE_FORMAT_DTA
+        if version == 15:
+            file_format_version = 119
+        elif version == 14:
+            file_format_version = 118
+        elif version == 13:
+            file_format_version = 117
+        elif version == 12:
+            file_format_version = 115
+        elif version in {10, 11}:
+            file_format_version = 114
+        elif version in {8, 9}:
+            file_format_version = 113
+        else:
+            raise PyreadstatError("Version not supported")
+        note = ""
+    elif writer_format == "xport":
+        writer_file_format = FILE_FORMAT_XPORT
+        file_format_version = version
+    elif writer_format == "por":
+        writer_file_format = FILE_FORMAT_POR
+    else:
+        raise PyreadstatError("wrong writer format")
+
+    run_write(df, dst_path, writer_file_format, file_label, column_labels, 
+        file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
+        variable_alignment, variable_display_width, variable_measure, variable_format, row_compression)
