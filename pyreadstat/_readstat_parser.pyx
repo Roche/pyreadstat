@@ -35,6 +35,8 @@ import numpy as np
 
 from readstat_api cimport *
 
+from pyclasses import metadata_container
+
 # necessary to work with the datetime C API
 import_datetime()
 
@@ -124,34 +126,6 @@ cdef class data_container:
         self.mtime = 0
         self.mr_sets = dict()
         self.output_format = ""
-        
-class metadata_container:
-    """
-    This class holds metadata we want to give back to python
-    """
-    def __init__(self):
-        self.column_names = list()
-        self.column_labels = list()
-        self.column_names_to_labels = dict()
-        self.file_encoding = None
-        self.number_columns = None
-        self.number_rows = None
-        self.variable_value_labels = dict()
-        self.value_labels = dict()
-        self.variable_to_label = dict()
-        self.notes = list()
-        self.original_variable_types = dict()
-        self.readstat_variable_types = dict()
-        self.table_name = None
-        self.missing_ranges = dict()
-        self.missing_user_values = dict()
-        self.variable_storage_width = dict()
-        self.variable_display_width = dict()
-        self.variable_alignment = dict()
-        self.variable_measure = dict()
-        self.creation_time = None
-        self.modification_time = None
-        self.mr_sets = dict()
 
 
 class ReadstatError(Exception):
@@ -160,11 +134,13 @@ class ReadstatError(Exception):
     """
     pass
 
+
 class PyreadstatError(Exception):
     """
     Just defining a custom exception to raise when pyreadstat raises an exception.
     """
     pass
+
 
 
 cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format):

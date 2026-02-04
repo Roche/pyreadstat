@@ -19,8 +19,8 @@ import multiprocessing as mp
 import narwhals.stable.v2 as nw
 import numpy as np
 
-from ._readstat_parser import  PyreadstatError, parser_entry_point
-from ._readstat_writer import writer_entry_point
+from ._readstat_parser import parser_entry_point
+from ._readstat_writer import writer_entry_point, PyreadstatError
 from .worker import worker
 from .pyfunctions import set_value_labels, set_catalog_to_sas
 
