@@ -14,31 +14,61 @@
 # limitations under the License.
 # #############################################################################
 
+# Typing
+
+from typing import TYPE_CHECKING, Literal, TypedDict
+
+if TYPE_CHECKING:
+    from datetime import datetime
+
+
+class _MissingRange(TypedDict):
+    lo: float
+    hi: float
+
+
+class MRSet(TypedDict):
+    """A dictionary to hold the definition of a multiple-response (MR) set."""
+
+    type: Literal["D", "C"]
+    is_dichotomy: bool
+    counted_value: int
+    label: str
+    variable_list: list[str]
+
+
+# Classes
+
+
 class metadata_container:
     """
     This class holds metadata we want to give back to python
     """
-    def __init__(self):
-        self.column_names = list()
-        self.column_labels = list()
-        self.column_names_to_labels = dict()
-        self.file_encoding = None
-        self.number_columns = None
-        self.number_rows = None
-        self.variable_value_labels = dict()
-        self.value_labels = dict()
-        self.variable_to_label = dict()
-        self.notes = list()
-        self.original_variable_types = dict()
-        self.readstat_variable_types = dict()
-        self.table_name = None
-        self.missing_ranges = dict()
-        self.missing_user_values = dict()
-        self.variable_storage_width = dict()
-        self.variable_display_width = dict()
-        self.variable_alignment = dict()
-        self.variable_measure = dict()
-        self.creation_time = None
-        self.modification_time = None
-        self.mr_sets = dict()
 
+    def __init__(self) -> None:
+        self.column_names: list[str] = list()
+        self.column_labels: list[str] = list()
+        self.column_names_to_labels: dict[str, str] = dict()
+        self.file_encoding: str | None = None
+        self.number_columns: int | None = None
+        self.number_rows: int | None = None
+        self.variable_value_labels: dict[str, dict[float | int, str]] = dict()
+        self.value_labels: dict[str, dict[float | int, str]] = dict()
+        self.variable_to_label: dict[str, str] = dict()
+        self.notes: list[str] = list()
+        self.original_variable_types: dict[str, str] = dict()
+        self.readstat_variable_types: dict[str, str] = dict()
+        self.table_name: str | None = None
+        self.missing_ranges: dict[str, list[int | float | str | _MissingRange]] = dict()
+        self.missing_user_values: dict[str, list[int | float | str | _MissingRange]] = (
+            dict()
+        )
+        self.variable_storage_width: dict[str, int] = dict()
+        self.variable_display_width: dict[str, int] = dict()
+        self.variable_alignment: dict[str, str] = dict()
+        self.variable_measure: dict[
+            str, Literal["nominal", "ordinal", "scale", "unknown"]
+        ] = dict()
+        self.creation_time: "datetime | None" = None
+        self.modification_time: "datetime | None" = None
+        self.mr_sets: dict[str, MRSet] = dict()
