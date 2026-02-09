@@ -109,9 +109,7 @@ def test_read_sas7bcat_types() -> None:
     df: pd.DataFrame | pl.DataFrame | dict[str, np.ndarray]
 
     df, meta = read_sas7bcat("file.sas7bcat")
-    reveal_type(
-        df
-    )  # pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray]
+    reveal_type(df)  # pandas.core.frame.DataFrame
     reveal_type(meta)  # metadata_container
 
     df, meta = read_sas7bcat("file.sas7bcat", output_format="pandas")
@@ -134,9 +132,7 @@ def test_read_multiprocessing() -> None:
     df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True)
     reveal_type(df)  # pandas.core.frame.DataFrame
 
-    df, meta = read_file_multiprocessing(
-        read_sav, "file.sav", metadataonly=True, output_format="polars"
-    )
+    df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True, output_format="polars")
     reveal_type(df)  # polars.dataframe.frame.DataFrame
 
     read_file_multiprocessing(noop, "file.sav", 1, 1)  # wrong callable, should error
@@ -149,9 +145,7 @@ def test_read_file_in_chunks() -> None:
     for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True):
         reveal_type(df)  # pandas.core.frame.DataFrame
 
-    for df, meta in read_file_in_chunks(
-        read_sav, "file.sav", metadataonly=True, output_format="polars"
-    ):
+    for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True, output_format="polars"):
         reveal_type(df)  # polars.dataframe.frame.DataFrame
 
     read_file_in_chunks(noop, "file.sav", 1, 1)  # wrong callable, should error
