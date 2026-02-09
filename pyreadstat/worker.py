@@ -1,4 +1,3 @@
-
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -19,7 +18,18 @@
 Functions to work with multiprocessing
 """
 
-def worker(inpt):
+from os import PathLike
+from typing import TYPE_CHECKING, Any, TypeAlias
+
+import numpy as np
+
+if TYPE_CHECKING:
+    from .pyreadstat import PyreadstatReadFunction, FileLike, DataFrame
+
+Input: TypeAlias = "tuple[PyreadstatReadFunction, str | bytes | PathLike | FileLike, int, int, dict[str, Any]]"
+
+
+def worker(inpt: Input) -> "DataFrame | dict[str, np.ndarray]":
     read_function, path, row_offset, row_limit, kwargs = inpt
     df, meta = read_function(path, row_offset=row_offset, row_limit=row_limit, **kwargs)
-    return df 
+    return df
