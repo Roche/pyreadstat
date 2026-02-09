@@ -375,6 +375,63 @@ def read_xport(
     return data_frame, metadata
 
 
+@overload
+def read_dta(
+    filename_path: "str | bytes | PathLike | FileLike",
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_dta(
+    filename_path: "str | bytes | PathLike | FileLike",
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_dta(
+    filename_path: "str | bytes | PathLike | FileLike",
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
 def read_dta(
     filename_path: "str | bytes | PathLike | FileLike",
     metadataonly: bool = False,
@@ -388,7 +445,7 @@ def read_dta(
     disable_datetime_conversion: bool = False,
     row_limit: int = 0,
     row_offset: int = 0,
-    output_format: str | None = None,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
     extra_datetime_formats: list[str] | None = None,
     extra_date_formats: list[str] | None = None,
     extra_time_formats: list[str] | None = None,
@@ -655,6 +712,57 @@ def read_sav(
     return data_frame, metadata
 
 
+@overload
+def read_por(
+    filename_path: "str | bytes | PathLike | FileLike",
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_por(
+    filename_path: "str | bytes | PathLike | FileLike",
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_por(
+    filename_path: "str | bytes | PathLike | FileLike",
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
 def read_por(
     filename_path: "str | bytes | PathLike | FileLike",
     metadataonly: bool = False,
@@ -666,7 +774,7 @@ def read_por(
     disable_datetime_conversion: bool = False,
     row_limit: int = 0,
     row_offset: int = 0,
-    output_format: str | None = None,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
     extra_datetime_formats: list[str] | None = None,
     extra_date_formats: list[str] | None = None,
     extra_time_formats: list[str] | None = None,
@@ -885,7 +993,7 @@ def read_file_in_chunks(
     ----------
         read_function : pyreadstat function
             a pyreadstat reading function
-        file_path : string
+        file_path : str, bytes, Path-like object or file-like object
             path to the file to be read
         chunksize : integer, optional
             size of the chunks to read
@@ -1010,7 +1118,7 @@ def read_file_multiprocessing(
     ----------
         read_function : pyreadstat function
             a pyreadstat reading function
-        file_path : string
+        file_path : str, bytes, Path-like object or file-like object
             path to the file to be read
         num_processes : integer, optional
             number of processes to spawn, by default the min 4 and the max cores on the computer
@@ -1201,7 +1309,7 @@ def write_dta(
     variable_value_labels: dict[str, dict[int | float, str]] | None = None,
     missing_user_values: dict[str, list[str]] | None = None,
     variable_format: dict[str, str] | None = None,
-):
+) -> None:
     """
     Writes a dataframe to a STATA dta file
 
