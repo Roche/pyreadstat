@@ -1,4 +1,4 @@
-# Run with `mypy tests/typing_tests.py`
+# Run with `mypy tests/typing_tests.pyi`
 
 import io
 from pathlib import Path
