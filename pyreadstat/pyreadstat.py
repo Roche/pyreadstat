@@ -1252,10 +1252,7 @@ def write_sav(
     writer_format = "sav"
 
     # formats
-    formats_presets = {
-        "restricted_integer": "N{var_width}",
-        "integer": "F{var_width}.0",
-    }
+    formats_presets = {"restricted_integer": "N{var_width}", "integer": "F{var_width}.0"}
     if variable_format:
         for col_name, col_format in variable_format.items():
             if col_format in formats_presets.keys() and col_name in df.columns:
