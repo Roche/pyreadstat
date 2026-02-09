@@ -201,3 +201,73 @@ def test_write_por_types() -> None:
     # Test writing with pandas DataFrame and BytesIO buffer
     buffer = io.BytesIO()
     write_por(pandas_df, buffer)
+
+def test_set_value_labels_types() -> None:
+    df = pd.DataFrame()
+    metadata = metadata_container()
+
+    df = set_value_labels(df, metadata)
+    reveal_type(df)  # pandas.core.frame.DataFrame
+
+    df = set_value_labels(df, metadata, formats_as_category=True)
+    reveal_type(df)  # pandas.core.frame.DataFrame
+
+    df = set_value_labels(df, metadata, formats_as_ordered_category=True)
+    reveal_type(df)  # pandas.core.frame.DataFrame
+
+def test_set_catalog_to_sas_types() -> None:
+    df = pd.DataFrame()
+    sas_metadata = metadata_container()
+    catalog_metadata = metadata_container()
+
+    df, meta = set_catalog_to_sas(df, sas_metadata, catalog_metadata)
+    reveal_type(df)  # pandas.core.frame.DataFrame
+    reveal_type(meta)  # metadata_container
+
+    df, meta = set_catalog_to_sas(df, sas_metadata, catalog_metadata, formats_as_category=True)
+    reveal_type(df)  # pandas.core.frame.DataFrame
+
+    df, meta = set_catalog_to_sas(df, sas_metadata, catalog_metadata, formats_as_ordered_category=True)
+    reveal_type(df)  # pandas.core.frame.DataFrame
+
+def test_worker_types() -> None:
+    from pyreadstat.worker import Input, worker
+
+    # Test with a valid input tuple
+    inpt: Input = (read_sav, "file.sav", 0, 100, {})
+    result = worker(inpt)
+    reveal_type(result)  # pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, np.ndarray]
+
+    # Test with an invalid input tuple (wrong callable)
+    inpt_invalid: Input = (lambda x: "A", "file.sav", 0, 100, {})
+
+def test_metadata_container_types() -> None:
+    from pyreadstat.pyclasses import metadata_container
+
+    meta = metadata_container()
+
+    meta.missing_ranges = {
+        "var1": [1, 5],
+        "var2": [{"hi": 1.0, "lo": 0.0}],
+        "var3": ["a", "b"],
+    }
+    meta.mr_sets = {
+        "set1": {
+            "type": "D",
+            "is_dichotomy": True,
+            "counted_value": 1,
+            "label": "Set 1",
+            "variable_list": ["var1", "var2"],
+        },
+    }
+    meta.variable_measure = {
+        "var1": "nominal",
+        "var2": "ordinal",
+        "var3": "scale",
+        "var4": "unknown",
+        "var5": "another",  # should error, not a valid Literal
+    }
+
+    reveal_type(meta.creation_time)  # datetime
+    reveal_type(meta.modification_time)  # datetime
+    reveal_type(meta.missing_user_values)  # dict[str, list[int | float | str | MissingRange]]
