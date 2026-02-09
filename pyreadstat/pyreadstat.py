@@ -27,19 +27,11 @@ from .pyfunctions import set_value_labels, set_catalog_to_sas
 
 # Typing interface
 from os import PathLike
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Concatenate,
-    Literal,
-    TypeAlias,
-    overload,
-    Protocol,
-)
+from typing import TYPE_CHECKING, Concatenate, Literal, TypeAlias, overload, Protocol
 
 from narwhals.typing import IntoDataFrame
 
-from .pyclasses import metadata_container, _MissingRange
+from .pyclasses import metadata_container, MissingRange
 
 if TYPE_CHECKING:
     try:
@@ -55,12 +47,15 @@ if TYPE_CHECKING:
 
 
 class FileLike(Protocol):
+    """Protocol for file-like objects accepted by pyreadstat"""
+
+    # Should work with any file-like object that has read and seek methods, such as those returned by open() or io.BytesIO
     def read(self, size: int | None = -1, /) -> bytes: ...
     def seek(self, pos: int, whence: int = 0, /) -> int: ...
 
 
 PyreadstatReadFunction = Callable[
-    Concatenate["str | bytes | PathLike | FileLike", ...],
+    Concatenate[str | bytes | PathLike | FileLike, ...],
     "tuple[DataFrame | dict[str, np.ndarray], metadata_container]",
 ]
 
@@ -72,10 +67,10 @@ PyreadstatReadFunction = Callable[
 
 @overload
 def read_sas7bdat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
-    catalog_file: "str | bytes | PathLike | FileLike | None" = ...,
+    catalog_file: str | bytes | PathLike | FileLike | None = ...,
     formats_as_category: bool = ...,
     formats_as_ordered_category: bool = ...,
     encoding: str | None = ...,
@@ -91,10 +86,10 @@ def read_sas7bdat(
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_sas7bdat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
-    catalog_file: "str | bytes | PathLike | FileLike | None" = ...,
+    catalog_file: str | bytes | PathLike | FileLike | None = ...,
     formats_as_category: bool = ...,
     formats_as_ordered_category: bool = ...,
     encoding: str | None = ...,
@@ -110,10 +105,10 @@ def read_sas7bdat(
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_sas7bdat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
-    catalog_file: "str | bytes | PathLike | FileLike | None" = ...,
+    catalog_file: str | bytes | PathLike | FileLike | None = ...,
     formats_as_category: bool = ...,
     formats_as_ordered_category: bool = ...,
     encoding: str | None = ...,
@@ -126,12 +121,12 @@ def read_sas7bdat(
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
     extra_time_formats: list[str] | None = ...,
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_sas7bdat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = False,
     dates_as_pandas_datetime: bool = False,
-    catalog_file: "str | bytes | PathLike | FileLike | None" = None,
+    catalog_file: str | bytes | PathLike | FileLike | None = None,
     formats_as_category: bool = True,
     formats_as_ordered_category: bool = False,
     encoding: str | None = None,
@@ -248,7 +243,7 @@ def read_sas7bdat(
 
 @overload
 def read_xport(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     encoding: str | None = ...,
@@ -263,7 +258,7 @@ def read_xport(
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_xport(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     encoding: str | None = ...,
@@ -278,7 +273,7 @@ def read_xport(
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_xport(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     encoding: str | None = ...,
@@ -290,9 +285,9 @@ def read_xport(
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
     extra_time_formats: list[str] | None = ...,
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_xport(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = False,
     dates_as_pandas_datetime: bool = False,
     encoding: str | None = None,
@@ -375,7 +370,7 @@ def read_xport(
 
 @overload
 def read_dta(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -394,7 +389,7 @@ def read_dta(
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_dta(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -413,7 +408,7 @@ def read_dta(
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_dta(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -429,9 +424,9 @@ def read_dta(
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
     extra_time_formats: list[str] | None = ...,
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_dta(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = False,
     dates_as_pandas_datetime: bool = False,
     apply_value_formats: bool = False,
@@ -543,7 +538,7 @@ def read_dta(
 
 @overload
 def read_sav(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -562,7 +557,7 @@ def read_sav(
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_sav(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -581,7 +576,7 @@ def read_sav(
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_sav(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -597,9 +592,9 @@ def read_sav(
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
     extra_time_formats: list[str] | None = ...,
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_sav(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = False,
     dates_as_pandas_datetime: bool = False,
     apply_value_formats: bool = False,
@@ -615,7 +610,7 @@ def read_sav(
     extra_datetime_formats: list[str] | None = None,
     extra_date_formats: list[str] | None = None,
     extra_time_formats: list[str] | None = None,
-) -> "tuple[DataFrame | dict[str, np.ndarray], Any]":
+) -> "tuple[DataFrame | dict[str, np.ndarray], metadata_container]":
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -712,7 +707,7 @@ def read_sav(
 
 @overload
 def read_por(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -729,7 +724,7 @@ def read_por(
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_por(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -746,7 +741,7 @@ def read_por(
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_por(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = ...,
     dates_as_pandas_datetime: bool = ...,
     apply_value_formats: bool = ...,
@@ -760,9 +755,9 @@ def read_por(
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
     extra_time_formats: list[str] | None = ...,
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_por(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     metadataonly: bool = False,
     dates_as_pandas_datetime: bool = False,
     apply_value_formats: bool = False,
@@ -861,24 +856,24 @@ def read_por(
 
 @overload
 def read_sas7bcat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     encoding: str | None = ...,
     output_format: Literal["pandas"] | None = ...,
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_sas7bcat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     encoding: str | None = ...,
     output_format: Literal["polars"] = "polars",
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_sas7bcat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     encoding: str | None = ...,
     output_format: Literal["dict"] = "dict",
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_sas7bcat(
-    filename_path: "str | bytes | PathLike | FileLike",
+    filename_path: str | bytes | PathLike | FileLike,
     encoding: str | None = None,
     output_format: Literal["pandas", "polars", "dict"] | None = None,
 ) -> "tuple[DataFrame | dict[str, np.ndarray], metadata_container]":
@@ -930,7 +925,7 @@ def read_sas7bcat(
 @overload
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     chunksize: int = ...,
     offset: int = ...,
     limit: int = ...,
@@ -944,7 +939,7 @@ def read_file_in_chunks(
 @overload
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     chunksize: int = ...,
     offset: int = ...,
     limit: int = ...,
@@ -958,7 +953,7 @@ def read_file_in_chunks(
 @overload
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     chunksize: int = ...,
     offset: int = ...,
     limit: int = ...,
@@ -968,10 +963,10 @@ def read_file_in_chunks(
     *,
     output_format: Literal["dict"] = "dict",
     **kwargs,
-) -> "Iterator[tuple[dict[str, np.ndarray], metadata_container]]": ...
+) -> Iterator[tuple[dict[str, np.ndarray], metadata_container]]: ...
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     chunksize: int = 100000,
     offset: int = 0,
     limit: int = 0,
@@ -1072,7 +1067,7 @@ def read_file_in_chunks(
 @overload
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
@@ -1082,7 +1077,7 @@ def read_file_multiprocessing(
 @overload
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
@@ -1092,16 +1087,16 @@ def read_file_multiprocessing(
 @overload
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
     output_format: Literal["dict"] = "dict",
     **kwargs,
-) -> "tuple[dict[str, np.ndarray], metadata_container]": ...
+) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: "str | bytes | PathLike | FileLike",
+    file_path: str | bytes | PathLike | FileLike,
     num_processes: int | None = None,
     num_rows: int | None = None,
     **kwargs,
@@ -1208,15 +1203,15 @@ def read_file_multiprocessing(
 
 
 def write_sav(
-    df: "DataFrame",
-    dst_path: "str | bytes | PathLike | FileLike",
+    df: "DataFrame",  # Can't be `IntoDataFrame` because columns get accessed via `__getitem__`
+    dst_path: str | bytes | PathLike | FileLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     compress: bool = False,
     row_compress: bool = False,
     note: str | list[str] | None = None,
     variable_value_labels: dict[str, dict[int | float, str]] | None = None,
-    missing_ranges: "dict[str, list[int | float | str | _MissingRange]] | None" = None,
+    missing_ranges: dict[str, list[int | float | str | MissingRange]] | None = None,
     variable_display_width: dict[str, int] | None = None,
     variable_measure: dict[str, str] | None = None,
     variable_format: dict[str, str] | None = None,
@@ -1300,7 +1295,7 @@ def write_sav(
 
 def write_dta(
     df: IntoDataFrame,
-    dst_path: "str | bytes | PathLike | FileLike",
+    dst_path: str | bytes | PathLike | FileLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     version: int = 15,
@@ -1356,7 +1351,7 @@ def write_dta(
 
 def write_xport(
     df: IntoDataFrame,
-    dst_path: "str | bytes | PathLike | FileLike",
+    dst_path: str | bytes | PathLike | FileLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     table_name: str | None = None,
@@ -1407,7 +1402,7 @@ def write_xport(
 
 def write_por(
     df: IntoDataFrame,
-    dst_path: "str | bytes | PathLike | FileLike",
+    dst_path: str | bytes | PathLike | FileLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     variable_format: dict[str, str] | None = None,

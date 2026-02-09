@@ -20,13 +20,14 @@ from datetime import datetime
 from typing import Literal, TypedDict
 
 
-class _MissingRange(TypedDict):
+class MissingRange(TypedDict):
+    """A dictionary to hold the definition of a missing range"""
     lo: float
     hi: float
 
 
 class MRSet(TypedDict):
-    """A dictionary to hold the definition of a multiple-response (MR) set."""
+    """A dictionary to hold the definition of a multiple-response (MR) set"""
 
     type: Literal["D", "C"]
     is_dichotomy: bool
@@ -57,8 +58,8 @@ class metadata_container:
         self.original_variable_types: dict[str, str] = dict()
         self.readstat_variable_types: dict[str, str] = dict()
         self.table_name: str = None  # type: ignore[assignment]
-        self.missing_ranges: dict[str, list[int | float | str | _MissingRange]] = dict()
-        self.missing_user_values: dict[str, list[int | float | str | _MissingRange]] = (
+        self.missing_ranges: dict[str, list[int | float | str | MissingRange]] = dict()
+        self.missing_user_values: dict[str, list[int | float | str | MissingRange]] = (
             dict()
         )
         self.variable_storage_width: dict[str, int] = dict()
