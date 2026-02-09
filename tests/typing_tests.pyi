@@ -51,3 +51,18 @@ def test_read_multiprocessing() -> None:
     reveal_type(df)  # polars.dataframe.frame.DataFrame
 
     read_file_multiprocessing(noop, "file.sav", 1, 1)  # wrong callable, should error
+
+def test_read_file_in_chunks() -> None:
+    df: pd.DataFrame | pl.DataFrame
+    def noop(a: int, /) -> int:
+        return a
+
+    for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True):
+        reveal_type(df)  # pandas.core.frame.DataFrame
+
+    for df, meta in read_file_in_chunks(
+        read_sav, "file.sav", metadataonly=True, output_format="polars"
+    ):
+        reveal_type(df)  # polars.dataframe.frame.DataFrame
+
+    read_file_in_chunks(noop, "file.sav", 1, 1)  # wrong callable, should error
