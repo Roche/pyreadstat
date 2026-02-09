@@ -22,6 +22,7 @@ from typing import Literal, TypedDict
 
 class MissingRange(TypedDict):
     """A dictionary to hold the definition of a missing range"""
+
     lo: float
     hi: float
 
@@ -59,15 +60,11 @@ class metadata_container:
         self.readstat_variable_types: dict[str, str] = dict()
         self.table_name: str = None  # type: ignore[assignment]
         self.missing_ranges: dict[str, list[int | float | str | MissingRange]] = dict()
-        self.missing_user_values: dict[str, list[int | float | str | MissingRange]] = (
-            dict()
-        )
+        self.missing_user_values: dict[str, list[int | float | str | MissingRange]] = dict()
         self.variable_storage_width: dict[str, int] = dict()
         self.variable_display_width: dict[str, int] = dict()
         self.variable_alignment: dict[str, str] = dict()
-        self.variable_measure: dict[
-            str, Literal["nominal", "ordinal", "scale", "unknown"]
-        ] = dict()
+        self.variable_measure: dict[str, Literal["nominal", "ordinal", "scale", "unknown"]] = dict()
         self.creation_time: datetime = None  # type: ignore[assignment]
         self.modification_time: datetime = None  # type: ignore[assignment]
         self.mr_sets: dict[str, MRSet] = dict()

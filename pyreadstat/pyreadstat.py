@@ -845,9 +845,7 @@ def read_por(
     metadata.file_format = parser_format
 
     if apply_value_formats:
-        data_frame = set_value_labels(
-            data_frame, metadata, formats_as_category=formats_as_category
-        )
+        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
 
     return data_frame, metadata
 
@@ -1054,9 +1052,7 @@ def read_file_in_chunks(
                 **kwargs,
             )
         else:
-            df, meta = read_function(
-                file_path, row_offset=offset, row_limit=chunksize, **kwargs
-            )
+            df, meta = read_function(file_path, row_offset=offset, row_limit=chunksize, **kwargs)
         if len(df):
             yield df, meta
             offset += chunksize
@@ -1155,10 +1151,7 @@ def read_file_multiprocessing(
         final, meta = read_function(file_path, **kwargs)
 
     numrows = min(max(numrows - row_offset, 0), row_limit)
-    divs = [
-        numrows // num_processes + (1 if x < numrows % num_processes else 0)
-        for x in range(num_processes)
-    ]
+    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0) for x in range(num_processes)]
     offsets = list()
     prev_offset = row_offset
     prev_div = 0
@@ -1167,10 +1160,7 @@ def read_file_multiprocessing(
         prev_offset = offset
         prev_div = div
         offsets.append((offset, div))
-    jobs = [
-        (read_function, file_path, offset, chunksize, kwargs)
-        for offset, chunksize in offsets
-    ]
+    jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset, chunksize in offsets]
     pool = mp.Pool(processes=num_processes)
     try:
         chunks = pool.map(worker, jobs)
@@ -1270,9 +1260,7 @@ def write_sav(
         for col_name, col_format in variable_format.items():
             if col_format in formats_presets.keys() and col_name in df.columns:
                 var_width = str(len(str(max(df[col_name]))))
-                variable_format[col_name] = formats_presets[col_format].format(
-                    var_width=var_width
-                )
+                variable_format[col_name] = formats_presets[col_format].format(var_width=var_width)
 
     writer_entry_point(
         df,
