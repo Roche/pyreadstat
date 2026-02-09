@@ -26,7 +26,7 @@ from .worker import worker
 from .pyfunctions import set_value_labels, set_catalog_to_sas
 
 # Typing interface
-
+from os import PathLike
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -42,8 +42,6 @@ from narwhals.typing import IntoDataFrame
 from .pyclasses import metadata_container, _MissingRange
 
 if TYPE_CHECKING:
-    from os import PathLike
-
     try:
         from pandas import DataFrame as PandasDataFrame
     except ImportError:

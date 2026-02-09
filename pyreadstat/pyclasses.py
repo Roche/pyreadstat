@@ -16,10 +16,8 @@
 
 # Typing
 
-from typing import TYPE_CHECKING, Literal, TypedDict
-
-if TYPE_CHECKING:
-    from datetime import datetime
+from datetime import datetime
+from typing import Literal, TypedDict
 
 
 class _MissingRange(TypedDict):
@@ -69,6 +67,6 @@ class metadata_container:
         self.variable_measure: dict[
             str, Literal["nominal", "ordinal", "scale", "unknown"]
         ] = dict()
-        self.creation_time: "datetime" = None  # type: ignore[assignment]
-        self.modification_time: "datetime" = None  # type: ignore[assignment]
+        self.creation_time: datetime = None  # type: ignore[assignment]
+        self.modification_time: datetime = None  # type: ignore[assignment]
         self.mr_sets: dict[str, MRSet] = dict()
