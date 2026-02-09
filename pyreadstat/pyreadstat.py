@@ -16,22 +16,20 @@
 
 from collections.abc import Callable, Iterator
 import multiprocessing as mp
+from os import PathLike
+from typing import TYPE_CHECKING, Concatenate, Literal, TypeAlias, overload, Protocol
 
 import narwhals.stable.v2 as nw
 import numpy as np
+from narwhals.typing import IntoDataFrame
 
 from ._readstat_parser import parser_entry_point
 from ._readstat_writer import writer_entry_point, PyreadstatError
 from .worker import worker
+from .pyclasses import metadata_container, MissingRange
 from .pyfunctions import set_value_labels, set_catalog_to_sas
 
 # Typing interface
-from os import PathLike
-from typing import TYPE_CHECKING, Concatenate, Literal, TypeAlias, overload, Protocol
-
-from narwhals.typing import IntoDataFrame
-
-from .pyclasses import metadata_container, MissingRange
 
 if TYPE_CHECKING:
     try:
