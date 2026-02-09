@@ -49,16 +49,16 @@ class metadata_container:
         self.column_names: list[str] = list()
         self.column_labels: list[str] = list()
         self.column_names_to_labels: dict[str, str] = dict()
-        self.file_encoding: str | None = None
-        self.number_columns: int | None = None
-        self.number_rows: int | None = None
+        self.file_encoding: str = None  # type: ignore[assignment]
+        self.number_columns: int = None  # type: ignore[assignment]
+        self.number_rows: int = None  # type: ignore[assignment]
         self.variable_value_labels: dict[str, dict[float | int, str]] = dict()
         self.value_labels: dict[str, dict[float | int, str]] = dict()
         self.variable_to_label: dict[str, str] = dict()
         self.notes: list[str] = list()
         self.original_variable_types: dict[str, str] = dict()
         self.readstat_variable_types: dict[str, str] = dict()
-        self.table_name: str | None = None
+        self.table_name: str = None  # type: ignore[assignment]
         self.missing_ranges: dict[str, list[int | float | str | _MissingRange]] = dict()
         self.missing_user_values: dict[str, list[int | float | str | _MissingRange]] = (
             dict()
@@ -69,6 +69,6 @@ class metadata_container:
         self.variable_measure: dict[
             str, Literal["nominal", "ordinal", "scale", "unknown"]
         ] = dict()
-        self.creation_time: "datetime | None" = None
-        self.modification_time: "datetime | None" = None
+        self.creation_time: "datetime" = None  # type: ignore[assignment]
+        self.modification_time: "datetime" = None  # type: ignore[assignment]
         self.mr_sets: dict[str, MRSet] = dict()
