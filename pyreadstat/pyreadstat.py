@@ -151,8 +151,8 @@ def read_sas7bdat(
             metadata object. The data frame will be set with the correct column names but no data.
         dates_as_pandas_datetime : bool, optional
             by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
-        catalog_file : str, optional
-            path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values
+        catalog_file : str, bytes, Path-like object or file-like object, optional
+            path to a sas7bcat file or file-like object. By default is None. If not None, will parse the catalog file and replace the values
             by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,
             Use read_sas7bcat to parse the catalog independently
             of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.
