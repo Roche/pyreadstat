@@ -1338,7 +1338,7 @@ def write_xport(
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     table_name: str | None = None,
-    file_format_version: int = 8,
+    file_format_version: Literal[5, 8] = 8,
     variable_format: dict[str, str] | None = None,
 ) -> None:
     """
