@@ -17,7 +17,7 @@
 from collections.abc import Callable, Iterator
 import multiprocessing as mp
 from os import PathLike
-from typing import TYPE_CHECKING, Concatenate, Literal, TypeAlias, overload, Protocol
+from typing import TYPE_CHECKING, Concatenate, Literal, ParamSpec, TypeAlias, overload, Protocol
 
 import narwhals.stable.v2 as nw
 import numpy as np
@@ -52,8 +52,10 @@ class FileLike(Protocol):
     def seek(self, pos: int, whence: int = 0, /) -> int: ...
 
 
+_P = ParamSpec("_P")
+
 PyreadstatReadFunction = Callable[
-    Concatenate[str | bytes | PathLike | FileLike, ...],
+    Concatenate[str | bytes | PathLike | FileLike, _P],
     "tuple[DataFrame | dict[str, np.ndarray], metadata_container]",
 ]
 
