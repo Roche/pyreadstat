@@ -921,7 +921,7 @@ def read_sas7bcat(
 @overload
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     chunksize: int = ...,
     offset: int = ...,
     limit: int = ...,
@@ -935,7 +935,7 @@ def read_file_in_chunks(
 @overload
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     chunksize: int = ...,
     offset: int = ...,
     limit: int = ...,
@@ -949,7 +949,7 @@ def read_file_in_chunks(
 @overload
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     chunksize: int = ...,
     offset: int = ...,
     limit: int = ...,
@@ -962,7 +962,7 @@ def read_file_in_chunks(
 ) -> Iterator[tuple[dict[str, np.ndarray], metadata_container]]: ...
 def read_file_in_chunks(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     chunksize: int = 100000,
     offset: int = 0,
     limit: int = 0,
@@ -982,7 +982,7 @@ def read_file_in_chunks(
     ----------
         read_function : pyreadstat function
             a pyreadstat reading function
-        file_path : str, bytes, Path-like object or file-like object
+        file_path : str, bytes or Path-like object
             path to the file to be read
         chunksize : integer, optional
             size of the chunks to read
@@ -1061,7 +1061,7 @@ def read_file_in_chunks(
 @overload
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
@@ -1071,7 +1071,7 @@ def read_file_multiprocessing(
 @overload
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
@@ -1081,7 +1081,7 @@ def read_file_multiprocessing(
 @overload
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
@@ -1090,7 +1090,7 @@ def read_file_multiprocessing(
 ) -> tuple[dict[str, np.ndarray], metadata_container]: ...
 def read_file_multiprocessing(
     read_function: PyreadstatReadFunction,
-    file_path: str | bytes | PathLike | FileLike,
+    file_path: str | bytes | PathLike,
     num_processes: int | None = None,
     num_rows: int | None = None,
     **kwargs,
@@ -1105,7 +1105,7 @@ def read_file_multiprocessing(
     ----------
         read_function : pyreadstat function
             a pyreadstat reading function
-        file_path : str, bytes, Path-like object or file-like object
+        file_path : str, bytes or Path-like object
             path to the file to be read
         num_processes : integer, optional
             number of processes to spawn, by default the min 4 and the max cores on the computer
@@ -1192,7 +1192,7 @@ def read_file_multiprocessing(
 
 def write_sav(
     df: "DataFrame",  # Can't be `IntoDataFrame` because columns get accessed via `__getitem__`
-    dst_path: str | bytes | PathLike | FileLike,
+    dst_path: str | bytes | PathLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     compress: bool = False,
@@ -1211,7 +1211,7 @@ def write_sav(
     ----------
     df : dataframe
         dataframe to write to sav or zsav
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
@@ -1278,7 +1278,7 @@ def write_sav(
 
 def write_dta(
     df: IntoDataFrame,
-    dst_path: str | bytes | PathLike | FileLike,
+    dst_path: str | bytes | PathLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     version: int = 15,
@@ -1293,7 +1293,7 @@ def write_dta(
     ----------
     df : dataframe
         dataframe to write to sav or zsav
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result dta file
     file_label : str, optional
         a label for the file
@@ -1334,7 +1334,7 @@ def write_dta(
 
 def write_xport(
     df: IntoDataFrame,
-    dst_path: str | bytes | PathLike | FileLike,
+    dst_path: str | bytes | PathLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     table_name: str | None = None,
@@ -1351,7 +1351,7 @@ def write_xport(
     ----------
     df : dataframe
         dataframe to write to xport
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result xport file
     file_label : str, optional
         a label for the file
@@ -1385,7 +1385,7 @@ def write_xport(
 
 def write_por(
     df: IntoDataFrame,
-    dst_path: str | bytes | PathLike | FileLike,
+    dst_path: str | bytes | PathLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
     variable_format: dict[str, str] | None = None,
@@ -1397,7 +1397,7 @@ def write_por(
     ----------
     df : dataframe
         data frame to write to por
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result por file
     file_label : str, optional
         a label for the file

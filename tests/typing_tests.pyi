@@ -159,9 +159,6 @@ def test_write_sav_types() -> None:
     write_sav(polars_df, "file.sav")
     # Test writing with pandas DataFrame and Path object
     write_sav(pandas_df, Path("file.sav"))
-    # Test writing with pandas DataFrame and BytesIO buffer
-    buffer = io.BytesIO()
-    write_sav(pandas_df, buffer)
 
 def test_write_dta_types() -> None:
     pandas_df = pd.DataFrame()
@@ -172,9 +169,6 @@ def test_write_dta_types() -> None:
     write_dta(polars_df, "file.dta")
     # Test writing with pandas DataFrame and Path object
     write_dta(pandas_df, Path("file.dta"))
-    # Test writing with pandas DataFrame and BytesIO buffer
-    buffer = io.BytesIO()
-    write_dta(pandas_df, buffer)
 
 def test_write_xport_types() -> None:
     pandas_df = pd.DataFrame()
@@ -185,9 +179,6 @@ def test_write_xport_types() -> None:
     write_xport(polars_df, "file.xpt")
     # Test writing with pandas DataFrame and Path object
     write_xport(pandas_df, Path("file.xpt"))
-    # Test writing with pandas DataFrame and BytesIO buffer
-    buffer = io.BytesIO()
-    write_xport(pandas_df, buffer)
 
 def test_write_por_types() -> None:
     pandas_df = pd.DataFrame()
@@ -198,9 +189,6 @@ def test_write_por_types() -> None:
     write_por(polars_df, "file.por")
     # Test writing with pandas DataFrame and Path object
     write_por(pandas_df, Path("file.por"))
-    # Test writing with pandas DataFrame and BytesIO buffer
-    buffer = io.BytesIO()
-    write_por(pandas_df, buffer)
 
 def test_set_value_labels_types() -> None:
     df = pd.DataFrame()
