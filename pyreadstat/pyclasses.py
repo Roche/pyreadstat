@@ -16,6 +16,7 @@
 
 # Typing
 
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal, TypedDict
 
@@ -40,31 +41,32 @@ class MRSet(TypedDict):
 # Classes
 
 
+@dataclass
 class metadata_container:
     """
     This class holds metadata we want to give back to python
     """
 
-    def __init__(self) -> None:
-        self.column_names: list[str] = list()
-        self.column_labels: list[str] = list()
-        self.column_names_to_labels: dict[str, str] = dict()
-        self.file_encoding: str = None  # type: ignore[assignment]
-        self.number_columns: int = None  # type: ignore[assignment]
-        self.number_rows: int = None  # type: ignore[assignment]
-        self.variable_value_labels: dict[str, dict[float | int, str]] = dict()
-        self.value_labels: dict[str, dict[float | int, str]] = dict()
-        self.variable_to_label: dict[str, str] = dict()
-        self.notes: list[str] = list()
-        self.original_variable_types: dict[str, str] = dict()
-        self.readstat_variable_types: dict[str, str] = dict()
-        self.table_name: str = None  # type: ignore[assignment]
-        self.missing_ranges: dict[str, list[int | float | str | MissingRange]] = dict()
-        self.missing_user_values: dict[str, list[int | float | str | MissingRange]] = dict()
-        self.variable_storage_width: dict[str, int] = dict()
-        self.variable_display_width: dict[str, int] = dict()
-        self.variable_alignment: dict[str, str] = dict()
-        self.variable_measure: dict[str, Literal["nominal", "ordinal", "scale", "unknown"]] = dict()
-        self.creation_time: datetime = None  # type: ignore[assignment]
-        self.modification_time: datetime = None  # type: ignore[assignment]
-        self.mr_sets: dict[str, MRSet] = dict()
+    column_names: list[str] = field(default_factory=list)
+    column_labels: list[str] = field(default_factory=list)
+    column_names_to_labels: dict[str, str] = field(default_factory=dict)
+    file_encoding: str = ""
+    file_label: str = ""
+    number_columns: int = 0
+    number_rows: int = 0
+    variable_value_labels: dict[str, dict[float | int, str]] = field(default_factory=dict)
+    value_labels: dict[str, dict[float | int, str]] = field(default_factory=dict)
+    variable_to_label: dict[str, str] = field(default_factory=dict)
+    notes: list[str] = field(default_factory=list)
+    original_variable_types: dict[str, str] = field(default_factory=dict)
+    readstat_variable_types: dict[str, str] = field(default_factory=dict)
+    table_name: str = ""
+    missing_ranges: dict[str, list[int | float | str | MissingRange]] = field(default_factory=dict)
+    missing_user_values: dict[str, list[int | float | str | MissingRange]] = field(default_factory=dict)
+    variable_storage_width: dict[str, int] = field(default_factory=dict)
+    variable_display_width: dict[str, int] = field(default_factory=dict)
+    variable_alignment: dict[str, str] = field(default_factory=dict)
+    variable_measure: dict[str, Literal["nominal", "ordinal", "scale", "unknown"]] = field(default_factory=dict)
+    creation_time: datetime = field(default_factory=datetime.now)
+    modification_time: datetime = field(default_factory=datetime.now)
+    mr_sets: dict[str, MRSet] = field(default_factory=dict)
