@@ -1,0 +1,349 @@
+# requires pytest-mypy-plugins
+# command to run: pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini --mypy-only-local-stub
+
+# yaml-language-server: $schema=https://raw.githubusercontent.com/typeddjango/pytest-mypy-plugins/master/pytest_mypy_plugins/schema.json
+
+- case: read_sav_default_types
+  main: |
+    from pyreadstat import read_sav
+    df, meta = read_sav("file.sav")
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_sav_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_sav
+    df: object
+    df, meta = read_sav("file.sav", output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_sav_buffer_types
+  main: |
+    import io
+    from pyreadstat import read_sav
+    buffer = io.BytesIO()
+    df, meta = read_sav(buffer)
+
+- case: read_dta_default_types
+  main: |
+    from pyreadstat import read_dta
+    df, meta = read_dta("file.dta")
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_dta_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_dta
+    df, meta = read_dta("file.dta", output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_dta_buffer_types
+  main: |
+    import io
+    from pyreadstat import read_dta
+    buffer = io.BytesIO()
+    df, meta = read_dta(buffer)
+
+- case: read_por_default_types
+  main: |
+    from pyreadstat import read_por
+    df, meta = read_por("file.por")
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_por_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_por
+    df, meta = read_por("file.por", output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_por_buffer_types
+  main: |
+    import io
+    from pyreadstat import read_por
+    buffer = io.BytesIO()
+    df, meta = read_por(buffer)
+
+- case: read_sas7bdat_default_types
+  main: |
+    from pyreadstat import read_sas7bdat
+    df, meta = read_sas7bdat("file.sas7bdat")
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_sas7bdat_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_sas7bdat
+    df, meta = read_sas7bdat("file.sas7bdat", output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_sas7bdat_buffer_types
+  main: |
+    import io
+    from pyreadstat import read_sas7bdat
+    buffer = io.BytesIO()
+    df, meta = read_sas7bdat(buffer)
+
+- case: read_sas7bcat_default_types
+  main: |
+    from pyreadstat import read_sas7bcat
+    df, meta = read_sas7bcat("file.sas7bcat")
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_xport_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_xport
+    df, meta = read_xport("file.xpt", output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_xport_buffer_types
+  main: |
+    import io
+    from pyreadstat import read_xport
+    buffer = io.BytesIO()
+    df, meta = read_xport(buffer)
+
+- case: read_sas7bcat_default_types
+  main: |
+    from pyreadstat import read_sas7bcat
+    df, meta = read_sas7bcat("file.sas7bcat")
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_sas7bcat_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_sas7bcat
+    df, meta = read_sas7bcat("file.sas7bcat", output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_sas7bcat_buffer_types
+  main: |
+    import io
+    from pyreadstat import read_sas7bcat
+    buffer = io.BytesIO()
+    df, meta = read_sas7bcat(buffer)
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+
+- case: read_file_multiprocessing_default_types
+  main: |
+    from pyreadstat import read_file_multiprocessing, read_sav
+    df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True)
+    reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+    reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_file_multiprocessing_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_file_multiprocessing, read_sav
+    df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True, output_format="polars")
+    reveal_type(df)  # N: Revealed type is "polars.dataframe.frame.DataFrame"
+
+- case: read_file_multiprocessing_invalid_callable
+  main: |
+    from pyreadstat import read_file_multiprocessing
+    def noop(a: int) -> int:
+        return a
+    read_file_multiprocessing(noop, "file.sav", 1, 1)  # E: Argument 1 to "read_file_multiprocessing" has incompatible type "Callable[[int], int]"; expected "def (str | bytes | PathLike[str] | PathLike[bytes] | FileLike, /, *Any, **Any) -> tuple[pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray[tuple[int, ...], dtype[generic[Any]]]], metadata_container]"  [arg-type]
+  out: |
+    main:4: note: This is likely because "noop" has named arguments: "a". Consider marking them positional-only
+
+- case: read_file_in_chunks_default_types
+  main: |
+    from pyreadstat import read_file_in_chunks, read_sav
+    for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True):
+        reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
+        reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
+
+- case: read_file_in_chunks_output_types
+  parametrized:
+    - output_format: "pandas"
+      expected_type: "pandas.core.frame.DataFrame"
+    - output_format: "polars"
+      expected_type: "polars.dataframe.frame.DataFrame"
+    - output_format: "dict"
+      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[builtins.int, ...], numpy.dtype[numpy.generic[Any]]]]"
+  main: |
+    from pyreadstat import read_file_in_chunks, read_sav
+    for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True, output_format="{{ output_format }}"):
+        reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
+
+- case: read_file_in_chunks_invalid_callable
+  main: |
+    from pyreadstat import read_file_in_chunks
+    def noop(a: int) -> int:
+        return a
+    read_file_in_chunks(noop, "file.sav", 1, 1)  # E: Argument 1 to "read_file_in_chunks" has incompatible type "Callable[[int], int]"; expected "def (str | bytes | PathLike[str] | PathLike[bytes] | FileLike, /, *Any, **Any) -> tuple[pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray[tuple[int, ...], dtype[generic[Any]]]], metadata_container]"  [arg-type]
+  out: |
+    main:4: note: This is likely because "noop" has named arguments: "a". Consider marking them positional-only
+
+- case: write_sav_types
+  main: |
+    import pandas as pd
+    import polars as pl
+    from pathlib import Path
+    from pyreadstat import write_sav
+    pandas_df = pd.DataFrame()
+    polars_df = pl.DataFrame()
+    write_sav(pandas_df, "file.sav")
+    write_sav(polars_df, "file.sav")
+    write_sav(pandas_df, Path("file.sav"))
+
+- case: write_dta_types
+  main: |
+    import pandas as pd
+    import polars as pl
+    from pathlib import Path
+    from pyreadstat import write_dta
+    pandas_df = pd.DataFrame()
+    polars_df = pl.DataFrame()
+    write_dta(pandas_df, "file.dta")
+    write_dta(polars_df, "file.dta")
+    write_dta(pandas_df, Path("file.dta"))
+
+- case: write_xport_types
+  main: |
+    import pandas as pd
+    import polars as pl
+    from pathlib import Path
+    from pyreadstat import write_xport
+    pandas_df = pd.DataFrame()
+    polars_df = pl.DataFrame()
+    write_xport(pandas_df, "file.xpt")
+    write_xport(polars_df, "file.xpt")
+    write_xport(pandas_df, Path("file.xpt"))
+
+- case: write_por_types
+  main: |
+    import pandas as pd
+    import polars as pl
+    from pathlib import Path
+    from pyreadstat import write_por
+    pandas_df = pd.DataFrame()
+    polars_df = pl.DataFrame()
+    write_por(pandas_df, "file.por")
+    write_por(polars_df, "file.por")
+    write_por(pandas_df, Path("file.por"))
+
+- case: set_value_labels_types
+  parametrized:
+    - backend: "pandas"
+      expected_value: "pandas.core.frame.DataFrame"
+    - backend: "polars"
+      expected_value: "polars.dataframe.frame.DataFrame"
+  main: |
+    import {{ backend }}
+    from pyreadstat import set_value_labels, metadata_container
+    df = {{ backend }}.DataFrame()
+    metadata = metadata_container()
+    df = set_value_labels(df, metadata)
+    reveal_type(df)  # N: Revealed type is "{{ expected_value }}"
+
+- case: set_catalog_to_sas_types
+  parametrized:
+    - backend: "pandas"
+      expected_value: "pandas.core.frame.DataFrame"
+    - backend: "polars"
+      expected_value: "polars.dataframe.frame.DataFrame"
+  main: |
+    import {{ backend }}
+    from pyreadstat import set_catalog_to_sas, metadata_container
+    df = {{ backend }}.DataFrame()
+    sas_metadata = metadata_container()
+    catalog_metadata = metadata_container()
+    df, meta = set_catalog_to_sas(df, sas_metadata, catalog_metadata)
+    reveal_type(df)  # N: Revealed type is "{{ expected_value }}"
+
+- case: worker_types
+  main: |
+    from pyreadstat import read_sav
+    from pyreadstat.worker import Input, worker
+    inpt: Input = (read_sav, "test_data/file.sav", 0, 100, {})
+    result = worker(inpt)
+    reveal_type(result)  # N: Revealed type is "pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | builtins.dict[builtins.str, numpy.ndarray[Any, Any]]"
+    inpt_invalid: Input = (lambda x: "A", "test_data/file.sav", 0, 100, {})  # E: Incompatible types in assignment (expression has type "tuple[Callable[[Any], str], str, int, int, dict[str, Any]]", variable has type "tuple[def (str | bytes | PathLike[str] | PathLike[bytes] | FileLike, /, *Any, **Any) -> tuple[pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray[tuple[int, ...], dtype[generic[Any]]]], metadata_container], str | bytes | PathLike[Any] | FileLike, int, int, dict[str, Any]]")  [assignment]
+  out: |
+    main:6: error: Cannot infer type of lambda  [misc]
+
+- case: metadata_container_types
+  main: |
+    from pyreadstat.pyclasses import metadata_container
+    meta = metadata_container()
+    meta.missing_ranges = {
+        "var1": [1, 5],
+        "var2": [{"hi": 1.0, "lo": 0.0}],
+        "var3": ["a", "b"],
+        "var4": {1, 2, 3},  # E: Dict entry 3 has incompatible type "str": "set[int]"; expected "str": "list[int | float | str | MissingRange]"  [dict-item]
+    }
+    meta.mr_sets = {
+        "set1": {
+            "type": "D",
+            "is_dichotomy": True,
+            "counted_value": 1,
+            "label": "Set 1",
+            "variable_list": ["var1", "var2"],
+        },
+        "set2": {
+            "type": "C",
+            "is_dichotomy": False,
+            "counted_value": None,
+            "label": "Set 2",
+            "variable_list": ["var3"],
+        },
+        "set3": {}  # E: Missing keys ("type", "is_dichotomy", "counted_value", "label", "variable_list") for TypedDict "MRSet"  [typeddict-item]
+    }
+    meta.variable_measure = {
+        "var1": "nominal",
+        "var2": "ordinal",
+        "var3": "scale",
+        "var4": "unknown",
+        "var5": "another",  # E: Dict entry 4 has incompatible type "str": "Literal['another']"; expected "str": "Literal['nominal', 'ordinal', 'scale', 'unknown']"  [dict-item]
+    }
