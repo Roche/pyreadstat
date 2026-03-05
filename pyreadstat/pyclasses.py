@@ -52,7 +52,7 @@ class metadata_container:
     column_names_to_labels: dict[str, str] = field(default_factory=dict)
     file_encoding: str | None = None
     file_label: str | None = None
-    number_columns: int = 0
+    number_columns: int | None = None
     number_rows: int | None = None
     variable_value_labels: dict[str, dict[float | int, str]] = field(default_factory=dict)
     value_labels: dict[str, dict[float | int, str]] = field(default_factory=dict)
