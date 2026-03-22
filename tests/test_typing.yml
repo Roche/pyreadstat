@@ -112,10 +112,10 @@
     buffer = io.BytesIO()
     df, meta = read_sas7bdat(buffer)
 
-- case: read_sas7bcat_default_types
+- case: read_xport_default_types
   main: |
-    from pyreadstat import read_sas7bcat
-    df, meta = read_sas7bcat("file.sas7bcat")
+    from pyreadstat import read_xport
+    df, meta = read_xport("file.xpt")
     reveal_type(df)  # N: Revealed type is "pandas.core.frame.DataFrame"
     reveal_type(meta)  # N: Revealed type is "pyreadstat.pyclasses.metadata_container"
 
