@@ -201,6 +201,10 @@ pip install git+https://github.com/Roche/pyreadstat.git
 
 You need a working C compiler and cython >=3.0.0.
 
+On some linux distributions it is necessary to link the library iconv, while in others it should not be linked
+for the final package to work. Right now the linkage happen only for ubuntu. If your distro needs linking iconv,
+you can force that manually setting the environment variable PYREADSTAT_LINK_ICONV=1.
+
 ### Compiling on Windows and Mac
 
 Compiling on linux is very easy, but on windows you need some extra preparation.
