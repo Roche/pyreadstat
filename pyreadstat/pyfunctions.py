@@ -26,20 +26,20 @@ def set_value_labels(
 
     Parameters
     ----------
-        dataframe : pandas dataframe
+        dataframe : pandas or polars dataframe
             resulting from parsing a file
         metadata : dictionary
             resulting from parsing a file
         formats_as_category : bool, optional
-            defaults to True. If True the variables having formats will be transformed into pandas categories.
+            defaults to True. If True the variables having formats will be transformed into pandas or polars categories.
         formats_as_ordered_category : bool, optional
-            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            defaults to False. If True the variables having formats will be transformed into pandas or polars ordered categories.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
 
     Returns
     -------
-        df_copy : pandas dataframe
+        df_copy : pandas or polars dataframe
             a copy of the original dataframe with the values changed, if appropiate formats were found, unaltered
             otherwise
     """
@@ -120,22 +120,22 @@ def set_catalog_to_sas(
 
     Parameters
     ----------
-        sas_dataframe : pandas dataframe
+        sas_dataframe : pandas or polars dataframe
             resulting from parsing a sas7bdat file
         sas_metadata : pyreadstat metadata object
             resulting from parsing a sas7bdat file
         catalog_metadata : pyreadstat metadata object
             resulting from parsing a sas7bcat (catalog) file
         formats_as_category : bool, optional
-            defaults to True. If True the variables having formats will be transformed into pandas categories.
+            defaults to True. If True the variables having formats will be transformed into pandas or polars categories.
         formats_as_ordered_category : bool, optional
-            defaults to False. If True the variables having formats will be transformed into pandas ordered categories.
+            defaults to False. If True the variables having formats will be transformed into pandas or polars ordered categories.
             it has precedence over formats_as_category, meaning if this is True, it will take effect irrespective of
             the value of formats_as_category.
 
     Returns
     -------
-        df_copy : pandas dataframe
+        df_copy : pandas or polars dataframe
             a copy of the original dataframe with the values changed, if appropriate formats were found, unaltered
             otherwise
         metadata : dict
