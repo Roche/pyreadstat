@@ -742,9 +742,9 @@ class TestBasic(unittest.TestCase):
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True, output_format='dict')
         alldfs = list()
         for chunkdict, meta in reader:
-            if self.backend != "pandas":
+            #if self.backend != "pandas":
                 # we need lists not numpy arrays for polars!
-                chunkdict = {k:v.tolist() for k,v in chunkdict.items()}
+                #chunkdict = {k:v.tolist() for k,v in chunkdict.items()}
             df = nw.from_dict(chunkdict, backend=self.backend)
             alldfs.append(df)
         df_multi = nw.concat(alldfs, how='vertical').to_native() 

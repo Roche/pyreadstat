@@ -16,11 +16,11 @@
 
 from collections.abc import Callable, Iterator
 import multiprocessing as mp
+from itertools import chain
 from os import PathLike
 from typing import TYPE_CHECKING, Any, Concatenate, Literal, ParamSpec, TypeAlias, overload, Protocol
 
 import narwhals.stable.v2 as nw
-import numpy as np
 
 from ._readstat_parser import parser_entry_point
 from ._readstat_writer import writer_entry_point, PyreadstatError
@@ -1175,9 +1175,7 @@ def read_file_multiprocessing(
     output_format = kwargs.get("output_format")
     if output_format == "dict":
         keys = chunks[0].keys()
-        final = dict()
-        for key in keys:
-            final[key] = np.concatenate([chunk[key] for chunk in chunks])
+        final = {key: list(chain.from_iterable(chunk[key] for chunk in chunks)) for key in keys}
     else:
         # final = pd.concat(chunks, axis=0, ignore_index=True)
         chunks = [nw.from_native(x) for x in chunks]

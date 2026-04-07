@@ -109,8 +109,9 @@ if os.name == 'nt':
 else:
     libraries.extend(["m", "z"])
     _platform = sys.platform
+    PYREADSTAT_LINK_ICONV = os.environ.get('PYREADSTAT_LINK_ICONV')
     # Mac and ubuntu: iconv needs to be linked statically
-    if _platform.lower().startswith("darwin") or (is_ubuntu() and is_python_lt_14()):
+    if PYREADSTAT_LINK_ICONV or  _platform.lower().startswith("darwin") or (is_ubuntu() and is_python_lt_14()):
         libraries.append("iconv")
 
 # Extensions
