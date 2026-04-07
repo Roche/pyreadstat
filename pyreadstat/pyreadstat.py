@@ -17,11 +17,10 @@
 from collections.abc import Callable, Iterator
 import multiprocessing as mp
 from os import PathLike
-from typing import TYPE_CHECKING, Concatenate, Literal, ParamSpec, TypeAlias, overload, Protocol
+from typing import TYPE_CHECKING, Any, Concatenate, Literal, ParamSpec, TypeAlias, overload, Protocol
 
 import narwhals.stable.v2 as nw
 import numpy as np
-import numpy.typing as npt
 
 from ._readstat_parser import parser_entry_point
 from ._readstat_writer import writer_entry_point, PyreadstatError
@@ -34,11 +33,10 @@ from .pyfunctions import set_value_labels, set_catalog_to_sas
 if TYPE_CHECKING:
     try:
         from pandas import DataFrame as PandasDataFrame
-    except ImportError:
-        pass
-    try:
         from polars import DataFrame as PolarsDataFrame
     except ImportError:
+        # Typing doesn't execute the import.
+        # Missing imports resolve to `Unknown`, so
         pass
 
     DataFrame: TypeAlias = PandasDataFrame | PolarsDataFrame
@@ -55,12 +53,12 @@ class FileLike(Protocol):
 FilePathLike: TypeAlias = str | bytes | PathLike[str] | PathLike[bytes]
 FilePathorBuffer: TypeAlias = FilePathLike | FileLike
 
-DictOutput = dict[str, npt.NDArray[np.generic]]
+DictOutput = dict[str, list[Any]]
 
 _P = ParamSpec("_P")
-PyreadstatReadFunction = Callable[
+PyreadstatReadFunction: TypeAlias = Callable[
     Concatenate[FilePathorBuffer, _P],
-    "tuple[DataFrame | DictOutput, metadata_container]"
+    "tuple[DataFrame | dict[str, list[Any]], metadata_container]",
 ]
 
 
@@ -719,8 +717,8 @@ def read_por(
     formats_as_ordered_category: bool = ...,
     usecols: list[str] | None = ...,
     disable_datetime_conversion: bool = ...,
-    row_limit: int = 0,
-    row_offset: int = 0,
+    row_limit: int = ...,
+    row_offset: int = ...,
     output_format: Literal["pandas"] | None = ...,
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
@@ -736,8 +734,8 @@ def read_por(
     formats_as_ordered_category: bool = ...,
     usecols: list[str] | None = ...,
     disable_datetime_conversion: bool = ...,
-    row_limit: int = 0,
-    row_offset: int = 0,
+    row_limit: int = ...,
+    row_offset: int = ...,
     output_format: Literal["polars"] = "polars",
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
@@ -753,8 +751,8 @@ def read_por(
     formats_as_ordered_category: bool = ...,
     usecols: list[str] | None = ...,
     disable_datetime_conversion: bool = ...,
-    row_limit: int = 0,
-    row_offset: int = 0,
+    row_limit: int = ...,
+    row_offset: int = ...,
     output_format: Literal["dict"] = "dict",
     extra_datetime_formats: list[str] | None = ...,
     extra_date_formats: list[str] | None = ...,
@@ -926,7 +924,7 @@ def read_sas7bcat(
 
 @overload
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     chunksize: int = ...,
     offset: int = ...,
@@ -936,11 +934,11 @@ def read_file_in_chunks(
     num_rows: int | None = ...,
     *,
     output_format: Literal["pandas"] | None = ...,
-    **kwargs,
+    **kwargs: Any,
 ) -> "Iterator[tuple[PandasDataFrame, metadata_container]]": ...
 @overload
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     chunksize: int = ...,
     offset: int = ...,
@@ -950,11 +948,11 @@ def read_file_in_chunks(
     num_rows: int | None = ...,
     *,
     output_format: Literal["polars"] = "polars",
-    **kwargs,
+    **kwargs: Any,
 ) -> "Iterator[tuple[PolarsDataFrame, metadata_container]]": ...
 @overload
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     chunksize: int = ...,
     offset: int = ...,
@@ -964,10 +962,10 @@ def read_file_in_chunks(
     num_rows: int | None = ...,
     *,
     output_format: Literal["dict"] = "dict",
-    **kwargs,
+    **kwargs: Any,
 ) -> Iterator[tuple[DictOutput, metadata_container]]: ...
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     chunksize: int = 100000,
     offset: int = 0,
@@ -975,7 +973,7 @@ def read_file_in_chunks(
     multiprocess: bool = False,
     num_processes: int = 4,
     num_rows: int | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> "Iterator[tuple[DataFrame | DictOutput, metadata_container]]":
     """
     Returns a generator that will allow to read a file in chunks.
@@ -1066,40 +1064,40 @@ def read_file_in_chunks(
 
 @overload
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
     output_format: Literal["pandas"] | None = ...,
-    **kwargs,
+    **kwargs: Any,
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
     output_format: Literal["polars"] = "polars",
-    **kwargs,
+    **kwargs: Any,
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
     *,
     output_format: Literal["dict"] = "dict",
-    **kwargs,
+    **kwargs: Any,
 ) -> tuple[DictOutput, metadata_container]: ...
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction,
+    read_function: PyreadstatReadFunction[_P],
     file_path: FilePathLike,
     num_processes: int | None = None,
     num_rows: int | None = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> "tuple[DataFrame | DictOutput, metadata_container]":
     """
     Reads a file in parallel using multiprocessing.
@@ -1394,7 +1392,7 @@ def write_por(
     dst_path: FilePathLike,
     file_label: str = "",
     column_labels: list[str] | dict[str, str] | None = None,
-    variable_format: dict[str, str] | None = None
+    variable_format: dict[str, str] | None = None,
 ) -> None:
     """
     Writes a dataframe to a SPSS POR file.
