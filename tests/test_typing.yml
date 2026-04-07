@@ -184,8 +184,8 @@
       expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
   main: |
     from pyreadstat import read_file_multiprocessing, read_sav
-    df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True, output_format="polars")
-    reveal_type(df)  # N: Revealed type is "polars.dataframe.frame.DataFrame"
+    df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True, output_format="{{ output_format }}")
+    reveal_type(df)  # N: Revealed type is "{{ expected_type }}"
 
 - case: read_file_multiprocessing_invalid_callable
   main: |
