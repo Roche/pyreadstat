@@ -24,9 +24,9 @@ from typing import TYPE_CHECKING, Any, TypeAlias
 import numpy as np
 
 if TYPE_CHECKING:
-    from .pyreadstat import PyreadstatReadFunction, FileLike, DataFrame
+    from .pyreadstat import PyreadstatReadFunction, DataFrame
 
-Input: TypeAlias = "tuple[PyreadstatReadFunction, str | bytes | PathLike | FileLike, int, int, dict[str, Any]]"
+Input: TypeAlias = "tuple[PyreadstatReadFunction, str | bytes | PathLike, int, int, dict[str, Any]]"
 
 
 def worker(inpt: Input) -> "DataFrame | dict[str, np.ndarray]":
