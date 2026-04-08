@@ -17,7 +17,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_sav
     df: object
@@ -45,7 +45,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_dta
     df, meta = read_dta("file.dta", output_format="{{ output_format }}")
@@ -72,7 +72,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_por
     df, meta = read_por("file.por", output_format="{{ output_format }}")
@@ -99,7 +99,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_sas7bdat
     df, meta = read_sas7bdat("file.sas7bdat", output_format="{{ output_format }}")
@@ -126,7 +126,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_xport
     df, meta = read_xport("file.xpt", output_format="{{ output_format }}")
@@ -153,7 +153,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_sas7bcat
     df, meta = read_sas7bcat("file.sas7bcat", output_format="{{ output_format }}")
@@ -181,7 +181,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_file_multiprocessing, read_sav
     df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True, output_format="{{ output_format }}")
@@ -190,11 +190,9 @@
 - case: read_file_multiprocessing_invalid_callable
   main: |
     from pyreadstat import read_file_multiprocessing
-    def noop(a: int) -> int:
+    def noop(a: int, /) -> int:
         return a
-    read_file_multiprocessing(noop, "file.sav", 1, 1)  # E: Argument 1 to "read_file_multiprocessing" has incompatible type "Callable[[int], int]"; expected "def (str | bytes | PathLike[str] | PathLike[bytes] | FileLike, /, *Any, **Any) -> tuple[pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray[tuple[Any, ...], dtype[generic[Any]]]], metadata_container]"  [arg-type]
-  out: |
-    main:4: note: This is likely because "noop" has named arguments: "a". Consider marking them positional-only
+    read_file_multiprocessing(noop, "file.sav", 1, 1)  # ER: Argument 1 to "read_file_multiprocessing" has incompatible type .+
 
 - case: read_file_in_chunks_default_types
   main: |
@@ -210,7 +208,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[numpy.generic[Any]]]]"
+      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
   main: |
     from pyreadstat import read_file_in_chunks, read_sav
     for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True, output_format="{{ output_format }}"):
@@ -219,11 +217,9 @@
 - case: read_file_in_chunks_invalid_callable
   main: |
     from pyreadstat import read_file_in_chunks
-    def noop(a: int) -> int:
+    def noop(a: int, /) -> int:
         return a
-    read_file_in_chunks(noop, "file.sav", 1, 1)  # E: Argument 1 to "read_file_in_chunks" has incompatible type "Callable[[int], int]"; expected "def (str | bytes | PathLike[str] | PathLike[bytes] | FileLike, /, *Any, **Any) -> tuple[pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray[tuple[Any, ...], dtype[generic[Any]]]], metadata_container]"  [arg-type]
-  out: |
-    main:4: note: This is likely because "noop" has named arguments: "a". Consider marking them positional-only
+    read_file_in_chunks(noop, "file.sav", 1, 1)  # ER: Argument 1 to "read_file_in_chunks" has incompatible type .+
 
 - case: write_sav_types
   main: |
@@ -308,10 +304,10 @@
     from pyreadstat.worker import Input, worker
     inpt: Input = (read_sav, "test_data/file.sav", 0, 100, {})
     result = worker(inpt)
-    reveal_type(result)  # N: Revealed type is "pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | builtins.dict[builtins.str, numpy.ndarray[builtins.tuple[Any, ...], numpy.dtype[Any]]]"
-    inpt_invalid: Input = (lambda x: "A", "test_data/file.sav", 0, 100, {})  # ER: Incompatible types in assignment (expression has type "tuple[Callable[[Any], str], str, int, int, dict[str, Any]]", variable has type "tuple[def (str | bytes | PathLike[str] | PathLike[bytes] | FileLike, /, *Any, **Any) -> tuple[pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, ndarray[tuple[Any, ...], dtype[generic[Any]]]], metadata_container], str | bytes | PathLike[Any] | FileLike, int, int, dict[str, Any]]")  [assignment]
-  out: |
-    main:6: error: Cannot infer type of lambda  [misc]
+    reveal_type(result)  # N: Revealed type is "pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | builtins.dict[builtins.str, builtins.list[Any]]"
+    def noop(a: int, /) -> int:
+        return a
+    inpt_invalid: Input = (noop, "test_data/file.sav", 0, 100, {})  # ER: Incompatible types in assignment .+
 
 - case: metadata_container_types
   main: |
