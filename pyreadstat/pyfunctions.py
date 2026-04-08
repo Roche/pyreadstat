@@ -2,7 +2,7 @@
 Functions written in pure python
 """
 
-from copy import deepcopy, copy
+from copy import deepcopy
 import warnings
 
 import narwhals.stable.v2 as nw
