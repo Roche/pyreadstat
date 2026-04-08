@@ -18,12 +18,12 @@ from collections.abc import Callable, Iterator
 import multiprocessing as mp
 from itertools import chain
 from os import PathLike
-from typing import TYPE_CHECKING, Any, Concatenate, Literal, ParamSpec, TypeAlias, overload, Protocol
+from typing import TYPE_CHECKING, Any, Concatenate, Literal, TypeAlias, overload, Protocol
 
 import narwhals.stable.v2 as nw
 
-from ._readstat_parser import parser_entry_point
-from ._readstat_writer import writer_entry_point, PyreadstatError
+from ._readstat_parser import parser_entry_point, PyreadstatError
+from ._readstat_writer import writer_entry_point
 from .worker import worker
 from .pyclasses import metadata_container, MissingRange
 from .pyfunctions import set_value_labels, set_catalog_to_sas
@@ -31,16 +31,26 @@ from .pyfunctions import set_value_labels, set_catalog_to_sas
 # Typing interface
 
 if TYPE_CHECKING:
+    # Setup type aliases for the public interface.
+    # These are not executed at runtime, but they help type checkers understand
+    # the expected types of the public functions and classes.
+
+    # Since pyreadstat can work with both pandas and polars, we define a DataFrame type that can be either.
     try:
-        from pandas import DataFrame as PandasDataFrame
-        from polars import DataFrame as PolarsDataFrame
+        from pandas import DataFrame as PandasDataFrame  # type: ignore
     except ImportError:
-        # Typing doesn't execute the import.
-        # Missing imports resolve to `Unknown`, so
-        pass
+        # Define a dummy DataFrame class to avoid accepting any type as PandasDataFrame when pandas is not installed
+        class PandasDataFrame:
+            pass
 
-    DataFrame: TypeAlias = PandasDataFrame | PolarsDataFrame
+    try:
+        from polars import DataFrame as PolarsDataFrame  # type: ignore
+    except ImportError:
+        # Define a dummy DataFrame class to avoid accepting any type as PolarsDataFrame when polars is not installed
+        class PolarsDataFrame:
+            pass
 
+DataFrame: TypeAlias = "PandasDataFrame | PolarsDataFrame"  # Define type at runtime for introspection
 
 class FileLike(Protocol):
     """Protocol for file-like objects accepted by pyreadstat"""
@@ -53,12 +63,10 @@ class FileLike(Protocol):
 FilePathLike: TypeAlias = str | bytes | PathLike[str] | PathLike[bytes]
 FilePathorBuffer: TypeAlias = FilePathLike | FileLike
 
-DictOutput = dict[str, list[Any]]
+DictOutput: TypeAlias = dict[str, list[Any]]
 
-_P = ParamSpec("_P")
 PyreadstatReadFunction: TypeAlias = Callable[
-    Concatenate[FilePathorBuffer, _P],
-    "tuple[DataFrame | dict[str, list[Any]], metadata_container]",
+    Concatenate[FilePathorBuffer, ...], "tuple[DataFrame | DictOutput, metadata_container]"
 ]
 
 
@@ -924,7 +932,7 @@ def read_sas7bcat(
 
 @overload
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     chunksize: int = ...,
     offset: int = ...,
@@ -938,7 +946,7 @@ def read_file_in_chunks(
 ) -> "Iterator[tuple[PandasDataFrame, metadata_container]]": ...
 @overload
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     chunksize: int = ...,
     offset: int = ...,
@@ -952,7 +960,7 @@ def read_file_in_chunks(
 ) -> "Iterator[tuple[PolarsDataFrame, metadata_container]]": ...
 @overload
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     chunksize: int = ...,
     offset: int = ...,
@@ -965,7 +973,7 @@ def read_file_in_chunks(
     **kwargs: Any,
 ) -> Iterator[tuple[DictOutput, metadata_container]]: ...
 def read_file_in_chunks(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     chunksize: int = 100000,
     offset: int = 0,
@@ -1064,7 +1072,7 @@ def read_file_in_chunks(
 
 @overload
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
@@ -1074,7 +1082,7 @@ def read_file_multiprocessing(
 ) -> "tuple[PandasDataFrame, metadata_container]": ...
 @overload
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
@@ -1084,7 +1092,7 @@ def read_file_multiprocessing(
 ) -> "tuple[PolarsDataFrame, metadata_container]": ...
 @overload
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     num_processes: int | None = ...,
     num_rows: int | None = ...,
@@ -1093,7 +1101,7 @@ def read_file_multiprocessing(
     **kwargs: Any,
 ) -> tuple[DictOutput, metadata_container]: ...
 def read_file_multiprocessing(
-    read_function: PyreadstatReadFunction[_P],
+    read_function: PyreadstatReadFunction,
     file_path: FilePathLike,
     num_processes: int | None = None,
     num_rows: int | None = None,
