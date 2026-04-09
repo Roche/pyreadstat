@@ -17,7 +17,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_sav
     df: object
@@ -45,7 +45,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_dta
     df, meta = read_dta("file.dta", output_format="{{ output_format }}")
@@ -72,7 +72,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_por
     df, meta = read_por("file.por", output_format="{{ output_format }}")
@@ -99,7 +99,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_sas7bdat
     df, meta = read_sas7bdat("file.sas7bdat", output_format="{{ output_format }}")
@@ -126,7 +126,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_xport
     df, meta = read_xport("file.xpt", output_format="{{ output_format }}")
@@ -153,7 +153,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_sas7bcat
     df, meta = read_sas7bcat("file.sas7bcat", output_format="{{ output_format }}")
@@ -181,7 +181,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_file_multiprocessing, read_sav
     df, meta = read_file_multiprocessing(read_sav, "file.sav", metadataonly=True, output_format="{{ output_format }}")
@@ -208,7 +208,7 @@
     - output_format: "polars"
       expected_type: "polars.dataframe.frame.DataFrame"
     - output_format: "dict"
-      expected_type: "builtins.dict[builtins.str, builtins.list[Any]]"
+      expected_type: "dict[str, list[Any]]"
   main: |
     from pyreadstat import read_file_in_chunks, read_sav
     for df, meta in read_file_in_chunks(read_sav, "file.sav", metadataonly=True, output_format="{{ output_format }}"):
@@ -304,7 +304,7 @@
     from pyreadstat.worker import Input, worker
     inpt: Input = (read_sav, "test_data/file.sav", 0, 100, {})
     result = worker(inpt)
-    reveal_type(result)  # N: Revealed type is "pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | builtins.dict[builtins.str, builtins.list[Any]]"
+    reveal_type(result)  # N: Revealed type is "pandas.core.frame.DataFrame | polars.dataframe.frame.DataFrame | dict[str, list[Any]]"
     def noop(a: int, /) -> int:
         return a
     inpt_invalid: Input = (noop, "test_data/file.sav", 0, 100, {})  # ER: Incompatible types in assignment .+
@@ -334,7 +334,7 @@
             "label": "Set 2",
             "variable_list": ["var3"],
         },
-        "set3": {}  # E: Missing keys ("type", "is_dichotomy", "counted_value", "label", "variable_list") for TypedDict "MRSet"  [typeddict-item]
+        "set3": {}  # E: Missing keys ("counted_value", "is_dichotomy", "label", "type", "variable_list") for TypedDict "MRSet"  [typeddict-item]
     }
     meta.variable_measure = {
         "var1": "nominal",
