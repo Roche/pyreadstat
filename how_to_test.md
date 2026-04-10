@@ -32,10 +32,11 @@ Type hint tests can be run with:
 
 ```shell
 pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini
+python tests/test_runtime_types.py --inplace
 ```
 
 To run all tests in place, do:
 
 ```shell
-python tests/test_basic.py --inplace && python tests/test_narwhalified.py --inplace --backend=pandas && python tests/test_narwhalified.py --inplace --backend=polars && python tests/test_http_integration.py --inplace && pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini
+python tests/test_basic.py --inplace && python tests/test_narwhalified.py --inplace --backend=pandas && python tests/test_narwhalified.py --inplace --backend=polars && python tests/test_http_integration.py --inplace && pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini & python tests/test_runtime_types.py --inplace
 ```
