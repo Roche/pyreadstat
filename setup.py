@@ -168,6 +168,8 @@ setup(
     ],
     ext_modules=extensions,
     packages=["pyreadstat"],
+    package_data={"pyreadstat": ["py.typed"]},
+    include_package_data=True,
     data_files=data_files,
     install_requires=['narwhals>=2.10.1', 'numpy'],
     license="Apache-2.0",

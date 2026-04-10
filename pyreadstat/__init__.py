@@ -14,12 +14,32 @@
 # limitations under the License.
 # #############################################################################
 
-from .pyreadstat import read_sav, read_sas7bdat, read_xport, read_dta, read_sav, read_por, read_sas7bcat
+
+from .pyreadstat import read_sav, read_sas7bdat, read_xport, read_dta, read_por, read_sas7bcat
 from .pyreadstat import write_sav, write_dta, write_xport, write_por
 from .pyreadstat import read_file_in_chunks, read_file_multiprocessing
 from .pyclasses import metadata_container
-from ._readstat_parser import ReadstatError
+from ._readstat_parser import ReadstatError, PyreadstatError
 from .pyfunctions import set_value_labels, set_catalog_to_sas
 
 __version__ = "1.3.4"
 
+__all__ = (
+    "read_sav",
+    "read_sas7bdat",
+    "read_xport",
+    "read_dta",
+    "read_por",
+    "read_sas7bcat",
+    "write_sav",
+    "write_dta",
+    "write_xport",
+    "write_por",
+    "read_file_in_chunks",
+    "read_file_multiprocessing",
+    "metadata_container",
+    "ReadstatError",
+    "PyreadstatError",
+    "set_value_labels",
+    "set_catalog_to_sas",
+)
