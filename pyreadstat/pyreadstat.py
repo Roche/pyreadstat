@@ -18,7 +18,7 @@ from collections.abc import Callable, Iterator
 import multiprocessing as mp
 from itertools import chain
 from os import PathLike
-from typing import TYPE_CHECKING, Any, Concatenate, Literal, TypeAlias, overload, Protocol
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, overload, Protocol
 
 import narwhals.stable.v2 as nw
 
@@ -31,6 +31,7 @@ from .pyfunctions import set_value_labels, set_catalog_to_sas
 # Typing interface
 
 if TYPE_CHECKING:
+    from typing import Concatenate
     # Setup type aliases for the public interface.
     # These are not executed at runtime, but they help type checkers understand
     # the expected types of the public functions and classes.
@@ -65,9 +66,7 @@ FilePathorBuffer: TypeAlias = FilePathLike | FileLike
 
 DictOutput: TypeAlias = dict[str, list[Any]]
 
-PyreadstatReadFunction: TypeAlias = Callable[
-    Concatenate[FilePathorBuffer, ...], "tuple[DataFrame | DictOutput, metadata_container]"
-]
+PyreadstatReadFunction: TypeAlias = "Callable[Concatenate[FilePathorBuffer, ...], tuple[DataFrame | DictOutput, metadata_container]]"
 
 
 # Public interface
