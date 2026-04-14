@@ -22,7 +22,8 @@
         ],
         "libraries": [
             "m",
-            "z"
+            "z",
+            "iconv"
         ],
         "name": "pyreadstat._readstat_writer",
         "sources": [
