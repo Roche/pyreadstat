@@ -36,23 +36,23 @@ jobs:
           pip install pandas polars
           pip install pytest mypy pytest-mypy-plugins pandas-stubs
 
-      - name: Build extensions
-        run: python setup.py build_ext --inplace
+      - name: Install package
+        run: pip install .
 
       - name: Run basic tests
-        run: python tests/test_basic.py --inplace
+        run: python tests/test_basic.py
 
       - name: Run narwhals pandas tests
-        run: python tests/test_narwhalified.py --inplace --backend=pandas
+        run: python tests/test_narwhalified.py --backend=pandas
 
       - name: Run narwhals polars tests
-        run: python tests/test_narwhalified.py --inplace --backend=polars
+        run: python tests/test_narwhalified.py --backend=polars
 
       - name: Run HTTP integration tests
-        run: python tests/test_http_integration.py --inplace
+        run: python tests/test_http_integration.py
 
       - name: Run runtime type tests
-        run: python tests/test_runtime_types.py --inplace
+        run: python tests/test_runtime_types.py
 
       - name: Run typing tests
         run: pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini
