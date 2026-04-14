@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2022]
+        os: [ubuntu-latest, ubuntu-22.04, macos-latest, windows-2022]
 
     steps:
       - name: Checkout
@@ -44,11 +44,32 @@ jobs:
         working-directory: /tmp
         run: |
           python -c "
-          import pyreadstat, pandas as pd, tempfile, os
+          import pyreadstat, pandas as pd, tempfile, os, subprocess, struct, ctypes, ctypes.util
+
           print('=== Environment ===')
           print('pyreadstat location:', pyreadstat.__file__)
           import sysconfig; print('CC:', sysconfig.get_config_var('CC'))
-          print()
+          import platform; print('glibc:', platform.libc_ver())
+
+          # Check linked libraries of the .so
+          so_dir = os.path.dirname(pyreadstat.__file__)
+          for f in os.listdir(so_dir):
+              if '_readstat_parser' in f and f.endswith('.so'):
+                  so_path = os.path.join(so_dir, f)
+                  print(f'\n=== ldd {f} ===')
+                  subprocess.run(['ldd', so_path])
+                  break
+
+          # Check iconv availability
+          print('\n=== iconv check ===')
+          libc = ctypes.CDLL(ctypes.util.find_library('c'))
+          try:
+              conv = libc.iconv_open(b'UTF-8', b'UTF-8')
+              print(f'iconv_open(UTF-8, UTF-8) = {conv}  (should be != -1)')
+              if conv != -1:
+                  libc.iconv_close(conv)
+          except Exception as e:
+              print(f'iconv_open failed: {e}')
 
           # Test write + read value labels
           df = pd.DataFrame({'x': [1.0, 2.0], 'y': ['a', 'b']})
@@ -57,40 +78,44 @@ jobs:
           pyreadstat.write_sav(df, path, variable_value_labels=vvl)
 
           df2, meta = pyreadstat.read_sav(path)
-          print('=== Read-back results ===')
+          print('\n=== Read-back results ===')
           print('variable_value_labels:', meta.variable_value_labels)
           print('value_labels (raw):', meta.value_labels)
           print('variable_to_label:', meta.variable_to_label)
-          print()
 
-          # Test reading an existing file with known value labels
+          # Existing file test
           checkout = os.environ.get('GITHUB_WORKSPACE', '')
           test_sav = os.path.join(checkout, 'test_data', 'basic', 'sample.sav')
           if os.path.exists(test_sav):
               _, meta2 = pyreadstat.read_sav(test_sav)
-              print('=== Existing file', test_sav, '===')
+              print(f'\n=== Existing file ===')
               print('variable_value_labels:', meta2.variable_value_labels)
-              print('value_labels (raw):', meta2.value_labels)
-          else:
-              print('Could not find test sample.sav at', test_sav)
 
-          # Check written file for value label records
+          # Dump file structure (record types)
           with open(path, 'rb') as f:
               data = f.read()
-          print()
-          print('=== Written file size:', len(data), 'bytes ===')
-          import struct
-          pos = 0
-          found_vlabel = False
-          while pos < len(data) - 4:
-              rec_type = struct.unpack('<I', data[pos:pos+4])[0]
-              if rec_type == 3:
-                  print(f'Found value label record (type=3) at offset {pos}')
-                  found_vlabel = True
+          print(f'\n=== Written file: {len(data)} bytes ===')
+          print('First 64 bytes hex:', data[:64].hex())
+          print('Bytes 176-260 hex:', data[176:260].hex())
+          # Parse SAV record types sequentially
+          pos = 176  # after header
+          for i in range(10):
+              if pos + 4 > len(data): break
+              rt = struct.unpack('<I', data[pos:pos+4])[0]
+              print(f'  offset {pos}: record_type={rt}, next 16 bytes: {data[pos:pos+16].hex()}')
+              if rt == 999: break
+              pos += 4
+              # skip based on record type
+              if rt == 2:  # variable record
+                  pos += 28  # rest of fixed part
+              elif rt == 3:  # value label
+                  lc = struct.unpack('<I', data[pos:pos+4])[0]
+                  print(f'    label_count={lc}')
                   break
-              pos += 1
-          if not found_vlabel:
-              print('NO value label record (type=3) found in file!')
+              elif rt == 7:  # extension
+                  pos += 8  # subtype + size + count header
+              else:
+                  break
           "
 
       - name: Run basic tests
