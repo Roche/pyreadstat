@@ -1,0 +1,64 @@
+name: CI Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-2022]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zlib1g-dev
+
+      - name: Build Windows Libraries
+        if: runner.os == 'Windows'
+        uses: ./.github/actions/windows_actions
+
+      - name: Install Python dependencies
+        run: |
+          pip install cython setuptools numpy narwhals
+          pip install pandas polars
+          pip install pytest mypy pytest-mypy-plugins pandas-stubs
+
+      # The ReadStat C library (src/) contains strict-aliasing violations
+      # (e.g. void* <-> readstat_variable_t** casts in readstat_writer.c).
+      # gcc 13+ at -O2 exploits this UB and optimizes away value-label writes.
+      # -fno-strict-aliasing disables that assumption while keeping other -O2 opts.
+      - name: Install package
+        run: pip install .
+        env:
+          CFLAGS: ${{ runner.os == 'Linux' && '-O2 -fno-strict-aliasing' || '' }}
+
+      - name: Run basic tests
+        run: python tests/test_basic.py
+
+      - name: Run narwhals pandas tests
+        run: python tests/test_narwhalified.py --backend=pandas
+
+      - name: Run narwhals polars tests
+        run: python tests/test_narwhalified.py --backend=polars
+
+      - name: Run HTTP integration tests
+        run: python tests/test_http_integration.py
+
+      - name: Run runtime type tests
+        run: python tests/test_runtime_types.py
+
+      - name: Run typing tests
+        run: pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini
