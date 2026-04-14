@@ -39,6 +39,65 @@ jobs:
       - name: Install package
         run: pip install .
 
+      - name: Diagnose value labels
+        if: runner.os == 'Linux'
+        run: |
+          python -c "
+          import pyreadstat, pandas as pd, tempfile, os
+          print('=== Environment ===')
+          print('pyreadstat location:', pyreadstat.__file__)
+          import sysconfig; print('CC:', sysconfig.get_config_var('CC'))
+          print()
+
+          # Test write + read value labels
+          df = pd.DataFrame({'x': [1.0, 2.0], 'y': ['a', 'b']})
+          path = os.path.join(tempfile.gettempdir(), 'diag_labels.sav')
+          vvl = {'x': {1.0: 'Male', 2.0: 'Female'}}
+          pyreadstat.write_sav(df, path, variable_value_labels=vvl)
+
+          df2, meta = pyreadstat.read_sav(path)
+          print('=== Read-back results ===')
+          print('variable_value_labels:', meta.variable_value_labels)
+          print('value_labels (raw):', meta.value_labels)
+          print('variable_to_label:', meta.variable_to_label)
+          print()
+
+          # Test reading an existing file with known value labels
+          import os.path
+          test_sav = os.path.join(os.path.dirname(os.path.dirname(pyreadstat.__file__)),
+                                  'tests', '..', 'test_data', 'basic', 'sample.sav')
+          # try the checkout path instead
+          test_sav2 = os.path.join(os.getcwd(), 'test_data', 'basic', 'sample.sav')
+          for p in [test_sav, test_sav2]:
+              if os.path.exists(p):
+                  _, meta2 = pyreadstat.read_sav(p)
+                  print('=== Existing file', p, '===')
+                  print('variable_value_labels:', meta2.variable_value_labels)
+                  print('value_labels (raw):', meta2.value_labels)
+                  break
+          else:
+              print('Could not find test sample.sav')
+
+          # Hexdump first 200 bytes of written file to check for value label records
+          with open(path, 'rb') as f:
+              data = f.read()
+          print()
+          print('=== Written file size:', len(data), 'bytes ===')
+          # SAV value label record type is 3 (little-endian int32)
+          import struct
+          pos = 0
+          found_vlabel = False
+          while pos < len(data) - 4:
+              rec_type = struct.unpack('<I', data[pos:pos+4])[0]
+              if rec_type == 3:
+                  print(f'Found value label record (type=3) at offset {pos}')
+                  found_vlabel = True
+                  break
+              pos += 1
+          if not found_vlabel:
+              print('NO value label record (type=3) found in file!')
+          "
+
       - name: Run basic tests
         run: python tests/test_basic.py
 
