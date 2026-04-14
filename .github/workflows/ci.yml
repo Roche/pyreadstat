@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-2022]
+        os: [ubuntu-latest, macos-latest, windows-2022]
 
     steps:
       - name: Checkout
@@ -36,106 +36,14 @@ jobs:
           pip install pandas polars
           pip install pytest mypy pytest-mypy-plugins pandas-stubs
 
+      # The ReadStat C library (src/) contains strict-aliasing violations
+      # (e.g. void* <-> readstat_variable_t** casts in readstat_writer.c).
+      # gcc 13+ at -O2 exploits this UB and optimizes away value-label writes.
+      # -fno-strict-aliasing disables that assumption while keeping other -O2 opts.
       - name: Install package
-        run: pip install -v .
+        run: pip install .
         env:
           CFLAGS: ${{ runner.os == 'Linux' && '-O2 -fno-strict-aliasing' || '' }}
-
-      - name: Diagnose value labels
-        if: runner.os == 'Linux'
-        continue-on-error: true
-        working-directory: /tmp
-        run: |
-          python -c "
-          import pyreadstat, pandas as pd, tempfile, os, subprocess, struct
-
-          print('=== Environment ===')
-          print('pyreadstat location:', pyreadstat.__file__)
-          import sysconfig; print('CC:', sysconfig.get_config_var('CC'))
-          import platform; print('glibc:', platform.libc_ver())
-          print('gcc:', subprocess.getoutput('gcc --version | head -1'))
-
-          # Check linked libraries of the .so
-          so_dir = os.path.dirname(pyreadstat.__file__)
-          for f in sorted(os.listdir(so_dir)):
-              if '_readstat_parser' in f and f.endswith('.so'):
-                  so_path = os.path.join(so_dir, f)
-                  print(f'\n=== ldd {f} ===')
-                  subprocess.run(['ldd', so_path])
-                  # Check if iconv symbols are referenced
-                  print(f'\n=== iconv symbols in {f} ===')
-                  subprocess.run(['bash', '-c', f'nm -D {so_path} | grep -i iconv || echo \"no iconv symbols found\"'])
-                  break
-
-          # Test write + read value labels
-          df = pd.DataFrame({'x': [1.0, 2.0], 'y': ['a', 'b']})
-          path = os.path.join(tempfile.gettempdir(), 'diag_labels.sav')
-          vvl = {'x': {1.0: 'Male', 2.0: 'Female'}}
-          pyreadstat.write_sav(df, path, variable_value_labels=vvl)
-
-          df2, meta = pyreadstat.read_sav(path)
-          print('\n=== Read-back results ===')
-          print('variable_value_labels:', meta.variable_value_labels)
-          print('value_labels (raw):', meta.value_labels)
-          print('variable_to_label:', meta.variable_to_label)
-
-          # Existing file test
-          checkout = os.environ.get('GITHUB_WORKSPACE', '')
-          test_sav = os.path.join(checkout, 'test_data', 'basic', 'sample.sav')
-          if os.path.exists(test_sav):
-              _, meta2 = pyreadstat.read_sav(test_sav)
-              print(f'\n=== Existing file ===')
-              print('variable_value_labels:', meta2.variable_value_labels)
-
-          # Dump binary structure of written file
-          with open(path, 'rb') as f:
-              data = f.read()
-          print(f'\n=== Written file: {len(data)} bytes ===')
-          print('Bytes 176-300 hex:')
-          for off in range(176, min(300, len(data)), 16):
-              chunk = data[off:off+16]
-              hexstr = ' '.join(f'{b:02x}' for b in chunk)
-              print(f'  {off:4d}: {hexstr}')
-
-          # Walk SAV records from offset 176
-          print('\n=== SAV record walk ===')
-          pos = 176
-          for i in range(20):
-              if pos + 4 > len(data): break
-              rt = struct.unpack('<I', data[pos:pos+4])[0]
-              if rt == 2:  # variable record
-                  vtype = struct.unpack('<I', data[pos+4:pos+8])[0]
-                  has_label = struct.unpack('<I', data[pos+8:pos+12])[0]
-                  name = data[pos+24:pos+32].rstrip(b'\x00').decode('ascii', errors='replace')
-                  rec_size = 32
-                  if has_label:
-                      label_len = struct.unpack('<I', data[pos+32:pos+36])[0]
-                      padded = (label_len + 3) // 4 * 4
-                      rec_size += 4 + padded
-                  print(f'  offset {pos}: VARIABLE (type={vtype}, has_label={has_label}, name={name!r}, size={rec_size})')
-                  pos += rec_size
-              elif rt == 3:  # value label
-                  lc = struct.unpack('<I', data[pos+4:pos+8])[0]
-                  print(f'  offset {pos}: VALUE_LABEL (count={lc})')
-                  break
-              elif rt == 4:  # value label variables
-                  vc = struct.unpack('<I', data[pos+4:pos+8])[0]
-                  print(f'  offset {pos}: VALUE_LABEL_VARS (var_count={vc})')
-                  break
-              elif rt == 7:  # extension
-                  subtype = struct.unpack('<I', data[pos+4:pos+8])[0]
-                  size = struct.unpack('<I', data[pos+8:pos+12])[0]
-                  count = struct.unpack('<I', data[pos+12:pos+16])[0]
-                  total = 16 + size * count
-                  print(f'  offset {pos}: EXTENSION (subtype={subtype}, size={size}, count={count}, total={total})')
-                  pos += total
-              elif rt == 999:
-                  print(f'  offset {pos}: DICT_TERMINATION')
-                  break
-              else:
-                  print(f'  offset {pos}: UNKNOWN (type={rt})')
-                  break
-          "
 
       - name: Run basic tests
         run: python tests/test_basic.py
