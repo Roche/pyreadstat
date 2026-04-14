@@ -39,7 +39,7 @@ jobs:
       - name: Install package
         run: pip install -v .
         env:
-          CFLAGS: ${{ runner.os == 'Linux' && '-O0' || '' }}
+          CFLAGS: ${{ runner.os == 'Linux' && '-O2 -fno-strict-aliasing' || '' }}
 
       - name: Diagnose value labels
         if: runner.os == 'Linux'
