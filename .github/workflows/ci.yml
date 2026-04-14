@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2022]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-2022]
 
     steps:
       - name: Checkout
@@ -37,7 +37,9 @@ jobs:
           pip install pytest mypy pytest-mypy-plugins pandas-stubs
 
       - name: Install package
-        run: pip install .
+        run: pip install -v .
+        env:
+          CFLAGS: ${{ runner.os == 'Linux' && '-O0' || '' }}
 
       - name: Diagnose value labels
         if: runner.os == 'Linux'
