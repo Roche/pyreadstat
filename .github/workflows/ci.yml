@@ -1,0 +1,58 @@
+name: CI Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-2022]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zlib1g-dev
+
+      - name: Build Windows Libraries
+        if: runner.os == 'Windows'
+        uses: ./.github/actions/windows_actions
+
+      - name: Install Python dependencies
+        run: |
+          pip install cython setuptools numpy narwhals
+          pip install pandas polars
+          pip install pytest mypy pytest-mypy-plugins pandas-stubs
+
+      - name: Build extensions
+        run: python setup.py build_ext --inplace
+
+      - name: Run basic tests
+        run: python tests/test_basic.py --inplace
+
+      - name: Run narwhals pandas tests
+        run: python tests/test_narwhalified.py --inplace --backend=pandas
+
+      - name: Run narwhals polars tests
+        run: python tests/test_narwhalified.py --inplace --backend=polars
+
+      - name: Run HTTP integration tests
+        run: python tests/test_http_integration.py --inplace
+
+      - name: Run runtime type tests
+        run: python tests/test_runtime_types.py --inplace
+
+      - name: Run typing tests
+        run: pytest tests/test_typing.yml --mypy-ini-file=tests/test_mypy_setup.ini
