@@ -1,6 +1,7 @@
 # 1.3.4 (github, pypi and conda 2026.xx.xx)
 * Refactored pyreadstat.pyx to pyreadstat.py solves #299
-* Adding typing annotations
+* Added env variable PYREADSTAT_LINK_ICONV to link iconv at compiling time
+* Adding typing annotations solves #299
 
 # 1.3.3 (github, pypi and conda 2026.01.23)
 * bumped narwhals requirement version to 2.10.1
