@@ -201,6 +201,13 @@ pip install git+https://github.com/Roche/pyreadstat.git
 
 You need a working C compiler and cython >=3.0.0.
 
+On some Linux distributions (e.g. Ubuntu) iconv is part of glibc and does not need
+to be linked explicitly, while on others it may require linking. Additionally,
+conda/miniforge environments bundle their own iconv, so pyreadstat will automatically
+link it when it detects a conda environment (Python 3.11-3.13, outside of conda-build).
+If your setup needs iconv linking for a different reason, you can force it by setting
+the environment variable PYREADSTAT_LINK_ICONV=1. Set it to 0 to disable.
+
 ### Compiling on Windows and Mac
 
 Compiling on linux is very easy, but on windows you need some extra preparation.
