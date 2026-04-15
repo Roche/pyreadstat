@@ -16,6 +16,8 @@
 # limitations under the License.
 # #############################################################################
 
+## if want to profile: # cython: profile=True
+
 from cpython.datetime cimport import_datetime, timedelta_new, datetime_new, total_seconds
 from cpython.exc cimport PyErr_Occurred
 from cpython.object cimport PyObject
@@ -32,6 +34,8 @@ import narwhals.stable.v2 as nw
 import numpy as np
 
 from readstat_api cimport *
+
+from pyclasses import metadata_container
 
 # necessary to work with the datetime C API
 import_datetime()
@@ -122,34 +126,6 @@ cdef class data_container:
         self.mtime = 0
         self.mr_sets = dict()
         self.output_format = ""
-        
-class metadata_container:
-    """
-    This class holds metadata we want to give back to python
-    """
-    def __init__(self):
-        self.column_names = list()
-        self.column_labels = list()
-        self.column_names_to_labels = dict()
-        self.file_encoding = None
-        self.number_columns = None
-        self.number_rows = None
-        self.variable_value_labels = dict()
-        self.value_labels = dict()
-        self.variable_to_label = dict()
-        self.notes = list()
-        self.original_variable_types = dict()
-        self.readstat_variable_types = dict()
-        self.table_name = None
-        self.missing_ranges = dict()
-        self.missing_user_values = dict()
-        self.variable_storage_width = dict()
-        self.variable_display_width = dict()
-        self.variable_alignment = dict()
-        self.variable_measure = dict()
-        self.creation_time = None
-        self.modification_time = None
-        self.mr_sets = dict()
 
 
 class ReadstatError(Exception):
@@ -158,11 +134,13 @@ class ReadstatError(Exception):
     """
     pass
 
+
 class PyreadstatError(Exception):
     """
     Just defining a custom exception to raise when pyreadstat raises an exception.
     """
     pass
+
 
 
 cdef py_datetime_format transform_variable_format(str var_format, py_file_format file_format):
@@ -1365,3 +1343,56 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     return data_frame, metadata
     
+def parser_entry_point(filename_path, str parser_format=None,
+                       metadataonly=False, dates_as_pandas_datetime=False, 
+             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
+             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None, 
+             list extra_date_formats=None, list extra_time_formats=None):
+
+
+    cdef py_file_format file_format
+    cdef py_file_extension file_extension
+
+    if parser_format == "sav/zsav":
+        file_format = FILE_FORMAT_SPSS
+        file_extension = FILE_EXT_SAV
+    elif parser_format == "sas7bdat":
+        file_format = FILE_FORMAT_SAS
+        file_extension = FILE_EXT_SAS7BDAT
+    elif parser_format == "xport":
+        file_format = FILE_FORMAT_SAS
+        file_extension = FILE_EXT_XPORT
+    elif parser_format == "dta":
+        file_format = FILE_FORMAT_STATA
+        file_extension = FILE_EXT_DTA
+    elif parser_format == "por":
+        file_format = FILE_FORMAT_SPSS
+        file_extension = FILE_EXT_POR
+    elif parser_format == "sas7bcat":
+        file_format = FILE_FORMAT_SAS
+        file_extension = FILE_EXT_SAS7BCAT
+    else:
+        raise PyreadstatError("wrong parser format")
+
+    cdef bint metaonly = 0
+    if metadataonly:
+        metaonly = 1
+
+    cdef bint dates_as_pandas = 0
+    if dates_as_pandas_datetime:
+        dates_as_pandas = 1
+
+    cdef bint usernan = 0
+    if user_missing:
+        usernan = 1
+
+    cdef bint no_datetime_conversion = 0
+    if disable_datetime_conversion:
+        no_datetime_conversion = 1
+    
+    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
+                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
+                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
+
+    return data_frame, metadata
+

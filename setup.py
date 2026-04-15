@@ -56,34 +56,13 @@ for dirname, _ , filenames in os.walk(source_dir_root):
 
 source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname not in omitted_source_dirs]
 
-def is_ubuntu():
-    """
-    Checks if the current operating system is Ubuntu.
-    
-    This function is safe to run on any OS. It returns False if not on Linux
-    or if the distribution is not Ubuntu.
-    """
-    if not sys.platform.startswith('linux'):
+def is_conda():
+    """Check if running in a conda/miniforge environment."""
+    if os.environ.get('CONDA_BUILD'):
         return False
-    
-    try:
-        with open('/etc/os-release', 'r', encoding='utf-8') as f:
-            for line in f:
-                if line.strip().startswith('ID='):
-                    # The value might have quotes, which we strip
-                    distro_id = line.split('=', 1)[1].strip().strip('"\'')
-                    if distro_id == 'ubuntu':
-                        return True
-    except FileNotFoundError:
-        # If /etc/os-release doesn't exist, it's not a standard modern Linux.
+    if not os.path.exists(os.path.join(sys.prefix, 'conda-meta')):
         return False
-        
-    return False
-
-def is_python_lt_14():
-    if PY_MAJOR_VERSION >= 3 and PY_MINOR_VERSION < 14:
-        return True
-    return False
+    return (3, 11) <= sys.version_info[:2] <= (3, 13)
 
 data_files = []
 libraries = []
@@ -109,20 +88,14 @@ if os.name == 'nt':
 else:
     libraries.extend(["m", "z"])
     _platform = sys.platform
-    # Mac and ubuntu: iconv needs to be linked statically
-    if _platform.lower().startswith("darwin") or (is_ubuntu() and is_python_lt_14()):
+    PYREADSTAT_LINK_ICONV = os.environ.get('PYREADSTAT_LINK_ICONV', '').lower() not in ('', '0', 'false', 'no')
+    # Mac and conda/miniforge: iconv needs to be linked
+    if PYREADSTAT_LINK_ICONV or  _platform.lower().startswith("darwin") or is_conda():
         libraries.append("iconv")
 
 # Extensions
 sources.sort()
-extensions = [Extension("pyreadstat.pyreadstat",
-                    sources=["pyreadstat/pyreadstat" + ext] + sources,
-                    # this dot here is important for cython to find the pxd files
-                    include_dirs =include_dirs,
-                    libraries=libraries,
-                    library_dirs=library_dirs,
-                    extra_compile_args=["-Ireadstat", "-DHAVE_ZLIB=1"] ),
-                Extension("pyreadstat._readstat_parser",
+extensions = [Extension("pyreadstat._readstat_parser",
                     sources=["pyreadstat/_readstat_parser" + ext] + sources,
                     include_dirs = include_dirs,
                     library_dirs=library_dirs,
@@ -156,7 +129,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.3.3',
+    version='1.3.4',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",
@@ -174,6 +147,8 @@ setup(
     ],
     ext_modules=extensions,
     packages=["pyreadstat"],
+    package_data={"pyreadstat": ["py.typed"]},
+    include_package_data=True,
     data_files=data_files,
     install_requires=['narwhals>=2.10.1', 'numpy'],
     license="Apache-2.0",

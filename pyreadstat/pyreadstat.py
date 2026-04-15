@@ -1,5 +1,3 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
-
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -16,32 +14,147 @@
 # limitations under the License.
 # #############################################################################
 
-## if want to profile: # cython: profile=True
-
+from collections.abc import Callable, Iterator
 import multiprocessing as mp
+from itertools import chain
+from os import PathLike
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias, overload, Protocol #, Concatenate: see later
 
 import narwhals.stable.v2 as nw
-import numpy as np
 
-from _readstat_parser cimport py_file_format, py_file_extension, run_conversion
-from _readstat_parser import  PyreadstatError
-from _readstat_writer cimport run_write
-cimport _readstat_parser, _readstat_writer
-from worker import worker
-from pyfunctions import set_value_labels, set_catalog_to_sas
+from ._readstat_parser import parser_entry_point, PyreadstatError
+from ._readstat_writer import writer_entry_point
+from .worker import worker
+from .pyclasses import metadata_container, MissingRange
+from .pyfunctions import set_value_labels, set_catalog_to_sas
+
+# Typing interface
+
+if TYPE_CHECKING:
+    from typing import Concatenate  # TODO: move back to top-level import when dropping Python 3.10 support
+    # Setup type aliases for the public interface.
+    # These are not executed at runtime, but they help type checkers understand
+    # the expected types of the public functions and classes.
+
+    # Since pyreadstat can work with both pandas and polars, we define a DataFrame type that can be either.
+    try:
+        from pandas import DataFrame as PandasDataFrame  # type: ignore
+    except ImportError:
+        # Define a dummy DataFrame class to avoid accepting any type as PandasDataFrame when pandas is not installed
+        class PandasDataFrame:
+            pass
+
+    try:
+        from polars import DataFrame as PolarsDataFrame  # type: ignore
+    except ImportError:
+        # Define a dummy DataFrame class to avoid accepting any type as PolarsDataFrame when polars is not installed
+        class PolarsDataFrame:
+            pass
+
+DataFrame: TypeAlias = "PandasDataFrame | PolarsDataFrame"  # Define type at runtime for introspection
+
+class FileLike(Protocol):
+    """Protocol for file-like objects accepted by pyreadstat"""
+
+    # Should work with any file-like object that has read and seek methods, such as those returned by open() or io.BytesIO
+    def read(self, size: int | None = -1, /) -> bytes: ...
+    def seek(self, pos: int, whence: int = 0, /) -> int: ...
+
+
+FilePathLike: TypeAlias = str | bytes | PathLike[str] | PathLike[bytes]
+FilePathorBuffer: TypeAlias = FilePathLike | FileLike
+
+DictOutput: TypeAlias = dict[str, list[Any]]
+
+# TODO: when dropping Python 3.10 support, remove the string quotes and move Concatenate back to the top-level import:
+#   PyreadstatReadFunction: TypeAlias = Callable[Concatenate[FilePathorBuffer, ...], tuple[DataFrame | DictOutput, metadata_container]]
+PyreadstatReadFunction: TypeAlias = "Callable[Concatenate[FilePathorBuffer, ...], tuple[DataFrame | DictOutput, metadata_container]]"
+
 
 # Public interface
 
 # Parsing functions
 
-def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=False, catalog_file=None,
-                  formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-                  disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
-                  list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+
+@overload
+def read_sas7bdat(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    catalog_file: FilePathorBuffer | None = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_sas7bdat(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    catalog_file: FilePathorBuffer | None = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_sas7bdat(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    catalog_file: FilePathorBuffer | None = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> tuple[DictOutput, metadata_container]: ...
+def read_sas7bdat(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = False,
+    dates_as_pandas_datetime: bool = False,
+    catalog_file: FilePathorBuffer | None = None,
+    formats_as_category: bool = True,
+    formats_as_ordered_category: bool = False,
+    encoding: str | None = None,
+    usecols: list[str] | None = None,
+    user_missing: bool = False,
+    disable_datetime_conversion: bool = False,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
+    extra_datetime_formats: list[str] | None = None,
+    extra_date_formats: list[str] | None = None,
+    extra_time_formats: list[str] | None = None,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     r"""
     Read a SAS sas7bdat file.
     It accepts the path to a sas7bcat.
-    
+
     Parameters
     ----------
         filename_path : str, bytes, Path-like object or file-like object
@@ -51,8 +164,8 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             metadata object. The data frame will be set with the correct column names but no data.
         dates_as_pandas_datetime : bool, optional
             by default False. If true dates will be transformed to pandas datetime64 instead of date, effective only for pandas.
-        catalog_file : str, optional
-            path to a sas7bcat file. By default is None. If not None, will parse the catalog file and replace the values
+        catalog_file : str, bytes, Path-like object or file-like object, optional
+            path to a sas7bcat file or file-like object. By default is None. If not None, will parse the catalog file and replace the values
             by the formats in the catalog, if any appropiate is found. If this is not the behavior you are looking for,
             Use read_sas7bcat to parse the catalog independently
             of the sas7bdat and set_catalog_to_sas to apply the resulting format into sas7bdat files.
@@ -85,7 +198,7 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
             one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -93,7 +206,7 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             formats to be parsed as python date objects
         extra_time_formats: list of str, optional
             formats to be parsed as python time objects
-            
+
 
     Returns
     -------
@@ -104,41 +217,100 @@ def read_sas7bdat(filename_path, metadataonly=False, dates_as_pandas_datetime=Fa
             supplied.
             Look at the documentation for more information.
     """
+    parser_format = "sas7bdat"
+    data_frame, metadata = parser_entry_point(
+        filename_path,
+        parser_format,
+        metadataonly=metadataonly,
+        dates_as_pandas_datetime=dates_as_pandas_datetime,
+        formats_as_category=formats_as_category,
+        formats_as_ordered_category=formats_as_ordered_category,
+        encoding=encoding,
+        usecols=usecols,
+        user_missing=user_missing,
+        disable_datetime_conversion=disable_datetime_conversion,
+        row_limit=row_limit,
+        row_offset=row_offset,
+        output_format=output_format,
+        extra_datetime_formats=extra_datetime_formats,
+        extra_date_formats=extra_date_formats,
+        extra_time_formats=extra_time_formats,
+    )
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-    if user_missing:
-        usernan = 1
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAS7BDAT
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "sas7bdat"
+    metadata.file_format = parser_format
 
     if catalog_file:
-        _ , catalog = read_sas7bcat(catalog_file, encoding=encoding)
-        data_frame, metadata = set_catalog_to_sas(data_frame, metadata, catalog, formats_as_category=formats_as_category, 
-                                formats_as_ordered_category=formats_as_ordered_category)
+        _, catalog = read_sas7bcat(catalog_file, encoding=encoding)
+        data_frame, metadata = set_catalog_to_sas(
+            data_frame,
+            metadata,
+            catalog,
+            formats_as_category=formats_as_category,
+            formats_as_ordered_category=formats_as_ordered_category,
+        )
 
     return data_frame, metadata
 
 
-def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False, str encoding=None,
-               list usecols=None, disable_datetime_conversion=False, int row_limit=0, int row_offset=0,
-               str output_format=None, list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+@overload
+def read_xport(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_xport(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_xport(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> tuple[DictOutput, metadata_container]: ...
+def read_xport(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = False,
+    dates_as_pandas_datetime: bool = False,
+    encoding: str | None = None,
+    usecols: list[str] | None = None,
+    disable_datetime_conversion: bool = False,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
+    extra_datetime_formats: list[str] | None = None,
+    extra_date_formats: list[str] | None = None,
+    extra_time_formats: list[str] | None = None,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     r"""
     Read a SAS xport file.
 
@@ -169,7 +341,7 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
             one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -185,35 +357,103 @@ def read_xport(filename_path, metadataonly=False, dates_as_pandas_datetime=False
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "xport"
+    data_frame, metadata = parser_entry_point(
+        filename_path,
+        parser_format,
+        metadataonly=metadataonly,
+        dates_as_pandas_datetime=dates_as_pandas_datetime,
+        encoding=encoding,
+        usecols=usecols,
+        disable_datetime_conversion=disable_datetime_conversion,
+        row_limit=row_limit,
+        row_offset=row_offset,
+        output_format=output_format,
+        extra_datetime_formats=extra_datetime_formats,
+        extra_date_formats=extra_date_formats,
+        extra_time_formats=extra_time_formats,
+    )
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_XPORT
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "xport"
+    metadata.file_format = parser_format
 
     return data_frame, metadata
 
 
-def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
-             list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+@overload
+def read_dta(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_dta(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_dta(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> tuple[DictOutput, metadata_container]: ...
+def read_dta(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = False,
+    dates_as_pandas_datetime: bool = False,
+    apply_value_formats: bool = False,
+    formats_as_category: bool = True,
+    formats_as_ordered_category: bool = False,
+    encoding: str | None = None,
+    usecols: list[str] | None = None,
+    user_missing: bool = False,
+    disable_datetime_conversion: bool = False,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
+    extra_datetime_formats: list[str] | None = None,
+    extra_date_formats: list[str] | None = None,
+    extra_time_formats: list[str] | None = None,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     r"""
     Read a STATA dta file
 
@@ -258,7 +498,7 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
             one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -274,41 +514,114 @@ def read_dta(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "dta"
+    data_frame, metadata = parser_entry_point(
+        filename_path,
+        parser_format=parser_format,
+        metadataonly=metadataonly,
+        dates_as_pandas_datetime=dates_as_pandas_datetime,
+        formats_as_category=formats_as_category,
+        formats_as_ordered_category=formats_as_ordered_category,
+        encoding=encoding,
+        usecols=usecols,
+        user_missing=user_missing,
+        disable_datetime_conversion=disable_datetime_conversion,
+        row_limit=row_limit,
+        row_offset=row_offset,
+        output_format=output_format,
+        extra_datetime_formats=extra_datetime_formats,
+        extra_date_formats=extra_date_formats,
+        extra_time_formats=extra_time_formats,
+    )
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
-
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-    if user_missing:
-        usernan = 1
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_STATA
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_DTA
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "dta"
+    metadata.file_format = parser_format
 
     if apply_value_formats:
-        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category,
-                                      formats_as_ordered_category=formats_as_ordered_category)
+        data_frame = set_value_labels(
+            data_frame,
+            metadata,
+            formats_as_category=formats_as_category,
+            formats_as_ordered_category=formats_as_ordered_category,
+        )
 
     return data_frame, metadata
 
 
-def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None, 
-             list extra_date_formats=None, list extra_time_formats=None):
+@overload
+def read_sav(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_sav(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_sav(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    encoding: str | None = ...,
+    usecols: list[str] | None = ...,
+    user_missing: bool = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> tuple[DictOutput, metadata_container]: ...
+def read_sav(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = False,
+    dates_as_pandas_datetime: bool = False,
+    apply_value_formats: bool = False,
+    formats_as_category: bool = True,
+    formats_as_ordered_category: bool = False,
+    encoding: str | None = None,
+    usecols: list[str] | None = None,
+    user_missing: bool = False,
+    disable_datetime_conversion: bool = False,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
+    extra_datetime_formats: list[str] | None = None,
+    extra_date_formats: list[str] | None = None,
+    extra_time_formats: list[str] | None = None,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     r"""
     Read a SPSS sav or zsav (compressed) files
 
@@ -353,7 +666,7 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
             one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -369,41 +682,107 @@ def read_sav(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "sav/zsav"
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
+    data_frame, metadata = parser_entry_point(
+        filename_path,
+        parser_format=parser_format,
+        metadataonly=metadataonly,
+        dates_as_pandas_datetime=dates_as_pandas_datetime,
+        formats_as_category=formats_as_category,
+        formats_as_ordered_category=formats_as_ordered_category,
+        encoding=encoding,
+        usecols=usecols,
+        user_missing=user_missing,
+        disable_datetime_conversion=disable_datetime_conversion,
+        row_limit=row_limit,
+        row_offset=row_offset,
+        output_format=output_format,
+        extra_datetime_formats=extra_datetime_formats,
+        extra_date_formats=extra_date_formats,
+        extra_time_formats=extra_time_formats,
+    )
 
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-    if user_missing:
-        usernan = 1
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAV
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "sav/zsav"
+    metadata.file_format = parser_format
 
     if apply_value_formats:
-        data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category,
-                                      formats_as_ordered_category=formats_as_ordered_category)
+        data_frame = set_value_labels(
+            data_frame,
+            metadata,
+            formats_as_category=formats_as_category,
+            formats_as_ordered_category=formats_as_ordered_category,
+        )
 
     return data_frame, metadata
 
 
-def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, apply_value_formats=False,
-             formats_as_category=True, formats_as_ordered_category=False, list usecols=None,
-             disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None,
-             list extra_datetime_formats=None, list extra_date_formats=None, list extra_time_formats=None):
+@overload
+def read_por(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["pandas"] | None = ...,
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_por(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["polars"] = "polars",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_por(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = ...,
+    dates_as_pandas_datetime: bool = ...,
+    apply_value_formats: bool = ...,
+    formats_as_category: bool = ...,
+    formats_as_ordered_category: bool = ...,
+    usecols: list[str] | None = ...,
+    disable_datetime_conversion: bool = ...,
+    row_limit: int = ...,
+    row_offset: int = ...,
+    output_format: Literal["dict"] = "dict",
+    extra_datetime_formats: list[str] | None = ...,
+    extra_date_formats: list[str] | None = ...,
+    extra_time_formats: list[str] | None = ...,
+) -> tuple[DictOutput, metadata_container]: ...
+def read_por(
+    filename_path: FilePathorBuffer,
+    metadataonly: bool = False,
+    dates_as_pandas_datetime: bool = False,
+    apply_value_formats: bool = False,
+    formats_as_category: bool = True,
+    formats_as_ordered_category: bool = False,
+    usecols: list[str] | None = None,
+    disable_datetime_conversion: bool = False,
+    row_limit: int = 0,
+    row_offset: int = 0,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
+    extra_datetime_formats: list[str] | None = None,
+    extra_date_formats: list[str] | None = None,
+    extra_time_formats: list[str] | None = None,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     r"""
     Read a SPSS por file. Files are assumed to be UTF-8 encoded, the encoding cannot be set to other.
 
@@ -442,7 +821,7 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
             start reading rows after this offset. By default 0, meaning start with the first row not skipping anything.
         output_format : str, optional
             one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned, the
-            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a 
+            user can then convert it to her preferred data format. Using dict is faster as the other types as the conversion to a
             dataframe is avoided.
         extra_datetime_formats: list of str, optional
             formats to be parsed as python datetime objects
@@ -458,36 +837,55 @@ def read_por(filename_path, metadataonly=False, dates_as_pandas_datetime=False, 
         metadata :
             object with metadata. Look at the documentation for more information.
     """
+    parser_format = "por"
+    data_frame, metadata = parser_entry_point(
+        filename_path,
+        parser_format=parser_format,
+        metadataonly=metadataonly,
+        dates_as_pandas_datetime=dates_as_pandas_datetime,
+        formats_as_category=formats_as_category,
+        formats_as_ordered_category=formats_as_ordered_category,
+        usecols=usecols,
+        disable_datetime_conversion=disable_datetime_conversion,
+        row_limit=row_limit,
+        row_offset=row_offset,
+        output_format=output_format,
+        extra_datetime_formats=extra_datetime_formats,
+        extra_date_formats=extra_date_formats,
+        extra_time_formats=extra_time_formats,
+    )
 
-    cdef bint metaonly = 0
-    if metadataonly:
-        metaonly = 1
+    metadata.file_format = parser_format
 
-    cdef bint dates_as_pandas = 0
-    if dates_as_pandas_datetime:
-        dates_as_pandas = 1
-
-    cdef bint usernan = 0
-
-    cdef bint no_datetime_conversion = 0
-    if disable_datetime_conversion:
-        no_datetime_conversion = 1
-
-    cdef str encoding = None
-    
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SPSS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_POR
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "por"
     if apply_value_formats:
         data_frame = set_value_labels(data_frame, metadata, formats_as_category=formats_as_category)
 
     return data_frame, metadata
 
 
-def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
+@overload
+def read_sas7bcat(
+    filename_path: FilePathorBuffer,
+    encoding: str | None = ...,
+    output_format: Literal["pandas"] | None = ...,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_sas7bcat(
+    filename_path: FilePathorBuffer,
+    encoding: str | None = ...,
+    output_format: Literal["polars"] = "polars",
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_sas7bcat(
+    filename_path: FilePathorBuffer,
+    encoding: str | None = ...,
+    output_format: Literal["dict"] = "dict",
+) -> tuple[DictOutput, metadata_container]: ...
+def read_sas7bcat(
+    filename_path: FilePathorBuffer,
+    encoding: str | None = None,
+    output_format: Literal["pandas", "polars", "dict"] | None = None,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     r"""
     Read a SAS sas7bcat file. The returning dataframe will be empty. The metadata object will contain a dictionary
     value_labels that contains the formats. When parsing the sas7bdat file, in the metadata, the dictionary
@@ -505,7 +903,7 @@ def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
             Defaults to None. If set, the system will use the defined encoding instead of guessing it. It has to be an
             iconv-compatible name
         output_format : str, optional
-            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned. 
+            one of 'pandas' (default), 'polars' or 'dict'. If 'dict' a dictionary with numpy arrays as values will be returned.
             Notice that for this function the resulting object is always empty, this is done for consistency with other functions
             but has no impact on performance.
 
@@ -517,34 +915,79 @@ def read_sas7bcat(filename_path, str encoding=None, str  output_format=None):
             object with metadata. The member value_labels is the one that contains the formats.
             Look at the documentation for more information.
     """
-    cdef bint metaonly = 1
-    cdef bint dates_as_pandas = 0
-    cdef list usecols = None
-    cdef bint usernan = 0
-    cdef bint no_datetime_conversion = 0
-    cdef long row_limit=0
-    cdef long row_offset=0
-    cdef list extra_datetime_formats=None
-    cdef list extra_date_formats=None
-    cdef list extra_time_formats=None
+    parser_format = "sas7bcat"
+    data_frame, metadata = parser_entry_point(
+        filename_path,
+        parser_format=parser_format,
+        encoding=encoding,
+        output_format=output_format,
+    )
 
-    cdef py_file_format file_format = _readstat_parser.FILE_FORMAT_SAS
-    cdef py_file_extension file_extension = _readstat_parser.FILE_EXT_SAS7BCAT
-    data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,
-                                          dates_as_pandas, usecols, usernan, no_datetime_conversion, row_limit, row_offset, 
-                                          output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
-    metadata.file_format = "sas7bcat"
+    metadata.file_format = parser_format
 
     return data_frame, metadata
 
+
 # convenience functions to read in chunks
 
-def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, limit=0,
-                        multiprocess=False, num_processes=4, num_rows=None, **kwargs):
+
+@overload
+def read_file_in_chunks(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    chunksize: int = ...,
+    offset: int = ...,
+    limit: int = ...,
+    multiprocess: bool = ...,
+    num_processes: int = ...,
+    num_rows: int | None = ...,
+    *,
+    output_format: Literal["pandas"] | None = ...,
+    **kwargs: Any,
+) -> "Iterator[tuple[PandasDataFrame, metadata_container]]": ...
+@overload
+def read_file_in_chunks(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    chunksize: int = ...,
+    offset: int = ...,
+    limit: int = ...,
+    multiprocess: bool = ...,
+    num_processes: int = ...,
+    num_rows: int | None = ...,
+    *,
+    output_format: Literal["polars"] = "polars",
+    **kwargs: Any,
+) -> "Iterator[tuple[PolarsDataFrame, metadata_container]]": ...
+@overload
+def read_file_in_chunks(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    chunksize: int = ...,
+    offset: int = ...,
+    limit: int = ...,
+    multiprocess: bool = ...,
+    num_processes: int = ...,
+    num_rows: int | None = ...,
+    *,
+    output_format: Literal["dict"] = "dict",
+    **kwargs: Any,
+) -> Iterator[tuple[DictOutput, metadata_container]]: ...
+def read_file_in_chunks(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    chunksize: int = 100000,
+    offset: int = 0,
+    limit: int = 0,
+    multiprocess: bool = False,
+    num_processes: int = 4,
+    num_rows: int | None = None,
+    **kwargs: Any,
+) -> "Iterator[tuple[DataFrame | DictOutput, metadata_container]]":
     """
     Returns a generator that will allow to read a file in chunks.
 
-    If using multiprocessing, for Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata, 
+    If using multiprocessing, for Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata,
     the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
     be obtained by the user before running this function.
 
@@ -552,7 +995,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
     ----------
         read_function : pyreadstat function
             a pyreadstat reading function
-        file_path : string
+        file_path : str, bytes or Path-like object
             path to the file to be read
         chunksize : integer, optional
             size of the chunks to read
@@ -566,7 +1009,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
             in case multiprocess is true, how many workers/processes to spawn?
         num_rows: integer, optional
             number of rows in the dataset. If using multiprocessing it is obligatory for files where
-            the number of rows cannot be obtained from the medatata, such as por and 
+            the number of rows cannot be obtained from the medatata, such as por and
             some defective xport and sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
             larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata or not using
             multiprocessing.
@@ -578,7 +1021,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
         data_frame : dataframe
             a dataframe with the data
         metadata :
-            object with metadata. 
+            object with metadata.
             Look at the documentation for more information.
 
         it : generator
@@ -587,7 +1030,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
 
     if read_function == read_sas7bcat:
         raise Exception("read_sas7bcat not supported")
-    
+
     if "row_offset" in kwargs:
         _ = kwargs.pop("row_offset")
 
@@ -603,7 +1046,7 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
         if not limit:
             limit = numrows
         else:
-            limit = min(offset+limit, numrows)
+            limit = min(offset + limit, numrows)
     else:
         if limit:
             limit = offset + limit
@@ -612,18 +1055,62 @@ def read_file_in_chunks(read_function, file_path, chunksize=100000, offset=0, li
         if limit and (offset >= limit):
             break
         if multiprocess:
-            df, meta = read_file_multiprocessing(read_function, file_path, num_processes=num_processes,
-                                                 row_offset=offset, row_limit=chunksize, num_rows=num_rows, **kwargs)
+            df, meta = read_file_multiprocessing(
+                read_function,
+                file_path,
+                num_processes=num_processes,
+                row_offset=offset,
+                row_limit=chunksize,
+                num_rows=num_rows,
+                **kwargs,
+            )
         else:
             df, meta = read_function(file_path, row_offset=offset, row_limit=chunksize, **kwargs)
         if len(df):
             yield df, meta
             offset += chunksize
 
-def read_file_multiprocessing(read_function, file_path, num_processes=None, num_rows=None, **kwargs):
+
+@overload
+def read_file_multiprocessing(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    num_processes: int | None = ...,
+    num_rows: int | None = ...,
+    *,
+    output_format: Literal["pandas"] | None = ...,
+    **kwargs: Any,
+) -> "tuple[PandasDataFrame, metadata_container]": ...
+@overload
+def read_file_multiprocessing(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    num_processes: int | None = ...,
+    num_rows: int | None = ...,
+    *,
+    output_format: Literal["polars"] = "polars",
+    **kwargs: Any,
+) -> "tuple[PolarsDataFrame, metadata_container]": ...
+@overload
+def read_file_multiprocessing(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    num_processes: int | None = ...,
+    num_rows: int | None = ...,
+    *,
+    output_format: Literal["dict"] = "dict",
+    **kwargs: Any,
+) -> tuple[DictOutput, metadata_container]: ...
+def read_file_multiprocessing(
+    read_function: PyreadstatReadFunction,
+    file_path: FilePathLike,
+    num_processes: int | None = None,
+    num_rows: int | None = None,
+    **kwargs: Any,
+) -> "tuple[DataFrame | DictOutput, metadata_container]":
     """
     Reads a file in parallel using multiprocessing.
-    For Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata, 
+    For Xport, Por and some defective sav files where the number of rows in the dataset canot be obtained from the metadata,
     the parameter num_rows must be set to a number equal or larger than the number of rows in the dataset. That information must
     be obtained by the user before running this function.
 
@@ -631,16 +1118,16 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
     ----------
         read_function : pyreadstat function
             a pyreadstat reading function
-        file_path : string
+        file_path : str, bytes or Path-like object
             path to the file to be read
         num_processes : integer, optional
             number of processes to spawn, by default the min 4 and the max cores on the computer
         num_rows: integer, optional
-            number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as por and 
+            number of rows in the dataset. Obligatory for files where the number of rows cannot be obtained from the medatata, such as por and
             some defective xport and sav files. The user must obtain this value by reading the file without multiprocessing first or any other means. A number
             larger than the actual number of rows will work as well. Discarded if the number of rows can be obtained from the metadata.
         kwargs : dict, optional
-            any other keyword argument to pass to the read_function. 
+            any other keyword argument to pass to the read_function.
 
     Returns
     -------
@@ -654,26 +1141,30 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
         raise Exception("read_sas7bcat is not supported")
 
     if read_function == read_por and num_rows is None:
-        raise Exception("num_rows must be specified for read_por to be a number equal or larger than the number of rows in the dataset.")
+        raise Exception(
+            "num_rows must be specified for read_por to be a number equal or larger than the number of rows in the dataset."
+        )
 
     if not num_processes:
         # let's be conservative with the number of workers
         num_processes = min(mp.cpu_count(), 4)
-    _ = kwargs.pop('metadataonly', None)
+    _ = kwargs.pop("metadataonly", None)
     row_offset = kwargs.pop("row_offset", 0)
-    row_limit = kwargs.pop("row_limit", float('inf'))
+    row_limit = kwargs.pop("row_limit", float("inf"))
     _, meta = read_function(file_path, metadataonly=True, **kwargs)
     numrows = meta.number_rows
 
     if numrows is None:
         if num_rows is None:
-            raise Exception("The number of rows of the file cannot be determined from the file's metadata. If you still want to proceed, please set num_rows to a number equal or larger than the number of rows of your data")
+            raise Exception(
+                "The number of rows of the file cannot be determined from the file's metadata. If you still want to proceed, please set num_rows to a number equal or larger than the number of rows of your data"
+            )
         numrows = num_rows
     elif numrows == 0:
         final, meta = read_function(file_path, **kwargs)
 
-    numrows = min(max(numrows - row_offset, 0), row_limit)        
-    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0)  for x in range (num_processes)]
+    numrows = min(max(numrows - row_offset, 0), row_limit)
+    divs = [numrows // num_processes + (1 if x < numrows % num_processes else 0) for x in range(num_processes)]
     offsets = list()
     prev_offset = row_offset
     prev_div = 0
@@ -691,15 +1182,13 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
     finally:
         pool.close()
     output_format = kwargs.get("output_format")
-    if output_format == 'dict':
+    if output_format == "dict":
         keys = chunks[0].keys()
-        final = dict()
-        for key in keys:
-            final[key] = np.concatenate([chunk[key] for chunk in chunks])
+        final = {key: list(chain.from_iterable(chunk[key] for chunk in chunks)) for key in keys}
     else:
-        #final = pd.concat(chunks, axis=0, ignore_index=True)
+        # final = pd.concat(chunks, axis=0, ignore_index=True)
         chunks = [nw.from_native(x) for x in chunks]
-        final = nw.concat(chunks, how='vertical')
+        final = nw.concat(chunks, how="vertical")
         ispandas = False
         if final.implementation.is_pandas():
             ispandas = True
@@ -708,11 +1197,24 @@ def read_file_multiprocessing(read_function, file_path, num_processes=None, num_
             final = final.reset_index(drop=True)
     return final, meta
 
+
 # Write API
 
-def write_sav(df, dst_path, str file_label="", object column_labels=None, compress=False, row_compress=False, object note=None,
-                dict variable_value_labels=None, dict missing_ranges=None, dict variable_display_width=None,
-                dict variable_measure=None, dict variable_format=None):
+
+def write_sav(
+    df: "DataFrame",
+    dst_path: FilePathLike,
+    file_label: str = "",
+    column_labels: list[str] | dict[str, str] | None = None,
+    compress: bool = False,
+    row_compress: bool = False,
+    note: str | list[str] | None = None,
+    variable_value_labels: dict[str, dict[int | float, str]] | None = None,
+    missing_ranges: dict[str, list[int | float | str | MissingRange]] | None = None,
+    variable_display_width: dict[str, int] | None = None,
+    variable_measure: dict[str, str] | None = None,
+    variable_format: dict[str, str] | None = None,
+) -> None:
     """
     Writes a dataframe to a SPSS sav or zsav file.
 
@@ -720,7 +1222,7 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
     ----------
     df : dataframe
         dataframe to write to sav or zsav
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result sav or zsav file
     file_label : str, optional
         a label for the file
@@ -754,39 +1256,47 @@ def write_sav(df, dst_path, str file_label="", object column_labels=None, compre
         sets the measure type for a variable. Must be a dictionary with keys being variable names and
         values being strings one of "nominal", "ordinal", "scale" or "unknown" (default).
     variable_format: dict, optional
-        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
         for more information.
     """
-
-    cdef int file_format_version = 2
-    cdef str var_width
-    cdef bint row_compression = 0
-    if compress and row_compress:
-        raise PyreadstatError("compress and row_compress cannot be both True")
-    if compress:
-        file_format_version = 3
-    if row_compress:
-        row_compression = 1
-    cdef table_name = ""
-    cdef dict missing_user_values = None
-    cdef dict variable_alignment = None
-
+    writer_format = "sav"
 
     # formats
-    formats_presets = {'restricted_integer':'N{var_width}', 'integer':'F{var_width}.0'}
+    formats_presets = {"restricted_integer": "N{var_width}", "integer": "F{var_width}.0"}
     if variable_format:
         for col_name, col_format in variable_format.items():
             if col_format in formats_presets.keys() and col_name in df.columns:
                 var_width = str(len(str(max(df[col_name]))))
-                variable_format[col_name] = formats_presets[col_format].format(var_width=var_width) 
-    
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_SAV, file_label, column_labels, 
-        file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, row_compression)
+                variable_format[col_name] = formats_presets[col_format].format(var_width=var_width)
 
-def write_dta(df, dst_path, str file_label="", object column_labels=None, int version=15, 
-            dict variable_value_labels=None, dict missing_user_values=None, dict variable_format=None):
+    writer_entry_point(
+        df,
+        dst_path,
+        writer_format=writer_format,
+        file_label=file_label,
+        column_labels=column_labels,
+        compress=compress,
+        row_compress=row_compress,
+        note=note,
+        variable_value_labels=variable_value_labels,
+        missing_ranges=missing_ranges,
+        variable_display_width=variable_display_width,
+        variable_measure=variable_measure,
+        variable_format=variable_format,
+    )
+
+
+def write_dta(
+    df: "DataFrame",
+    dst_path: FilePathLike,
+    file_label: str = "",
+    column_labels: list[str] | dict[str, str] | None = None,
+    version: int = 15,
+    variable_value_labels: dict[str, dict[int | float, str]] | None = None,
+    missing_user_values: dict[str, list[str]] | None = None,
+    variable_format: dict[str, str] | None = None,
+) -> None:
     """
     Writes a dataframe to a STATA dta file
 
@@ -794,7 +1304,7 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
     ----------
     df : dataframe
         dataframe to write to sav or zsav
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result dta file
     file_label : str, optional
         a label for the file
@@ -814,41 +1324,34 @@ def write_dta(df, dst_path, str file_label="", object column_labels=None, int ve
         names and values being a list of missing values. Missing values must be a single character
         between a and z.
     variable_format: dict, optional
-        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
         for more information.
     """
 
-    if version == 15:
-        file_format_version = 119
-    elif version == 14:
-        file_format_version = 118
-    elif version == 13:
-        file_format_version = 117
-    elif version == 12:
-        file_format_version = 115
-    elif version in {10, 11}:
-        file_format_version = 114
-    elif version in {8, 9}:
-        file_format_version = 113
-    else:
-        raise Exception("Version not supported")
+    writer_format = "dta"
+    writer_entry_point(
+        df,
+        dst_path,
+        writer_format=writer_format,
+        file_label=file_label,
+        column_labels=column_labels,
+        version=version,
+        variable_value_labels=variable_value_labels,
+        missing_user_values=missing_user_values,
+        variable_format=variable_format,
+    )
 
-    cdef str note = ""
-    cdef str table_name = ""
-    cdef dict missing_ranges = None
-    cdef dict variable_alignment = None
-    cdef dict variable_display_width = None
-    cdef dict variable_measure = None
-    #cdef dict variable_format = None
-    cdef bint row_compression = 0
 
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_DTA, file_label, column_labels, file_format_version,
-     note, table_name, variable_value_labels, missing_ranges, missing_user_values, variable_alignment,
-     variable_display_width, variable_measure, variable_format, row_compression)
-
-def write_xport(df, dst_path, str file_label="", object column_labels=None, str table_name=None, int file_format_version = 8,
-    dict variable_format=None):
+def write_xport(
+    df: "DataFrame",
+    dst_path: FilePathLike,
+    file_label: str = "",
+    column_labels: list[str] | dict[str, str] | None = None,
+    table_name: str | None = None,
+    file_format_version: Literal[5, 8] = 8,
+    variable_format: dict[str, str] | None = None,
+) -> None:
     """
     Writes a dataframe to a SAS Xport (xpt) file.
     If no table_name is specified the dataset has by default the name DATASET (take it into account if
@@ -859,7 +1362,7 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
     ----------
     df : dataframe
         dataframe to write to xport
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result xport file
     file_label : str, optional
         a label for the file
@@ -873,25 +1376,31 @@ def write_xport(df, dst_path, str file_label="", object column_labels=None, str 
     file_format_version : int, optional
         XPORT file version, either 8 or 5, default is 8
     variable_format: dict, optional
-        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
         for more information.
     """
 
-    cdef dict variable_value_labels = None
-    cdef str note = ""
-    cdef dict missing_ranges = None
-    cdef dict missing_user_values = None
-    cdef dict variable_alignment = None
-    cdef dict variable_display_width = None
-    cdef dict variable_measure = None
-    #cdef dict variable_format = None
-    cdef bint row_compression = 0
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_XPORT, file_label, column_labels, 
-        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
+    writer_format = "xport"
+    writer_entry_point(
+        df,
+        dst_path,
+        writer_format=writer_format,
+        file_label=file_label,
+        column_labels=column_labels,
+        version=file_format_version,
+        table_name=table_name,
+        variable_format=variable_format,
+    )
 
-def write_por(df, dst_path, str file_label="", object column_labels=None, dict variable_format=None):
+
+def write_por(
+    df: "DataFrame",
+    dst_path: FilePathLike,
+    file_label: str = "",
+    column_labels: list[str] | dict[str, str] | None = None,
+    variable_format: dict[str, str] | None = None,
+) -> None:
     """
     Writes a dataframe to a SPSS POR file.
 
@@ -899,7 +1408,7 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
     ----------
     df : dataframe
         data frame to write to por
-    dst_path : str or pathlib.Path
+    dst_path : str, bytes or Path-like object
         full path to the result por file
     file_label : str, optional
         a label for the file
@@ -909,23 +1418,17 @@ def write_por(df, dst_path, str file_label="", object column_labels=None, dict v
         In such case there is no need to include all variables; labels for non existent
         variables will be ignored with no warning or error.
     variable_format: dict, optional
-        sets the format of a variable. Must be a dictionary with keys being the variable names and 
+        sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
         for more information.
     """
 
-    # atm version 5 and 8 are supported by readstat but only 5 can be later be read by SAS
-    cdef str note=None
-    cdef int file_format_version = 0
-    cdef dict variable_value_labels=None
-    cdef dict missing_ranges = None
-    cdef dict missing_user_values = None
-    cdef dict variable_alignment = None
-    cdef dict variable_display_width = None
-    cdef dict variable_measure = None
-    cdef str table_name = ""
-    #cdef dict variable_format = None
-    cdef bint row_compression = 0
-    run_write(df, dst_path, _readstat_writer.FILE_FORMAT_POR, file_label, column_labels,
-        file_format_version, note, table_name, variable_value_labels, missing_ranges,missing_user_values,
-        variable_alignment,variable_display_width, variable_measure, variable_format, row_compression)
+    writer_format = "por"
+    writer_entry_point(
+        df,
+        dst_path,
+        writer_format=writer_format,
+        file_label=file_label,
+        column_labels=column_labels,
+        variable_format=variable_format,
+    )
