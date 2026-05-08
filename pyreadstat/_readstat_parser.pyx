@@ -29,6 +29,7 @@ import datetime
 import os
 import warnings
 import sys
+import re
 
 import narwhals.stable.v2 as nw
 import numpy as np
@@ -42,18 +43,17 @@ import_datetime()
 
 cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
-cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "DATE9", "YYMMDD10", 
-                                "DDMMYYB", "DDMMYYB10", "DDMMYYC", "DDMMYYC10", "DDMMYYD", "DDMMYYD10",
-                                "DDMMYYN6", "DDMMYYN8", "DDMMYYP", "DDMMYYP10", "DDMMYYS", "DDMMYYS10",
-                                "MMDDYYB", "MMDDYYB10", "MMDDYYC", "MMDDYYC10", "MMDDYYD", "MMDDYYD10",
-                                "MMDDYYN6", "MMDDYYN8", "MMDDYYP", "MMDDYYP10", "MMDDYYS", "MMDDYYS10",
+cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "YYMMDD",
+                                "DDMMYYB", "DDMMYYC", "DDMMYYD",
+                                "DDMMYYN", "DDMMYYP", "DDMMYYS",
+                                "MMDDYYB", "MMDDYYC", "MMDDYYD",
+                                "MMDDYYN", "MMDDYYP", "MMDDYYS",
                                 #"MONNAME", "MONTH",  "WEEKDAY", "QTR", "QTRR", "YEAR","DAY",  "DOWNAME" # these do not print as full dates in sas
                                 "WEEKDATX", "DTDATE",
                                 "IS8601DA", "E8601DA", "B8601DA",
-                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS",]
-cdef list sas_datetime_formats = ["DATETIME", "DATETIME18", "DATETIME19",  "DATETIME20", "DATETIME21", "DATETIME22",
-                "E8601DT", "DATEAMPM", "MDYAMPM", "IS8601DT", "B8601DT", "B8601DN"]
-cdef list sas_time_formats = ["TIME", "HHMM", "TIME20.3", "TIME20", "TIME5", "TOD", "TIMEAMPM", "IS8601TM", "E8601TM", "B8601TM", ]
+                                "YYMMDDB", "YYMMDDD", "YYMMDDN", "YYMMDDP", "YYMMDDS"]
+cdef list sas_datetime_formats = ["DATETIME", "E8601DT", "DATEAMPM", "MDYAMPM", "IS8601DT", "B8601DT", "B8601DN"]
+cdef list sas_time_formats = ["TIME", "HHMM", "TOD", "TIMEAMPM", "IS8601TM", "E8601TM", "B8601TM"]
 # "HOUR" # these do not print as full time formats in sas 
 #cdef list sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 cdef list sas_all_formats
@@ -148,15 +148,18 @@ cdef py_datetime_format transform_variable_format(str var_format, py_file_format
     Transforms a readstat var_format to a date, datetime or time format label
     """
     if file_format == FILE_FORMAT_SAS:
-        if var_format in sas_all_formats:
-            if var_format in sas_date_formats:
-                return DATE_FORMAT_DATE
-            elif var_format in sas_datetime_formats:
-                return DATE_FORMAT_DATETIME
-            elif var_format in sas_time_formats:
-                return DATE_FORMAT_TIME
-        else:
-            return DATE_FORMAT_NOTADATE
+        if var_format:
+            format_match = re.match(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)", var_format)
+            if format_match:
+                var_format_name = format_match.group(1)
+                if var_format_name in sas_all_formats:
+                    if var_format_name in sas_date_formats:
+                        return DATE_FORMAT_DATE
+                    elif var_format_name in sas_datetime_formats:
+                        return DATE_FORMAT_DATETIME
+                    elif var_format_name in sas_time_formats:
+                        return DATE_FORMAT_TIME
+        return DATE_FORMAT_NOTADATE
         
     elif file_format == FILE_FORMAT_SPSS:
         if var_format in spss_all_formats:
