@@ -43,6 +43,7 @@ import_datetime()
 
 cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
+cdef object sas_format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)")
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "YYMMDD",
                                 "DDMMYYB", "DDMMYYC", "DDMMYYD",
                                 "DDMMYYN", "DDMMYYP", "DDMMYYS",
@@ -149,7 +150,7 @@ cdef py_datetime_format transform_variable_format(str var_format, py_file_format
     """
     if file_format == FILE_FORMAT_SAS:
         if var_format:
-            format_match = re.match(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)", var_format)
+            format_match = sas_format_regex.match(var_format)
             if format_match:
                 var_format_name = format_match.group(1)
                 if var_format_name in sas_all_formats:
@@ -1270,7 +1271,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     if extra_date_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_date_formats.extend(extra_date_formats)
+            sas_date_formats.extend([sas_format_regex.match(edf).group(1) for edf in extra_datetime_formats if sas_format_regex.match(edf)])
         elif file_format == FILE_FORMAT_SPSS:
             spss_date_formats.extend(extra_date_formats)
         elif file_format == FILE_FORMAT_STATA:
@@ -1279,7 +1280,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
             raise PyreadstatError("Unknown file format")
     if extra_datetime_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_datetime_formats.extend(extra_datetime_formats)
+            sas_datetime_formats.extend([sas_format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if sas_format_regex.match(edtf)])
         elif file_format == FILE_FORMAT_SPSS:
             spss_datetime_formats.extend(extra_datetime_formats)
         elif file_format == FILE_FORMAT_STATA:
@@ -1288,7 +1289,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
             raise PyreadstatError("Unknown file format")
     if extra_time_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_time_formats.extend(extra_time_formats)
+            sas_time_formats.extend([sas_format_regex.match(etf).group(1) for etf in extra_datetime_formats if sas_format_regex.match(etf)])
         elif file_format == FILE_FORMAT_SPSS:
             spss_time_formats.extend(extra_time_formats)
         elif file_format == FILE_FORMAT_STATA:
