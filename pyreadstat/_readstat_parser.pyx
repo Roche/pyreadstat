@@ -1271,7 +1271,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     if extra_date_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_date_formats.extend([sas_format_regex.match(edf).group(1) for edf in extra_datetime_formats if sas_format_regex.match(edf)])
+            sas_date_formats.extend([sas_format_regex.match(edf).group(1) for edf in extra_date_formats if sas_format_regex.match(edf)])
         elif file_format == FILE_FORMAT_SPSS:
             spss_date_formats.extend(extra_date_formats)
         elif file_format == FILE_FORMAT_STATA:
@@ -1289,7 +1289,7 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
             raise PyreadstatError("Unknown file format")
     if extra_time_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_time_formats.extend([sas_format_regex.match(etf).group(1) for etf in extra_datetime_formats if sas_format_regex.match(etf)])
+            sas_time_formats.extend([sas_format_regex.match(etf).group(1) for etf in extra_time_formats if sas_format_regex.match(etf)])
         elif file_format == FILE_FORMAT_SPSS:
             spss_time_formats.extend(extra_time_formats)
         elif file_format == FILE_FORMAT_STATA:
