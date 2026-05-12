@@ -43,7 +43,7 @@ import_datetime()
 
 cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
-cdef object sas_format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)")
+cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)")
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "YYMMDD",
                                 "DDMMYYB", "DDMMYYC", "DDMMYYD",
                                 "DDMMYYN", "DDMMYYP", "DDMMYYS",
@@ -61,9 +61,9 @@ cdef list sas_all_formats
 cdef object sas_origin = datetime_new(1960, 1, 1, 0, 0, 0, 0, None)
 cdef object sas_secs_from_unix = total_seconds(unix_origin - sas_origin)
 
-cdef list spss_datetime_formats = ["DATETIME", "DATETIME8", 'DATETIME17', 'DATETIME20', 'DATETIME23.2',"YMDHMS16","YMDHMS19","YMDHMS19.2", "YMDHMS20"]
-cdef list spss_date_formats = ["DATE",'DATE8','DATE11', 'DATE12', "ADATE","ADATE8", "ADATE10", "EDATE", 'EDATE8','EDATE10', "JDATE", "JDATE5", "JDATE7", "SDATE", "SDATE8", "SDATE10",]
-cdef list spss_time_formats = ["TIME", "DTIME", 'TIME8', 'TIME5', 'TIME11.2']
+cdef list spss_datetime_formats = ["DATETIME", "YMDHMS"]
+cdef list spss_date_formats = ["DATE", "ADATE", "EDATE", "JDATE", "SDATE"]
+cdef list spss_time_formats = ["TIME", "DTIME"]
 #cdef list spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 cdef list spss_all_formats
 cdef object spss_origin = datetime_new(1582, 10, 14, 0, 0, 0, 0, None)
@@ -150,7 +150,7 @@ cdef py_datetime_format transform_variable_format(str var_format, py_file_format
     """
     if file_format == FILE_FORMAT_SAS:
         if var_format:
-            format_match = sas_format_regex.match(var_format)
+            format_match = format_regex.match(var_format)
             if format_match:
                 var_format_name = format_match.group(1)
                 if var_format_name in sas_all_formats:
@@ -163,15 +163,18 @@ cdef py_datetime_format transform_variable_format(str var_format, py_file_format
         return DATE_FORMAT_NOTADATE
         
     elif file_format == FILE_FORMAT_SPSS:
-        if var_format in spss_all_formats:
-            if var_format in spss_date_formats:
-                return DATE_FORMAT_DATE
-            elif var_format in spss_datetime_formats:
-                return DATE_FORMAT_DATETIME
-            elif var_format in spss_time_formats:
-                return DATE_FORMAT_TIME
-        else:
-            return DATE_FORMAT_NOTADATE
+        if var_format:
+            format_match = format_regex.match(var_format)
+            if format_match:
+                var_format_name = format_match.group(1)
+                if var_format_name in spss_all_formats:
+                    if var_format_name in spss_date_formats:
+                        return DATE_FORMAT_DATE
+                    elif var_format_name in spss_datetime_formats:
+                        return DATE_FORMAT_DATETIME
+                    elif var_format_name in spss_time_formats:
+                        return DATE_FORMAT_TIME
+        return DATE_FORMAT_NOTADATE
         
     elif file_format == FILE_FORMAT_STATA:
         if var_format in stata_all_formats:
@@ -1271,27 +1274,27 @@ cdef object run_conversion(object filename_path, py_file_format file_format, py_
 
     if extra_date_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_date_formats.extend([sas_format_regex.match(edf).group(1) for edf in extra_date_formats if sas_format_regex.match(edf)])
+            sas_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])
         elif file_format == FILE_FORMAT_SPSS:
-            spss_date_formats.extend(extra_date_formats)
+            spss_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])
         elif file_format == FILE_FORMAT_STATA:
             stata_date_formats.extend(extra_date_formats)
         else:
             raise PyreadstatError("Unknown file format")
     if extra_datetime_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_datetime_formats.extend([sas_format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if sas_format_regex.match(edtf)])
+            sas_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])
         elif file_format == FILE_FORMAT_SPSS:
-            spss_datetime_formats.extend(extra_datetime_formats)
+            spss_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])
         elif file_format == FILE_FORMAT_STATA:
             stata_datetime_formats.extend(extra_datetime_formats)
         else:
             raise PyreadstatError("Unknown file format")
     if extra_time_formats is not None:
         if file_format == FILE_FORMAT_SAS:
-            sas_time_formats.extend([sas_format_regex.match(etf).group(1) for etf in extra_time_formats if sas_format_regex.match(etf)])
+            sas_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])
         elif file_format == FILE_FORMAT_SPSS:
-            spss_time_formats.extend(extra_time_formats)
+            spss_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])
         elif file_format == FILE_FORMAT_STATA:
             stata_time_formats.extend(extra_time_formats)
         else:
