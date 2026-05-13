@@ -171,6 +171,22 @@ class TestBasic(unittest.TestCase):
             self.df_sas_dates = df_dates2.to_native()
             #schema = {"date": nw.Date, "dtime": nw.Datetime("ns"), "time": nw.Time()}
             self.df_sas_dates2 = nw.concat([df_dates2, nw.from_dict({"date":[None], "dtime":[None], "time":[None]}, backend=backend)]).to_native() #, schema=schema
+
+        # datetime and time variables with fractional seconds as well as unusual date, time and datetime formats
+        sas_fractional_seconds = os.path.join(self.basic_data_folder, "fractional_seconds.csv")
+        if backend == "polars":
+            kwds["try_parse_dates"] = True
+        df_fractional_seconds_raw = nw.read_csv(sas_fractional_seconds,backend=backend, **kwds)
+        df_fractional_seconds1 = df_fractional_seconds_raw.clone()
+        df_fractional_seconds1 = df_fractional_seconds1.to_native()
+        if backend == "pandas":
+            df_fractional_seconds1["date"] = pd.to_datetime(df_fractional_seconds1["date"])
+            df_fractional_seconds1["date"] = df_fractional_seconds1["date"].apply(lambda x: x.date())
+            df_fractional_seconds1["dtime"] = pd.to_datetime(df_fractional_seconds1["dtime"])
+            df_fractional_seconds1["time"] = pd.to_datetime(df_fractional_seconds1["time"], format='%H:%M:%S.%f')
+            df_fractional_seconds1["time"] = df_fractional_seconds1["time"].apply(lambda x: x.time())
+        self.df_sas_fractional_seconds = df_fractional_seconds1
+
         # character column with nan and object column with nan (object pyreadstat writer doesn't know what to do with)
         if backend == "pandas":
             self.df_charnan = pd.DataFrame([[0,np.nan,np.nan],[1,"test", timedelta]], columns = ["integer", "string", "object"])
@@ -574,7 +590,11 @@ class TestBasic(unittest.TestCase):
         sas_file = os.path.join(self.basic_data_folder, "dates.sas7bdat")
         df_sas, meta = pyreadstat.read_sas7bdat(sas_file, dates_as_pandas_datetime=True, output_format=self.backend)
         self.assertTrue(df_sas.equals(self.df_sas_dates_as_pandas))
-        
+
+    def test_sas_fractional_seconds(self):
+        sas_file = os.path.join(self.basic_data_folder, "fractional_seconds.sas7bdat")
+        df_sas, meta = pyreadstat.read_sas7bdat(sas_file, output_format=self.backend)
+        self.assertTrue(df_sas.equals(self.df_sas_fractional_seconds))
 
 
     def test_sas_user_missing(self):
