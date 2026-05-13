@@ -236,10 +236,10 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
             # we want to return seconds from unix
             if file_format == FILE_FORMAT_STATA:
                 # tstamp is in millisecons
-                return (tstamp/1000) - unix_to_origin_secs
+                return (tstamp/1000), unix_to_origin_secs
             else:
                 # tstamp in seconds
-                return tstamp - unix_to_origin_secs
+                return tstamp,  unix_to_origin_secs
 
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
@@ -1107,7 +1107,16 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
                 if var_format == DATE_FORMAT_DATE:
                     date_cols.append(column)
             if datetime_cols:
-                data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*datetime_cols), time_unit='s'))
+                data_frame = data_frame.with_columns(
+                    [
+                        pl.from_epoch(
+                            (pl.col(c).list.get(0) % 1 * 1e6).round().cast(pl.Int64) + (
+                                        pl.col(c).list.get(0).floor() * 1e6).cast(pl.Int64) - (
+                                        pl.col(c).list.get(1) * 1e6).cast(pl.Int64),
+                            time_unit='us')
+                        for c in datetime_cols if data_frame[c].len() > 0
+                    ]
+                )
             if date_cols:
                 data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*date_cols), time_unit='d'))
 
