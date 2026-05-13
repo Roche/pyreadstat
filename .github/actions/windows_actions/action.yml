@@ -5,7 +5,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout libiconv
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: kiyolee/libiconv-win-build
         ref: dff1030d222ba934e0f4a9cdab9c34134f072f68 # v1.18
@@ -13,7 +13,7 @@ runs:
         persist-credentials: false
 
     - name: Checkout zlib
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: kiyolee/zlib-win-build
         ref: 30623e05e64fe4b97f2073ddaf8d3ba0e99d7249
@@ -21,7 +21,7 @@ runs:
         persist-credentials: false
 
     - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
+      uses: microsoft/setup-msbuild@v3
 
     - name: Build libiconv
       run: |
