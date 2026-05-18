@@ -233,13 +233,13 @@ cdef object transform_datetime(py_datetime_format var_format, double tstamp, py_
             return mydat.date()
     elif var_format == DATE_FORMAT_DATETIME:
         if output_format == "polars":
-            # we want to return seconds from unix
+            # we want to return timestamp in seconds
             if file_format == FILE_FORMAT_STATA:
                 # tstamp is in millisecons
-                return (tstamp/1000), unix_to_origin_secs
+                return (tstamp/1000)
             else:
                 # tstamp in seconds
-                return tstamp,  unix_to_origin_secs
+                return tstamp
 
         if file_format == FILE_FORMAT_STATA:
             # tstamp is in millisecons
@@ -1110,9 +1110,9 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
                 data_frame = data_frame.with_columns(
                     [
                         pl.from_epoch(
-                            (pl.col(c).list.get(0) % 1 * 1e6).round().cast(pl.Int64) + (
-                                        pl.col(c).list.get(0).floor() * 1e6).cast(pl.Int64) - (
-                                        pl.col(c).list.get(1) * 1e6).cast(pl.Int64),
+                            (pl.col(c) % 1 * 1e6).round().cast(pl.Int64) + (
+                                    pl.col(c).floor() * 1e6).cast(pl.Int64) - (
+                                    pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
                             time_unit='us')
                         for c in datetime_cols if data_frame[c].len() > 0
                     ]
