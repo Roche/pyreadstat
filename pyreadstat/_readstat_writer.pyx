@@ -21,6 +21,7 @@ import sys
 import datetime
 #import calendar
 from datetime import timezone
+from decimal import Decimal
 #from datetime import timezone as _timezone
 #from libc.math cimport round, NAN
 
@@ -64,19 +65,19 @@ cdef object vectorized_convert_datetime_to_number(object df, dst_file_format fil
     transforms datetime64 columns in the dataframe to floats
     """
     cdef dict convfacs
-    cdef double offset_secs
-    cdef double mulfac = 1.0
+    cdef long long offset_secs
+    cdef int mulfac = 1
     cdef int col_indx
     cdef list col_indxs
-    cdef double convfac
+    cdef int convfac
 
     if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
-        offset_secs = spss_offset_secs
+        offset_secs = int(spss_offset_secs)
     else:
-        offset_secs = sas_offset_secs
+        offset_secs = int(sas_offset_secs)
     if file_format == FILE_FORMAT_DTA:
         # stata stores in milliseconds
-        mulfac = 1000.0
+        mulfac = 1000
     convfacs = {'ns': 1e9, 'us': 1e6, 'ms': 1e3}
 
     col_indxs = list()
@@ -87,8 +88,9 @@ cdef object vectorized_convert_datetime_to_number(object df, dst_file_format fil
     df = df.with_columns(nw.nth(col_indxs).cast(nw.Int64))
     for col_indx in col_indxs:
         convfac = convfacs[pywriter_timeunits[col_indx]]
-        df = df.with_columns(nw.when(nw.nth(col_indx)!=-9223372036854775808).then(nw.nth(col_indx)))
-        df = df.with_columns((((nw.nth(col_indx).cast(nw.Float64))/convfac) + offset_secs).round() * mulfac)
+        df = df.with_columns(nw.when(nw.nth(col_indx) != -9223372036854775808).then(
+            ((nw.nth(col_indx) + offset_secs * convfac) * Decimal(mulfac) / convfac).round(6).cast(
+                nw.Float64)))
     return df
 
 
@@ -138,7 +140,7 @@ cdef object vectorized_convert_time_to_number(object df, dst_file_format file_fo
     df = df.with_columns(nw.nth(col_indxs).cast(nw.Int64))
     for col_indx in col_indxs:
         df = df.with_columns(nw.when(nw.nth(col_indx)!=-9223372036854775808).then(nw.nth(col_indx)))
-        df = df.with_columns((nw.nth(col_indx).cast(nw.Float64)/1e9).round() * mulfac)
+        df = df.with_columns((nw.nth(col_indx).cast(nw.Float64)/1e9).round(9) * mulfac)
     return df
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *:
