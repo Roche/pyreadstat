@@ -88,9 +88,10 @@ cdef object vectorized_convert_datetime_to_number(object df, dst_file_format fil
     df = df.with_columns(nw.nth(col_indxs).cast(nw.Int64))
     for col_indx in col_indxs:
         convfac = convfacs[pywriter_timeunits[col_indx]]
-        finfac = Decimal(mulfac) / Decimal(convfac)
-        df = df.with_columns(nw.when(nw.nth(col_indx) != -9223372036854775808).then(
-            ((nw.nth(col_indx) + offset_secs * convfac) * finfac).cast(nw.Float64)))
+        whole = nw.nth(col_indx) // convfac + offset_secs
+        frac = nw.nth(col_indx) % convfac
+        df = df.with_columns(nw.when(nw.nth(col_indx)!=-9223372036854775808).then(
+            (whole.cast(nw.Float64) * mulfac + frac.cast(nw.Float64) / convfac * mulfac)))
     return df
 
 
