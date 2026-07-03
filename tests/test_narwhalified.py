@@ -1361,6 +1361,37 @@ class TestBasic(unittest.TestCase):
         df2, meta = pyreadstat.read_sav(path,  output_format=self.backend)
         self.assertTrue(df_ori.to_native().equals(df2))
 
+    def test_write_sav_locked_file(self):
+        """Test that writing to a locked or unwritable file raises PyreadstatError, not a crash (issue #328)."""
+        from pyreadstat._readstat_parser import PyreadstatError
+        import stat
+
+        df = nw.from_native(self.df_pandas).to_native()
+        path = os.path.join(self.write_folder, "locked_write_test.sav")
+
+        if os.name == "nt":
+            import msvcrt
+            pyreadstat.write_sav(df, path)
+            f = open(path, "r+b")
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+            try:
+                with self.assertRaises(PyreadstatError):
+                    pyreadstat.write_sav(df, path)
+            finally:
+                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+                f.close()
+                os.remove(path)
+        else:
+            pyreadstat.write_sav(df, path)
+            os.chmod(path, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+            try:
+                if os.getuid() != 0:
+                    with self.assertRaises(PyreadstatError):
+                        pyreadstat.write_sav(df, path)
+            finally:
+                os.chmod(path, stat.S_IRWXU)
+                os.remove(path)
+
     def test_read_sav_file_handle(self):
         """Test reading SAV file from file-like object (e.g., zip archive)"""
         sav_file = os.path.join(self.basic_data_folder, "sample.sav")

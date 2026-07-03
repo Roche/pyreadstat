@@ -7598,7 +7598,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_pyt
   int __pyx_v_dates_as_pandas;
   __pyx_t_10pyreadstat_16_readstat_parser_py_file_format __pyx_v_file_format;
   PyObject *__pyx_v_result = 0;
-  char *__pyx_v_c_str_value;
+  char const *__pyx_v_c_str_value;
   PyObject *__pyx_v_py_str_value = 0;
   int8_t __pyx_v_c_int8_value;
   int16_t __pyx_v_c_int16_value;
@@ -8380,14 +8380,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_metadata(readstat_meta
   int __pyx_v_obs_count;
   int __pyx_v_mr_len;
   struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *__pyx_v_dc = 0;
-  char *__pyx_v_flabel_orig;
-  char *__pyx_v_fencoding_orig;
+  char const *__pyx_v_flabel_orig;
+  char const *__pyx_v_fencoding_orig;
   PyObject *__pyx_v_flabel = 0;
   PyObject *__pyx_v_fencoding = 0;
   CYTHON_UNUSED int __pyx_v_metaonly;
-  char *__pyx_v_table;
+  char const *__pyx_v_table;
   int __pyx_v_i;
-  mr_set_t *__pyx_v_mr_sets_orig;
+  mr_set_t const *__pyx_v_mr_sets_orig;
   PyObject *__pyx_v_mr_sets = 0;
   PyObject *__pyx_v_name = 0;
   PyObject *__pyx_v_variable_list = 0;
@@ -8414,7 +8414,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_metadata(readstat_meta
  *     cdef int var_count, obs_count, mr_len
  *     cdef  data_container dc = <data_container> ctx             # <<<<<<<<<<<<<<
  *     #cdef object row
- *     cdef char * flabel_orig
+ *     cdef const char * flabel_orig
 */
   __pyx_t_1 = ((PyObject *)__pyx_v_ctx);
   __Pyx_INCREF(__pyx_t_1);
@@ -8425,14 +8425,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_metadata(readstat_meta
  *     cdef int ctime
  *     cdef int mtime
  *     cdef int i = 0             # <<<<<<<<<<<<<<
- *     cdef mr_set_t * mr_sets_orig
+ *     cdef const mr_set_t * mr_sets_orig
  *     cdef dict mr_sets = {}
 */
   __pyx_v_i = 0;
 
   /* "pyreadstat/_readstat_parser.pyx":397
  *     cdef int i = 0
- *     cdef mr_set_t * mr_sets_orig
+ *     cdef const mr_set_t * mr_sets_orig
  *     cdef dict mr_sets = {}             # <<<<<<<<<<<<<<
  *     cdef str name
  *     cdef list variable_list = []
@@ -9163,9 +9163,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_metadata(readstat_meta
 */
 
 static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_index, readstat_variable_t *__pyx_v_variable, char *__pyx_v_val_labels, void *__pyx_v_ctx) {
-  char *__pyx_v_var_name;
-  char *__pyx_v_var_label;
-  char *__pyx_v_var_format;
+  char const *__pyx_v_var_name;
+  char const *__pyx_v_var_label;
+  char const *__pyx_v_var_format;
   PyObject *__pyx_v_col_name = 0;
   PyObject *__pyx_v_col_label = 0;
   PyObject *__pyx_v_label_name = 0;
@@ -11807,7 +11807,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 
 static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__pyx_v_val_labels, readstat_value_t __pyx_v_value, char *__pyx_v_label, void *__pyx_v_ctx) {
   struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *__pyx_v_dc = 0;
-  char *__pyx_v_c_str_value;
+  char const *__pyx_v_c_str_value;
   PyObject *__pyx_v_py_str_value = 0;
   int8_t __pyx_v_c_int8_value;
   int16_t __pyx_v_c_int16_value;
@@ -11841,7 +11841,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
  * 
  *     cdef  data_container dc = <data_container> ctx             # <<<<<<<<<<<<<<
  * 
- *     cdef char * c_str_value
+ *     cdef const char * c_str_value
 */
   __pyx_t_1 = ((PyObject *)__pyx_v_ctx);
   __Pyx_INCREF(__pyx_t_1);
@@ -13236,7 +13236,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
 */
 
 static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_error_t __pyx_v_retcode) {
-  char *__pyx_v_err_readstat;
+  char const *__pyx_v_err_readstat;
   PyObject *__pyx_v_err_message = 0;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -13250,7 +13250,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
   __Pyx_RefNannySetupContext("check_exit_status", 0);
 
   /* "pyreadstat/_readstat_parser.pyx":910
- *     cdef char * err_readstat
+ *     cdef const char * err_readstat
  *     cdef str err_message
  *     if retcode != READSTAT_OK:             # <<<<<<<<<<<<<<
  *         err_readstat = readstat_error_message(retcode)
@@ -13318,7 +13318,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
     __PYX_ERR(0, 913, __pyx_L1_error)
 
     /* "pyreadstat/_readstat_parser.pyx":910
- *     cdef char * err_readstat
+ *     cdef const char * err_readstat
  *     cdef str err_message
  *     if retcode != READSTAT_OK:             # <<<<<<<<<<<<<<
  *         err_readstat = readstat_error_message(retcode)
@@ -13401,13 +13401,22 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
  *     metaonly = data.metaonly
  *     ctx = <void *>data             # <<<<<<<<<<<<<<
  * 
- *     #readstat_error_t error = READSTAT_OK;
+ *     error = READSTAT_OK;
 */
   __pyx_v_ctx = ((void *)__pyx_v_data);
 
+  /* "pyreadstat/_readstat_parser.pyx":946
+ *     ctx = <void *>data
+ * 
+ *     error = READSTAT_OK;             # <<<<<<<<<<<<<<
+ *     parser = readstat_parser_init()
+ *     metadata_handler = <readstat_metadata_handler> handle_metadata
+*/
+  __pyx_v_error = READSTAT_OK;
+
   /* "pyreadstat/_readstat_parser.pyx":947
  * 
- *     #readstat_error_t error = READSTAT_OK;
+ *     error = READSTAT_OK;
  *     parser = readstat_parser_init()             # <<<<<<<<<<<<<<
  *     metadata_handler = <readstat_metadata_handler> handle_metadata
  *     variable_handler = <readstat_variable_handler> handle_variable
@@ -13415,7 +13424,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_v_parser = readstat_parser_init();
 
   /* "pyreadstat/_readstat_parser.pyx":948
- *     #readstat_error_t error = READSTAT_OK;
+ *     error = READSTAT_OK;
  *     parser = readstat_parser_init()
  *     metadata_handler = <readstat_metadata_handler> handle_metadata             # <<<<<<<<<<<<<<
  *     variable_handler = <readstat_variable_handler> handle_variable
