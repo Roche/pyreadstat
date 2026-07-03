@@ -28,6 +28,7 @@ import numpy as np
 import narwhals.stable.v2 as nw
 
 from readstat_api cimport *
+from libc.errno cimport errno
 from _readstat_parser import ReadstatError, PyreadstatError
 from _readstat_parser cimport check_exit_status
 
@@ -596,6 +597,8 @@ cdef int open_file(bytes filename_bytes):
     return fd
 
 cdef int close_file(int fd):
+    if fd == -1:
+        return -1
     if os.name == "nt":
         return _close(fd)
     else:
@@ -758,6 +761,11 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
 
     cdef int fd = open_file(filename_bytes)
+    if fd == -1:
+        raise PyreadstatError(
+            "Could not open file '%s' for writing: %s (errno %d). "
+            "The file may be locked by another process or you may not have write permission."
+            % (os.fsdecode(filename_bytes), os.strerror(errno), errno))
     writer = readstat_writer_init()
 
     try:

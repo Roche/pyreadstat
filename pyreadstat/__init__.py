@@ -22,7 +22,7 @@ from .pyclasses import metadata_container
 from ._readstat_parser import ReadstatError, PyreadstatError
 from .pyfunctions import set_value_labels, set_catalog_to_sas
 
-__version__ = "1.3.5"
+__version__ = "1.3.6"
 
 __all__ = (
     "read_sav",
