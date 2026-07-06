@@ -970,6 +970,12 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_xport(path, output_format=self.backend)
         self.assertTrue(df.equals(self.df_sas_dates2))
 
+    def test_xport_write_fractional_seconds(self):
+        path = os.path.join(self.write_folder, "fractional_seconds.xpt")
+        pyreadstat.write_xport(self.df_sas_fractional_seconds, path)
+        df, meta = pyreadstat.read_xport(path, output_format=self.backend)
+        self.assertTrue(df.equals(self.df_sas_fractional_seconds))
+
     def test_sav_write_charnan(self):
         path = os.path.join(self.write_folder, "charnan.sav")
         pyreadstat.write_sav(self.df_charnan, path)
