@@ -23,6 +23,7 @@ import sys
 import shutil
 import multiprocessing as mp
 import tempfile
+import time
 import zipfile
 import io
 
@@ -1379,29 +1380,28 @@ class TestBasic(unittest.TestCase):
                     
                     self.assertEqual(len(df.columns), len(self.df_pandas.columns))
                     self.assertEqual(len(df), len(self.df_pandas))
-
-    def test_read_sav_file_handle_threads(self):
+    def test_read_sav_bytesio_threads(self):
         """Test reading SAV file from file-like object in multiple threads at once (tests thread safety)"""
+
+        class SlowBytesIO(io.BytesIO):
+            """A BytesIO that sleeps a bit on each read. This subclass is necessary because we want
+            to test paralell threads reading at the same time, but the test data is so small that
+            the reads are too fast to overlap. """
+            def read(self, *args, **kwargs):
+                time.sleep(0.001)
+                return super().read(*args, **kwargs)
+
+        def read_sav_file(buffer):
+            df, meta = pyreadstat.read_sav(buffer, output_format=self.backend)
+            return df, meta
+
         sav_file = os.path.join(self.basic_data_folder, "sample.sav")
         with open(sav_file, "rb") as f:
             file_bytes = f.read()
-
-        def read_sav_file(path):
-            with open(path, "rb") as fo:
-                df, meta = pyreadstat.read_sav(fo)
-            return df, meta
-
-        num_threads = 10
-
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            paths = [os.path.join(tmp_dir, f"sample{i}.sav") for i in range(num_threads)]
-            for path in paths:
-                with open(path, "wb") as f:
-                    f.write(file_bytes)
-
-            with ThreadPoolExecutor(max_workers=num_threads) as executor:
-                results = list(executor.map(read_sav_file, paths))
-
+        num_threads = 5
+        buffers = [SlowBytesIO(file_bytes) for _ in range(num_threads)]
+        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+            results = list(executor.map(read_sav_file, buffers))
         for df, meta in results:
             self.assertEqual(len(df.columns), len(self.df_pandas.columns))
             self.assertEqual(len(df), len(self.df_pandas))
