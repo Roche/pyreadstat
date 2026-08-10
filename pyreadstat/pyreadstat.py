@@ -1039,8 +1039,15 @@ def read_file_in_chunks(
 
     if "num_processes" in kwargs:
         _ = kwargs.pop("num_processes")
+        
+    output_format = None
+    if "output_format" in kwargs:
+        output_format = kwargs["output_format"]
 
-    _, meta = read_function(file_path, metadataonly=True)
+    if output_format:
+        _, meta = read_function(file_path, metadataonly=True, output_format=output_format)
+    else:
+        _, meta = read_function(file_path, metadataonly=True)
     numrows = meta.number_rows
     if numrows:
         if not limit:
