@@ -16,12 +16,14 @@
 # #############################################################################
 
 from datetime import datetime, timedelta, date
+from concurrent.futures import ThreadPoolExecutor
 import unittest
 import os
 import sys
 import shutil
 import multiprocessing as mp
 import tempfile
+import time
 import zipfile
 import io
 
@@ -1415,6 +1417,32 @@ class TestBasic(unittest.TestCase):
                     
                     self.assertEqual(len(df.columns), len(self.df_pandas.columns))
                     self.assertEqual(len(df), len(self.df_pandas))
+    def test_read_sav_bytesio_threads(self):
+        """Test reading SAV file from file-like object in multiple threads at once (tests thread safety)"""
+
+        class SlowBytesIO(io.BytesIO):
+            """A BytesIO that sleeps a bit on each read. This subclass is necessary because we want
+            to test paralell threads reading at the same time, but the test data is so small that
+            the reads are too fast to overlap. """
+            def read(self, *args, **kwargs):
+                time.sleep(0.001)
+                return super().read(*args, **kwargs)
+
+        def read_sav_file(buffer):
+            df, meta = pyreadstat.read_sav(buffer, output_format=self.backend)
+            return df, meta
+
+        sav_file = os.path.join(self.basic_data_folder, "sample.sav")
+        with open(sav_file, "rb") as f:
+            file_bytes = f.read()
+        num_threads = 5
+        buffers = [SlowBytesIO(file_bytes) for _ in range(num_threads)]
+        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+            results = list(executor.map(read_sav_file, buffers))
+        for df, meta in results:
+            self.assertEqual(len(df.columns), len(self.df_pandas.columns))
+            self.assertEqual(len(df), len(self.df_pandas))
+            self.assertListEqual(list(df.columns), list(self.df_pandas.columns))
 
     def test_read_sav_bytesio(self):
         """Test reading SAV file from BytesIO (simulates remote/streaming data)"""

@@ -852,7 +852,6 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         return -1
 
 
-cdef object _file_object_ctx = None
 
 cdef int pyobject_open_handler(const char *path, void *io_ctx) noexcept:
     """File is already open - this is a no-op"""
@@ -864,13 +863,12 @@ cdef int pyobject_close_handler(void *io_ctx) noexcept:
 
 cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexcept:
     """Bridge Python file.read() to C read operation"""
-    global _file_object_ctx
     cdef bytes data
     cdef ssize_t bytes_read
     cdef char *data_ptr
-    
+    cdef object file_obj = <object> io_ctx
+
     try:
-        file_obj = _file_object_ctx
         data = file_obj.read(nbyte)
         bytes_read = len(data)
         if bytes_read > 0:
@@ -882,18 +880,17 @@ cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexce
 
 cdef readstat_off_t pyobject_seek_handler(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx) noexcept:
     """Bridge Python file.seek() to C seek operation"""
-    global _file_object_ctx
     cdef int py_whence
-    
+    cdef object file_obj = <object> io_ctx
+
     try:
-        file_obj = _file_object_ctx
         if whence == READSTAT_SEEK_SET:
             py_whence = 0
         elif whence == READSTAT_SEEK_CUR:
             py_whence = 1
         else:  # READSTAT_SEEK_END
             py_whence = 2
-        
+
         file_obj.seek(offset, py_whence)
         return file_obj.tell()
     except:
@@ -916,11 +913,9 @@ cdef void check_exit_status(readstat_error_t retcode) except *:
 cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset, object file_obj=None) except *:
     """
     Runs the parsing of the file by readstat library.
-    
+
     If file_obj is provided, it will be used instead of filename for I/O operations.
     """
-    global _file_object_ctx
-    
     cdef readstat_parser_t *parser
     cdef readstat_error_t error
     cdef readstat_metadata_handler metadata_handler
@@ -959,11 +954,12 @@ cdef void run_readstat_parser(char * filename, data_container data, py_file_exte
 
     # Set up custom I/O handlers for file objects
     if file_obj is not None:
-        _file_object_ctx = file_obj
+        io_ctx = <void *> file_obj
         open_handler = <readstat_open_handler> pyobject_open_handler
         close_handler = <readstat_close_handler> pyobject_close_handler
         read_handler = <readstat_read_handler> pyobject_read_handler
         seek_handler = <readstat_seek_handler> pyobject_seek_handler
+        readstat_set_io_ctx(parser, io_ctx)
         readstat_set_open_handler(parser, open_handler)
         readstat_set_close_handler(parser, close_handler)
         readstat_set_read_handler(parser, read_handler)
