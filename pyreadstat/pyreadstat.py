@@ -1358,6 +1358,7 @@ def write_xport(
     table_name: str | None = None,
     file_format_version: Literal[5, 8] = 8,
     variable_format: dict[str, str] | None = None,
+    variable_informat: dict[str, str] | None = None,
 ) -> None:
     """
     Writes a dataframe to a SAS Xport (xpt) file.
@@ -1386,6 +1387,9 @@ def write_xport(
         sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
         for more information.
+    variable_informat: dict, optional
+        sets the informat of a variable. Must be a dictionary with keys being the variable names and
+        values being strings defining the format.
     """
 
     writer_format = "xport"
@@ -1398,6 +1402,7 @@ def write_xport(
         version=file_format_version,
         table_name=table_name,
         variable_format=variable_format,
+        variable_informat=variable_informat,
     )
 
 
