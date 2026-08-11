@@ -59,6 +59,7 @@ class metadata_container:
     variable_to_label: dict[str, str] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
     original_variable_types: dict[str, str] = field(default_factory=dict)
+    original_variable_informats: dict[str, str] = field(default_factory=dict)
     readstat_variable_types: dict[str, str] = field(default_factory=dict)
     table_name: str | None = None
     missing_ranges: dict[str, list[int | float | str | MissingRange]] = field(default_factory=dict)
