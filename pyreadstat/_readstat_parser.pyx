@@ -101,6 +101,7 @@ cdef class data_container:
         self.col_dytpes_isfloat = list()
         self.col_formats = list()
         self.col_formats_original = list()
+        self.col_informats_original = list()
         self.origin = None
         self.unix_to_origin_secs = 0
         self.is_unkown_number_rows = 0
@@ -471,7 +472,8 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     cdef const char * var_name, 
     cdef const char * var_label
     cdef const char * var_format
-    cdef str col_name, col_label, label_name, col_format_original, output_format
+    cdef const char * var_informat
+    cdef str col_name, col_label, label_name, col_format_original, col_informat_original, output_format
     cdef py_datetime_format col_format_final
     cdef readstat_type_t var_type
     cdef py_file_format file_format
@@ -541,8 +543,15 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
         col_format_original = None
     else:
         col_format_original = <str>var_format
+    # informat (SAS)
+    var_informat = readstat_variable_get_informat(variable)
+    if var_informat == NULL:
+        col_informat_original = None
+    else:
+        col_informat_original = <str>var_informat
     file_format = dc.file_format
     dc.col_formats_original.append(col_format_original)
+    dc.col_informats_original.append(col_informat_original)
     col_format_final = transform_variable_format(col_format_original, file_format)
     dc.col_formats.append(col_format_final)
     # readstat type
@@ -1132,10 +1141,10 @@ cdef object data_container_extract_metadata(data_container data):
     cdef bint is_unkown_number_rows
     cdef object label_to_var_name
     cdef object labels_raw
-    cdef str var_name, var_label
+    cdef str var_name, var_label, cur_type, cur_informat
     cdef object current_labels
     cdef object labels_str
-    cdef object original_types
+    cdef object original_types, original_informats
     cdef readstat_type_t var_type
 
     metaonly = data.metaonly
@@ -1166,11 +1175,14 @@ cdef object data_container_extract_metadata(data_container data):
                 variable_value_labels[var_name] = current_labels
 
     original_types = dict()
+    original_informats = dict()
     readstat_types = dict()
     for indx in range(metadata.number_columns):
         cur_col = data.col_names[indx]
         cur_type = data.col_formats_original[indx]
         original_types[cur_col] = cur_type
+        cur_informat = data.col_informats_original[indx]
+        original_informats[cur_col] = cur_informat
         var_type = data.col_dtypes[indx]
         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
             readstat_types[cur_col] = "string"
@@ -1201,6 +1213,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.value_labels = labels_raw
     metadata.variable_to_label = label_to_var_name
     metadata.original_variable_types = original_types
+    metadata.original_variable_informats = original_informats
     metadata.readstat_variable_types = readstat_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges

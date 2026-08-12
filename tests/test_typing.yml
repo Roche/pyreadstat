@@ -341,5 +341,5 @@
         "var2": "ordinal",
         "var3": "scale",
         "var4": "unknown",
-        "var5": "another",  # E: Dict entry 4 has incompatible type "str": "Literal['another']"; expected "str": "Literal['nominal', 'ordinal', 'scale', 'unknown']"  [dict-item]
+        "var5": "another",  # E: Dict entry 4 has incompatible type "str": "Literal['another']"; expected "str": "Literal['nominal', 'ordinal', 'scale', 'unknown', 'undetermined']"  [dict-item]
     }

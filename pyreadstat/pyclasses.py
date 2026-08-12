@@ -48,8 +48,8 @@ class metadata_container:
     """
 
     column_names: list[str] = field(default_factory=list)
-    column_labels: list[str] = field(default_factory=list)
-    column_names_to_labels: dict[str, str] = field(default_factory=dict)
+    column_labels: list[str | None] = field(default_factory=list)
+    column_names_to_labels: dict[str, str | None] = field(default_factory=dict)
     file_encoding: str | None = None
     file_label: str | None = None
     number_columns: int | None = None
@@ -58,7 +58,8 @@ class metadata_container:
     value_labels: dict[str, dict[float | int, str]] = field(default_factory=dict)
     variable_to_label: dict[str, str] = field(default_factory=dict)
     notes: list[str] = field(default_factory=list)
-    original_variable_types: dict[str, str] = field(default_factory=dict)
+    original_variable_types: dict[str, str | None] = field(default_factory=dict)
+    original_variable_informats: dict[str, str | None] = field(default_factory=dict)
     readstat_variable_types: dict[str, str] = field(default_factory=dict)
     table_name: str | None = None
     missing_ranges: dict[str, list[int | float | str | MissingRange]] = field(default_factory=dict)
@@ -66,7 +67,7 @@ class metadata_container:
     variable_storage_width: dict[str, int] = field(default_factory=dict)
     variable_display_width: dict[str, int] = field(default_factory=dict)
     variable_alignment: dict[str, str] = field(default_factory=dict)
-    variable_measure: dict[str, Literal["nominal", "ordinal", "scale", "unknown"]] = field(default_factory=dict)
+    variable_measure: dict[str, Literal["nominal", "ordinal", "scale", "unknown", "undetermined"]] = field(default_factory=dict)
     creation_time: datetime | None = None
     modification_time: datetime | None = None
     mr_sets: dict[str, MRSet] = field(default_factory=dict)
