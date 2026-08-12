@@ -1,4 +1,4 @@
-# 1.3.6 (github, pypi and conda 2026.xx.xx)
+# 1.3.6 (github, pypi and conda 2026.08.12)
 * Fixing #328, #336, #342, #344, #287, #307
 * Updated Readstat sources to 634f40a80d27221848ba57e9fb633b41146bac36
 
