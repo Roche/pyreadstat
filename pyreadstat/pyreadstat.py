@@ -1039,8 +1039,15 @@ def read_file_in_chunks(
 
     if "num_processes" in kwargs:
         _ = kwargs.pop("num_processes")
+        
+    output_format = None
+    if "output_format" in kwargs:
+        output_format = kwargs["output_format"]
 
-    _, meta = read_function(file_path, metadataonly=True)
+    if output_format:
+        _, meta = read_function(file_path, metadataonly=True, output_format=output_format)
+    else:
+        _, meta = read_function(file_path, metadataonly=True)
     numrows = meta.number_rows
     if numrows:
         if not limit:
@@ -1205,7 +1212,7 @@ def write_sav(
     df: "DataFrame",
     dst_path: FilePathLike,
     file_label: str = "",
-    column_labels: list[str] | dict[str, str] | None = None,
+    column_labels: list[str | None] | dict[str, str | None] | None = None,
     compress: bool = False,
     row_compress: bool = False,
     note: str | list[str] | None = None,
@@ -1291,7 +1298,7 @@ def write_dta(
     df: "DataFrame",
     dst_path: FilePathLike,
     file_label: str = "",
-    column_labels: list[str] | dict[str, str] | None = None,
+    column_labels: list[str | None] | dict[str, str | None] | None = None,
     version: int = 15,
     variable_value_labels: dict[str, dict[int | float, str]] | None = None,
     missing_user_values: dict[str, list[str]] | None = None,
@@ -1347,10 +1354,11 @@ def write_xport(
     df: "DataFrame",
     dst_path: FilePathLike,
     file_label: str = "",
-    column_labels: list[str] | dict[str, str] | None = None,
+    column_labels: list[str | None] | dict[str, str | None] | None = None,
     table_name: str | None = None,
     file_format_version: Literal[5, 8] = 8,
     variable_format: dict[str, str] | None = None,
+    variable_informat: dict[str, str] | None = None,
 ) -> None:
     """
     Writes a dataframe to a SAS Xport (xpt) file.
@@ -1379,6 +1387,9 @@ def write_xport(
         sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
         for more information.
+    variable_informat: dict, optional
+        sets the informat of a variable. Must be a dictionary with keys being the variable names and
+        values being strings defining the format.
     """
 
     writer_format = "xport"
@@ -1391,6 +1402,7 @@ def write_xport(
         version=file_format_version,
         table_name=table_name,
         variable_format=variable_format,
+        variable_informat=variable_informat,
     )
 
 
@@ -1398,7 +1410,7 @@ def write_por(
     df: "DataFrame",
     dst_path: FilePathLike,
     file_label: str = "",
-    column_labels: list[str] | dict[str, str] | None = None,
+    column_labels: list[str | None] | dict[str, str | None] | None = None,
     variable_format: dict[str, str] | None = None,
 ) -> None:
     """

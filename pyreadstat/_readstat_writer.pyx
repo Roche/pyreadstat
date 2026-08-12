@@ -28,6 +28,7 @@ import numpy as np
 import narwhals.stable.v2 as nw
 
 from readstat_api cimport *
+from libc.errno cimport errno
 from _readstat_parser import ReadstatError, PyreadstatError
 from _readstat_parser cimport check_exit_status
 
@@ -64,19 +65,19 @@ cdef object vectorized_convert_datetime_to_number(object df, dst_file_format fil
     transforms datetime64 columns in the dataframe to floats
     """
     cdef dict convfacs
-    cdef double offset_secs
-    cdef double mulfac = 1.0
+    cdef long long offset_secs
+    cdef int mulfac = 1
     cdef int col_indx
     cdef list col_indxs
-    cdef double convfac
+    cdef int convfac
 
     if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
-        offset_secs = spss_offset_secs
+        offset_secs = int(spss_offset_secs)
     else:
-        offset_secs = sas_offset_secs
+        offset_secs = int(sas_offset_secs)
     if file_format == FILE_FORMAT_DTA:
         # stata stores in milliseconds
-        mulfac = 1000.0
+        mulfac = 1000
     convfacs = {'ns': 1e9, 'us': 1e6, 'ms': 1e3}
 
     col_indxs = list()
@@ -87,8 +88,10 @@ cdef object vectorized_convert_datetime_to_number(object df, dst_file_format fil
     df = df.with_columns(nw.nth(col_indxs).cast(nw.Int64))
     for col_indx in col_indxs:
         convfac = convfacs[pywriter_timeunits[col_indx]]
-        df = df.with_columns(nw.when(nw.nth(col_indx)!=-9223372036854775808).then(nw.nth(col_indx)))
-        df = df.with_columns((((nw.nth(col_indx).cast(nw.Float64))/convfac) + offset_secs).round() * mulfac)
+        whole = nw.nth(col_indx) // convfac + offset_secs
+        frac = nw.nth(col_indx) % convfac
+        df = df.with_columns(nw.when(nw.nth(col_indx)!=-9223372036854775808).then(
+            (whole.cast(nw.Float64) * mulfac + frac.cast(nw.Float64) / convfac * mulfac)))
     return df
 
 
@@ -138,7 +141,7 @@ cdef object vectorized_convert_time_to_number(object df, dst_file_format file_fo
     df = df.with_columns(nw.nth(col_indxs).cast(nw.Int64))
     for col_indx in col_indxs:
         df = df.with_columns(nw.when(nw.nth(col_indx)!=-9223372036854775808).then(nw.nth(col_indx)))
-        df = df.with_columns((nw.nth(col_indx).cast(nw.Float64)/1e9).round() * mulfac)
+        df = df.with_columns((nw.nth(col_indx).cast(nw.Float64)/1e9).round(9) * mulfac)
     return df
 
 cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter_variable_type curtype, object curval) except *:
@@ -146,7 +149,8 @@ cdef double convert_datetimelike_to_number(dst_file_format file_format, pywriter
     converts a datime like python/pandas object to a float
     """
 
-    cdef double offset_days, tstamp
+    cdef double offset_days
+    cdef double tstamp = 0
 
     if file_format == FILE_FORMAT_SAV or file_format == FILE_FORMAT_POR:
         offset_days = spss_offset_days
@@ -574,18 +578,6 @@ cdef ssize_t write_bytes(const void *data, size_t _len, void *ctx) noexcept:
     else:
         return write(fd, data, _len)
 
-cdef void _check_exit_status(readstat_error_t retcode) except *:
-    """
-    transforms a readstat exit status to a python error if status is not READSTAT OK
-    """
-
-    cdef char * err_readstat
-    cdef str err_message
-    if retcode != READSTAT_OK:
-        err_readstat = readstat_error_message(retcode)
-        err_message = <str> err_readstat
-        raise ReadstatError(err_message)
-
 cdef int open_file(bytes filename_bytes):
 
     cdef int fd
@@ -607,6 +599,8 @@ cdef int open_file(bytes filename_bytes):
     return fd
 
 cdef int close_file(int fd):
+    if fd == -1:
+        return -1
     if os.name == "nt":
         return _close(fd)
     else:
@@ -653,8 +647,8 @@ cdef void initial_checks(bint is_pandas, bint is_polars, dict variable_value_lab
                 raise PyreadstatError("variable name '%s' is of type %s and it must be str (not starting with numbers!)" % (variable_name, str(type(variable_name))))
         if len(variable_name) == 0:
             raise PyreadstatError("variable names must be non-empty strings, not starting with numbers")
-        if not variable_name[0].isalpha():
-            raise PyreadstatError("variable name '%s' starts with an illegal (non-alphabetic) character: '%s' (ordinal %s)" % (variable_name, variable_name[0], ord(variable_name[0])))
+        if not (variable_name[0].isalpha() or variable_name[0] == "_"):
+            raise PyreadstatError("variable name '%s' starts with an illegal (neither alphabetic nor an underscore) character: '%s' (ordinal %s)" % (variable_name, variable_name[0], ord(variable_name[0])))
         if " " in variable_name:
             raise PyreadstatError("variable name '%s' contains a space, which is not allowed" % variable_name)
 
@@ -685,7 +679,8 @@ cdef bytes filepath_to_bytes(object filename_path):
 cdef int run_write(df, object filename_path, dst_file_format file_format, str file_label, object column_labels,
                    int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
-                   dict variable_display_width, dict variable_measure, dict variable_format, bint row_compression) except *:
+                   dict variable_display_width, dict variable_measure, dict variable_format,
+                   dict variable_informat, bint row_compression) except *:
     """
     main entry point for writing all formats. Some parameters are specific for certain file type
     and are even incompatible between them. This function relies on the caller to select the right
@@ -769,6 +764,11 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
 
 
     cdef int fd = open_file(filename_bytes)
+    if fd == -1:
+        raise PyreadstatError(
+            "Could not open file '%s' for writing: %s (errno %d). "
+            "The file may be locked by another process or you may not have write permission."
+            % (os.fsdecode(filename_bytes), os.strerror(errno), errno))
     writer = readstat_writer_init()
 
     try:
@@ -833,6 +833,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
             if curtype in pyrwriter_datetimelike_types and (variable_format is None or variable_name not in variable_format.keys()):
                 curformat = get_datetimelike_format_for_readstat(file_format, curtype)
                 readstat_variable_set_format(variable, curformat)
+            if variable_informat:
+                tempformat = variable_informat.get(variable_name)
+                if tempformat:
+                   readstat_variable_set_informat(variable, tempformat.encode("utf-8")) 
             # prepare string_ref
             # for STRING_REF we have to add to a dict here before start writing
             if curtype == PYWRITER_DTA_STR_REF:
@@ -1001,6 +1005,7 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
                 dict missing_user_values=None,
                 dict variable_format=None,
                 dict variable_alignment = None,
+                dict variable_informat=None,
                        ):
 
 
@@ -1045,4 +1050,4 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
 
     run_write(df, dst_path, writer_file_format, file_label, column_labels, 
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, row_compression)
+        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression)

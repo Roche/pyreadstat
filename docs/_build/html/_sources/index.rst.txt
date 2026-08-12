@@ -36,6 +36,8 @@ object contains the following fields:
     value_labels. Sas7bdat files may have this member populated and its information can be used to match the information
     in the value_labels coming from the sas7bcat file.
   * original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.
+  * original_variable_informats : a dict of variable name to variable SAS informat in the original file. For debugging purposes.
+    will be populated only for sas7bdat and xport files if available.
   * readstat_variable_types : a dict of variable name to variable type in the original file as extracted by Readstat.i
     For debugging purposes. In SAS and SPSS variables will be either double (numeric in the original app) or string (character).
     Stata has in addition int8, int32 and float types.

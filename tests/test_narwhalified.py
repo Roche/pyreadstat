@@ -16,12 +16,14 @@
 # #############################################################################
 
 from datetime import datetime, timedelta, date
+from concurrent.futures import ThreadPoolExecutor
 import unittest
 import os
 import sys
 import shutil
 import multiprocessing as mp
 import tempfile
+import time
 import zipfile
 import io
 
@@ -289,6 +291,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(meta.number_rows==len(df))
+        self.assertTrue(meta.original_variable_informats['MYDATE'] == 'YYMMDD10')
         #self.assertTrue(meta.creation_time==datetime(2018, 8, 14, 10, 55, 46))
         #self.assertTrue(meta.modification_time==datetime(2018, 8, 14, 10, 55, 46))
 
@@ -904,8 +907,11 @@ class TestBasic(unittest.TestCase):
         table_name = "TEST"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
         path = os.path.join(self.write_folder, "write.xpt")
-        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name, file_format_version=8)
+        informats = {'mychar': '$1', 'mynum': 'BEST32', 'mydate': 'YYMMDD10', 'dtime': 'ANYDTDTM40', 'mylabl': 'BEST32', 'myord': 'BEST32', 'mytime': 'TIME20.3'}
+        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name,
+                               file_format_version=8, variable_informat=informats)
         df, meta = pyreadstat.read_xport(path, output_format=self.backend)
+        self.assertTrue(meta.original_variable_informats['mydate'] == 'YYMMDD10')
         df.columns = [x.lower() for x in df.columns]
 
         self.assertTrue(df.equals(self.df_pandas))
@@ -969,6 +975,12 @@ class TestBasic(unittest.TestCase):
         pyreadstat.write_xport(self.df_sas_dates2, path)
         df, meta = pyreadstat.read_xport(path, output_format=self.backend)
         self.assertTrue(df.equals(self.df_sas_dates2))
+
+    def test_xport_write_fractional_seconds(self):
+        path = os.path.join(self.write_folder, "fractional_seconds.xpt")
+        pyreadstat.write_xport(self.df_sas_fractional_seconds, path)
+        df, meta = pyreadstat.read_xport(path, output_format=self.backend)
+        self.assertTrue(df.equals(self.df_sas_fractional_seconds))
 
     def test_sav_write_charnan(self):
         path = os.path.join(self.write_folder, "charnan.sav")
@@ -1361,6 +1373,37 @@ class TestBasic(unittest.TestCase):
         df2, meta = pyreadstat.read_sav(path,  output_format=self.backend)
         self.assertTrue(df_ori.to_native().equals(df2))
 
+    def test_write_sav_locked_file(self):
+        """Test that writing to a locked or unwritable file raises PyreadstatError, not a crash (issue #328)."""
+        from pyreadstat._readstat_parser import PyreadstatError
+        import stat
+
+        df = nw.from_native(self.df_pandas).to_native()
+        path = os.path.join(self.write_folder, "locked_write_test.sav")
+
+        if os.name == "nt":
+            import msvcrt
+            pyreadstat.write_sav(df, path)
+            f = open(path, "r+b")
+            msvcrt.locking(f.fileno(), msvcrt.LK_NBLCK, 1)
+            try:
+                with self.assertRaises(PyreadstatError):
+                    pyreadstat.write_sav(df, path)
+            finally:
+                msvcrt.locking(f.fileno(), msvcrt.LK_UNLCK, 1)
+                f.close()
+                os.remove(path)
+        else:
+            pyreadstat.write_sav(df, path)
+            os.chmod(path, stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+            try:
+                if os.getuid() != 0:
+                    with self.assertRaises(PyreadstatError):
+                        pyreadstat.write_sav(df, path)
+            finally:
+                os.chmod(path, stat.S_IRWXU)
+                os.remove(path)
+
     def test_read_sav_file_handle(self):
         """Test reading SAV file from file-like object (e.g., zip archive)"""
         sav_file = os.path.join(self.basic_data_folder, "sample.sav")
@@ -1378,6 +1421,32 @@ class TestBasic(unittest.TestCase):
                     
                     self.assertEqual(len(df.columns), len(self.df_pandas.columns))
                     self.assertEqual(len(df), len(self.df_pandas))
+    def test_read_sav_bytesio_threads(self):
+        """Test reading SAV file from file-like object in multiple threads at once (tests thread safety)"""
+
+        class SlowBytesIO(io.BytesIO):
+            """A BytesIO that sleeps a bit on each read. This subclass is necessary because we want
+            to test paralell threads reading at the same time, but the test data is so small that
+            the reads are too fast to overlap. """
+            def read(self, *args, **kwargs):
+                time.sleep(0.001)
+                return super().read(*args, **kwargs)
+
+        def read_sav_file(buffer):
+            df, meta = pyreadstat.read_sav(buffer, output_format=self.backend)
+            return df, meta
+
+        sav_file = os.path.join(self.basic_data_folder, "sample.sav")
+        with open(sav_file, "rb") as f:
+            file_bytes = f.read()
+        num_threads = 5
+        buffers = [SlowBytesIO(file_bytes) for _ in range(num_threads)]
+        with ThreadPoolExecutor(max_workers=num_threads) as executor:
+            results = list(executor.map(read_sav_file, buffers))
+        for df, meta in results:
+            self.assertEqual(len(df.columns), len(self.df_pandas.columns))
+            self.assertEqual(len(df), len(self.df_pandas))
+            self.assertListEqual(list(df.columns), list(self.df_pandas.columns))
 
     def test_read_sav_bytesio(self):
         """Test reading SAV file from BytesIO (simulates remote/streaming data)"""

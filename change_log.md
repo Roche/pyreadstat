@@ -1,3 +1,7 @@
+# 1.3.6 (github, pypi and conda 2026.xx.xx)
+* Fixing #328, #336, #342, #344, #287, #307
+* Updated Readstat sources to 634f40a80d27221848ba57e9fb633b41146bac36
+
 # 1.3.5 (github, pypi and conda 2026.05.19)
 * Readstat sources updated to commit 3add3a5eaac6df24d938beffb9148792e362d9ef
 * date, datetime and time formats are now used without precision, decreasing the

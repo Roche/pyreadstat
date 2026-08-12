@@ -101,6 +101,7 @@ cdef class data_container:
         self.col_dytpes_isfloat = list()
         self.col_formats = list()
         self.col_formats_original = list()
+        self.col_informats_original = list()
         self.origin = None
         self.unix_to_origin_secs = 0
         self.is_unkown_number_rows = 0
@@ -293,7 +294,7 @@ cdef object convert_readstat_to_python_value(readstat_value_t value, int index, 
     cdef py_file_format file_format
     cdef object result
 
-    cdef char * c_str_value
+    cdef const char * c_str_value
     cdef str py_str_value
     cdef int8_t c_int8_value
     cdef int16_t c_int16_value
@@ -385,15 +386,15 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
     cdef int var_count, obs_count, mr_len
     cdef  data_container dc = <data_container> ctx
     #cdef object row
-    cdef char * flabel_orig
-    cdef char * fencoding_orig
+    cdef const char * flabel_orig
+    cdef const char * fencoding_orig
     cdef str flabel, fencoding
     cdef bint metaonly
-    cdef char * table
+    cdef const char * table
     cdef int ctime
     cdef int mtime
     cdef int i = 0
-    cdef mr_set_t * mr_sets_orig
+    cdef const mr_set_t * mr_sets_orig
     cdef dict mr_sets = {}
     cdef str name
     cdef list variable_list = []
@@ -468,10 +469,11 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     if any.
     """
 
-    cdef char * var_name, 
-    cdef char * var_label
-    cdef char * var_format
-    cdef str col_name, col_label, label_name, col_format_original, output_format
+    cdef const char * var_name, 
+    cdef const char * var_label
+    cdef const char * var_format
+    cdef const char * var_informat
+    cdef str col_name, col_label, label_name, col_format_original, col_informat_original, output_format
     cdef py_datetime_format col_format_final
     cdef readstat_type_t var_type
     cdef py_file_format file_format
@@ -541,8 +543,15 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
         col_format_original = None
     else:
         col_format_original = <str>var_format
+    # informat (SAS)
+    var_informat = readstat_variable_get_informat(variable)
+    if var_informat == NULL:
+        col_informat_original = None
+    else:
+        col_informat_original = <str>var_informat
     file_format = dc.file_format
     dc.col_formats_original.append(col_format_original)
+    dc.col_informats_original.append(col_informat_original)
     col_format_final = transform_variable_format(col_format_original, file_format)
     dc.col_formats.append(col_format_final)
     # readstat type
@@ -742,7 +751,7 @@ cdef int handle_value_label(char *val_labels, readstat_value_t value, char *labe
 
     cdef  data_container dc = <data_container> ctx
 
-    cdef char * c_str_value
+    cdef const char * c_str_value
     cdef str py_str_value
     cdef int8_t c_int8_value
     cdef int16_t c_int16_value
@@ -852,7 +861,6 @@ cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_
         return -1
 
 
-cdef object _file_object_ctx = None
 
 cdef int pyobject_open_handler(const char *path, void *io_ctx) noexcept:
     """File is already open - this is a no-op"""
@@ -864,13 +872,12 @@ cdef int pyobject_close_handler(void *io_ctx) noexcept:
 
 cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexcept:
     """Bridge Python file.read() to C read operation"""
-    global _file_object_ctx
     cdef bytes data
     cdef ssize_t bytes_read
     cdef char *data_ptr
-    
+    cdef object file_obj = <object> io_ctx
+
     try:
-        file_obj = _file_object_ctx
         data = file_obj.read(nbyte)
         bytes_read = len(data)
         if bytes_read > 0:
@@ -882,18 +889,17 @@ cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexce
 
 cdef readstat_off_t pyobject_seek_handler(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx) noexcept:
     """Bridge Python file.seek() to C seek operation"""
-    global _file_object_ctx
     cdef int py_whence
-    
+    cdef object file_obj = <object> io_ctx
+
     try:
-        file_obj = _file_object_ctx
         if whence == READSTAT_SEEK_SET:
             py_whence = 0
         elif whence == READSTAT_SEEK_CUR:
             py_whence = 1
         else:  # READSTAT_SEEK_END
             py_whence = 2
-        
+
         file_obj.seek(offset, py_whence)
         return file_obj.tell()
     except:
@@ -905,7 +911,7 @@ cdef void check_exit_status(readstat_error_t retcode) except *:
     transforms a readstat exit status to a python error if status is not READSTAT OK
     """
 
-    cdef char * err_readstat
+    cdef const char * err_readstat
     cdef str err_message
     if retcode != READSTAT_OK:
         err_readstat = readstat_error_message(retcode)
@@ -916,11 +922,9 @@ cdef void check_exit_status(readstat_error_t retcode) except *:
 cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset, object file_obj=None) except *:
     """
     Runs the parsing of the file by readstat library.
-    
+
     If file_obj is provided, it will be used instead of filename for I/O operations.
     """
-    global _file_object_ctx
-    
     cdef readstat_parser_t *parser
     cdef readstat_error_t error
     cdef readstat_metadata_handler metadata_handler
@@ -943,7 +947,7 @@ cdef void run_readstat_parser(char * filename, data_container data, py_file_exte
     metaonly = data.metaonly
     ctx = <void *>data
     
-    #readstat_error_t error = READSTAT_OK;
+    error = READSTAT_OK;
     parser = readstat_parser_init()
     metadata_handler = <readstat_metadata_handler> handle_metadata
     variable_handler = <readstat_variable_handler> handle_variable
@@ -959,11 +963,12 @@ cdef void run_readstat_parser(char * filename, data_container data, py_file_exte
 
     # Set up custom I/O handlers for file objects
     if file_obj is not None:
-        _file_object_ctx = file_obj
+        io_ctx = <void *> file_obj
         open_handler = <readstat_open_handler> pyobject_open_handler
         close_handler = <readstat_close_handler> pyobject_close_handler
         read_handler = <readstat_read_handler> pyobject_read_handler
         seek_handler = <readstat_seek_handler> pyobject_seek_handler
+        readstat_set_io_ctx(parser, io_ctx)
         readstat_set_open_handler(parser, open_handler)
         readstat_set_close_handler(parser, close_handler)
         readstat_set_read_handler(parser, read_handler)
@@ -1136,10 +1141,10 @@ cdef object data_container_extract_metadata(data_container data):
     cdef bint is_unkown_number_rows
     cdef object label_to_var_name
     cdef object labels_raw
-    cdef str var_name, var_label
+    cdef str var_name, var_label, cur_type, cur_informat
     cdef object current_labels
     cdef object labels_str
-    cdef object original_types
+    cdef object original_types, original_informats
     cdef readstat_type_t var_type
 
     metaonly = data.metaonly
@@ -1170,11 +1175,14 @@ cdef object data_container_extract_metadata(data_container data):
                 variable_value_labels[var_name] = current_labels
 
     original_types = dict()
+    original_informats = dict()
     readstat_types = dict()
     for indx in range(metadata.number_columns):
         cur_col = data.col_names[indx]
         cur_type = data.col_formats_original[indx]
         original_types[cur_col] = cur_type
+        cur_informat = data.col_informats_original[indx]
+        original_informats[cur_col] = cur_informat
         var_type = data.col_dtypes[indx]
         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
             readstat_types[cur_col] = "string"
@@ -1205,6 +1213,7 @@ cdef object data_container_extract_metadata(data_container data):
     metadata.value_labels = labels_raw
     metadata.variable_to_label = label_to_var_name
     metadata.original_variable_types = original_types
+    metadata.original_variable_informats = original_informats
     metadata.readstat_variable_types = readstat_types
     metadata.table_name = data.table_name
     metadata.missing_ranges = data.missing_ranges

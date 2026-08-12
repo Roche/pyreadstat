@@ -28,6 +28,7 @@ static int readstat_compare_string_refs(const void *elem1, const void *elem2) {
 readstat_string_ref_t *readstat_string_ref_init(const char *string) {
     size_t len = strlen(string) + 1;
     readstat_string_ref_t *ref = calloc(1, sizeof(readstat_string_ref_t) + len);
+    if (ref == NULL) return NULL;
     ref->first_o = -1;
     ref->first_v = -1;
     ref->len = len;
@@ -140,6 +141,7 @@ static readstat_error_t readstat_begin_writing_data(readstat_writer_t *writer) {
     }
     writer->row_len = row_len;
     writer->row = malloc(writer->row_len);
+    if (writer->row == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
     if (writer->callbacks.begin_data) {
         retval = writer->callbacks.begin_data(writer);
     }
@@ -433,6 +435,14 @@ void readstat_variable_set_format(readstat_variable_t *variable, const char *for
         snprintf(variable->format, sizeof(variable->format), "%s", format);
     } else {
         memset(variable->format, '\0', sizeof(variable->format));
+    }
+}
+
+void readstat_variable_set_informat(readstat_variable_t *variable, const char *informat) {
+    if (informat) {
+        snprintf(variable->informat, sizeof(variable->informat), "%s", informat);
+    } else {
+        memset(variable->informat, '\0', sizeof(variable->informat));
     }
 }
 
