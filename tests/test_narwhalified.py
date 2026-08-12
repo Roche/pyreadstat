@@ -291,6 +291,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_columns == len(self.df_pandas.columns))
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(meta.number_rows==len(df))
+        self.assertTrue(meta.original_variable_informats['MYDATE'] == 'YYMMDD10')
         #self.assertTrue(meta.creation_time==datetime(2018, 8, 14, 10, 55, 46))
         #self.assertTrue(meta.modification_time==datetime(2018, 8, 14, 10, 55, 46))
 
@@ -906,8 +907,11 @@ class TestBasic(unittest.TestCase):
         table_name = "TEST"
         col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
         path = os.path.join(self.write_folder, "write.xpt")
-        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name, file_format_version=8)
+        informats = {'mychar': '$1', 'mynum': 'BEST32', 'mydate': 'YYMMDD10', 'dtime': 'ANYDTDTM40', 'mylabl': 'BEST32', 'myord': 'BEST32', 'mytime': 'TIME20.3'}
+        pyreadstat.write_xport(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name,
+                               file_format_version=8, variable_informat=informats)
         df, meta = pyreadstat.read_xport(path, output_format=self.backend)
+        self.assertTrue(meta.original_variable_informats['mydate'] == 'YYMMDD10')
         df.columns = [x.lower() for x in df.columns]
 
         self.assertTrue(df.equals(self.df_pandas))
