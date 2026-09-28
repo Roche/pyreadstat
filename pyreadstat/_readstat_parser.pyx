@@ -419,6 +419,8 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         i = 0
         while i < mr_len:
             name = <str>mr_sets_orig[i].name
+            if name.startswith("$"):
+                name = name[1:]
             variable_list = []
             for j in range(mr_sets_orig[i].num_subvars):
                 variable_list.append(<str>mr_sets_orig[i].subvariables[j])

@@ -567,6 +567,10 @@ static readstat_error_t xport_metadata_ok(void *writer_ctx) {
     return READSTAT_OK;
 }
 
+static readstat_error_t xport_v5_validate_variable(const readstat_variable_t *variable) {
+    return sas_validate_name(readstat_variable_get_name(variable), 8);
+}
+
 readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *user_ctx, long row_count) {
 
     if (writer->version == 0)
@@ -585,7 +589,11 @@ readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *u
     writer->callbacks.write_missing_tagged = &xport_write_missing_tagged;
 
     writer->callbacks.variable_width = &xport_variable_width;
-    writer->callbacks.variable_ok = &sas_validate_variable;
+    if (writer->version == 5) {
+        writer->callbacks.variable_ok = &xport_v5_validate_variable;
+    } else {
+        writer->callbacks.variable_ok = &sas_validate_variable;
+    }
 
     writer->callbacks.begin_data = &xport_begin_data;
     writer->callbacks.end_data = &xport_end_data;

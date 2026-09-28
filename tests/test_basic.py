@@ -330,7 +330,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
@@ -386,7 +386,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
     
     def test_sav_expand(self):
@@ -441,7 +441,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
 
     def test_por(self):
@@ -1076,7 +1076,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
