@@ -781,6 +781,25 @@ class TestBasic(unittest.TestCase):
         df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
         self.assertTrue(df_multi.equals(df_single))
 
+    def test_multiprocess_reader_fewer_rows_than_processes(self):
+        # some workers get 0 rows to read, they should not read the rest of the file
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, num_processes=4, row_offset=10, row_limit=3, output_format=self.backend)
+        df_single, meta_single = pyreadstat.read_sav(fpath, row_offset=10, row_limit=3, output_format=self.backend)
+        self.assertTrue(df_multi.equals(df_single))
+
+    def test_chunk_reader_multiprocess_chunksize_smaller_than_processes(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize=2, offset=0, limit=4, multiprocess=True, num_processes=4, output_format=self.backend)
+        alldfs = list()
+        for df, meta in reader:
+            alldfs.append(nw.from_native(df))
+        df_multi = nw.concat(alldfs, how='vertical').to_native()
+        if self.backend == "pandas":
+            df_multi = df_multi.reset_index(drop=True)
+        df_single, meta_single = pyreadstat.read_sav(fpath, row_offset=0, row_limit=4, output_format=self.backend)
+        self.assertTrue(df_multi.equals(df_single))
+
     def test_multiprocess_reader_xport(self):
         fpath = os.path.join(self.basic_data_folder, "sample.xpt")
         df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_xport, fpath, num_rows=1000, output_format=self.backend) 

@@ -1180,6 +1180,9 @@ def read_file_multiprocessing(
         prev_offset = offset
         prev_div = div
         offsets.append((offset, div))
+    # a chunk with 0 rows would be passed as row_limit=0, which means no limit, and that worker would read
+    # all the remaining rows. Drop those chunks, but keep one if all are empty to get an empty dataframe.
+    offsets = [x for x in offsets if x[1] > 0] or offsets[:1]
     jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset, chunksize in offsets]
     pool = mp.Pool(processes=num_processes)
     try:
