@@ -873,6 +873,29 @@ pyreadstat.write_sav(df, path, variable_format=formats)
 
 There is some information about the possible formats [here](https://www.gnu.org/software/pspp/pspp-dev/html_node/Variable-Record.html).
 
+**Width, Decimals and Columns in SPSS**
+
+SPSS Variable View shows three properties that are easy to mix up. In pyreadstat they map as follows:
+
+| SPSS Variable View | pyreadstat (write) | pyreadstat (read, metadata) |
+| ------------------ | ------------------ | --------------------------- |
+| Width              | `variable_format`, e.g. `"F10.2"` | `original_variable_types` |
+| Decimals           | `variable_format`, e.g. `"F10.2"` | `original_variable_types` |
+| Columns            | `variable_display_width` | `variable_display_width` |
+
+Notice that `variable_display_width` sets **Columns**, not Width. To set Width, set the format:
+
+```python
+import pandas as pd
+import pyreadstat
+
+df = pd.DataFrame({"a": [1.5, 22.25]})
+# Width 10, 2 decimals, shown in a column 25 characters wide
+pyreadstat.write_sav(df, "file.sav", variable_format={"a": "F10.2"}, variable_display_width={"a": 25})
+```
+
+To get the Width of an existing variable, read it from `meta.original_variable_types` (e.g. `"F5.0"` is width 5, 0 decimals).
+
 #### Variable type conversion
 
 The following rules are used in order to convert from pandas/polars/numpy/python types to the target file types:

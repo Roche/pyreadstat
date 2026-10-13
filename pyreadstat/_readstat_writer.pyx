@@ -274,7 +274,11 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
 
         # if categorical, let's use the type of the categories
         if col_type == nw.Categorical:
-            col_type = curseries.cat.get_categories().dtype
+            if df.implementation.is_pandas():
+                col_type = curseries.cat.get_categories().dtype
+            else:
+                # polars 2 removed Series.cat.get_categories(); polars categories are always strings
+                col_type = nw.String
 
         # we need to remove nulls for series inspection
         has_missing = <bint>curseries.null_count()>0

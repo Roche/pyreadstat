@@ -1,5 +1,6 @@
 # 1.3.7 (github, pypi and conda 2026.xx.xx)
-* Updated Readstat sources to 835b88c
+* Updated Readstat sources to 98813868140c835fd56ce61de5894c3359b15c5e
+* Updated source code and tests for polars 2
 * variable_storage_width for SPSS string variables now returns the declared
   string width instead of the internal segment size (e.g., 1 for A1 instead of 8)
 * The Readstat update solves #340, #298, #265 and #246

@@ -40,6 +40,7 @@ except:
     pass
 
 is_pandas_version_newer_than_2 = int(pd.__version__.split(".")[0])>2
+is_polars_version_newer_than_1 = int(pl.__version__.split(".")[0])>1
 
 class TestBasic(unittest.TestCase):
     """
@@ -121,7 +122,10 @@ class TestBasic(unittest.TestCase):
         if backend == "polars":
             kwds["null_values"] = "#NULL!"
             kwds["try_parse_dates"] = True
-            kwds["missing_utf8_is_empty_string"] = True
+            if is_polars_version_newer_than_1:
+                kwds["empty_string_is_null"] = False
+            else:
+                kwds["missing_utf8_is_empty_string"] = True
         df_missing_sav = nw.read_csv(pandas_missing_sav_csv, backend=backend, **kwds )
         df_missing_sav = df_missing_sav.to_native()
         if backend == "pandas":
@@ -1184,12 +1188,14 @@ class TestBasic(unittest.TestCase):
     def test_sav_ordered_categories(self):
         path = os.path.join(self.basic_data_folder, "ordered_category.sav")
         df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True, output_format=self.backend)
-        # in polars it is enum, it is ordered by default
         if self.backend == "pandas":
             self.assertTrue(df["Col1"].cat.ordered)
+            categories = nw.from_native(df)["Col1"].cat.get_categories().to_list()
         else:
-            self.assertTrue(type(nw.from_native(df)["Col1"].dtype)==nw.Enum)
-        self.assertListEqual(list(nw.from_native(df)["Col1"].cat.get_categories().to_list()), ['high', 'low', 'medium'])
+            # in polars it is enum, it is ordered by default
+            self.assertTrue(type(nw.from_native(df)["Col1"].dtype) == nw.Enum)
+            categories = nw.from_native(df)["Col1"].dtype.categories
+        self.assertListEqual(list(categories), ['high', 'low', 'medium'])
 
     def test_sav_pathlib(self):
         if is_pathlib_available:

@@ -1261,14 +1261,17 @@ def write_sav(
         For this to be effective, values in the dataframe must be the same as reported here and not NaN.
     variable_display_width : dict, optional
         set the display width for variables. Must be a dictonary with keys being variable names and
-        values being integers.
+        values being integers. In SPSS this sets the "Columns" property of the variable (how wide the
+        column is displayed), not its "Width". To set Width (and Decimals) use variable_format
+        instead, e.g. {"var": "F10.2"} for width 10 and 2 decimals.
     variable_measure: dict, optional
         sets the measure type for a variable. Must be a dictionary with keys being variable names and
         values being strings one of "nominal", "ordinal", "scale" or "unknown" (default).
     variable_format: dict, optional
         sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
-        for more information.
+        for more information. In SPSS the Width and Decimals shown in Variable View are part of the
+        format (e.g. "F10.2").
     """
     writer_format = "sav"
 
