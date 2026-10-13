@@ -12,6 +12,7 @@
 #include "../readstat_iconv.h"
 #include "../readstat_convert.h"
 #include "../readstat_writer.h"
+#include "../readstat_strings.h"
 
 #define SAS_FILE_HEADER_SIZE_32BIT 1024
 #define SAS_FILE_HEADER_SIZE_64BIT 8192
@@ -24,6 +25,13 @@ unsigned char sas7bdat_magic_number[32] = {
     0x00, 0x00, 0x00, 0x00,   0xc2, 0xea, 0x81, 0x60,
     0xb3, 0x14, 0x11, 0xcf,   0xbd, 0x92, 0x08, 0x00,
     0x09, 0xc7, 0x31, 0x8c,   0x18, 0x1f, 0x10, 0x11
+};
+
+unsigned char sas7bdat_magic_number_alt[32] = {
+    0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,   0x18, 0x1f, 0x10, 0x11
 };
 
 unsigned char sas7bcat_magic_number[32] = {
@@ -172,6 +180,7 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         goto cleanup;
     }
     if (memcmp(header_start.magic, sas7bdat_magic_number, sizeof(sas7bdat_magic_number)) != 0 &&
+            memcmp(header_start.magic, sas7bdat_magic_number_alt, sizeof(sas7bdat_magic_number_alt)) != 0 &&
             memcmp(header_start.magic, sas7bcat_magic_number, sizeof(sas7bcat_magic_number)) != 0) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
@@ -310,14 +319,14 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         retval = READSTAT_ERROR_READ;
         goto cleanup;
     }
-    char major, revision_tag;
-    int minor, revision;
+    char major, revision_tag, revision;
+    int minor;
     /* The release field is not NUL-terminated in the file; copy it into a
      * terminated buffer before handing it to sscanf, which calls strlen on it. */
     char release[sizeof(header_end.release)+1];
     memcpy(release, header_end.release, sizeof(header_end.release));
     release[sizeof(header_end.release)] = '\0';
-    if (sscanf(release, "%c.%04d%c%1d", &major, &minor, &revision_tag, &revision) != 4) {
+    if (sscanf(release, "%c.%04d%c%c", &major, &minor, &revision_tag, &revision) != 4) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
@@ -333,14 +342,23 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         goto cleanup;
     }
     // revision_tag is usually M, but J has been observed in the wild (not created with SAS?)
-    if ((major == '8' || major == '9') && revision_tag != 'M' && revision_tag != 'J') {
+    // files have also been observed with TK in place of the revision details.
+    if ((major == '8' || major == '9') && revision_tag != 'M' && revision_tag != 'J' && revision_tag != 'T') {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
     hinfo->minor_version = minor;
-    hinfo->revision = revision;
+    if (revision >= '0' && revision <= '9') {
+        hinfo->revision = revision - '0';
+    } else if (revision_tag == 'T' && revision == 'K') {
+        // files have been observed with TK in place of the revision details.
+        hinfo->revision = 0;
+    } else {
+        retval = READSTAT_ERROR_PARSE;
+        goto cleanup;
+    }
 
-    if ((major == '8' || major == '9') && minor == 0 && revision == 0) {
+    if ((major == '8' || major == '9') && minor == 0 && hinfo->revision == 0) {
         /* A bit of a hack, but most SAS installations are running a minor update */
         hinfo->vendor = READSTAT_VENDOR_STAT_TRANSFER;
     } else {
@@ -437,18 +455,19 @@ readstat_error_t sas_write_header(readstat_writer_t *writer, sas_header_info_t *
 
     memcpy(&header[84], header_start.file_type, sizeof(header_start.file_type));
 
-    /* Dataset name: 64 bytes, space padded */
+    /* Dataset name: 64 bytes. SAS space-pads the name to 32 bytes (the
+     * maximum length of a SAS name) and leaves the rest as NULs. */
     if (writer->table_name[0]) {
-        sas_write_padded_ascii((char *)&header[92], 64, writer->table_name, ' ');
+        sas_write_padded_ascii((char *)&header[92], 32, writer->table_name, ' ');
     } else {
-        sas_write_padded_ascii((char *)&header[92], 64, "DATASET", ' ');
+        sas_write_padded_ascii((char *)&header[92], 32, "DATASET", ' ');
     }
 
     memcpy(&header[156], header_start.file_info, sizeof(header_start.file_info));
 
     double utc_offset = sas_local_utc_offset(writer->timestamp);
-    double creation_time = (double)(hinfo->creation_time - epoch) + utc_offset;
-    double modification_time = (double)(hinfo->modification_time - epoch) + utc_offset;
+    double creation_time = (double)(hinfo->creation_time - epoch) + utc_offset + writer->timestamp_fraction;
+    double modification_time = (double)(hinfo->modification_time - epoch) + utc_offset + writer->timestamp_fraction;
 
     off = 164 + a1;
     memcpy(&header[off], &creation_time, sizeof(double));
@@ -472,26 +491,31 @@ readstat_error_t sas_write_header(readstat_writer_t *writer, sas_header_info_t *
 
     char release[9];
     if (writer->version == 9) {
-        snprintf(release, sizeof(release), "9.0401M2");
+        snprintf(release, sizeof(release), "9.0401M5");
     } else {
         snprintf(release, sizeof(release), "%1d.0202M0", (unsigned int)writer->version % 10);
     }
     memcpy(&header[off], release, 8);
     sas_write_padded_ascii((char *)&header[off+8], 16, "Linux", '\0');   /* host */
-    sas_write_padded_ascii((char *)&header[off+24], 16, "", '\0');       /* OS version */
+    sas_write_padded_ascii((char *)&header[off+24], 16, "3.10.0-1160.11.1", '\0'); /* OS version */
     sas_write_padded_ascii((char *)&header[off+40], 16, "", '\0');       /* OS vendor */
     sas_write_padded_ascii((char *)&header[off+56], 16, "x86_64", '\0'); /* OS name */
 
-    /* Bytes 288-303 are involved in the READ-password check. SAS derives them
-     * from the creation date (and the password, if any); the derivation is not
-     * known, so use a pair of values copied from an unencrypted SAS dataset,
-     * which SAS accepts. */
-    uint32_t pattern1 = 0xD4C8C038;
-    uint32_t pattern2 = 0xB1A78E74;
-    memcpy(&header[off+72], &pattern1, sizeof(uint32_t));
-    memcpy(&header[off+76], &pattern2, sizeof(uint32_t));
-    memcpy(&header[off+80], &pattern2, sizeof(uint32_t));
-    memcpy(&header[off+84], &pattern2, sizeof(uint32_t));
+    /* Bytes 288-303 are a password checksum. The first 4 bytes are the low
+     * 32 bits of the creation time (as stored, in native byte order). The
+     * next three 4-byte fields correspond to SAS's three dataset passwords
+     * (READ=, WRITE= and ALTER=). For a dataset without passwords, each one
+     * is the first 4 bytes XORed with "LNoe". This holds in every
+     * SAS-written file we have examined. */
+    const unsigned char *salt = (const unsigned char *)&creation_time;
+    if (!machine_is_little_endian())
+        salt += 4;
+    for (int i=0; i<4; i++) {
+        header[off+72+i] = salt[i];
+        header[off+76+i] = salt[i] ^ "LNoe"[i];
+        header[off+80+i] = salt[i] ^ "LNoe"[i];
+        header[off+84+i] = salt[i] ^ "LNoe"[i];
+    }
 
     /* 304-319: zeros */
 
@@ -578,6 +602,39 @@ readstat_error_t sas_validate_tag(char tag) {
         return READSTAT_OK;
 
     return READSTAT_ERROR_TAGGED_VALUE_IS_OUT_OF_RANGE;
+}
+
+static int sas_compare_names(const void *elem1, const void *elem2) {
+    return strcasecmp(*(const char **)elem1, *(const char **)elem2);
+}
+
+/* SAS variable names are case-insensitive, so "name" and "Name" collide. */
+readstat_error_t sas_validate_unique_names(readstat_writer_t *writer) {
+    readstat_error_t retval = READSTAT_OK;
+    const char **names = NULL;
+    int i;
+
+    if (writer->variables_count < 2)
+        goto cleanup;
+
+    if ((names = malloc(writer->variables_count * sizeof(const char *))) == NULL) {
+        retval = READSTAT_ERROR_MALLOC;
+        goto cleanup;
+    }
+    for (i=0; i<writer->variables_count; i++) {
+        names[i] = readstat_variable_get_name(readstat_get_variable(writer, i));
+    }
+    qsort(names, writer->variables_count, sizeof(const char *), &sas_compare_names);
+    for (i=1; i<writer->variables_count; i++) {
+        if (strcasecmp(names[i-1], names[i]) == 0) {
+            retval = READSTAT_ERROR_DUPLICATE_VARIABLE_NAME;
+            goto cleanup;
+        }
+    }
+
+cleanup:
+    free(names);
+    return retval;
 }
 
 void sas_assign_tag(readstat_value_t *value, uint8_t tag) {
