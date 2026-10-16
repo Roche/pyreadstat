@@ -1117,8 +1117,8 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
                 data_frame = data_frame.with_columns(
                     [
                         pl.from_epoch(
-                            (pl.col(c) % 1 * 1e6).round().cast(pl.Int64) + (
-                                    pl.col(c).floor() * 1e6).cast(pl.Int64) - (
+                            (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (
+                                    pl.col(c).cast(pl.Float64).floor() * 1e6).cast(pl.Int64) - (
                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
                             time_unit='us')
                         for c in datetime_cols if data_frame[c].len() > 0
