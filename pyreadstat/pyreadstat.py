@@ -1197,6 +1197,26 @@ def read_file_multiprocessing(
         final = {key: list(chain.from_iterable(chunk[key] for chunk in chunks)) for key in keys}
     else:
         # final = pd.concat(chunks, axis=0, ignore_index=True)
+        if output_format == "polars":
+            import polars as pl
+
+            # All-null chunks have no inferred type. Use the type from a
+            # populated chunk without coercing conflicting non-null types.
+            schemas = [chunk.schema for chunk in chunks]
+            populated_types = {
+                name: dtype
+                for schema in schemas
+                for name, dtype in schema.items()
+                if dtype != pl.Null
+            }
+            chunks = [
+                chunk.cast({
+                    name: populated_types[name]
+                    for name, dtype in schema.items()
+                    if dtype == pl.Null and name in populated_types
+                })
+                for chunk, schema in zip(chunks, schemas)
+            ]
         chunks = [nw.from_native(x) for x in chunks]
         final = nw.concat(chunks, how="vertical")
         ispandas = False

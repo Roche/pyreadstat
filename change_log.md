@@ -1,4 +1,5 @@
 # 1.3.7 (github, pypi and conda 2026.xx.xx)
+* Fix parallel Polars reads when a chunk contains only missing values, including datetime columns (#350)
 * Updated Readstat sources to 98813868140c835fd56ce61de5894c3359b15c5e
 * Updated source code and tests for polars 2
 * variable_storage_width for SPSS string variables now returns the declared
