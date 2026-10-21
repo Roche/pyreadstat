@@ -12,6 +12,7 @@
 #include "../readstat_iconv.h"
 #include "../readstat_convert.h"
 #include "../readstat_writer.h"
+#include "../readstat_strings.h"
 
 #define SAS_FILE_HEADER_SIZE_32BIT 1024
 #define SAS_FILE_HEADER_SIZE_64BIT 8192
@@ -24,6 +25,13 @@ unsigned char sas7bdat_magic_number[32] = {
     0x00, 0x00, 0x00, 0x00,   0xc2, 0xea, 0x81, 0x60,
     0xb3, 0x14, 0x11, 0xcf,   0xbd, 0x92, 0x08, 0x00,
     0x09, 0xc7, 0x31, 0x8c,   0x18, 0x1f, 0x10, 0x11
+};
+
+unsigned char sas7bdat_magic_number_alt[32] = {
+    0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00,   0x18, 0x1f, 0x10, 0x11
 };
 
 unsigned char sas7bcat_magic_number[32] = {
@@ -55,6 +63,7 @@ static readstat_charset_entry_t _charset_table[] = {
     { .code = 35,    .name = "ISO-8859-7" },
     { .code = 36,    .name = "ISO-8859-8" },
     { .code = 37,    .name = "ISO-8859-9" },
+    { .code = 38,    .name = "ISO-8859-10" },
     { .code = 39,    .name = "ISO-8859-11" },
     { .code = 40,    .name = "ISO-8859-15" },
     { .code = 41,    .name = "CP437" },
@@ -99,7 +108,7 @@ static readstat_charset_entry_t _charset_table[] = {
     { .code = 126,   .name = "WINDOWS-936" }, // "zwin"
     { .code = 128,   .name = "CP1381" }, // "zpce"
     { .code = 134,   .name = "EUC-JP" },
-    { .code = 136,   .name = "CP949" },
+    { .code = 136,   .name = "CP932" }, // "ms-932" in SAS
     { .code = 137,   .name = "CP942" },
     { .code = 138,   .name = "CP932" }, // "shift-jis" in SAS
     { .code = 140,   .name = "EUC-KR" },
@@ -171,6 +180,7 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         goto cleanup;
     }
     if (memcmp(header_start.magic, sas7bdat_magic_number, sizeof(sas7bdat_magic_number)) != 0 &&
+            memcmp(header_start.magic, sas7bdat_magic_number_alt, sizeof(sas7bdat_magic_number_alt)) != 0 &&
             memcmp(header_start.magic, sas7bcat_magic_number, sizeof(sas7bcat_magic_number)) != 0) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
@@ -309,9 +319,14 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         retval = READSTAT_ERROR_READ;
         goto cleanup;
     }
-    char major, revision_tag;
-    int minor, revision;
-    if (sscanf(header_end.release, "%c.%04d%c%1d", &major, &minor, &revision_tag, &revision) != 4) {
+    char major, revision_tag, revision;
+    int minor;
+    /* The release field is not NUL-terminated in the file; copy it into a
+     * terminated buffer before handing it to sscanf, which calls strlen on it. */
+    char release[sizeof(header_end.release)+1];
+    memcpy(release, header_end.release, sizeof(header_end.release));
+    release[sizeof(header_end.release)] = '\0';
+    if (sscanf(release, "%c.%04d%c%c", &major, &minor, &revision_tag, &revision) != 4) {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
@@ -327,14 +342,23 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
         goto cleanup;
     }
     // revision_tag is usually M, but J has been observed in the wild (not created with SAS?)
-    if (revision_tag != 'M' && revision_tag != 'J') {
+    // files have also been observed with TK in place of the revision details.
+    if ((major == '8' || major == '9') && revision_tag != 'M' && revision_tag != 'J' && revision_tag != 'T') {
         retval = READSTAT_ERROR_PARSE;
         goto cleanup;
     }
     hinfo->minor_version = minor;
-    hinfo->revision = revision;
+    if (revision >= '0' && revision <= '9') {
+        hinfo->revision = revision - '0';
+    } else if (revision_tag == 'T' && revision == 'K') {
+        // files have been observed with TK in place of the revision details.
+        hinfo->revision = 0;
+    } else {
+        retval = READSTAT_ERROR_PARSE;
+        goto cleanup;
+    }
 
-    if ((major == '8' || major == '9') && minor == 0 && revision == 0) {
+    if ((major == '8' || major == '9') && minor == 0 && hinfo->revision == 0) {
         /* A bit of a hack, but most SAS installations are running a minor update */
         hinfo->vendor = READSTAT_VENDOR_STAT_TRANSFER;
     } else {
@@ -354,88 +378,157 @@ cleanup:
     return retval;
 }
 
+/* Seconds between local time and UTC at the given instant (local - UTC).
+ * SAS stores its timestamps in local time and records this offset next to them. */
+static double sas_local_utc_offset(time_t timestamp) {
+    struct tm *gmt = gmtime(&timestamp);
+    if (gmt == NULL)
+        return 0;
+    struct tm utc_as_local = *gmt;
+    utc_as_local.tm_isdst = -1;
+    time_t reinterpreted = mktime(&utc_as_local);
+    if (reinterpreted == (time_t)-1)
+        return 0;
+    return difftime(timestamp, reinterpreted);
+}
+
+static void sas_write_padded_ascii(char *dst, size_t dst_len, const char *src, char pad) {
+    size_t len = strlen(src);
+    if (len > dst_len)
+        len = dst_len;
+    memcpy(dst, src, len);
+    memset(dst + len, pad, dst_len - len);
+}
+
+/* The layout of the file header follows the sas7bdat specification
+ * (Shotwell & Yu, as updated by FredHutch/sas7bdat-specification).
+ * Bytes with no known meaning are set to the constant values observed
+ * in every file written by SAS 9. */
 readstat_error_t sas_write_header(readstat_writer_t *writer, sas_header_info_t *hinfo, sas_header_start_t header_start) {
     readstat_error_t retval = READSTAT_OK;
     time_t epoch = sas_epoch();
+    int u64 = hinfo->u64;
+    int a1 = (header_start.a1 == SAS_ALIGNMENT_OFFSET_4) ? 4 : 0;
+    int a2 = u64 ? 4 : 0;
+    size_t off = 0;
+    unsigned char *header = calloc(1, hinfo->header_size);
+    if (header == NULL)
+        return READSTAT_ERROR_MALLOC;
 
-    memset(header_start.table_name, ' ', sizeof(header_start.table_name));
+    unsigned char encoding = header_start.encoding ? header_start.encoding : 20; /* UTF-8 */
 
-    size_t table_name_len = strlen(writer->table_name);
-    if (table_name_len > sizeof(header_start.table_name))
-        table_name_len = sizeof(header_start.table_name);
+    memcpy(header, &header_start, sizeof(sas_header_start_t));
 
-    if (table_name_len) {
-        memcpy(header_start.table_name, writer->table_name, table_name_len);
+    header[32] = u64 ? SAS_ALIGNMENT_OFFSET_4 : SAS_ALIGNMENT_OFFSET_0;
+    header[33] = 0x22;
+    header[34] = 0x00;
+    header[35] = header_start.a1;
+    header[36] = a1 ? 0x33 : 0x22;
+    header[37] = header_start.endian;
+    header[38] = 0x02;
+    header[39] = header_start.file_format;
+    header[40] = u64 ? 0x01 : 0x04;
+    memset(&header[41], 0, 6);
+    header[47] = encoding;
+    header[48] = 0x00;
+    header[49] = 0x00;
+    header[50] = 0x03;
+    header[51] = 0x01;
+    header[52] = 0x18;
+    header[53] = 0x1F;
+    header[54] = 0x10;
+    header[55] = 0x11;
+    memcpy(&header[56], &header[32], 8);
+    header[64] = u64 ? 0x01 : 0x04;
+    header[65] = u64 ? 0x33 : 0x32;
+    header[66] = 0x01;
+    header[67] = u64 ? 0x23 : 0x22;
+    header[68] = u64 ? 0x33 : 0x22;
+    header[69] = 0x00;
+    header[70] = encoding;
+    header[71] = encoding;
+    header[72] = 0x00;
+    header[73] = u64 ? 0x20 : 0x10;
+    header[74] = 0x03;
+    header[75] = 0x01;
+    memset(&header[76], 0, 8);
+
+    memcpy(&header[84], header_start.file_type, sizeof(header_start.file_type));
+
+    /* Dataset name: 64 bytes. SAS space-pads the name to 32 bytes (the
+     * maximum length of a SAS name) and leaves the rest as NULs. */
+    if (writer->table_name[0]) {
+        sas_write_padded_ascii((char *)&header[92], 32, writer->table_name, ' ');
     } else {
-        memcpy(header_start.table_name, "DATASET", sizeof("DATASET")-1);
+        sas_write_padded_ascii((char *)&header[92], 32, "DATASET", ' ');
     }
 
-    retval = readstat_write_bytes(writer, &header_start, sizeof(sas_header_start_t));
-    if (retval != READSTAT_OK)
-        goto cleanup;
+    memcpy(&header[156], header_start.file_info, sizeof(header_start.file_info));
 
-    retval = readstat_write_zeros(writer, hinfo->pad1);
-    if (retval != READSTAT_OK)
-        goto cleanup;
+    double utc_offset = sas_local_utc_offset(writer->timestamp);
+    double creation_time = (double)(hinfo->creation_time - epoch) + utc_offset + writer->timestamp_fraction;
+    double modification_time = (double)(hinfo->modification_time - epoch) + utc_offset + writer->timestamp_fraction;
 
-    double creation_time = hinfo->creation_time - epoch;
-
-    retval = readstat_write_bytes(writer, &creation_time, sizeof(double));
-    if (retval != READSTAT_OK)
-        goto cleanup;
-
-    double modification_time = hinfo->modification_time - epoch;
-
-    retval = readstat_write_bytes(writer, &modification_time, sizeof(double));
-    if (retval != READSTAT_OK)
-        goto cleanup;
-
-    retval = readstat_write_zeros(writer, 16);
-    if (retval != READSTAT_OK)
-        goto cleanup;
+    off = 164 + a1;
+    memcpy(&header[off], &creation_time, sizeof(double));
+    memcpy(&header[off+8], &modification_time, sizeof(double));
+    memcpy(&header[off+16], &utc_offset, sizeof(double));
+    memcpy(&header[off+24], &utc_offset, sizeof(double));
 
     uint32_t header_size = hinfo->header_size;
     uint32_t page_size = hinfo->page_size;
-
-    retval = readstat_write_bytes(writer, &header_size, sizeof(uint32_t));
-    if (retval != READSTAT_OK)
-        goto cleanup;
-
-    retval = readstat_write_bytes(writer, &page_size, sizeof(uint32_t));
-    if (retval != READSTAT_OK)
-        goto cleanup;
-
-    if (hinfo->u64) {
+    memcpy(&header[off+32], &header_size, sizeof(uint32_t));
+    memcpy(&header[off+36], &page_size, sizeof(uint32_t));
+    if (u64) {
         uint64_t page_count = hinfo->page_count;
-        retval = readstat_write_bytes(writer, &page_count, sizeof(uint64_t));
+        memcpy(&header[off+40], &page_count, sizeof(uint64_t));
     } else {
         uint32_t page_count = hinfo->page_count;
-        retval = readstat_write_bytes(writer, &page_count, sizeof(uint32_t));
+        memcpy(&header[off+40], &page_count, sizeof(uint32_t));
     }
-    if (retval != READSTAT_OK)
-        goto cleanup;
 
-    retval = readstat_write_zeros(writer, 8);
-    if (retval != READSTAT_OK)
-        goto cleanup;
+    off = 216 + a1 + a2;
 
-    sas_header_end_t header_end = {
-        .host = "9.0401M6Linux"
-    };
+    char release[9];
+    if (writer->version == 9) {
+        snprintf(release, sizeof(release), "9.0401M5");
+    } else {
+        snprintf(release, sizeof(release), "%1d.0202M0", (unsigned int)writer->version % 10);
+    }
+    memcpy(&header[off], release, 8);
+    sas_write_padded_ascii((char *)&header[off+8], 16, "Linux", '\0');   /* host */
+    sas_write_padded_ascii((char *)&header[off+24], 16, "3.10.0-1160.11.1", '\0'); /* OS version */
+    sas_write_padded_ascii((char *)&header[off+40], 16, "", '\0');       /* OS vendor */
+    sas_write_padded_ascii((char *)&header[off+56], 16, "x86_64", '\0'); /* OS name */
 
-    char release[sizeof(header_end.release)+1] = { 0 };
-    snprintf(release, sizeof(release), "%1d.%04dM0", (unsigned int)writer->version % 10, 101);
-    memcpy(header_end.release, release, sizeof(header_end.release));
+    /* Bytes 288-303 are a password checksum. The first 4 bytes are the low
+     * 32 bits of the creation time (as stored, in native byte order). The
+     * next three 4-byte fields correspond to SAS's three dataset passwords
+     * (READ=, WRITE= and ALTER=). For a dataset without passwords, each one
+     * is the first 4 bytes XORed with "LNoe". This holds in every
+     * SAS-written file we have examined. */
+    const unsigned char *salt = (const unsigned char *)&creation_time;
+    if (!machine_is_little_endian())
+        salt += 4;
+    for (int i=0; i<4; i++) {
+        header[off+72+i] = salt[i];
+        header[off+76+i] = salt[i] ^ "LNoe"[i];
+        header[off+80+i] = salt[i] ^ "LNoe"[i];
+        header[off+84+i] = salt[i] ^ "LNoe"[i];
+    }
 
-    retval = readstat_write_bytes(writer, &header_end, sizeof(sas_header_end_t));
-    if (retval != READSTAT_OK)
-        goto cleanup;
+    /* 304-319: zeros */
 
-    retval = readstat_write_zeros(writer, hinfo->header_size-writer->bytes_written);
-    if (retval != READSTAT_OK)
-        goto cleanup;
+    /* 320: page number mask (the "initial page sequence number") */
+    memcpy(&header[off+104], &hinfo->page_number_mask, sizeof(uint32_t));
 
-cleanup:
+    /* 328: creation timestamp again */
+    memcpy(&header[off+112], &creation_time, sizeof(double));
+
+    retval = readstat_write_bytes(writer, header, hinfo->header_size);
+
+    free(header);
+
     return retval;
 }
 
@@ -509,6 +602,39 @@ readstat_error_t sas_validate_tag(char tag) {
         return READSTAT_OK;
 
     return READSTAT_ERROR_TAGGED_VALUE_IS_OUT_OF_RANGE;
+}
+
+static int sas_compare_names(const void *elem1, const void *elem2) {
+    return strcasecmp(*(const char **)elem1, *(const char **)elem2);
+}
+
+/* SAS variable names are case-insensitive, so "name" and "Name" collide. */
+readstat_error_t sas_validate_unique_names(readstat_writer_t *writer) {
+    readstat_error_t retval = READSTAT_OK;
+    const char **names = NULL;
+    int i;
+
+    if (writer->variables_count < 2)
+        goto cleanup;
+
+    if ((names = malloc(writer->variables_count * sizeof(const char *))) == NULL) {
+        retval = READSTAT_ERROR_MALLOC;
+        goto cleanup;
+    }
+    for (i=0; i<writer->variables_count; i++) {
+        names[i] = readstat_variable_get_name(readstat_get_variable(writer, i));
+    }
+    qsort(names, writer->variables_count, sizeof(const char *), &sas_compare_names);
+    for (i=1; i<writer->variables_count; i++) {
+        if (strcasecmp(names[i-1], names[i]) == 0) {
+            retval = READSTAT_ERROR_DUPLICATE_VARIABLE_NAME;
+            goto cleanup;
+        }
+    }
+
+cleanup:
+    free(names);
+    return retval;
 }
 
 void sas_assign_tag(readstat_value_t *value, uint8_t tag) {

@@ -18,6 +18,7 @@
 from datetime import datetime, timedelta, date
 from concurrent.futures import ThreadPoolExecutor
 import unittest
+from unittest.mock import patch
 import os
 import sys
 import shutil
@@ -40,6 +41,7 @@ except:
     pass
 
 is_pandas_version_newer_than_2 = int(pd.__version__.split(".")[0])>2
+is_polars_version_newer_than_1 = int(pl.__version__.split(".")[0])>1
 
 class TestBasic(unittest.TestCase):
     """
@@ -121,7 +123,10 @@ class TestBasic(unittest.TestCase):
         if backend == "polars":
             kwds["null_values"] = "#NULL!"
             kwds["try_parse_dates"] = True
-            kwds["missing_utf8_is_empty_string"] = True
+            if is_polars_version_newer_than_1:
+                kwds["empty_string_is_null"] = False
+            else:
+                kwds["missing_utf8_is_empty_string"] = True
         df_missing_sav = nw.read_csv(pandas_missing_sav_csv, backend=backend, **kwds )
         df_missing_sav = df_missing_sav.to_native()
         if backend == "pandas":
@@ -403,7 +408,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
@@ -461,7 +466,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
     
     def test_sav_expand(self):
@@ -517,7 +522,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
 
     def test_por(self):
@@ -753,6 +758,62 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(df_multi.equals(df_single))
         self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
 
+    def test_multiprocess_reader_sparse_columns(self):
+        if self.backend != "polars":
+            self.skipTest("Polars null column inference")
+        data = pd.DataFrame({
+            "number": [None] * 4 + [1.5, 2.5, 3.5, 4.5],
+            "empty": [float("nan")] * 8,
+            "text": [""] * 4 + ["one", "two", "three", "four"],
+            "stamp": pd.to_datetime([None] * 4 + ["2025-01-01"] * 4),
+            "day": [None] * 4 + [date(2025, 1, 1)] * 4,
+            "clock": [None] * 4 + [datetime(2025, 1, 1, 12, 30).time()] * 4,
+        })
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "pyreadstat.pyreadstat.mp.Pool", mp.get_context("spawn").Pool,
+        ):
+            path = os.path.join(directory, "sparse.sav")
+            for reverse in (False, True):
+                with self.subTest(reverse=reverse):
+                    frame = data.iloc[::-1] if reverse else data
+                    pyreadstat.write_sav(frame, path, missing_ranges={"text": [""]})
+                    for selection in ({}, {"row_offset": 1, "row_limit": 6},
+                                      {"row_offset": 0, "row_limit": 4}):
+                        with self.subTest(selection=selection):
+                            expected, meta = pyreadstat.read_sav(
+                                path, output_format=self.backend, **selection,
+                            )
+                            actual, actual_meta = pyreadstat.read_file_multiprocessing(
+                                pyreadstat.read_sav, path, num_processes=2,
+                                output_format=self.backend, **selection,
+                            )
+                            self.assertTrue(actual.equals(expected))
+                            self.assertEqual(actual_meta.column_names, meta.column_names)
+                            self.assertEqual(actual_meta.number_rows, len(data))
+                            if self.backend == "polars":
+                                self.assertEqual(actual.schema, expected.schema)
+
+    def test_multiprocess_reader_sparse_value_labels(self):
+        if self.backend != "polars":
+            self.skipTest("Polars null column inference")
+        data = pd.DataFrame({"value": [None] * 4 + [1.0] * 4})
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "pyreadstat.pyreadstat.mp.Pool", mp.get_context("spawn").Pool,
+        ):
+            path = os.path.join(directory, "labels.sav")
+            pyreadstat.write_sav(data, path, variable_value_labels={"value": {1: "one"}})
+            for categorical in (False, True):
+                with self.subTest(categorical=categorical):
+                    kwargs = dict(output_format=self.backend, apply_value_formats=True,
+                                  formats_as_category=categorical)
+                    expected, _ = pyreadstat.read_sav(path, **kwargs)
+                    actual, _ = pyreadstat.read_file_multiprocessing(
+                        pyreadstat.read_sav, path, num_processes=2, **kwargs,
+                    )
+                    self.assertTrue(actual.equals(expected))
+                    if self.backend == "polars":
+                        self.assertEqual(actual.schema, expected.schema)
+
     def test_chunk_reader_multiprocess(self):
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
         reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize= 50, multiprocess=True, output_format=self.backend)
@@ -779,6 +840,25 @@ class TestBasic(unittest.TestCase):
         if self.backend == "pandas":
             df_multi = df_multi.reset_index(drop=True)
         df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
+        self.assertTrue(df_multi.equals(df_single))
+
+    def test_multiprocess_reader_fewer_rows_than_processes(self):
+        # some workers get 0 rows to read, they should not read the rest of the file
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, num_processes=4, row_offset=10, row_limit=3, output_format=self.backend)
+        df_single, meta_single = pyreadstat.read_sav(fpath, row_offset=10, row_limit=3, output_format=self.backend)
+        self.assertTrue(df_multi.equals(df_single))
+
+    def test_chunk_reader_multiprocess_chunksize_smaller_than_processes(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize=2, offset=0, limit=4, multiprocess=True, num_processes=4, output_format=self.backend)
+        alldfs = list()
+        for df, meta in reader:
+            alldfs.append(nw.from_native(df))
+        df_multi = nw.concat(alldfs, how='vertical').to_native()
+        if self.backend == "pandas":
+            df_multi = df_multi.reset_index(drop=True)
+        df_single, meta_single = pyreadstat.read_sav(fpath, row_offset=0, row_limit=4, output_format=self.backend)
         self.assertTrue(df_multi.equals(df_single))
 
     def test_multiprocess_reader_xport(self):
@@ -1165,12 +1245,14 @@ class TestBasic(unittest.TestCase):
     def test_sav_ordered_categories(self):
         path = os.path.join(self.basic_data_folder, "ordered_category.sav")
         df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True, output_format=self.backend)
-        # in polars it is enum, it is ordered by default
         if self.backend == "pandas":
             self.assertTrue(df["Col1"].cat.ordered)
+            categories = nw.from_native(df)["Col1"].cat.get_categories().to_list()
         else:
-            self.assertTrue(type(nw.from_native(df)["Col1"].dtype)==nw.Enum)
-        self.assertListEqual(list(nw.from_native(df)["Col1"].cat.get_categories().to_list()), ['high', 'low', 'medium'])
+            # in polars it is enum, it is ordered by default
+            self.assertTrue(type(nw.from_native(df)["Col1"].dtype) == nw.Enum)
+            categories = nw.from_native(df)["Col1"].dtype.categories
+        self.assertListEqual(list(categories), ['high', 'low', 'medium'])
 
     def test_sav_pathlib(self):
         if is_pathlib_available:
@@ -1241,7 +1323,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")

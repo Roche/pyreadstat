@@ -26,7 +26,7 @@ typedef struct xport_ctx_s {
     readstat_io_t *io;
     time_t         timestamp;
 
-    int            obs_count;
+    long           obs_count; /* from OBSV8 header; 0 if unknown */
     int            var_count;
     int            row_limit;
     int            row_offset;
@@ -120,6 +120,21 @@ static readstat_error_t xport_read_header_record(xport_ctx_t *ctx, xport_header_
 
     if (matches < 2) {
         return READSTAT_ERROR_PARSE;
+    }
+
+    /* V8 files store the observation count as a 15-character field
+     * immediately after the 48-character header prefix. Older writers
+     * may leave it blank or zero, in which case it stays unknown. */
+    if (strcmp(xrecord->name, "OBSV8") == 0) {
+        char obs_count[16];
+        memcpy(obs_count, &line[48], 15);
+        obs_count[15] = '\0';
+
+        char *end = NULL;
+        long count = strtol(obs_count, &end, 10);
+        if (end != obs_count && count > 0) {
+            ctx->obs_count = count;
+        }
     }
 
     return READSTAT_OK;
@@ -333,8 +348,14 @@ static readstat_error_t xport_read_labels_v8(xport_ctx_t *ctx, int label_count) 
             goto cleanup;
         }
 
-        name = realloc(name, name_len + 1);
-        label = realloc(label, label_len + 1);
+        char *tmp_name = realloc(name, name_len + 1);
+        if (tmp_name == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
+        name = tmp_name;
+
+        char *tmp_label = realloc(label, label_len + 1);
+        if (tmp_label == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
+        label = tmp_label;
+
         readstat_variable_t *variable = ctx->variables[index-1];
 
         if (read_bytes(ctx, name, name_len) != name_len ||
@@ -403,10 +424,21 @@ static readstat_error_t xport_read_labels_v9(xport_ctx_t *ctx, int label_count) 
             goto cleanup;
         }
 
-        name = realloc(name, name_len + 1);
-        label = realloc(label, label_len + 1);
-        format = realloc(format, format_len + 1);
-        informat = realloc(informat, informat_len + 1);
+        char *tmp_name = realloc(name, name_len + 1);
+        if (tmp_name == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
+        name = tmp_name;
+
+        char *tmp_label = realloc(label, label_len + 1);
+        if (tmp_label == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
+        label = tmp_label;
+
+        char *tmp_format = realloc(format, format_len + 1);
+        if (tmp_format == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
+        format = tmp_format;
+
+        char *tmp_informat = realloc(informat, informat_len + 1);
+        if (tmp_informat == NULL) { retval = READSTAT_ERROR_MALLOC; goto cleanup; }
+        informat = tmp_informat;
 
         readstat_variable_t *variable = ctx->variables[index-1];
 
@@ -637,6 +669,7 @@ static readstat_error_t xport_read_data(xport_ctx_t *ctx) {
     char *row = readstat_malloc(ctx->row_length);
     char *blank_row = readstat_malloc(ctx->row_length);
     int num_blank_rows = 0;
+    long rows_read = 0;
 
     if (row == NULL || blank_row == NULL) {
         retval = READSTAT_ERROR_MALLOC;
@@ -645,6 +678,9 @@ static readstat_error_t xport_read_data(xport_ctx_t *ctx) {
 
     memset(blank_row, ' ', ctx->row_length);
     while (1) {
+        if (ctx->obs_count > 0 && rows_read == ctx->obs_count)
+            break;
+
         ssize_t bytes_read = read_bytes(ctx, row, ctx->row_length);
         if (bytes_read == -1) {
             retval = READSTAT_ERROR_READ;
@@ -652,10 +688,13 @@ static readstat_error_t xport_read_data(xport_ctx_t *ctx) {
         } else if (bytes_read < ctx->row_length) {
             break;
         }
+        rows_read++;
 
         off_t pos = 0;
 
-        int row_is_blank = 1;
+        /* When the row count is known, blank rows are real data rather
+         * than potential end-of-file padding */
+        int row_is_blank = ctx->obs_count <= 0;
 
         for (pos=0; pos<ctx->row_length; pos++) {
             if (row[pos] != ' ') {
@@ -786,4 +825,3 @@ cleanup:
 
     return retval;
 }
-

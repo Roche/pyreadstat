@@ -46,6 +46,7 @@ typedef struct sas_header_info_s {
     int64_t  subheader_pointer_size;
     int64_t  page_count;
     int64_t  header_size;
+    uint32_t page_number_mask;
     time_t   creation_time;
     time_t   modification_time;
     char     table_name[32];
@@ -121,10 +122,15 @@ typedef enum sas_subheader_type_e {
 #define SAS_PAGE_HEADER_SIZE_32BIT  24
 #define SAS_PAGE_HEADER_SIZE_64BIT  40
 
-#define SAS_COMPRESSION_NONE         0x00
-#define SAS_COMPRESSION_TRUNC        0x01
-#define SAS_COMPRESSION_ROW          0x04
-#define SAS_COMPRESSION_DELETED_ROW  0x05
+#define SAS_COMPRESSION_NONE               0x00
+#define SAS_COMPRESSION_TRUNC              0x01
+#define SAS_COMPRESSION_NONE_MOVED         0x02
+#define SAS_COMPRESSION_REFERENCE          0x03
+#define SAS_COMPRESSION_ROW                0x04
+#define SAS_COMPRESSION_DELETED_ROW        0x05
+#define SAS_COMPRESSION_ROW_MOVED          0x06
+#define SAS_COMPRESSION_NONE_UNREFERENCED  0x09
+#define SAS_COMPRESSION_ROW_UNREFERENCED   0x0d
 
 #define SAS_COMPRESSION_SIGNATURE_RLE  "SASYZCRL"
 #define SAS_COMPRESSION_SIGNATURE_RDC  "SASYZCR2"
@@ -132,6 +138,7 @@ typedef enum sas_subheader_type_e {
 #define SAS_DEFAULT_FILE_VERSION  9
 
 extern unsigned char sas7bdat_magic_number[32];
+extern unsigned char sas7bdat_magic_number_alt[32];
 extern unsigned char sas7bcat_magic_number[32];
 
 uint64_t sas_read8(const char *data, int bswap);
@@ -146,4 +153,5 @@ readstat_error_t sas_fill_page(readstat_writer_t *writer, sas_header_info_t *hin
 readstat_error_t sas_validate_variable(const readstat_variable_t *variable);
 readstat_error_t sas_validate_name(const char *name, size_t max_len);
 readstat_error_t sas_validate_tag(char tag);
+readstat_error_t sas_validate_unique_names(readstat_writer_t *writer);
 void sas_assign_tag(readstat_value_t *value, uint8_t tag);

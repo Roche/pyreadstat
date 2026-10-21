@@ -26,7 +26,7 @@ author = 'Otto Fajardo'
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '1.3.6'
+release = '1.3.7'
 
 
 # -- General configuration ---------------------------------------------------

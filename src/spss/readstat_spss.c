@@ -175,6 +175,7 @@ readstat_variable_t *spss_init_variable_for_info(spss_varinfo_t *info, int index
 
     variable->missingness = spss_missingness_for_info(info);
     variable->measure = info->measure;
+    variable->alignment = info->alignment;
     if (info->display_width) {
         variable->display_width = info->display_width;
     } else {
@@ -235,10 +236,10 @@ readstat_error_t spss_format_for_variable(readstat_variable_t *r_variable,
     memset(spss_format, 0, sizeof(spss_format_t));
 
     if (r_variable->type == READSTAT_TYPE_STRING) {
+        /* The A format width must match the variable's width; display_width
+         * belongs only in the variable display parameter record. */
         spss_format->type = SPSS_FORMAT_TYPE_A;
-        if (r_variable->display_width) {
-            spss_format->width = r_variable->display_width;
-        } else if (r_variable->user_width) {
+        if (r_variable->user_width) {
             spss_format->width = r_variable->user_width;
         } else {
             spss_format->width = r_variable->storage_width;
@@ -262,6 +263,16 @@ readstat_error_t spss_format_for_variable(readstat_variable_t *r_variable,
         if (spss_parse_format(fmt, strlen(fmt), spss_format) != READSTAT_OK) {
             retval = READSTAT_ERROR_BAD_FORMAT_STRING;
             goto cleanup;
+        }
+        /* When the caller gave a string width, the format can't contradict it (#321) */
+        if (r_variable->type == READSTAT_TYPE_STRING && r_variable->user_width) {
+            if (spss_format->type == SPSS_FORMAT_TYPE_AHEX) {
+                spss_format->width = 2 * (int)r_variable->user_width;
+            } else {
+                spss_format->type = SPSS_FORMAT_TYPE_A;
+                spss_format->width = (int)r_variable->user_width;
+            }
+            spss_format->decimal_places = 0;
         }
     }
 

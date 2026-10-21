@@ -36,6 +36,8 @@ object contains the following fields:
     value_labels. Sas7bdat files may have this member populated and its information can be used to match the information
     in the value_labels coming from the sas7bcat file.
   * original_variable_types : a dict of variable name to variable format in the original file. For debugging purposes.
+    In SPSS the format also holds the variable Width and Decimals as shown in Variable View (e.g. F5.0 is
+    width 5 with 0 decimals).
   * original_variable_informats : a dict of variable name to variable SAS informat in the original file. For debugging purposes.
     will be populated only for sas7bdat and xport files if available.
   * readstat_variable_types : a dict of variable name to variable type in the original file as extracted by Readstat.i
@@ -52,7 +54,8 @@ object contains the following fields:
     missing values in SAS and STATA. This appears when using user_missing=True in read_sas7bdat or read_dta if user defined missing values are present.
   * variable_alignment: a dict with keys being variable names and values being the display alignment: left, center, right or unknown
   * variable_storage_width: a dict with keys being variable names and values being the storage width
-  * variable_display_width: a dict with keys being variable names and values being the display width
+  * variable_display_width: a dict with keys being variable names and values being the display width. In SPSS
+    this is the "Columns" property, not "Width"; Width is part of the format in original_variable_types.
   * variable_measure: a dict with keys being variable names and values being the measure: nominal, ordinal, scale or unknown
   * mr_sets: a dictionary representing the definitions of multiple-response (MR)
     variables in the dataset (currently only supported for SAV format). MR variables

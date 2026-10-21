@@ -419,6 +419,8 @@ cdef int handle_metadata(readstat_metadata_t *metadata, void *ctx) except READST
         i = 0
         while i < mr_len:
             name = <str>mr_sets_orig[i].name
+            if name.startswith("$"):
+                name = name[1:]
             variable_list = []
             for j in range(mr_sets_orig[i].num_subvars):
                 variable_list.append(<str>mr_sets_orig[i].subvariables[j])
@@ -1115,8 +1117,8 @@ cdef object dict_to_dataframe(object dict_data, data_container dc):
                 data_frame = data_frame.with_columns(
                     [
                         pl.from_epoch(
-                            (pl.col(c) % 1 * 1e6).round().cast(pl.Int64) + (
-                                    pl.col(c).floor() * 1e6).cast(pl.Int64) - (
+                            (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (
+                                    pl.col(c).cast(pl.Float64).floor() * 1e6).cast(pl.Int64) - (
                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
                             time_unit='us')
                         for c in datetime_cols if data_frame[c].len() > 0

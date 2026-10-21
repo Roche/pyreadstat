@@ -556,15 +556,17 @@ static readstat_error_t xport_metadata_ok(void *writer_ctx) {
         return READSTAT_ERROR_UNSUPPORTED_FILE_FORMAT_VERSION;
 
     if (writer->table_name[0]) {
-        if (writer->version == 8) {
-            return sas_validate_name(writer->table_name, 32);
-        }
-        if (writer->version == 5) {
-            return sas_validate_name(writer->table_name, 8);
-        }
+        readstat_error_t retval = sas_validate_name(writer->table_name,
+                writer->version == 8 ? 32 : 8);
+        if (retval != READSTAT_OK)
+            return retval;
     }
 
-    return READSTAT_OK;
+    return sas_validate_unique_names(writer);
+}
+
+static readstat_error_t xport_v5_validate_variable(const readstat_variable_t *variable) {
+    return sas_validate_name(readstat_variable_get_name(variable), 8);
 }
 
 readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *user_ctx, long row_count) {
@@ -585,7 +587,11 @@ readstat_error_t readstat_begin_writing_xport(readstat_writer_t *writer, void *u
     writer->callbacks.write_missing_tagged = &xport_write_missing_tagged;
 
     writer->callbacks.variable_width = &xport_variable_width;
-    writer->callbacks.variable_ok = &sas_validate_variable;
+    if (writer->version == 5) {
+        writer->callbacks.variable_ok = &xport_v5_validate_variable;
+    } else {
+        writer->callbacks.variable_ok = &sas_validate_variable;
+    }
 
     writer->callbacks.begin_data = &xport_begin_data;
     writer->callbacks.end_data = &xport_end_data;

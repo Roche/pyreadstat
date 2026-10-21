@@ -1180,6 +1180,9 @@ def read_file_multiprocessing(
         prev_offset = offset
         prev_div = div
         offsets.append((offset, div))
+    # a chunk with 0 rows would be passed as row_limit=0, which means no limit, and that worker would read
+    # all the remaining rows. Drop those chunks, but keep one if all are empty to get an empty dataframe.
+    offsets = [x for x in offsets if x[1] > 0] or offsets[:1]
     jobs = [(read_function, file_path, offset, chunksize, kwargs) for offset, chunksize in offsets]
     pool = mp.Pool(processes=num_processes)
     try:
@@ -1194,6 +1197,26 @@ def read_file_multiprocessing(
         final = {key: list(chain.from_iterable(chunk[key] for chunk in chunks)) for key in keys}
     else:
         # final = pd.concat(chunks, axis=0, ignore_index=True)
+        if output_format == "polars":
+            import polars as pl
+
+            # All-null chunks have no inferred type. Use the type from a
+            # populated chunk without coercing conflicting non-null types.
+            schemas = [chunk.schema for chunk in chunks]
+            populated_types = {
+                name: dtype
+                for schema in schemas
+                for name, dtype in schema.items()
+                if dtype != pl.Null
+            }
+            chunks = [
+                chunk.cast({
+                    name: populated_types[name]
+                    for name, dtype in schema.items()
+                    if dtype == pl.Null and name in populated_types
+                })
+                for chunk, schema in zip(chunks, schemas)
+            ]
         chunks = [nw.from_native(x) for x in chunks]
         final = nw.concat(chunks, how="vertical")
         ispandas = False
@@ -1258,14 +1281,17 @@ def write_sav(
         For this to be effective, values in the dataframe must be the same as reported here and not NaN.
     variable_display_width : dict, optional
         set the display width for variables. Must be a dictonary with keys being variable names and
-        values being integers.
+        values being integers. In SPSS this sets the "Columns" property of the variable (how wide the
+        column is displayed), not its "Width". To set Width (and Decimals) use variable_format
+        instead, e.g. {"var": "F10.2"} for width 10 and 2 decimals.
     variable_measure: dict, optional
         sets the measure type for a variable. Must be a dictionary with keys being variable names and
         values being strings one of "nominal", "ordinal", "scale" or "unknown" (default).
     variable_format: dict, optional
         sets the format of a variable. Must be a dictionary with keys being the variable names and
         values being strings defining the format. See README, setting variable formats section,
-        for more information.
+        for more information. In SPSS the Width and Decimals shown in Variable View are part of the
+        format (e.g. "F10.2").
     """
     writer_format = "sav"
 

@@ -51,7 +51,17 @@ readstat_writer_t *readstat_writer_init(void) {
     writer->string_refs = calloc(STRING_REFS_INITIAL_CAPACITY, sizeof(readstat_string_ref_t *));
     writer->string_refs_capacity = STRING_REFS_INITIAL_CAPACITY;
 
+#ifdef TIME_UTC
+    struct timespec now;
+    if (timespec_get(&now, TIME_UTC) == TIME_UTC) {
+        writer->timestamp = now.tv_sec;
+        writer->timestamp_fraction = now.tv_nsec / 1e9;
+    } else {
+        writer->timestamp = time(NULL);
+    }
+#else
     writer->timestamp = time(NULL);
+#endif
     writer->is_64bit = 1;
     writer->callbacks.write_row = &readstat_write_row_default_callback;
 
@@ -76,23 +86,29 @@ static void readstat_label_set_free(readstat_label_set_t *label_set) {
     free(label_set);
 }
 
-static void readstat_copy_label(readstat_value_label_t *value_label, const char *label) {
+static readstat_error_t readstat_copy_label(readstat_value_label_t *value_label, const char *label) {
     if (label && strlen(label)) {
-        value_label->label_len = strlen(label);
-        value_label->label = malloc(value_label->label_len);
-        memcpy(value_label->label, label, value_label->label_len);
+        size_t label_len = strlen(label);
+        if ((value_label->label = malloc(label_len + 1)) == NULL)
+            return READSTAT_ERROR_MALLOC;
+        memcpy(value_label->label, label, label_len + 1);
+        value_label->label_len = label_len;
     }
+    return READSTAT_OK;
 }
 
 static readstat_value_label_t *readstat_add_value_label(readstat_label_set_t *label_set, const char *label) {
     if (label_set->value_labels_count == label_set->value_labels_capacity) {
+        void *tmp = realloc(label_set->value_labels,
+                2 * label_set->value_labels_capacity * sizeof(readstat_value_label_t));
+        if (tmp == NULL) return NULL;
+        label_set->value_labels = tmp;
         label_set->value_labels_capacity *= 2;
-        label_set->value_labels = realloc(label_set->value_labels, 
-                label_set->value_labels_capacity * sizeof(readstat_value_label_t));
     }
     readstat_value_label_t *new_value_label = &label_set->value_labels[label_set->value_labels_count++];
     memset(new_value_label, 0, sizeof(readstat_value_label_t));
-    readstat_copy_label(new_value_label, label);
+    if (readstat_copy_label(new_value_label, label) != READSTAT_OK)
+        return NULL;
     return new_value_label;
 }
 
@@ -237,6 +253,8 @@ readstat_error_t readstat_write_line_padding(readstat_writer_t *writer, char pad
     readstat_error_t error = READSTAT_OK;
     ssize_t bytes_left_in_line = line_len - (writer->bytes_written % (line_len + line_sep_len));
     char *bytes = malloc(bytes_left_in_line);
+    if (bytes == NULL)
+        return READSTAT_ERROR_MALLOC;
     memset(bytes, pad, bytes_left_in_line);
 
     if ((error = readstat_write_bytes(writer, bytes, bytes_left_in_line)) != READSTAT_OK)
@@ -249,7 +267,7 @@ cleanup:
     if (bytes)
         free(bytes);
 
-    return READSTAT_OK;
+    return error;
 }
 
 readstat_error_t readstat_write_string(readstat_writer_t *writer, const char *bytes) {
@@ -292,11 +310,23 @@ readstat_error_t readstat_write_space_padded_string(readstat_writer_t *writer, c
     return readstat_write_spaces(writer, max_len - len);
 }
 
+/* Once the first row has been begun (or readstat_end_writing called on an
+ * empty data set) the file header, row layout, and section offsets have been
+ * computed from the registered metadata, so nothing more may be added */
+static int readstat_writer_data_has_begun(readstat_writer_t *writer) {
+    return writer->row != NULL;
+}
+
 readstat_label_set_t *readstat_add_label_set(readstat_writer_t *writer, readstat_type_t type, const char *name) {
+    if (readstat_writer_data_has_begun(writer))
+        return NULL;
+
     if (writer->label_sets_count == writer->label_sets_capacity) {
+        void *tmp = realloc(writer->label_sets,
+                2 * writer->label_sets_capacity * sizeof(readstat_label_set_t *));
+        if (tmp == NULL) return NULL;
+        writer->label_sets = tmp;
         writer->label_sets_capacity *= 2;
-        writer->label_sets = realloc(writer->label_sets, 
-                writer->label_sets_capacity * sizeof(readstat_label_set_t *));
     }
     readstat_label_set_t *new_label_set = calloc(1, sizeof(readstat_label_set_t));
     
@@ -343,35 +373,50 @@ readstat_variable_t *readstat_get_label_set_variable(readstat_label_set_t *label
 
 void readstat_label_double_value(readstat_label_set_t *label_set, double value, const char *label) {
     readstat_value_label_t *new_value_label = readstat_add_value_label(label_set, label);
+    if (new_value_label == NULL)
+        return;
     new_value_label->double_key = value;
     new_value_label->int32_key = value;
 }
 
 void readstat_label_int32_value(readstat_label_set_t *label_set, int32_t value, const char *label) {
     readstat_value_label_t *new_value_label = readstat_add_value_label(label_set, label);
+    if (new_value_label == NULL)
+        return;
     new_value_label->double_key = value;
     new_value_label->int32_key = value;
 }
 
 void readstat_label_string_value(readstat_label_set_t *label_set, const char *value, const char *label) {
     readstat_value_label_t *new_value_label = readstat_add_value_label(label_set, label);
+    if (new_value_label == NULL)
+        return;
     if (value && strlen(value)) {
-        new_value_label->string_key_len = strlen(value);
-        new_value_label->string_key = malloc(new_value_label->string_key_len);
-        memcpy(new_value_label->string_key, value, new_value_label->string_key_len);
+        size_t string_key_len = strlen(value);
+        if ((new_value_label->string_key = malloc(string_key_len + 1)) == NULL)
+            return;
+        memcpy(new_value_label->string_key, value, string_key_len + 1);
+        new_value_label->string_key_len = string_key_len;
     }
 }
 
 void readstat_label_tagged_value(readstat_label_set_t *label_set, char tag, const char *label) {
     readstat_value_label_t *new_value_label = readstat_add_value_label(label_set, label);
+    if (new_value_label == NULL)
+        return;
     new_value_label->tag = tag;
 }
 
 readstat_variable_t *readstat_add_variable(readstat_writer_t *writer, const char *name, readstat_type_t type, size_t width) {
+    if (readstat_writer_data_has_begun(writer))
+        return NULL;
+
     if (writer->variables_count == writer->variables_capacity) {
+        void *tmp = realloc(writer->variables,
+                2 * writer->variables_capacity * sizeof(readstat_variable_t *));
+        if (tmp == NULL) return NULL;
+        writer->variables = tmp;
         writer->variables_capacity *= 2;
-        writer->variables = realloc(writer->variables,
-                writer->variables_capacity * sizeof(readstat_variable_t *));
     }
     readstat_variable_t *new_variable = calloc(1, sizeof(readstat_variable_t));
 
@@ -398,24 +443,37 @@ readstat_variable_t *readstat_add_variable(readstat_writer_t *writer, const char
 
 static void readstat_append_string_ref(readstat_writer_t *writer, readstat_string_ref_t *ref) {
     if (writer->string_refs_count == writer->string_refs_capacity) {
+        void *tmp = realloc(writer->string_refs,
+                2 * writer->string_refs_capacity * sizeof(readstat_string_ref_t *));
+        if (tmp == NULL) return;
+        writer->string_refs = tmp;
         writer->string_refs_capacity *= 2;
-        writer->string_refs = realloc(writer->string_refs,
-                writer->string_refs_capacity * sizeof(readstat_string_ref_t *));
     }
     writer->string_refs[writer->string_refs_count++] = ref;
 }
 
 readstat_string_ref_t *readstat_add_string_ref(readstat_writer_t *writer, const char *string) {
+    if (readstat_writer_data_has_begun(writer))
+        return NULL;
+
     readstat_string_ref_t *ref = readstat_string_ref_init(string);
+    if (ref == NULL)
+        return NULL;
+
     readstat_append_string_ref(writer, ref);
     return ref;
 }
 
 void readstat_add_note(readstat_writer_t *writer, const char *note) {
+    if (readstat_writer_data_has_begun(writer))
+        return;
+
     if (writer->notes_count == writer->notes_capacity) {
+        void *tmp = realloc(writer->notes,
+                2 * writer->notes_capacity * sizeof(const char *));
+        if (tmp == NULL) return;
+        writer->notes = tmp;
         writer->notes_capacity *= 2;
-        writer->notes = realloc(writer->notes,
-                writer->notes_capacity * sizeof(const char *));
     }
     char *note_copy = malloc(strlen(note) + 1);
     strcpy(note_copy, note);
@@ -462,9 +520,11 @@ void readstat_variable_set_label_set(readstat_variable_t *variable, readstat_lab
     variable->label_set = label_set;
     if (label_set) {
         if (label_set->variables_count == label_set->variables_capacity) {
+            void *tmp = realloc(label_set->variables,
+                    2 * label_set->variables_capacity * sizeof(readstat_variable_t *));
+            if (tmp == NULL) return;
+            label_set->variables = tmp;
             label_set->variables_capacity *= 2;
-            label_set->variables = realloc(label_set->variables,
-                    label_set->variables_capacity * sizeof(readstat_variable_t *));
         }
         ((readstat_variable_t **)label_set->variables)[label_set->variables_count++] = variable;
     }
@@ -491,6 +551,7 @@ readstat_error_t readstat_writer_set_file_label(readstat_writer_t *writer, const
 
 readstat_error_t readstat_writer_set_file_timestamp(readstat_writer_t *writer, time_t timestamp) {
     writer->timestamp = timestamp;
+    writer->timestamp_fraction = 0.0;
     return READSTAT_OK;
 }
 
@@ -546,13 +607,16 @@ readstat_error_t readstat_begin_row(readstat_writer_t *writer) {
     if (writer->current_row == 0)
         retval = readstat_begin_writing_data(writer);
 
+    if (retval != READSTAT_OK || writer->row == NULL)
+        return retval;
+
     memset(writer->row, '\0', writer->row_len);
     return retval;
 }
 
 // Then call one of these for each variable
 readstat_error_t readstat_insert_int8_value(readstat_writer_t *writer, const readstat_variable_t *variable, int8_t value) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_INT8)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -561,7 +625,7 @@ readstat_error_t readstat_insert_int8_value(readstat_writer_t *writer, const rea
 }
 
 readstat_error_t readstat_insert_int16_value(readstat_writer_t *writer, const readstat_variable_t *variable, int16_t value) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_INT16)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -570,7 +634,7 @@ readstat_error_t readstat_insert_int16_value(readstat_writer_t *writer, const re
 }
 
 readstat_error_t readstat_insert_int32_value(readstat_writer_t *writer, const readstat_variable_t *variable, int32_t value) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_INT32)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -579,7 +643,7 @@ readstat_error_t readstat_insert_int32_value(readstat_writer_t *writer, const re
 }
 
 readstat_error_t readstat_insert_float_value(readstat_writer_t *writer, const readstat_variable_t *variable, float value) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_FLOAT)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -588,7 +652,7 @@ readstat_error_t readstat_insert_float_value(readstat_writer_t *writer, const re
 }
 
 readstat_error_t readstat_insert_double_value(readstat_writer_t *writer, const readstat_variable_t *variable, double value) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_DOUBLE)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -597,7 +661,7 @@ readstat_error_t readstat_insert_double_value(readstat_writer_t *writer, const r
 }
 
 readstat_error_t readstat_insert_string_value(readstat_writer_t *writer, const readstat_variable_t *variable, const char *value) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_STRING)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -606,7 +670,7 @@ readstat_error_t readstat_insert_string_value(readstat_writer_t *writer, const r
 }
 
 readstat_error_t readstat_insert_string_ref(readstat_writer_t *writer, const readstat_variable_t *variable, readstat_string_ref_t *ref) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (variable->type != READSTAT_TYPE_STRING_REF)
         return READSTAT_ERROR_VALUE_TYPE_MISMATCH;
@@ -622,7 +686,7 @@ readstat_error_t readstat_insert_string_ref(readstat_writer_t *writer, const rea
 }
 
 readstat_error_t readstat_insert_missing_value(readstat_writer_t *writer, const readstat_variable_t *variable) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
 
     if (variable->type == READSTAT_TYPE_STRING) {
@@ -636,7 +700,7 @@ readstat_error_t readstat_insert_missing_value(readstat_writer_t *writer, const 
 }
 
 readstat_error_t readstat_insert_tagged_missing_value(readstat_writer_t *writer, const readstat_variable_t *variable, char tag) {
-    if (!writer->initialized)
+    if (!writer->initialized || writer->row == NULL)
         return READSTAT_ERROR_WRITER_NOT_INITIALIZED;
     if (!writer->callbacks.write_missing_tagged) {
         /* Write out a missing number but return an error */

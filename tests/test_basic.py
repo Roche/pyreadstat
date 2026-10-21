@@ -330,7 +330,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
@@ -386,7 +386,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
     
     def test_sav_expand(self):
@@ -441,7 +441,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
 
     def test_por(self):
@@ -667,6 +667,23 @@ class TestBasic(unittest.TestCase):
         df_single, meta_single = pyreadstat.read_sav(fpath)
         self.assertTrue(df_multi.equals(df_single))
 
+
+    def test_multiprocess_reader_fewer_rows_than_processes(self):
+        # some workers get 0 rows to read, they should not read the rest of the file
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        df_multi, meta_multi = pyreadstat.read_file_multiprocessing(pyreadstat.read_sav, fpath, num_processes=4, row_offset=10, row_limit=3)
+        df_single, meta_single = pyreadstat.read_sav(fpath, row_offset=10, row_limit=3)
+        self.assertTrue(df_multi.equals(df_single))
+
+    def test_chunk_reader_multiprocess_chunksize_smaller_than_processes(self):
+        fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
+        reader = pyreadstat.read_file_in_chunks(pyreadstat.read_sav, fpath, chunksize=2, offset=0, limit=4, multiprocess=True, num_processes=4)
+        alldfs = list()
+        for df, meta in reader:
+            alldfs.append(df)
+        df_multi = pd.concat(alldfs, axis=0, ignore_index=True)
+        df_single, meta_single = pyreadstat.read_sav(fpath, row_offset=0, row_limit=4)
+        self.assertTrue(df_multi.equals(df_single))
 
     def test_multiprocess_reader_xport(self):
         fpath = os.path.join(self.basic_data_folder, "sample.xpt")
@@ -1076,7 +1093,7 @@ class TestBasic(unittest.TestCase):
         self.assertTrue(meta.number_rows == len(self.df_pandas))
         self.assertTrue(len(meta.notes)>0)
         self.assertTrue(meta.variable_display_width["mychar"]==9)
-        self.assertTrue(meta.variable_storage_width["mychar"] == 8)
+        self.assertTrue(meta.variable_storage_width["mychar"] == 1)
         self.assertTrue(meta.variable_measure["mychar"]=="nominal")
         self.assertTrue(meta.readstat_variable_types["mychar"]=="string")
         self.assertTrue(meta.readstat_variable_types["myord"]=="double")
