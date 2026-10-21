@@ -4,12 +4,13 @@ on: [push, pull_request]
 
 jobs:
   test:
-    name: Test ${{ matrix.os }}
+    name: Test ${{ matrix.os }} Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2022]
+        python-version: ["3.13", "3.15"]
 
     steps:
       - name: Checkout
@@ -18,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
