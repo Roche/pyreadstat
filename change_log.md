@@ -4,7 +4,7 @@
 * Updated source code and tests for polars 2
 * variable_storage_width for SPSS string variables now returns the declared
   string width instead of the internal segment size (e.g., 1 for A1 instead of 8)
-* The Readstat update solves #340, #298, #265 and #246
+* The Readstat update solves #340, #298, #265 and #246 also #297, #264, #119
 
 # 1.3.6 (github, pypi and conda 2026.08.12)
 * Fixing #328, #336, #342, #344, #287, #307
