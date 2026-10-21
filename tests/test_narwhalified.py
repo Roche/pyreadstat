@@ -18,6 +18,7 @@
 from datetime import datetime, timedelta, date
 from concurrent.futures import ThreadPoolExecutor
 import unittest
+from unittest.mock import patch
 import os
 import sys
 import shutil
@@ -756,6 +757,62 @@ class TestBasic(unittest.TestCase):
         df_single, meta_single = pyreadstat.read_sav(fpath, output_format=self.backend)
         self.assertTrue(df_multi.equals(df_single))
         self.assertEqual(meta_multi.number_rows, meta_single.number_rows)
+
+    def test_multiprocess_reader_sparse_columns(self):
+        if self.backend != "polars":
+            self.skipTest("Polars null column inference")
+        data = pd.DataFrame({
+            "number": [None] * 4 + [1.5, 2.5, 3.5, 4.5],
+            "empty": [float("nan")] * 8,
+            "text": [""] * 4 + ["one", "two", "three", "four"],
+            "stamp": pd.to_datetime([None] * 4 + ["2025-01-01"] * 4),
+            "day": [None] * 4 + [date(2025, 1, 1)] * 4,
+            "clock": [None] * 4 + [datetime(2025, 1, 1, 12, 30).time()] * 4,
+        })
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "pyreadstat.pyreadstat.mp.Pool", mp.get_context("spawn").Pool,
+        ):
+            path = os.path.join(directory, "sparse.sav")
+            for reverse in (False, True):
+                with self.subTest(reverse=reverse):
+                    frame = data.iloc[::-1] if reverse else data
+                    pyreadstat.write_sav(frame, path, missing_ranges={"text": [""]})
+                    for selection in ({}, {"row_offset": 1, "row_limit": 6},
+                                      {"row_offset": 0, "row_limit": 4}):
+                        with self.subTest(selection=selection):
+                            expected, meta = pyreadstat.read_sav(
+                                path, output_format=self.backend, **selection,
+                            )
+                            actual, actual_meta = pyreadstat.read_file_multiprocessing(
+                                pyreadstat.read_sav, path, num_processes=2,
+                                output_format=self.backend, **selection,
+                            )
+                            self.assertTrue(actual.equals(expected))
+                            self.assertEqual(actual_meta.column_names, meta.column_names)
+                            self.assertEqual(actual_meta.number_rows, len(data))
+                            if self.backend == "polars":
+                                self.assertEqual(actual.schema, expected.schema)
+
+    def test_multiprocess_reader_sparse_value_labels(self):
+        if self.backend != "polars":
+            self.skipTest("Polars null column inference")
+        data = pd.DataFrame({"value": [None] * 4 + [1.0] * 4})
+        with tempfile.TemporaryDirectory() as directory, patch(
+            "pyreadstat.pyreadstat.mp.Pool", mp.get_context("spawn").Pool,
+        ):
+            path = os.path.join(directory, "labels.sav")
+            pyreadstat.write_sav(data, path, variable_value_labels={"value": {1: "one"}})
+            for categorical in (False, True):
+                with self.subTest(categorical=categorical):
+                    kwargs = dict(output_format=self.backend, apply_value_formats=True,
+                                  formats_as_category=categorical)
+                    expected, _ = pyreadstat.read_sav(path, **kwargs)
+                    actual, _ = pyreadstat.read_file_multiprocessing(
+                        pyreadstat.read_sav, path, num_processes=2, **kwargs,
+                    )
+                    self.assertTrue(actual.equals(expected))
+                    if self.backend == "polars":
+                        self.assertEqual(actual.schema, expected.schema)
 
     def test_chunk_reader_multiprocess(self):
         fpath = os.path.join(self.basic_data_folder, "sample_large.sav")
