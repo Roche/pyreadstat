@@ -43,7 +43,7 @@ import_datetime()
 
 cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
-cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)")
+cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d*)?$|$)")
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "YYMMDD",
                                 "DDMMYYB", "DDMMYYC", "DDMMYYD",
                                 "DDMMYYN", "DDMMYYP", "DDMMYYS",

@@ -16,9 +16,7 @@
 
 #define SAS_FILE_HEADER_SIZE_32BIT 1024
 #define SAS_FILE_HEADER_SIZE_64BIT 8192
-#define SAS_DEFAULT_PAGE_SIZE      4096
-
-#define SAS_DEFAULT_STRING_ENCODING "WINDOWS-1252"
+#define SAS_DEFAULT_PAGE_SIZE      65536
 
 unsigned char sas7bdat_magic_number[32] = {
     0x00, 0x00, 0x00, 0x00,   0x00, 0x00, 0x00, 0x00,
@@ -50,8 +48,9 @@ unsigned char sas7bcat_magic_number[32] = {
  * what's listed in the docs. In these cases the encoding used by ReadStat 
  * represents the author's best guess.
  */
+/* Note that code 0 (encoding not specified) is deliberately absent, so that
+ * hinfo->encoding is left as NULL in sas_read_header(). */
 static readstat_charset_entry_t _charset_table[] = { 
-    { .code = 0,     .name = SAS_DEFAULT_STRING_ENCODING },
     { .code = 20,    .name = "UTF-8" },
     { .code = 28,    .name = "US-ASCII" },
     { .code = 29,    .name = "ISO-8859-1" },
@@ -209,7 +208,7 @@ readstat_error_t sas_read_header(readstat_io_t *io, sas_header_info_t *hinfo,
             break;
         }
     }
-    if (hinfo->encoding == NULL) {
+    if (hinfo->encoding == NULL && header_start.encoding != 0) {
         if (error_handler) {
             snprintf(error_buf, sizeof(error_buf), "Unsupported character set code: %d", header_start.encoding);
             error_handler(error_buf, user_ctx);

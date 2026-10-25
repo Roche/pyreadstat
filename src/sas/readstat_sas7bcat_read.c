@@ -473,8 +473,12 @@ readstat_error_t readstat_parse_sas7bcat(readstat_parser_t *parser, const char *
         ctx->xlsr_O_offset += 24;
     }
 
-    if (ctx->input_encoding && ctx->output_encoding && strcmp(ctx->input_encoding, ctx->output_encoding) != 0) {
-        iconv_t converter = iconv_open(ctx->output_encoding, ctx->input_encoding);
+    const char *input_encoding = ctx->input_encoding;
+    if (input_encoding == NULL) {
+        input_encoding = SAS_DEFAULT_STRING_ENCODING;
+    }
+    if (ctx->output_encoding && strcmp(input_encoding, ctx->output_encoding) != 0) {
+        iconv_t converter = iconv_open(ctx->output_encoding, input_encoding);
         if (converter == (iconv_t)-1) {
             retval = READSTAT_ERROR_UNSUPPORTED_CHARSET;
             goto cleanup;

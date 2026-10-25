@@ -137,6 +137,9 @@ typedef enum sas_subheader_type_e {
 
 #define SAS_DEFAULT_FILE_VERSION  9
 
+/* Used when a file doesn't record its encoding (header byte is 0) */
+#define SAS_DEFAULT_STRING_ENCODING "WINDOWS-1252"
+
 extern unsigned char sas7bdat_magic_number[32];
 extern unsigned char sas7bdat_magic_number_alt[32];
 extern unsigned char sas7bcat_magic_number[32];
