@@ -95,4 +95,4 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                    int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format, dict variable_informat,
-                   bint row_compression) except *
+                   bint row_compression, bint is_64bit) except *

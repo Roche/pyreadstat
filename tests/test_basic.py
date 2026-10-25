@@ -892,6 +892,89 @@ class TestBasic(unittest.TestCase):
         df2['object'] = df2['object'].astype(str)
         self.assertTrue(df2.equals(df))
 
+    def test_sas7bdat_write_basic(self):
+        file_label = "basic write"
+        table_name = "TEST"
+        col_labels = ["mychar label","mynum label", "mydate label", "dtime label", None, "myord label", "mytime label"]
+        informats = {'mychar': '$1', 'mynum': 'BEST32', 'mydate': 'YYMMDD10', 'dtime': 'ANYDTDTM40', 'mylabl': 'BEST32', 'myord': 'BEST32', 'mytime': 'TIME20.3'}
+        path = os.path.join(self.write_folder, "write.sas7bdat")
+        pyreadstat.write_sas7bdat(self.df_pandas, path, file_label=file_label, column_labels=col_labels, table_name=table_name,
+                                  variable_informat=informats)
+        df, meta = pyreadstat.read_sas7bdat(path)
+
+        self.assertTrue(df.equals(self.df_pandas))
+        self.assertEqual(meta.file_label, file_label)
+        self.assertListEqual(meta.column_labels, col_labels)
+        self.assertEqual(table_name, meta.table_name)
+        self.assertEqual(meta.original_variable_informats['mydate'], 'YYMMDD10')
+        self.assertEqual(meta.original_variable_informats['mytime'], 'TIME20.3')
+
+    def test_sas7bdat_write_compress_32bit(self):
+        path = os.path.join(self.write_folder, "write_options.sas7bdat")
+        # byte 32 of the header is the 64 bit alignment marker (0x33) and the RLE compression
+        # signature SASYZCRL is written only to compressed files
+        for compress in (False, True):
+            for is_64bit in (True, False):
+                pyreadstat.write_sas7bdat(self.df_pandas, path, compress=compress, is_64bit=is_64bit)
+                df, meta = pyreadstat.read_sas7bdat(path)
+                self.assertTrue(df.equals(self.df_pandas))
+                with open(path, "rb") as fh:
+                    raw = fh.read()
+                self.assertEqual(raw[32] == 0x33, is_64bit)
+                self.assertEqual(b"SASYZCRL" in raw, compress)
+
+    def test_sas7bdat_write_dates(self):
+        path = os.path.join(self.write_folder, "dates_write.sas7bdat")
+        pyreadstat.write_sas7bdat(self.df_sas_dates2, path)
+        df, meta = pyreadstat.read_sas7bdat(path)
+        self.assertTrue(df.equals(self.df_sas_dates2))
+
+    def test_sas7bdat_write_charnan(self):
+        path = os.path.join(self.write_folder, "charnan.sas7bdat")
+        pyreadstat.write_sas7bdat(self.df_charnan, path)
+        df, meta = pyreadstat.read_sas7bdat(path)
+        df2 = self.df_charnan
+        df2.iloc[0,1] = ""
+        df2.iloc[0,2] = ""
+        df2['integer'] = df2["integer"].astype(float)
+        df2['object'] = df2['object'].astype(str)
+        self.assertTrue(df2.equals(df))
+
+    def test_sas7bdat_write_user_missing(self):
+        df_orig = pd.DataFrame([[3.0, "a"], ["A", "b"], ["_", "c"], [np.nan, "d"]], columns=["Var1", "Var2"])
+        missing_user_values = {'Var1': ['A', '_']}
+        path = os.path.join(self.write_folder, "user_missing_write.sas7bdat")
+        pyreadstat.write_sas7bdat(df_orig, path, missing_user_values=missing_user_values)
+
+        df, meta = pyreadstat.read_sas7bdat(path, user_missing=True)
+        self.assertListEqual(df["Var1"].tolist()[:3], [3.0, "A", "_"])
+        self.assertTrue(pd.isna(df["Var1"][3]))
+        self.assertDictEqual(meta.missing_user_values, missing_user_values)
+
+        # without user_missing special missing values become nan
+        df, meta = pyreadstat.read_sas7bdat(path)
+        self.assertEqual(df["Var1"][0], 3.0)
+        self.assertTrue(df["Var1"][1:].isna().all())
+
+    def test_sas7bdat_write_variable_formats(self):
+        path = os.path.join(self.write_folder, "formats_write.sas7bdat")
+        pyreadstat.write_sas7bdat(self.df_pandas, path, variable_format={'mynum': 'COMMA10.2', 'mydate': 'YYMMDD10'})
+        df, meta = pyreadstat.read_sas7bdat(path)
+        self.assertEqual(meta.original_variable_types['mynum'], 'COMMA10.2')
+        self.assertEqual(meta.original_variable_types['mydate'], 'YYMMDD10')
+        self.assertTrue(df.equals(self.df_pandas))
+
+    def test_sas7bdat_write_errors(self):
+        path = os.path.join(self.write_folder, "errors_write.sas7bdat")
+        # SAS variable names are case insensitive
+        df = pd.DataFrame({"a": [1.0], "A": [2.0]})
+        with self.assertRaises(pyreadstat.ReadstatError):
+            pyreadstat.write_sas7bdat(df, path)
+        # SAS special missing values are uppercase
+        df = pd.DataFrame({"a": [1.0, "a"]})
+        with self.assertRaises(pyreadstat.PyreadstatError):
+            pyreadstat.write_sas7bdat(df, path, missing_user_values={"a": ["a"]})
+
     def test_por_write_charnan(self):
         path = os.path.join(self.write_folder, "charnan_zsav.por")
         pyreadstat.write_por(self.df_charnan, path)

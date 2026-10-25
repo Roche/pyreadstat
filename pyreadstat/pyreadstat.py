@@ -1432,6 +1432,74 @@ def write_xport(
     )
 
 
+def write_sas7bdat(
+    df: "DataFrame",
+    dst_path: FilePathLike,
+    file_label: str = "",
+    column_labels: list[str | None] | dict[str, str | None] | None = None,
+    table_name: str | None = None,
+    compress: bool = False,
+    is_64bit: bool = True,
+    variable_format: dict[str, str] | None = None,
+    variable_informat: dict[str, str] | None = None,
+    missing_user_values: dict[str, list[str]] | None = None,
+) -> None:
+    """
+    Writes a dataframe to a SAS sas7bdat file.
+    Value labels cannot be stored in sas7bdat files (SAS keeps them in a separate sas7bcat catalog
+    file, which cannot be written).
+    SAS variable names are case insensitive, therefore column names that differ only in case
+    will raise an error.
+
+    Parameters
+    ----------
+    df : dataframe
+        dataframe to write to sas7bdat
+    dst_path : str, bytes or Path-like object
+        full path to the result sas7bdat file
+    file_label : str, optional
+        a label for the file
+    column_labels : list or dict, optional
+        labels for columns (variables), if list must be the same length as the number of columns. Variables with no
+        labels must be represented by None. If dict values must be variable names and values variable labels.
+        In such case there is no need to include all variables; labels for non existent
+        variables will be ignored with no warning or error.
+    table_name : str, optional
+        name of the dataset (member name in SAS)
+    compress : boolean, optional
+        if true the file is compressed with run length encoding (equivalent to COMPRESS=CHAR in SAS),
+        by default False. Binary compression (COMPRESS=BINARY) is not supported.
+    is_64bit : boolean, optional
+        if true (default) a 64 bit file is written, otherwise a 32 bit file.
+    variable_format: dict, optional
+        sets the format of a variable. Must be a dictionary with keys being the variable names and
+        values being strings defining the format. See README, setting variable formats section,
+        for more information.
+    variable_informat: dict, optional
+        sets the informat of a variable. Must be a dictionary with keys being the variable names and
+        values being strings defining the format.
+    missing_user_values : dict, optional
+        SAS special missing values for numeric variables. Must be a dictionary with keys being variable
+        names and values being a list of missing values. Missing values must be a single character
+        between A and Z, or _. They can be read back with read_sas7bdat and user_missing=True.
+    """
+
+    writer_format = "sas7bdat"
+    writer_entry_point(
+        df,
+        dst_path,
+        writer_format=writer_format,
+        file_label=file_label,
+        column_labels=column_labels,
+        table_name=table_name,
+        compress=compress,
+        is_64bit=is_64bit,
+        variable_format=variable_format,
+        variable_informat=variable_informat,
+        missing_user_values=missing_user_values,
+    )
+
+
 def write_por(
     df: "DataFrame",
     dst_path: FilePathLike,

@@ -5,6 +5,8 @@
   sas7bdat, the changes in xport come from Readstat.
 * Date/datetime/time formats with a trailing dot (e.g. DATE9.) are now recognized,
   including in extra_date_formats, extra_datetime_formats and extra_time_formats
+* New function write_sas7bdat to write SAS sas7bdat files since Readstat now produces
+  sas7bdat files that can be read in SAS.
 
 # 1.3.7 (github, pypi and conda 2026.10.21)
 * Fix parallel Polars reads when a chunk contains only missing values, including datetime columns (#350)

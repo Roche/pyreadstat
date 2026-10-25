@@ -281,7 +281,7 @@ print(df.head())
 
 #### Writing files
 
-Pyreadstat can write STATA (dta), SPSS (sav and zsav, por currently nor supported) and SAS (Xport, sas7bdat and sas7bcat
+Pyreadstat can write STATA (dta), SPSS (sav and zsav, por currently nor supported) and SAS (Xport and sas7bdat, sas7bcat
 currently not supported) files from pandas or polars dataframes.
 
 write functions take as first argument a pandas or polars dataframe (other data structures are not supported), as a second argument
@@ -300,7 +300,8 @@ pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_la
 
 Some special arguments are available depending on the function. write_sav can take also notes as string or list of strings, wheter to
 compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
-write_xport a name for the dataset. User defined missing values and value labels are also supported. See the
+write_xport a name for the dataset. write_sas7bdat a name for the dataset, whether to compress (RLE) and whether to write
+a 64 bit or 32 bit file. User defined missing values and value labels are also supported. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 Here there is a relation of all functions available.
@@ -321,6 +322,7 @@ You can also check the [Module documentation](https://ofajardo.github.io/pyreads
 | write_por           | write SPSS Portable (POR) files |
 | write_dta           | write STATA dta files |
 | write_xport         | write SAS Xport (XPT) files version 8 and 5 |
+| write_sas7bdat      | write SAS sas7bdat files |
 
 
 ### More reading options
@@ -776,7 +778,8 @@ For more information, please check the [Module documentation](https://ofajardo.g
 
 Some special arguments are available depending on the function. write_sav can take also notes as string or list of strings, wheter to
 compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
-write_xport a name for the dataset. See the
+write_xport a name for the dataset. write_sas7bdat a name for the dataset, whether to compress (RLE, equivalent to
+COMPRESS=CHAR in SAS) and whether to write a 64 bit (default) or 32 bit file. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 #### Writing value labels
@@ -830,6 +833,22 @@ variable_value_labels = {'Var1':{'a':'a missing value'}
 missing_ranges = {'Var1':['a'], 'Var2': ['b']}
 path = "/path/to/somefile.sav"
 pyreadstat.write_sav(df, path, missing_ranges=missing_ranges, variable_value_labels=variable_value_labels)
+```
+
+##### SAS
+
+The argument missing_user_values can be passed to write_sas7bdat to write SAS special missing values (.A to .Z and ._)
+only for numeric variables. It works as for STATA, but valid values are single character strings between A and Z
+(uppercase) or _. Value labels cannot be written to sas7bdat files. Read them back with read_sas7bdat and
+user_missing=True.
+
+```python
+import pandas as pd
+import pyreadstat
+df = pd.DataFrame([["A", 1],[2.2, 2],[3.3, "_"]], columns=['Var1', 'Var2'])
+missing_user_values = {'Var1':['A'], 'Var2': ['_']}
+path = "/path/to/somefile.sas7bdat"
+pyreadstat.write_sas7bdat(df, path, missing_user_values=missing_user_values)
 ```
 
 #### Setting variable formats

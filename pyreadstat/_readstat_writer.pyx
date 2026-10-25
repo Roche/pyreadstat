@@ -684,7 +684,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                    int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format,
-                   dict variable_informat, bint row_compression) except *:
+                   dict variable_informat, bint row_compression, bint is_64bit) except *:
     """
     main entry point for writing all formats. Some parameters are specific for certain file type
     and are even incompatible between them. This function relies on the caller to select the right
@@ -799,7 +799,10 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         if row_compression:
             check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))
 
-        # table name is used only for xpt files
+        # only used by SAS formats (sas7bdat, sas7bcat)
+        check_exit_status(readstat_writer_set_file_format_is_64bit(writer, is_64bit))
+
+        # table name is used only for xpt and sas7bdat files
         if table_name:
             table_name_bytes = table_name.encode("utf-8")
             tab_name = <char *> table_name_bytes
@@ -1010,6 +1013,7 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
                 dict variable_format=None,
                 dict variable_alignment = None,
                 dict variable_informat=None,
+                bint is_64bit=True,
                        ):
 
 
@@ -1049,9 +1053,15 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
         file_format_version = version
     elif writer_format == "por":
         writer_file_format = FILE_FORMAT_POR
+    elif writer_format == "sas7bdat":
+        writer_file_format = FILE_FORMAT_SAS7BDAT
+        # RLE compression
+        if compress:
+            row_compression = 1
     else:
         raise PyreadstatError("wrong writer format")
 
-    run_write(df, dst_path, writer_file_format, file_label, column_labels, 
+    run_write(df, dst_path, writer_file_format, file_label, column_labels,
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression)
+        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression,
+        is_64bit)

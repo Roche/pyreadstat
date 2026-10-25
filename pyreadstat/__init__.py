@@ -16,7 +16,7 @@
 
 
 from .pyreadstat import read_sav, read_sas7bdat, read_xport, read_dta, read_por, read_sas7bcat
-from .pyreadstat import write_sav, write_dta, write_xport, write_por
+from .pyreadstat import write_sav, write_dta, write_xport, write_por, write_sas7bdat
 from .pyreadstat import read_file_in_chunks, read_file_multiprocessing
 from .pyclasses import metadata_container
 from ._readstat_parser import ReadstatError, PyreadstatError
@@ -35,6 +35,7 @@ __all__ = (
     "write_dta",
     "write_xport",
     "write_por",
+    "write_sas7bdat",
     "read_file_in_chunks",
     "read_file_multiprocessing",
     "metadata_container",

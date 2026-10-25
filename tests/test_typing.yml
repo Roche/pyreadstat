@@ -269,6 +269,19 @@
     write_por(polars_df, "file.por")
     write_por(pandas_df, Path("file.por"))
 
+- case: write_sas7bdat_types
+  main: |
+    import pandas as pd
+    import polars as pl
+    from pathlib import Path
+    from pyreadstat import write_sas7bdat
+    pandas_df = pd.DataFrame()
+    polars_df = pl.DataFrame()
+    write_sas7bdat(pandas_df, "file.sas7bdat")
+    write_sas7bdat(polars_df, "file.sas7bdat")
+    write_sas7bdat(pandas_df, Path("file.sas7bdat"), compress=True, is_64bit=False)
+    write_sas7bdat(pandas_df, "file.sas7bdat", missing_user_values={"a": ["A"]})
+
 - case: set_value_labels_types
   parametrized:
     - backend: "pandas"
