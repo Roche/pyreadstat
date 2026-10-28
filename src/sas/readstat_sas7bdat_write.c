@@ -366,34 +366,26 @@ static readstat_error_t sas7bdat_text_add(sas7bdat_write_ctx_t *ctx, const char 
 /* Formats -------------------------------------------------------------- */
 
 /* Splits a format such as "DATETIME19.2" into name "DATETIME", width 19 and
- * 2 digits, the way SAS stores it. If the string can't be split without
- * losing information, it is stored verbatim as the format name. */
-static void sas7bdat_split_format(const char *format, char *name, size_t name_len,
+ * 2 digits, the way SAS stores it. */
+static readstat_error_t sas7bdat_split_format(const char *format, char *name, size_t name_len,
         uint16_t *width, uint16_t *digits) {
     name[0] = '\0';
     *width = 0;
     *digits = 0;
     if (format == NULL || format[0] == '\0')
-        return;
+        return READSTAT_OK;
 
     xport_format_t parsed;
-    if (xport_parse_format(format, strlen(format), &parsed, NULL, NULL) == READSTAT_OK &&
-            parsed.width >= 0 && parsed.width <= UINT16_MAX &&
-            parsed.decimals >= 0 && parsed.decimals <= UINT16_MAX) {
-        char rebuilt[64];
-        size_t len = snprintf(rebuilt, sizeof(rebuilt), "%s", parsed.name);
-        if (parsed.width && len < sizeof(rebuilt))
-            len += snprintf(rebuilt + len, sizeof(rebuilt) - len, "%d", parsed.width);
-        if (parsed.decimals && len < sizeof(rebuilt))
-            len += snprintf(rebuilt + len, sizeof(rebuilt) - len, ".%d", parsed.decimals);
-        if (len < sizeof(rebuilt) && strcmp(rebuilt, format) == 0) {
-            snprintf(name, name_len, "%s", parsed.name);
-            *width = parsed.width;
-            *digits = parsed.decimals;
-            return;
-        }
-    }
-    snprintf(name, name_len, "%s", format);
+    if (xport_parse_format(format, strlen(format), &parsed, NULL, NULL) != READSTAT_OK ||
+            parsed.width < 0 || parsed.width > UINT16_MAX ||
+            parsed.decimals < 0 || parsed.decimals > UINT16_MAX ||
+            (parsed.width == 0 && parsed.decimals != 0))
+        return READSTAT_ERROR_BAD_FORMAT_STRING;
+
+    snprintf(name, name_len, "%s", parsed.name);
+    *width = parsed.width;
+    *digits = parsed.decimals;
+    return READSTAT_OK;
 }
 
 /* Column name hash table ----------------------------------------------- */
@@ -528,10 +520,12 @@ static readstat_error_t sas7bdat_add_column_text(readstat_writer_t *writer, sas7
         size_t name_len = strlen(variable->name);
         size_t label_len = strlen(variable->label);
 
-        sas7bdat_split_format(variable->format, format_name, sizeof(format_name),
-                &ctx->format_widths[i], &ctx->format_digits[i]);
-        sas7bdat_split_format(variable->informat, informat_name, sizeof(informat_name),
-                &ctx->informat_widths[i], &ctx->informat_digits[i]);
+        if ((retval = sas7bdat_split_format(variable->format, format_name, sizeof(format_name),
+                        &ctx->format_widths[i], &ctx->format_digits[i])) != READSTAT_OK)
+            goto cleanup;
+        if ((retval = sas7bdat_split_format(variable->informat, informat_name, sizeof(informat_name),
+                        &ctx->informat_widths[i], &ctx->informat_digits[i])) != READSTAT_OK)
+            goto cleanup;
 
         if ((retval = sas7bdat_text_add(ctx, variable->name, &ctx->name_refs[i])) != READSTAT_OK)
             goto cleanup;
@@ -898,8 +892,8 @@ static void sas7bdat_fill_row_size_subheader(readstat_writer_t *writer, sas7bdat
     w2(&d[len-58], ctx->max_name_len);
     w2(&d[len-56], ctx->max_label_len);
     w2(&d[len-42], ctx->compressed ? 0 : ctx->rows_per_data_page);
-    wint(ctx, &d[OFF(ctx, 444, 776)], writer->row_count);
-    d[len-13] = 1;
+    wint(ctx, &d[OFF(ctx, 448, 776)], writer->row_count);
+    d[len-13] = OFF(ctx, 5, 1);
 }
 
 static void sas7bdat_fill_counts_subheader(sas7bdat_write_ctx_t *ctx) {

@@ -36,7 +36,7 @@ typedef struct xport_namestr_s {
 #pragma pack(pop)
 
 typedef struct xport_format_s {
-    char         name[32];
+    char         name[33];
     int          width;
     int          decimals;
 } xport_format_t;

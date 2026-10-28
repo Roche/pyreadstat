@@ -43,7 +43,7 @@ import_datetime()
 
 cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
-cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d*)?$|$)")
+cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d*)?$|\.?$)")
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "YYMMDD",
                                 "DDMMYYB", "DDMMYYC", "DDMMYYD",
                                 "DDMMYYN", "DDMMYYP", "DDMMYYS",
@@ -528,6 +528,10 @@ cdef int handle_variable(int index, readstat_variable_t *variable,
     # the name of the value label for the variable
     if val_labels != NULL:
         label_name = <str> val_labels
+        # for SAS readstat passes the format (e.g. "$A.") as the label set name,
+        # but catalogs name the set without the trailing dot ("$A")
+        if dc.file_format == FILE_FORMAT_SAS and label_name.endswith("."):
+            label_name = label_name[:-1]
         if label_name:
             dc.label_to_var_name[col_name] = label_name
     

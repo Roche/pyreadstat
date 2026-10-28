@@ -296,7 +296,10 @@ cleanup:
 static int compare_block_pointers(const void *elem1, const void *elem2) {
     uint64_t v1 = *(const uint64_t *)elem1;
     uint64_t v2 = *(const uint64_t *)elem2;
-    return v1 - v2;
+    /* The values pack a page number into the high 32 bits, so a plain
+     * subtraction truncated to int loses that half and misorders (or reports
+     * as equal) pointers on different pages. Compare three-way instead. */
+    return (v1 > v2) - (v1 < v2);
 }
 
 static void sas7bcat_sort_index(sas7bcat_ctx_t *ctx) {

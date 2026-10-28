@@ -746,14 +746,36 @@ static readstat_error_t sas7bdat_construct_format(char *dst, size_t dst_len,
     if (retval != READSTAT_OK)
         return retval;
 
+    /* Digits require a width */
+    if (width == 0 && digits != 0)
+        return READSTAT_ERROR_PARSE;
+
+    if (strchr(dst, '.')) {
+        /* Legacy layout: earlier ReadStat writers stored the full format
+         * string (e.g. "YYMMDD10." or "BEST.") verbatim as the name, with
+         * width and digits both 0. Return it unchanged. */
+        if (width == 0 && digits == 0)
+            return READSTAT_OK;
+        return READSTAT_ERROR_PARSE;
+    }
+
+    /* No format at all */
+    if (dst[0] == '\0' && width == 0)
+        return READSTAT_OK;
+
+    /* NAME. / NAMEw. / NAMEw.d (NAME may be empty, as in the w.d format) */
     size_t len = strlen(dst);
-    if (width && len < dst_len - 1) {
-        snprintf(dst + len, dst_len - len, "%d", width);
-        len = strlen(dst);
+    int written;
+    if (digits) {
+        written = snprintf(dst + len, dst_len - len, "%d.%d", width, digits);
+    } else if (width) {
+        written = snprintf(dst + len, dst_len - len, "%d.", width);
+    } else {
+        written = snprintf(dst + len, dst_len - len, ".");
     }
-    if (len && digits && len < dst_len - 1) {
-        snprintf(dst + len, dst_len - len, ".%d", digits);
-    }
+    if (written < 0 || (size_t)written >= dst_len - len)
+        return READSTAT_ERROR_PARSE;
+
     return READSTAT_OK;
 }
 

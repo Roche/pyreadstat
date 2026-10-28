@@ -1,12 +1,15 @@
 # 1.3.8 (github, pypi and conda 2026.xx.xx)
-* Updated Readstat sources to 4fbf1d8e516513dc06c7a73aab03b3daced87d4f
-* XPORT formats and informats with a width but no decimals now end with a dot
-  (e.g. YYMMDD10. instead of YYMMDD10), as written by SAS. This has not been changed for
-  sas7bdat, the changes in xport come from Readstat.
-* Date/datetime/time formats with a trailing dot (e.g. DATE9.) are now recognized,
+* Updated Readstat sources to 1434a0770a51b4fdb2c09515ea33c38f4fa51be8
+* XPORT and sas7bdat formats and informats without decimals now end with a dot
+  (e.g. YYMMDD10. instead of YYMMDD10, DATETIME. instead of DATETIME), as written by SAS.
+  The changes come from Readstat.
+* write_sas7bdat now raises an error for format strings that cannot be parsed (Readstat
+  previously stored them verbatim).
+* Date/datetime/time formats with a trailing dot (e.g. DATE9., DATETIME.) are now recognized,
   including in extra_date_formats, extra_datetime_formats and extra_time_formats
 * New function write_sas7bdat to write SAS sas7bdat files since Readstat now produces
-  sas7bdat files that can be read in SAS.
+  sas7bdat files that can be read in SAS. Only uncompressed files are written, as compressed
+  files cannot be read by SAS yet.
 
 # 1.3.7 (github, pypi and conda 2026.10.21)
 * Fix parallel Polars reads when a chunk contains only missing values, including datetime columns (#350)

@@ -1121,22 +1121,19 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(meta.file_label, file_label)
         self.assertListEqual(meta.column_labels, col_labels)
         self.assertEqual(table_name, meta.table_name)
-        self.assertEqual(meta.original_variable_informats['mydate'], 'YYMMDD10')
+        self.assertEqual(meta.original_variable_informats['mydate'], 'YYMMDD10.')
         self.assertEqual(meta.original_variable_informats['mytime'], 'TIME20.3')
 
-    def test_sas7bdat_write_compress_32bit(self):
+    def test_sas7bdat_write_32bit(self):
         path = os.path.join(self.write_folder, "write_options.sas7bdat")
-        # byte 32 of the header is the 64 bit alignment marker (0x33) and the RLE compression
-        # signature SASYZCRL is written only to compressed files
-        for compress in (False, True):
-            for is_64bit in (True, False):
-                pyreadstat.write_sas7bdat(self.df_pandas, path, compress=compress, is_64bit=is_64bit)
-                df, meta = pyreadstat.read_sas7bdat(path, output_format=self.backend)
-                self.assertTrue(df.equals(self.df_pandas))
-                with open(path, "rb") as fh:
-                    raw = fh.read()
-                self.assertEqual(raw[32] == 0x33, is_64bit)
-                self.assertEqual(b"SASYZCRL" in raw, compress)
+        # byte 32 of the header is the 64 bit alignment marker (0x33)
+        for is_64bit in (True, False):
+            pyreadstat.write_sas7bdat(self.df_pandas, path, is_64bit=is_64bit)
+            df, meta = pyreadstat.read_sas7bdat(path, output_format=self.backend)
+            self.assertTrue(df.equals(self.df_pandas))
+            with open(path, "rb") as fh:
+                raw = fh.read()
+            self.assertEqual(raw[32] == 0x33, is_64bit)
 
     def test_sas7bdat_write_dates(self):
         path = os.path.join(self.write_folder, "dates_write.sas7bdat")
@@ -1191,7 +1188,7 @@ class TestBasic(unittest.TestCase):
         pyreadstat.write_sas7bdat(self.df_pandas, path, variable_format={'mynum': 'COMMA10.2', 'mydate': 'YYMMDD10'})
         df, meta = pyreadstat.read_sas7bdat(path, output_format=self.backend)
         self.assertEqual(meta.original_variable_types['mynum'], 'COMMA10.2')
-        self.assertEqual(meta.original_variable_types['mydate'], 'YYMMDD10')
+        self.assertEqual(meta.original_variable_types['mydate'], 'YYMMDD10.')
         self.assertTrue(df.equals(self.df_pandas))
 
     def test_sas7bdat_write_errors(self):
