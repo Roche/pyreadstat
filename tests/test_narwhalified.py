@@ -1107,6 +1107,18 @@ class TestBasic(unittest.TestCase):
         df2 = df2.to_native()
         self.assertTrue(df2.equals(df))
 
+    def test_sav_write_object_enum_all_null(self):
+        # issue 356
+        if self.backend != "polars":
+            self.skipTest("Polars Object and Enum dtypes")
+        df_in = pl.DataFrame({"obj": [None, None, None], "enum": [None, None, None]},
+                             schema={"obj": pl.Object, "enum": pl.Enum(["a", "b"])})
+        path = os.path.join(self.write_folder, "object_enum_all_null.sav")
+        pyreadstat.write_sav(df_in, path)
+        df, meta = pyreadstat.read_sav(path, output_format=self.backend)
+        expected = pl.DataFrame({"obj": ["", "", ""], "enum": ["", "", ""]})
+        self.assertTrue(df.equals(expected))
+
     def test_sas7bdat_write_basic(self):
         file_label = "basic write"
         table_name = "TEST"

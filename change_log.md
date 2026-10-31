@@ -10,6 +10,7 @@
 * New function write_sas7bdat to write SAS sas7bdat files since Readstat now produces
   sas7bdat files that can be read in SAS. Only uncompressed files are written, as compressed
   files cannot be read by SAS yet.
+* Fix writing Polars Object or Enum columns containing only missing values (#356)
 
 # 1.3.7 (github, pypi and conda 2026.10.21)
 * Fix parallel Polars reads when a chunk contains only missing values, including datetime columns (#350)

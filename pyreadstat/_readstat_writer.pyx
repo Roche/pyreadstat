@@ -306,7 +306,8 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         curtype = None
         equal = True
         # let's deal first with object type, Enum could also be anything
-        if col_type == nw.Object or col_type==nw.Enum:
+        # if the series is empty (all nulls) it is handled at the end as other unknown types
+        if (col_type == nw.Object or col_type==nw.Enum) and len(curseries):
             curtype = type(curseries[0])
             equal = check_series_all_same_types(curseries, curtype)
             # if all elements are equal, they could be a few we expect to be an object class
