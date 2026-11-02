@@ -1438,6 +1438,7 @@ def write_sas7bdat(
     file_label: str = "",
     column_labels: list[str | None] | dict[str, str | None] | None = None,
     table_name: str | None = None,
+    row_compress: bool = False,
     is_64bit: bool = True,
     variable_format: dict[str, str] | None = None,
     variable_informat: dict[str, str] | None = None,
@@ -1465,6 +1466,9 @@ def write_sas7bdat(
         variables will be ignored with no warning or error.
     table_name : str, optional
         name of the dataset (member name in SAS)
+    row_compress : boolean, optional
+        if true rows are compressed with run length encoding (RLE), equivalent to SAS COMPRESS=CHAR,
+        by default False
     is_64bit : boolean, optional
         if true (default) a 64 bit file is written, otherwise a 32 bit file.
     variable_format: dict, optional
@@ -1488,9 +1492,7 @@ def write_sas7bdat(
         file_label=file_label,
         column_labels=column_labels,
         table_name=table_name,
-        # RLE compressed files written by Readstat cannot be read by SAS yet, therefore
-        # compression is not exposed. Re-add compress to the signature once it works.
-        compress=False,
+        row_compress=row_compress,
         is_64bit=is_64bit,
         variable_format=variable_format,
         variable_informat=variable_informat,

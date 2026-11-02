@@ -195,7 +195,7 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
     int string_offset = 0;
     int payload_offset = 106;
     uint16_t flags = 0;
-    char name[4*32+1];
+    char name[4*32+2]; /* room for the trailing dot */
 
     if (data_size < payload_offset)
         goto cleanup;
@@ -227,7 +227,7 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
         goto cleanup;
     }
 
-    if ((retval = readstat_convert(name, sizeof(name), &data[8], 8, ctx->converter)) != READSTAT_OK)
+    if ((retval = readstat_convert(name, sizeof(name) - 1, &data[8], 8, ctx->converter)) != READSTAT_OK)
         goto cleanup;
 
     if (pad) {
@@ -238,11 +238,14 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
         if (data_size < payload_offset + pad + 32)
             goto cleanup;
 
-        retval = readstat_convert(name, sizeof(name), &data[payload_offset+pad], 32, ctx->converter);
+        retval = readstat_convert(name, sizeof(name) - 1, &data[payload_offset+pad], 32, ctx->converter);
         if (retval != READSTAT_OK)
             goto cleanup;
         pad += 32;
     }
+
+    /* Present format names the way SAS does, e.g. "MYFMT." or "$MYFMT." */
+    strcat(name, ".");
 
     if (data_size < payload_offset + pad)
         goto cleanup;

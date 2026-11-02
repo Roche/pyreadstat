@@ -1028,6 +1028,10 @@ static readstat_error_t sas7bdat_write_comp_page(readstat_writer_t *writer, sas7
     int64_t rows_on_first_page = 0;
     int64_t i;
 
+    /* SAS lays out the COMP page within at most 0x7FFF bytes, as the field
+     * at phs-2 is a signed 16-bit value, and zero-fills the rest. */
+    size_t region = ctx->page_size < 0x7FFF ? ctx->page_size : 0x7FFF;
+
     for (i=first_page->first; i<first_page->first+first_page->count; i++) {
         if (ctx->subheaders[i]->is_row_data)
             rows_on_first_page++;
@@ -1039,10 +1043,10 @@ static readstat_error_t sas7bdat_write_comp_page(readstat_writer_t *writer, sas7
     w2(&buffer[ctx->phs-8], SAS_PAGE_TYPE_COMP);
     w2(&buffer[ctx->phs-6], ctx->total_pages);
     w2(&buffer[ctx->phs-4], 1);
-    w2(&buffer[ctx->phs-2], ctx->page_size - ctx->phs - ctx->sps - 2);
-    buffer[ctx->page_size-7] = rows_on_first_page & 0xFF;
-    buffer[ctx->page_size-6] = 1;
-    w2(&buffer[ctx->page_size-2], first_page->count);
+    w2(&buffer[ctx->phs-2], region - ctx->phs - ctx->sps - (10 - ctx->int_len));
+    buffer[region - ctx->int_len - 3] = rows_on_first_page & 0xFF;
+    buffer[region - ctx->int_len - 2] = 1;
+    w2(&buffer[region-2], first_page->count);
 
     return readstat_write_bytes(writer, buffer, ctx->page_size);
 }

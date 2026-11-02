@@ -300,8 +300,8 @@ pyreadstat.write_sav(df, "path/to/destination.sav", file_label="test", column_la
 
 Some special arguments are available depending on the function. write_sav can take also notes as string or list of strings, wheter to
 compress or not as zsav or apply row compression, variable display widths and variable measures. write_dta can take a stata version.
-write_xport a name for the dataset. write_sas7bdat a name for the dataset and whether to write
-a 64 bit or 32 bit file. User defined missing values and value labels are also supported. See the
+write_xport a name for the dataset. write_sas7bdat a name for the dataset, whether to apply row compression
+(SAS COMPRESS=CHAR) and whether to write a 64 bit or 32 bit file. User defined missing values and value labels are also supported. See the
 [Module documentation](https://ofajardo.github.io/pyreadstat_documentation/_build/html/index.html) for more details.
 
 Here there is a relation of all functions available.

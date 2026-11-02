@@ -1,15 +1,11 @@
 # 1.3.8 (github, pypi and conda 2026.xx.xx)
-* Updated Readstat sources to 1434a0770a51b4fdb2c09515ea33c38f4fa51be8
-* XPORT and sas7bdat formats and informats without decimals now end with a dot
+* Updated Readstat sources to e36e4fb250927346e4a480694fb6a447a7803057
+* XPORT, sas7bdat and sas7bcat formats and informats without decimals now end with a dot
   (e.g. YYMMDD10. instead of YYMMDD10, DATETIME. instead of DATETIME), as written by SAS.
   The changes come from Readstat.
-* write_sas7bdat now raises an error for format strings that cannot be parsed (Readstat
-  previously stored them verbatim).
-* Date/datetime/time formats with a trailing dot (e.g. DATE9., DATETIME.) are now recognized,
-  including in extra_date_formats, extra_datetime_formats and extra_time_formats
 * New function write_sas7bdat to write SAS sas7bdat files since Readstat now produces
-  sas7bdat files that can be read in SAS. Only uncompressed files are written, as compressed
-  files cannot be read by SAS yet.
+  sas7bdat files that can be read in SAS. Row compression (RLE, SAS COMPRESS=CHAR) is
+  available with row_compress=True. Binary compression (COMPRESS=BINARY) is not supported.
 * Fix writing Polars Object or Enum columns containing only missing values (#356)
 
 # 1.3.7 (github, pypi and conda 2026.10.21)

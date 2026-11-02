@@ -1056,8 +1056,9 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
         writer_file_format = FILE_FORMAT_POR
     elif writer_format == "sas7bdat":
         writer_file_format = FILE_FORMAT_SAS7BDAT
-        # RLE compression
-        if compress:
+        # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
+        # compression, which Readstat cannot write yet
+        if row_compress:
             row_compression = 1
     else:
         raise PyreadstatError("wrong writer format")

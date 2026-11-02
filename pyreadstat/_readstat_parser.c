@@ -1740,7 +1740,7 @@ enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format {
 };
 typedef enum __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format __pyx_t_10pyreadstat_16_readstat_parser_py_variable_format;
 
-/* "pyreadstat/_readstat_parser.pyx":928
+/* "pyreadstat/_readstat_parser.pyx":924
  * 
  * 
  * cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset, object file_obj=None) except *:             # <<<<<<<<<<<<<<
@@ -9615,7 +9615,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *     # the name of the value label for the variable
  *     if val_labels != NULL:             # <<<<<<<<<<<<<<
  *         label_name = <str> val_labels
- *         # for SAS readstat passes the format (e.g. "$A.") as the label set name,
+ *         if label_name:
 */
   __pyx_t_2 = (__pyx_v_val_labels != NULL);
   if (__pyx_t_2) {
@@ -9624,8 +9624,8 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *     # the name of the value label for the variable
  *     if val_labels != NULL:
  *         label_name = <str> val_labels             # <<<<<<<<<<<<<<
- *         # for SAS readstat passes the format (e.g. "$A.") as the label set name,
- *         # but catalogs name the set without the trailing dot ("$A")
+ *         if label_name:
+ *             dc.label_to_var_name[col_name] = label_name
 */
     __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_val_labels); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 530, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -9635,56 +9635,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __pyx_v_label_name = ((PyObject*)__pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":533
- *         # for SAS readstat passes the format (e.g. "$A.") as the label set name,
- *         # but catalogs name the set without the trailing dot ("$A")
- *         if dc.file_format == FILE_FORMAT_SAS and label_name.endswith("."):             # <<<<<<<<<<<<<<
- *             label_name = label_name[:-1]
- *         if label_name:
-*/
-    __pyx_t_4 = (__pyx_v_dc->file_format == __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS);
-    if (__pyx_t_4) {
-    } else {
-      __pyx_t_2 = __pyx_t_4;
-      goto __pyx_L13_bool_binop_done;
-    }
-    if (unlikely(__pyx_v_label_name == Py_None)) {
-      PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "endswith");
-      __PYX_ERR(0, 533, __pyx_L1_error)
-    }
-    __pyx_t_4 = __Pyx_PyUnicode_Tailmatch(__pyx_v_label_name, __pyx_mstate_global->__pyx_kp_u__4, 0, PY_SSIZE_T_MAX, 1); if (unlikely(__pyx_t_4 == ((int)-1))) __PYX_ERR(0, 533, __pyx_L1_error)
-    __pyx_t_2 = __pyx_t_4;
-    __pyx_L13_bool_binop_done:;
-    if (__pyx_t_2) {
-
-      /* "pyreadstat/_readstat_parser.pyx":534
- *         # but catalogs name the set without the trailing dot ("$A")
- *         if dc.file_format == FILE_FORMAT_SAS and label_name.endswith("."):
- *             label_name = label_name[:-1]             # <<<<<<<<<<<<<<
- *         if label_name:
- *             dc.label_to_var_name[col_name] = label_name
-*/
-      if (unlikely(__pyx_v_label_name == Py_None)) {
-        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 534, __pyx_L1_error)
-      }
-      __pyx_t_7 = __Pyx_PyUnicode_Substring(__pyx_v_label_name, 0, -1L); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 534, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_DECREF_SET(__pyx_v_label_name, ((PyObject*)__pyx_t_7));
-      __pyx_t_7 = 0;
-
-      /* "pyreadstat/_readstat_parser.pyx":533
- *         # for SAS readstat passes the format (e.g. "$A.") as the label set name,
- *         # but catalogs name the set without the trailing dot ("$A")
- *         if dc.file_format == FILE_FORMAT_SAS and label_name.endswith("."):             # <<<<<<<<<<<<<<
- *             label_name = label_name[:-1]
- *         if label_name:
-*/
-    }
-
-    /* "pyreadstat/_readstat_parser.pyx":535
- *         if dc.file_format == FILE_FORMAT_SAS and label_name.endswith("."):
- *             label_name = label_name[:-1]
+    /* "pyreadstat/_readstat_parser.pyx":531
+ *     if val_labels != NULL:
+ *         label_name = <str> val_labels
  *         if label_name:             # <<<<<<<<<<<<<<
  *             dc.label_to_var_name[col_name] = label_name
  * 
@@ -9693,24 +9646,24 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     else
     {
       Py_ssize_t __pyx_temp = __Pyx_PyUnicode_IS_TRUE(__pyx_v_label_name);
-      if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 535, __pyx_L1_error)
+      if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 531, __pyx_L1_error)
       __pyx_t_2 = (__pyx_temp != 0);
     }
 
     if (__pyx_t_2) {
 
-      /* "pyreadstat/_readstat_parser.pyx":536
- *             label_name = label_name[:-1]
+      /* "pyreadstat/_readstat_parser.pyx":532
+ *         label_name = <str> val_labels
  *         if label_name:
  *             dc.label_to_var_name[col_name] = label_name             # <<<<<<<<<<<<<<
  * 
  *     var_label = readstat_variable_get_label(variable)
 */
-      if (unlikely((PyObject_SetItem(__pyx_v_dc->label_to_var_name, __pyx_v_col_name, __pyx_v_label_name) < 0))) __PYX_ERR(0, 536, __pyx_L1_error)
+      if (unlikely((PyObject_SetItem(__pyx_v_dc->label_to_var_name, __pyx_v_col_name, __pyx_v_label_name) < 0))) __PYX_ERR(0, 532, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":535
- *         if dc.file_format == FILE_FORMAT_SAS and label_name.endswith("."):
- *             label_name = label_name[:-1]
+      /* "pyreadstat/_readstat_parser.pyx":531
+ *     if val_labels != NULL:
+ *         label_name = <str> val_labels
  *         if label_name:             # <<<<<<<<<<<<<<
  *             dc.label_to_var_name[col_name] = label_name
  * 
@@ -9722,11 +9675,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *     # the name of the value label for the variable
  *     if val_labels != NULL:             # <<<<<<<<<<<<<<
  *         label_name = <str> val_labels
- *         # for SAS readstat passes the format (e.g. "$A.") as the label set name,
+ *         if label_name:
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":538
+  /* "pyreadstat/_readstat_parser.pyx":534
  *             dc.label_to_var_name[col_name] = label_name
  * 
  *     var_label = readstat_variable_get_label(variable)             # <<<<<<<<<<<<<<
@@ -9735,7 +9688,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_var_label = readstat_variable_get_label(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":539
+  /* "pyreadstat/_readstat_parser.pyx":535
  * 
  *     var_label = readstat_variable_get_label(variable)
  *     if var_label == NULL:             # <<<<<<<<<<<<<<
@@ -9745,7 +9698,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   __pyx_t_2 = (__pyx_v_var_label == NULL);
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":540
+    /* "pyreadstat/_readstat_parser.pyx":536
  *     var_label = readstat_variable_get_label(variable)
  *     if var_label == NULL:
  *         col_label = None             # <<<<<<<<<<<<<<
@@ -9755,17 +9708,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(Py_None);
     __pyx_v_col_label = ((PyObject*)Py_None);
 
-    /* "pyreadstat/_readstat_parser.pyx":539
+    /* "pyreadstat/_readstat_parser.pyx":535
  * 
  *     var_label = readstat_variable_get_label(variable)
  *     if var_label == NULL:             # <<<<<<<<<<<<<<
  *         col_label = None
  *     else:
 */
-    goto __pyx_L16;
+    goto __pyx_L13;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":542
+  /* "pyreadstat/_readstat_parser.pyx":538
  *         col_label = None
  *     else:
  *         col_label = <str>var_label             # <<<<<<<<<<<<<<
@@ -9773,7 +9726,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  * 
 */
   /*else*/ {
-    __pyx_t_7 = __Pyx_PyUnicode_FromString(__pyx_v_var_label); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 542, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_FromString(__pyx_v_var_label); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 538, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_1 = __pyx_t_7;
     __Pyx_INCREF(__pyx_t_1);
@@ -9781,9 +9734,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __pyx_v_col_label = ((PyObject*)__pyx_t_1);
     __pyx_t_1 = 0;
   }
-  __pyx_L16:;
+  __pyx_L13:;
 
-  /* "pyreadstat/_readstat_parser.pyx":543
+  /* "pyreadstat/_readstat_parser.pyx":539
  *     else:
  *         col_label = <str>var_label
  *     dc.col_labels.append(col_label)             # <<<<<<<<<<<<<<
@@ -9792,11 +9745,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_labels == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 543, __pyx_L1_error)
+    __PYX_ERR(0, 539, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_labels, __pyx_v_col_label); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 543, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_labels, __pyx_v_col_label); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 539, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":546
+  /* "pyreadstat/_readstat_parser.pyx":542
  * 
  *     # format, we have to transform it in something more usable
  *     var_format = readstat_variable_get_format(variable)             # <<<<<<<<<<<<<<
@@ -9805,7 +9758,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_var_format = readstat_variable_get_format(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":547
+  /* "pyreadstat/_readstat_parser.pyx":543
  *     # format, we have to transform it in something more usable
  *     var_format = readstat_variable_get_format(variable)
  *     if var_format == NULL:             # <<<<<<<<<<<<<<
@@ -9815,7 +9768,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   __pyx_t_2 = (__pyx_v_var_format == NULL);
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":549
+    /* "pyreadstat/_readstat_parser.pyx":545
  *     if var_format == NULL:
  *         #col_format_original = "NULL"
  *         col_format_original = None             # <<<<<<<<<<<<<<
@@ -9825,17 +9778,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(Py_None);
     __pyx_v_col_format_original = ((PyObject*)Py_None);
 
-    /* "pyreadstat/_readstat_parser.pyx":547
+    /* "pyreadstat/_readstat_parser.pyx":543
  *     # format, we have to transform it in something more usable
  *     var_format = readstat_variable_get_format(variable)
  *     if var_format == NULL:             # <<<<<<<<<<<<<<
  *         #col_format_original = "NULL"
  *         col_format_original = None
 */
-    goto __pyx_L17;
+    goto __pyx_L14;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":551
+  /* "pyreadstat/_readstat_parser.pyx":547
  *         col_format_original = None
  *     else:
  *         col_format_original = <str>var_format             # <<<<<<<<<<<<<<
@@ -9843,7 +9796,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *     var_informat = readstat_variable_get_informat(variable)
 */
   /*else*/ {
-    __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_var_format); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 551, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_var_format); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 547, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_7 = __pyx_t_1;
     __Pyx_INCREF(__pyx_t_7);
@@ -9851,9 +9804,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __pyx_v_col_format_original = ((PyObject*)__pyx_t_7);
     __pyx_t_7 = 0;
   }
-  __pyx_L17:;
+  __pyx_L14:;
 
-  /* "pyreadstat/_readstat_parser.pyx":553
+  /* "pyreadstat/_readstat_parser.pyx":549
  *         col_format_original = <str>var_format
  *     # informat (SAS)
  *     var_informat = readstat_variable_get_informat(variable)             # <<<<<<<<<<<<<<
@@ -9862,7 +9815,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_var_informat = readstat_variable_get_informat(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":554
+  /* "pyreadstat/_readstat_parser.pyx":550
  *     # informat (SAS)
  *     var_informat = readstat_variable_get_informat(variable)
  *     if var_informat == NULL:             # <<<<<<<<<<<<<<
@@ -9872,7 +9825,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   __pyx_t_2 = (__pyx_v_var_informat == NULL);
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":555
+    /* "pyreadstat/_readstat_parser.pyx":551
  *     var_informat = readstat_variable_get_informat(variable)
  *     if var_informat == NULL:
  *         col_informat_original = None             # <<<<<<<<<<<<<<
@@ -9882,17 +9835,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(Py_None);
     __pyx_v_col_informat_original = ((PyObject*)Py_None);
 
-    /* "pyreadstat/_readstat_parser.pyx":554
+    /* "pyreadstat/_readstat_parser.pyx":550
  *     # informat (SAS)
  *     var_informat = readstat_variable_get_informat(variable)
  *     if var_informat == NULL:             # <<<<<<<<<<<<<<
  *         col_informat_original = None
  *     else:
 */
-    goto __pyx_L18;
+    goto __pyx_L15;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":557
+  /* "pyreadstat/_readstat_parser.pyx":553
  *         col_informat_original = None
  *     else:
  *         col_informat_original = <str>var_informat             # <<<<<<<<<<<<<<
@@ -9900,7 +9853,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *     dc.col_formats_original.append(col_format_original)
 */
   /*else*/ {
-    __pyx_t_7 = __Pyx_PyUnicode_FromString(__pyx_v_var_informat); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 557, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyUnicode_FromString(__pyx_v_var_informat); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 553, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_1 = __pyx_t_7;
     __Pyx_INCREF(__pyx_t_1);
@@ -9908,9 +9861,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __pyx_v_col_informat_original = ((PyObject*)__pyx_t_1);
     __pyx_t_1 = 0;
   }
-  __pyx_L18:;
+  __pyx_L15:;
 
-  /* "pyreadstat/_readstat_parser.pyx":558
+  /* "pyreadstat/_readstat_parser.pyx":554
  *     else:
  *         col_informat_original = <str>var_informat
  *     file_format = dc.file_format             # <<<<<<<<<<<<<<
@@ -9920,7 +9873,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   __pyx_t_9 = __pyx_v_dc->file_format;
   __pyx_v_file_format = __pyx_t_9;
 
-  /* "pyreadstat/_readstat_parser.pyx":559
+  /* "pyreadstat/_readstat_parser.pyx":555
  *         col_informat_original = <str>var_informat
  *     file_format = dc.file_format
  *     dc.col_formats_original.append(col_format_original)             # <<<<<<<<<<<<<<
@@ -9929,11 +9882,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_formats_original == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 559, __pyx_L1_error)
+    __PYX_ERR(0, 555, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_formats_original, __pyx_v_col_format_original); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 559, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_formats_original, __pyx_v_col_format_original); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 555, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":560
+  /* "pyreadstat/_readstat_parser.pyx":556
  *     file_format = dc.file_format
  *     dc.col_formats_original.append(col_format_original)
  *     dc.col_informats_original.append(col_informat_original)             # <<<<<<<<<<<<<<
@@ -9942,21 +9895,21 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_informats_original == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 560, __pyx_L1_error)
+    __PYX_ERR(0, 556, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_informats_original, __pyx_v_col_informat_original); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 560, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_informats_original, __pyx_v_col_informat_original); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 556, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":561
+  /* "pyreadstat/_readstat_parser.pyx":557
  *     dc.col_formats_original.append(col_format_original)
  *     dc.col_informats_original.append(col_informat_original)
  *     col_format_final = transform_variable_format(col_format_original, file_format)             # <<<<<<<<<<<<<<
  *     dc.col_formats.append(col_format_final)
  *     # readstat type
 */
-  __pyx_t_10 = __pyx_f_10pyreadstat_16_readstat_parser_transform_variable_format(__pyx_v_col_format_original, __pyx_v_file_format); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 561, __pyx_L1_error)
+  __pyx_t_10 = __pyx_f_10pyreadstat_16_readstat_parser_transform_variable_format(__pyx_v_col_format_original, __pyx_v_file_format); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 557, __pyx_L1_error)
   __pyx_v_col_format_final = __pyx_t_10;
 
-  /* "pyreadstat/_readstat_parser.pyx":562
+  /* "pyreadstat/_readstat_parser.pyx":558
  *     dc.col_informats_original.append(col_informat_original)
  *     col_format_final = transform_variable_format(col_format_original, file_format)
  *     dc.col_formats.append(col_format_final)             # <<<<<<<<<<<<<<
@@ -9965,14 +9918,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_formats == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 562, __pyx_L1_error)
+    __PYX_ERR(0, 558, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyLong_From___pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format(__pyx_v_col_format_final); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 562, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From___pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format(__pyx_v_col_format_final); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_formats, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 562, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_formats, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 558, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":564
+  /* "pyreadstat/_readstat_parser.pyx":560
  *     dc.col_formats.append(col_format_final)
  *     # readstat type
  *     var_type = readstat_variable_get_type(variable)             # <<<<<<<<<<<<<<
@@ -9981,7 +9934,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_var_type = readstat_variable_get_type(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":565
+  /* "pyreadstat/_readstat_parser.pyx":561
  *     # readstat type
  *     var_type = readstat_variable_get_type(variable)
  *     dc.col_dtypes.append(var_type)             # <<<<<<<<<<<<<<
@@ -9990,14 +9943,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_dtypes == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 565, __pyx_L1_error)
+    __PYX_ERR(0, 561, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyLong_From_readstat_type_t(__pyx_v_var_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 565, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyLong_From_readstat_type_t(__pyx_v_var_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 561, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_dtypes, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 565, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_dtypes, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 561, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":568
+  /* "pyreadstat/_readstat_parser.pyx":564
  *     # equivalent numpy type
  *     # if it's a date then we need object
  *     if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0:             # <<<<<<<<<<<<<<
@@ -10008,14 +9961,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   if (__pyx_t_4) {
   } else {
     __pyx_t_2 = __pyx_t_4;
-    goto __pyx_L20_bool_binop_done;
+    goto __pyx_L17_bool_binop_done;
   }
   __pyx_t_4 = (__pyx_v_dc->no_datetime_conversion == 0);
   __pyx_t_2 = __pyx_t_4;
-  __pyx_L20_bool_binop_done:;
+  __pyx_L17_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":569
+    /* "pyreadstat/_readstat_parser.pyx":565
  *     # if it's a date then we need object
  *     if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0:
  *         curnptype = object             # <<<<<<<<<<<<<<
@@ -10025,17 +9978,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_builtin_object);
     __pyx_v_curnptype = __pyx_builtin_object;
 
-    /* "pyreadstat/_readstat_parser.pyx":568
+    /* "pyreadstat/_readstat_parser.pyx":564
  *     # equivalent numpy type
  *     # if it's a date then we need object
  *     if col_format_final != DATE_FORMAT_NOTADATE and dc.no_datetime_conversion == 0:             # <<<<<<<<<<<<<<
  *         curnptype = object
  *     else:
 */
-    goto __pyx_L19;
+    goto __pyx_L16;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":571
+  /* "pyreadstat/_readstat_parser.pyx":567
  *         curnptype = object
  *     else:
  *         curnptype = readstat_to_numpy_types[var_type]             # <<<<<<<<<<<<<<
@@ -10045,19 +9998,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   /*else*/ {
     if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_readstat_to_numpy_types == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 571, __pyx_L1_error)
+      __PYX_ERR(0, 567, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyLong_From_readstat_type_t(__pyx_v_var_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 571, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyLong_From_readstat_type_t(__pyx_v_var_type); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_10pyreadstat_16_readstat_parser_readstat_to_numpy_types, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 571, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_10pyreadstat_16_readstat_parser_readstat_to_numpy_types, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_curnptype = __pyx_t_7;
     __pyx_t_7 = 0;
   }
-  __pyx_L19:;
+  __pyx_L16:;
 
-  /* "pyreadstat/_readstat_parser.pyx":572
+  /* "pyreadstat/_readstat_parser.pyx":568
  *     else:
  *         curnptype = readstat_to_numpy_types[var_type]
  *     iscurnptypefloat = 0             # <<<<<<<<<<<<<<
@@ -10066,7 +10019,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_iscurnptypefloat = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":573
+  /* "pyreadstat/_readstat_parser.pyx":569
  *         curnptype = readstat_to_numpy_types[var_type]
  *     iscurnptypefloat = 0
  *     iscurnptypeobject = 0             # <<<<<<<<<<<<<<
@@ -10075,7 +10028,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_iscurnptypeobject = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":575
+  /* "pyreadstat/_readstat_parser.pyx":571
  *     iscurnptypeobject = 0
  *     # book keeping numpy types
  *     dc.col_numpy_dtypes[index] = curnptype             # <<<<<<<<<<<<<<
@@ -10084,23 +10037,23 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_numpy_dtypes == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 575, __pyx_L1_error)
+    __PYX_ERR(0, 571, __pyx_L1_error)
   }
-  if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, __pyx_v_curnptype, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 575, __pyx_L1_error)
+  if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, __pyx_v_curnptype, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 571, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":576
+  /* "pyreadstat/_readstat_parser.pyx":572
  *     # book keeping numpy types
  *     dc.col_numpy_dtypes[index] = curnptype
  *     if curnptype == object:             # <<<<<<<<<<<<<<
  *         iscurnptypeobject = 1
  *     if curnptype == np.float64:
 */
-  __pyx_t_7 = PyObject_RichCompare(__pyx_v_curnptype, __pyx_builtin_object, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 576, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 576, __pyx_L1_error)
+  __pyx_t_7 = PyObject_RichCompare(__pyx_v_curnptype, __pyx_builtin_object, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 572, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 572, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":577
+    /* "pyreadstat/_readstat_parser.pyx":573
  *     dc.col_numpy_dtypes[index] = curnptype
  *     if curnptype == object:
  *         iscurnptypeobject = 1             # <<<<<<<<<<<<<<
@@ -10109,7 +10062,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
     __pyx_v_iscurnptypeobject = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":576
+    /* "pyreadstat/_readstat_parser.pyx":572
  *     # book keeping numpy types
  *     dc.col_numpy_dtypes[index] = curnptype
  *     if curnptype == object:             # <<<<<<<<<<<<<<
@@ -10118,25 +10071,25 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":578
+  /* "pyreadstat/_readstat_parser.pyx":574
  *     if curnptype == object:
  *         iscurnptypeobject = 1
  *     if curnptype == np.float64:             # <<<<<<<<<<<<<<
  *         iscurnptypefloat = 1
  *     dc.col_dtypes_isobject[index] = iscurnptypeobject
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 574, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_float64); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 574, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  __pyx_t_7 = PyObject_RichCompare(__pyx_v_curnptype, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_7 = PyObject_RichCompare(__pyx_v_curnptype, __pyx_t_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 574, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 574, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":579
+    /* "pyreadstat/_readstat_parser.pyx":575
  *         iscurnptypeobject = 1
  *     if curnptype == np.float64:
  *         iscurnptypefloat = 1             # <<<<<<<<<<<<<<
@@ -10145,7 +10098,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
     __pyx_v_iscurnptypefloat = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":578
+    /* "pyreadstat/_readstat_parser.pyx":574
  *     if curnptype == object:
  *         iscurnptypeobject = 1
  *     if curnptype == np.float64:             # <<<<<<<<<<<<<<
@@ -10154,39 +10107,39 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":580
+  /* "pyreadstat/_readstat_parser.pyx":576
  *     if curnptype == np.float64:
  *         iscurnptypefloat = 1
  *     dc.col_dtypes_isobject[index] = iscurnptypeobject             # <<<<<<<<<<<<<<
  *     dc.col_dytpes_isfloat[index] = iscurnptypefloat
  *     metaonly = dc.metaonly
 */
-  __pyx_t_7 = __Pyx_PyBool_FromLong(__pyx_v_iscurnptypeobject); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 580, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyBool_FromLong(__pyx_v_iscurnptypeobject); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 576, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (unlikely(__pyx_v_dc->col_dtypes_isobject == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 580, __pyx_L1_error)
+    __PYX_ERR(0, 576, __pyx_L1_error)
   }
-  if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, __pyx_t_7, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 580, __pyx_L1_error)
+  if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, __pyx_t_7, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 576, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":581
+  /* "pyreadstat/_readstat_parser.pyx":577
  *         iscurnptypefloat = 1
  *     dc.col_dtypes_isobject[index] = iscurnptypeobject
  *     dc.col_dytpes_isfloat[index] = iscurnptypefloat             # <<<<<<<<<<<<<<
  *     metaonly = dc.metaonly
  *     # pre-allocate data
 */
-  __pyx_t_7 = __Pyx_PyBool_FromLong(__pyx_v_iscurnptypefloat); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 581, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyBool_FromLong(__pyx_v_iscurnptypefloat); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 577, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (unlikely(__pyx_v_dc->col_dytpes_isfloat == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 581, __pyx_L1_error)
+    __PYX_ERR(0, 577, __pyx_L1_error)
   }
-  if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dytpes_isfloat, __pyx_v_index, __pyx_t_7, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 581, __pyx_L1_error)
+  if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dytpes_isfloat, __pyx_v_index, __pyx_t_7, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 577, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":582
+  /* "pyreadstat/_readstat_parser.pyx":578
  *     dc.col_dtypes_isobject[index] = iscurnptypeobject
  *     dc.col_dytpes_isfloat[index] = iscurnptypefloat
  *     metaonly = dc.metaonly             # <<<<<<<<<<<<<<
@@ -10196,7 +10149,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   __pyx_t_2 = __pyx_v_dc->metaonly;
   __pyx_v_metaonly = __pyx_t_2;
 
-  /* "pyreadstat/_readstat_parser.pyx":584
+  /* "pyreadstat/_readstat_parser.pyx":580
  *     metaonly = dc.metaonly
  *     # pre-allocate data
  *     if metaonly:             # <<<<<<<<<<<<<<
@@ -10205,17 +10158,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (__pyx_v_metaonly) {
 
-    /* "pyreadstat/_readstat_parser.pyx":585
+    /* "pyreadstat/_readstat_parser.pyx":581
  *     # pre-allocate data
  *     if metaonly:
  *         if output_format == "pandas":             # <<<<<<<<<<<<<<
  *             row = np.empty(1, dtype=curnptype)
  *         else:
 */
-    __pyx_t_2 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 585, __pyx_L1_error)
+    __pyx_t_2 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 581, __pyx_L1_error)
     if (__pyx_t_2) {
 
-      /* "pyreadstat/_readstat_parser.pyx":586
+      /* "pyreadstat/_readstat_parser.pyx":582
  *     if metaonly:
  *         if output_format == "pandas":
  *             row = np.empty(1, dtype=curnptype)             # <<<<<<<<<<<<<<
@@ -10223,9 +10176,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *             row = list()
 */
       __pyx_t_1 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 586, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 582, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 586, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 582, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_6 = 1;
@@ -10242,30 +10195,30 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
       #endif
       {
         PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_1, __pyx_mstate_global->__pyx_int_1};
-        __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 586, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 582, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_v_curnptype, __pyx_t_5, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 586, __pyx_L1_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_v_curnptype, __pyx_t_5, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 582, __pyx_L1_error)
         __pyx_t_7 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_5);
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 586, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 582, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __pyx_v_row = __pyx_t_7;
       __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":585
+      /* "pyreadstat/_readstat_parser.pyx":581
  *     # pre-allocate data
  *     if metaonly:
  *         if output_format == "pandas":             # <<<<<<<<<<<<<<
  *             row = np.empty(1, dtype=curnptype)
  *         else:
 */
-      goto __pyx_L25;
+      goto __pyx_L22;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":588
+    /* "pyreadstat/_readstat_parser.pyx":584
  *             row = np.empty(1, dtype=curnptype)
  *         else:
  *             row = list()             # <<<<<<<<<<<<<<
@@ -10273,24 +10226,24 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *         obs_count = dc.n_obs
 */
     /*else*/ {
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 588, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 584, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_v_row = __pyx_t_7;
       __pyx_t_7 = 0;
     }
-    __pyx_L25:;
+    __pyx_L22:;
 
-    /* "pyreadstat/_readstat_parser.pyx":584
+    /* "pyreadstat/_readstat_parser.pyx":580
  *     metaonly = dc.metaonly
  *     # pre-allocate data
  *     if metaonly:             # <<<<<<<<<<<<<<
  *         if output_format == "pandas":
  *             row = np.empty(1, dtype=curnptype)
 */
-    goto __pyx_L24;
+    goto __pyx_L21;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":590
+  /* "pyreadstat/_readstat_parser.pyx":586
  *             row = list()
  *     else:
  *         obs_count = dc.n_obs             # <<<<<<<<<<<<<<
@@ -10301,17 +10254,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __pyx_t_11 = __pyx_v_dc->n_obs;
     __pyx_v_obs_count = __pyx_t_11;
 
-    /* "pyreadstat/_readstat_parser.pyx":591
+    /* "pyreadstat/_readstat_parser.pyx":587
  *     else:
  *         obs_count = dc.n_obs
  *         if output_format == "pandas":             # <<<<<<<<<<<<<<
  *             row = np.empty(obs_count, dtype=curnptype)
  *             if iscurnptypeobject or iscurnptypefloat:
 */
-    __pyx_t_2 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 591, __pyx_L1_error)
+    __pyx_t_2 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 587, __pyx_L1_error)
     if (__pyx_t_2) {
 
-      /* "pyreadstat/_readstat_parser.pyx":592
+      /* "pyreadstat/_readstat_parser.pyx":588
  *         obs_count = dc.n_obs
  *         if output_format == "pandas":
  *             row = np.empty(obs_count, dtype=curnptype)             # <<<<<<<<<<<<<<
@@ -10319,12 +10272,12 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  *                 row.fill(np.nan)
 */
       __pyx_t_3 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 592, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 588, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 592, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_obs_count); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 592, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_obs_count); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 588, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -10340,21 +10293,21 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
       #endif
       {
         PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_3, __pyx_t_5};
-        __pyx_t_12 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 592, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 588, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_v_curnptype, __pyx_t_12, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 592, __pyx_L1_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_v_curnptype, __pyx_t_12, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 588, __pyx_L1_error)
         __pyx_t_7 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_1, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_12);
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 592, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 588, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __pyx_v_row = __pyx_t_7;
       __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":593
+      /* "pyreadstat/_readstat_parser.pyx":589
  *         if output_format == "pandas":
  *             row = np.empty(obs_count, dtype=curnptype)
  *             if iscurnptypeobject or iscurnptypefloat:             # <<<<<<<<<<<<<<
@@ -10364,13 +10317,13 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
       if (!__pyx_v_iscurnptypeobject) {
       } else {
         __pyx_t_2 = __pyx_v_iscurnptypeobject;
-        goto __pyx_L28_bool_binop_done;
+        goto __pyx_L25_bool_binop_done;
       }
       __pyx_t_2 = __pyx_v_iscurnptypefloat;
-      __pyx_L28_bool_binop_done:;
+      __pyx_L25_bool_binop_done:;
       if (__pyx_t_2) {
 
-        /* "pyreadstat/_readstat_parser.pyx":594
+        /* "pyreadstat/_readstat_parser.pyx":590
  *             row = np.empty(obs_count, dtype=curnptype)
  *             if iscurnptypeobject or iscurnptypefloat:
  *                 row.fill(np.nan)             # <<<<<<<<<<<<<<
@@ -10379,9 +10332,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
         __pyx_t_1 = __pyx_v_row;
         __Pyx_INCREF(__pyx_t_1);
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 594, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 590, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_nan); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 594, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_nan); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 590, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __pyx_t_6 = 0;
@@ -10390,12 +10343,12 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
           __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_fill, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 594, __pyx_L1_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 590, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
         }
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":593
+        /* "pyreadstat/_readstat_parser.pyx":589
  *         if output_format == "pandas":
  *             row = np.empty(obs_count, dtype=curnptype)
  *             if iscurnptypeobject or iscurnptypefloat:             # <<<<<<<<<<<<<<
@@ -10404,17 +10357,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":591
+      /* "pyreadstat/_readstat_parser.pyx":587
  *     else:
  *         obs_count = dc.n_obs
  *         if output_format == "pandas":             # <<<<<<<<<<<<<<
  *             row = np.empty(obs_count, dtype=curnptype)
  *             if iscurnptypeobject or iscurnptypefloat:
 */
-      goto __pyx_L26;
+      goto __pyx_L23;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":596
+    /* "pyreadstat/_readstat_parser.pyx":592
  *                 row.fill(np.nan)
  *         else:
  *             row = [None] * obs_count             # <<<<<<<<<<<<<<
@@ -10422,23 +10375,23 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
  * 
 */
     /*else*/ {
-      __pyx_t_7 = PyList_New(1 * ((__pyx_v_obs_count<0) ? 0:__pyx_v_obs_count)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 596, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(1 * ((__pyx_v_obs_count<0) ? 0:__pyx_v_obs_count)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 592, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       { Py_ssize_t __pyx_temp;
         for (__pyx_temp=0; __pyx_temp < __pyx_v_obs_count; __pyx_temp++) {
           __Pyx_INCREF(Py_None);
           __Pyx_GIVEREF(Py_None);
-          if (__Pyx_PyList_SET_ITEM(__pyx_t_7, __pyx_temp, Py_None) != (0)) __PYX_ERR(0, 596, __pyx_L1_error);
+          if (__Pyx_PyList_SET_ITEM(__pyx_t_7, __pyx_temp, Py_None) != (0)) __PYX_ERR(0, 592, __pyx_L1_error);
         }
       }
       __pyx_v_row = __pyx_t_7;
       __pyx_t_7 = 0;
     }
-    __pyx_L26:;
+    __pyx_L23:;
   }
-  __pyx_L24:;
+  __pyx_L21:;
 
-  /* "pyreadstat/_readstat_parser.pyx":597
+  /* "pyreadstat/_readstat_parser.pyx":593
  *         else:
  *             row = [None] * obs_count
  *     dc.col_data.append(row)             # <<<<<<<<<<<<<<
@@ -10447,11 +10400,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (unlikely(__pyx_v_dc->col_data == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 597, __pyx_L1_error)
+    __PYX_ERR(0, 593, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_data, __pyx_v_row); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 597, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_dc->col_data, __pyx_v_row); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 593, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":600
+  /* "pyreadstat/_readstat_parser.pyx":596
  * 
  *     # missing values
  *     if dc.usernan:             # <<<<<<<<<<<<<<
@@ -10460,7 +10413,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   if (__pyx_v_dc->usernan) {
 
-    /* "pyreadstat/_readstat_parser.pyx":601
+    /* "pyreadstat/_readstat_parser.pyx":597
  *     # missing values
  *     if dc.usernan:
  *         n_ranges = readstat_variable_get_missing_ranges_count(variable)             # <<<<<<<<<<<<<<
@@ -10469,7 +10422,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
     __pyx_v_n_ranges = readstat_variable_get_missing_ranges_count(__pyx_v_variable);
 
-    /* "pyreadstat/_readstat_parser.pyx":602
+    /* "pyreadstat/_readstat_parser.pyx":598
  *     if dc.usernan:
  *         n_ranges = readstat_variable_get_missing_ranges_count(variable)
  *         if n_ranges>0:             # <<<<<<<<<<<<<<
@@ -10479,19 +10432,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __pyx_t_2 = (__pyx_v_n_ranges > 0);
     if (__pyx_t_2) {
 
-      /* "pyreadstat/_readstat_parser.pyx":603
+      /* "pyreadstat/_readstat_parser.pyx":599
  *         n_ranges = readstat_variable_get_missing_ranges_count(variable)
  *         if n_ranges>0:
  *             missing_ranges = list()             # <<<<<<<<<<<<<<
  *             for i in range(0, n_ranges):
  *                 loval = readstat_variable_get_missing_range_lo(variable, i)
 */
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 603, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 599, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_v_missing_ranges = ((PyObject*)__pyx_t_7);
       __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":604
+      /* "pyreadstat/_readstat_parser.pyx":600
  *         if n_ranges>0:
  *             missing_ranges = list()
  *             for i in range(0, n_ranges):             # <<<<<<<<<<<<<<
@@ -10503,7 +10456,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
       for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
         __pyx_v_i = __pyx_t_14;
 
-        /* "pyreadstat/_readstat_parser.pyx":605
+        /* "pyreadstat/_readstat_parser.pyx":601
  *             missing_ranges = list()
  *             for i in range(0, n_ranges):
  *                 loval = readstat_variable_get_missing_range_lo(variable, i)             # <<<<<<<<<<<<<<
@@ -10512,19 +10465,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
         __pyx_v_loval = readstat_variable_get_missing_range_lo(__pyx_v_variable, __pyx_v_i);
 
-        /* "pyreadstat/_readstat_parser.pyx":606
+        /* "pyreadstat/_readstat_parser.pyx":602
  *             for i in range(0, n_ranges):
  *                 loval = readstat_variable_get_missing_range_lo(variable, i)
  *                 pyloval = convert_readstat_to_python_value(loval, index, dc)             # <<<<<<<<<<<<<<
  *                 hival = readstat_variable_get_missing_range_hi(variable, i)
  *                 pyhival = convert_readstat_to_python_value(hival, index, dc)
 */
-        __pyx_t_7 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_loval, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 606, __pyx_L1_error)
+        __pyx_t_7 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_loval, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 602, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_XDECREF_SET(__pyx_v_pyloval, __pyx_t_7);
         __pyx_t_7 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":607
+        /* "pyreadstat/_readstat_parser.pyx":603
  *                 loval = readstat_variable_get_missing_range_lo(variable, i)
  *                 pyloval = convert_readstat_to_python_value(loval, index, dc)
  *                 hival = readstat_variable_get_missing_range_hi(variable, i)             # <<<<<<<<<<<<<<
@@ -10533,34 +10486,34 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
         __pyx_v_hival = readstat_variable_get_missing_range_hi(__pyx_v_variable, __pyx_v_i);
 
-        /* "pyreadstat/_readstat_parser.pyx":608
+        /* "pyreadstat/_readstat_parser.pyx":604
  *                 pyloval = convert_readstat_to_python_value(loval, index, dc)
  *                 hival = readstat_variable_get_missing_range_hi(variable, i)
  *                 pyhival = convert_readstat_to_python_value(hival, index, dc)             # <<<<<<<<<<<<<<
  *                 missing_ranges.append({'lo':pyloval, 'hi':pyhival})
  *             dc.missing_ranges[col_name] = missing_ranges
 */
-        __pyx_t_7 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_hival, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 608, __pyx_L1_error)
+        __pyx_t_7 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_hival, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 604, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_XDECREF_SET(__pyx_v_pyhival, __pyx_t_7);
         __pyx_t_7 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":609
+        /* "pyreadstat/_readstat_parser.pyx":605
  *                 hival = readstat_variable_get_missing_range_hi(variable, i)
  *                 pyhival = convert_readstat_to_python_value(hival, index, dc)
  *                 missing_ranges.append({'lo':pyloval, 'hi':pyhival})             # <<<<<<<<<<<<<<
  *             dc.missing_ranges[col_name] = missing_ranges
  * 
 */
-        __pyx_t_7 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 609, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 605, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        if (PyDict_SetItem(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_lo, __pyx_v_pyloval) < (0)) __PYX_ERR(0, 609, __pyx_L1_error)
-        if (PyDict_SetItem(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_hi, __pyx_v_pyhival) < (0)) __PYX_ERR(0, 609, __pyx_L1_error)
-        __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_missing_ranges, __pyx_t_7); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 609, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_lo, __pyx_v_pyloval) < (0)) __PYX_ERR(0, 605, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_hi, __pyx_v_pyhival) < (0)) __PYX_ERR(0, 605, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_missing_ranges, __pyx_t_7); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 605, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":610
+      /* "pyreadstat/_readstat_parser.pyx":606
  *                 pyhival = convert_readstat_to_python_value(hival, index, dc)
  *                 missing_ranges.append({'lo':pyloval, 'hi':pyhival})
  *             dc.missing_ranges[col_name] = missing_ranges             # <<<<<<<<<<<<<<
@@ -10569,11 +10522,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
       if (unlikely(__pyx_v_dc->missing_ranges == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 610, __pyx_L1_error)
+        __PYX_ERR(0, 606, __pyx_L1_error)
       }
-      if (unlikely((PyDict_SetItem(__pyx_v_dc->missing_ranges, __pyx_v_col_name, __pyx_v_missing_ranges) < 0))) __PYX_ERR(0, 610, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_dc->missing_ranges, __pyx_v_col_name, __pyx_v_missing_ranges) < 0))) __PYX_ERR(0, 606, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":602
+      /* "pyreadstat/_readstat_parser.pyx":598
  *     if dc.usernan:
  *         n_ranges = readstat_variable_get_missing_ranges_count(variable)
  *         if n_ranges>0:             # <<<<<<<<<<<<<<
@@ -10582,7 +10535,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":600
+    /* "pyreadstat/_readstat_parser.pyx":596
  * 
  *     # missing values
  *     if dc.usernan:             # <<<<<<<<<<<<<<
@@ -10591,7 +10544,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":613
+  /* "pyreadstat/_readstat_parser.pyx":609
  * 
  *     cdef size_t storage_width
  *     storage_width = readstat_variable_get_storage_width(variable)             # <<<<<<<<<<<<<<
@@ -10600,35 +10553,35 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_storage_width = readstat_variable_get_storage_width(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":614
+  /* "pyreadstat/_readstat_parser.pyx":610
  *     cdef size_t storage_width
  *     storage_width = readstat_variable_get_storage_width(variable)
  *     dc.variable_storage_width[col_name] = <int>storage_width             # <<<<<<<<<<<<<<
  * 
  *     dc.variable_display_width[col_name] = readstat_variable_get_display_width(variable)
 */
-  __pyx_t_7 = __Pyx_PyLong_From_int(((int)__pyx_v_storage_width)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 614, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_From_int(((int)__pyx_v_storage_width)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 610, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (unlikely(__pyx_v_dc->variable_storage_width == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 614, __pyx_L1_error)
+    __PYX_ERR(0, 610, __pyx_L1_error)
   }
-  if (unlikely((PyDict_SetItem(__pyx_v_dc->variable_storage_width, __pyx_v_col_name, __pyx_t_7) < 0))) __PYX_ERR(0, 614, __pyx_L1_error)
+  if (unlikely((PyDict_SetItem(__pyx_v_dc->variable_storage_width, __pyx_v_col_name, __pyx_t_7) < 0))) __PYX_ERR(0, 610, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":616
+  /* "pyreadstat/_readstat_parser.pyx":612
  *     dc.variable_storage_width[col_name] = <int>storage_width
  * 
  *     dc.variable_display_width[col_name] = readstat_variable_get_display_width(variable)             # <<<<<<<<<<<<<<
  * 
  *     cdef readstat_alignment_t align
 */
-  __pyx_t_7 = __Pyx_PyLong_From_int(readstat_variable_get_display_width(__pyx_v_variable)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 616, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyLong_From_int(readstat_variable_get_display_width(__pyx_v_variable)); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 612, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (unlikely((PyObject_SetItem(__pyx_v_dc->variable_display_width, __pyx_v_col_name, __pyx_t_7) < 0))) __PYX_ERR(0, 616, __pyx_L1_error)
+  if (unlikely((PyObject_SetItem(__pyx_v_dc->variable_display_width, __pyx_v_col_name, __pyx_t_7) < 0))) __PYX_ERR(0, 612, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":620
+  /* "pyreadstat/_readstat_parser.pyx":616
  *     cdef readstat_alignment_t align
  *     cdef str pyalign
  *     align = readstat_variable_get_alignment(variable)             # <<<<<<<<<<<<<<
@@ -10637,7 +10590,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_align = readstat_variable_get_alignment(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":621
+  /* "pyreadstat/_readstat_parser.pyx":617
  *     cdef str pyalign
  *     align = readstat_variable_get_alignment(variable)
  *     if align == READSTAT_ALIGNMENT_UNKNOWN:             # <<<<<<<<<<<<<<
@@ -10647,7 +10600,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   switch (__pyx_v_align) {
     case READSTAT_ALIGNMENT_UNKNOWN:
 
-    /* "pyreadstat/_readstat_parser.pyx":622
+    /* "pyreadstat/_readstat_parser.pyx":618
  *     align = readstat_variable_get_alignment(variable)
  *     if align == READSTAT_ALIGNMENT_UNKNOWN:
  *         pyalign = "unknown"             # <<<<<<<<<<<<<<
@@ -10657,7 +10610,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_unknown);
     __pyx_v_pyalign = __pyx_mstate_global->__pyx_n_u_unknown;
 
-    /* "pyreadstat/_readstat_parser.pyx":621
+    /* "pyreadstat/_readstat_parser.pyx":617
  *     cdef str pyalign
  *     align = readstat_variable_get_alignment(variable)
  *     if align == READSTAT_ALIGNMENT_UNKNOWN:             # <<<<<<<<<<<<<<
@@ -10667,7 +10620,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     case READSTAT_ALIGNMENT_LEFT:
 
-    /* "pyreadstat/_readstat_parser.pyx":624
+    /* "pyreadstat/_readstat_parser.pyx":620
  *         pyalign = "unknown"
  *     elif align == READSTAT_ALIGNMENT_LEFT:
  *         pyalign = "left"             # <<<<<<<<<<<<<<
@@ -10677,7 +10630,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_left);
     __pyx_v_pyalign = __pyx_mstate_global->__pyx_n_u_left;
 
-    /* "pyreadstat/_readstat_parser.pyx":623
+    /* "pyreadstat/_readstat_parser.pyx":619
  *     if align == READSTAT_ALIGNMENT_UNKNOWN:
  *         pyalign = "unknown"
  *     elif align == READSTAT_ALIGNMENT_LEFT:             # <<<<<<<<<<<<<<
@@ -10687,7 +10640,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     case READSTAT_ALIGNMENT_CENTER:
 
-    /* "pyreadstat/_readstat_parser.pyx":626
+    /* "pyreadstat/_readstat_parser.pyx":622
  *         pyalign = "left"
  *     elif align == READSTAT_ALIGNMENT_CENTER:
  *         pyalign = "center"             # <<<<<<<<<<<<<<
@@ -10697,7 +10650,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_center);
     __pyx_v_pyalign = __pyx_mstate_global->__pyx_n_u_center;
 
-    /* "pyreadstat/_readstat_parser.pyx":625
+    /* "pyreadstat/_readstat_parser.pyx":621
  *     elif align == READSTAT_ALIGNMENT_LEFT:
  *         pyalign = "left"
  *     elif align == READSTAT_ALIGNMENT_CENTER:             # <<<<<<<<<<<<<<
@@ -10707,7 +10660,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     case READSTAT_ALIGNMENT_RIGHT:
 
-    /* "pyreadstat/_readstat_parser.pyx":628
+    /* "pyreadstat/_readstat_parser.pyx":624
  *         pyalign = "center"
  *     elif align == READSTAT_ALIGNMENT_RIGHT:
  *         pyalign = "right"             # <<<<<<<<<<<<<<
@@ -10717,7 +10670,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_right);
     __pyx_v_pyalign = __pyx_mstate_global->__pyx_n_u_right;
 
-    /* "pyreadstat/_readstat_parser.pyx":627
+    /* "pyreadstat/_readstat_parser.pyx":623
  *     elif align == READSTAT_ALIGNMENT_CENTER:
  *         pyalign = "center"
  *     elif align == READSTAT_ALIGNMENT_RIGHT:             # <<<<<<<<<<<<<<
@@ -10727,7 +10680,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     default:
 
-    /* "pyreadstat/_readstat_parser.pyx":630
+    /* "pyreadstat/_readstat_parser.pyx":626
  *         pyalign = "right"
  *     else:
  *         pyalign = "undetermined"             # <<<<<<<<<<<<<<
@@ -10739,16 +10692,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":632
+  /* "pyreadstat/_readstat_parser.pyx":628
  *         pyalign = "undetermined"
  * 
  *     dc.variable_alignment[col_name] = pyalign             # <<<<<<<<<<<<<<
  * 
  *     cdef readstat_measure_t measure
 */
-  if (unlikely((PyObject_SetItem(__pyx_v_dc->variable_alignment, __pyx_v_col_name, __pyx_v_pyalign) < 0))) __PYX_ERR(0, 632, __pyx_L1_error)
+  if (unlikely((PyObject_SetItem(__pyx_v_dc->variable_alignment, __pyx_v_col_name, __pyx_v_pyalign) < 0))) __PYX_ERR(0, 628, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":636
+  /* "pyreadstat/_readstat_parser.pyx":632
  *     cdef readstat_measure_t measure
  *     cdef str pymeasure
  *     measure = readstat_variable_get_measure(variable)             # <<<<<<<<<<<<<<
@@ -10757,7 +10710,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
 */
   __pyx_v_measure = readstat_variable_get_measure(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":637
+  /* "pyreadstat/_readstat_parser.pyx":633
  *     cdef str pymeasure
  *     measure = readstat_variable_get_measure(variable)
  *     if measure == READSTAT_MEASURE_UNKNOWN:             # <<<<<<<<<<<<<<
@@ -10767,7 +10720,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   switch (__pyx_v_measure) {
     case READSTAT_MEASURE_UNKNOWN:
 
-    /* "pyreadstat/_readstat_parser.pyx":638
+    /* "pyreadstat/_readstat_parser.pyx":634
  *     measure = readstat_variable_get_measure(variable)
  *     if measure == READSTAT_MEASURE_UNKNOWN:
  *         pymeasure = "unknown"             # <<<<<<<<<<<<<<
@@ -10777,7 +10730,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_unknown);
     __pyx_v_pymeasure = __pyx_mstate_global->__pyx_n_u_unknown;
 
-    /* "pyreadstat/_readstat_parser.pyx":637
+    /* "pyreadstat/_readstat_parser.pyx":633
  *     cdef str pymeasure
  *     measure = readstat_variable_get_measure(variable)
  *     if measure == READSTAT_MEASURE_UNKNOWN:             # <<<<<<<<<<<<<<
@@ -10787,7 +10740,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     case READSTAT_MEASURE_NOMINAL:
 
-    /* "pyreadstat/_readstat_parser.pyx":640
+    /* "pyreadstat/_readstat_parser.pyx":636
  *         pymeasure = "unknown"
  *     elif measure == READSTAT_MEASURE_NOMINAL:
  *         pymeasure = "nominal"             # <<<<<<<<<<<<<<
@@ -10797,7 +10750,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_nominal);
     __pyx_v_pymeasure = __pyx_mstate_global->__pyx_n_u_nominal;
 
-    /* "pyreadstat/_readstat_parser.pyx":639
+    /* "pyreadstat/_readstat_parser.pyx":635
  *     if measure == READSTAT_MEASURE_UNKNOWN:
  *         pymeasure = "unknown"
  *     elif measure == READSTAT_MEASURE_NOMINAL:             # <<<<<<<<<<<<<<
@@ -10807,7 +10760,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     case READSTAT_MEASURE_ORDINAL:
 
-    /* "pyreadstat/_readstat_parser.pyx":642
+    /* "pyreadstat/_readstat_parser.pyx":638
  *         pymeasure = "nominal"
  *     elif measure == READSTAT_MEASURE_ORDINAL:
  *         pymeasure = "ordinal"             # <<<<<<<<<<<<<<
@@ -10817,7 +10770,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_ordinal);
     __pyx_v_pymeasure = __pyx_mstate_global->__pyx_n_u_ordinal;
 
-    /* "pyreadstat/_readstat_parser.pyx":641
+    /* "pyreadstat/_readstat_parser.pyx":637
  *     elif measure == READSTAT_MEASURE_NOMINAL:
  *         pymeasure = "nominal"
  *     elif measure == READSTAT_MEASURE_ORDINAL:             # <<<<<<<<<<<<<<
@@ -10827,7 +10780,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     case READSTAT_MEASURE_SCALE:
 
-    /* "pyreadstat/_readstat_parser.pyx":644
+    /* "pyreadstat/_readstat_parser.pyx":640
  *         pymeasure = "ordinal"
  *     elif measure == READSTAT_MEASURE_SCALE:
  *         pymeasure = "scale"             # <<<<<<<<<<<<<<
@@ -10837,7 +10790,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_scale);
     __pyx_v_pymeasure = __pyx_mstate_global->__pyx_n_u_scale;
 
-    /* "pyreadstat/_readstat_parser.pyx":643
+    /* "pyreadstat/_readstat_parser.pyx":639
  *     elif measure == READSTAT_MEASURE_ORDINAL:
  *         pymeasure = "ordinal"
  *     elif measure == READSTAT_MEASURE_SCALE:             # <<<<<<<<<<<<<<
@@ -10847,7 +10800,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
     default:
 
-    /* "pyreadstat/_readstat_parser.pyx":646
+    /* "pyreadstat/_readstat_parser.pyx":642
  *         pymeasure = "scale"
  *     else:
  *         pymeasure = "undetermined"             # <<<<<<<<<<<<<<
@@ -10859,16 +10812,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
     break;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":648
+  /* "pyreadstat/_readstat_parser.pyx":644
  *         pymeasure = "undetermined"
  * 
  *     dc.variable_measure[col_name] = pymeasure             # <<<<<<<<<<<<<<
  * 
  *     return READSTAT_HANDLER_OK
 */
-  if (unlikely((PyObject_SetItem(__pyx_v_dc->variable_measure, __pyx_v_col_name, __pyx_v_pymeasure) < 0))) __PYX_ERR(0, 648, __pyx_L1_error)
+  if (unlikely((PyObject_SetItem(__pyx_v_dc->variable_measure, __pyx_v_col_name, __pyx_v_pymeasure) < 0))) __PYX_ERR(0, 644, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":650
+  /* "pyreadstat/_readstat_parser.pyx":646
  *     dc.variable_measure[col_name] = pymeasure
  * 
  *     return READSTAT_HANDLER_OK             # <<<<<<<<<<<<<<
@@ -10916,7 +10869,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_variable(int __pyx_v_i
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":653
+/* "pyreadstat/_readstat_parser.pyx":649
  * 
  * 
  * cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_value_t value, void *ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -10954,7 +10907,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("handle_value", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":674
+  /* "pyreadstat/_readstat_parser.pyx":670
  * 
  *     # extract variables we need from data container
  *     dc = <data_container> ctx             # <<<<<<<<<<<<<<
@@ -10966,7 +10919,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   __pyx_v_dc = ((struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":675
+  /* "pyreadstat/_readstat_parser.pyx":671
  *     # extract variables we need from data container
  *     dc = <data_container> ctx
  *     output_format = dc.output_format             # <<<<<<<<<<<<<<
@@ -10978,7 +10931,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   __pyx_v_output_format = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":676
+  /* "pyreadstat/_readstat_parser.pyx":672
  *     dc = <data_container> ctx
  *     output_format = dc.output_format
  *     index = readstat_variable_get_index_after_skipping(variable)             # <<<<<<<<<<<<<<
@@ -10987,7 +10940,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
   __pyx_v_index = readstat_variable_get_index_after_skipping(__pyx_v_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":677
+  /* "pyreadstat/_readstat_parser.pyx":673
  *     output_format = dc.output_format
  *     index = readstat_variable_get_index_after_skipping(variable)
  *     max_n_obs = dc.max_n_obs             # <<<<<<<<<<<<<<
@@ -10997,7 +10950,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   __pyx_t_2 = __pyx_v_dc->max_n_obs;
   __pyx_v_max_n_obs = __pyx_t_2;
 
-  /* "pyreadstat/_readstat_parser.pyx":678
+  /* "pyreadstat/_readstat_parser.pyx":674
  *     index = readstat_variable_get_index_after_skipping(variable)
  *     max_n_obs = dc.max_n_obs
  *     is_unkown_number_rows = dc.is_unkown_number_rows             # <<<<<<<<<<<<<<
@@ -11007,7 +10960,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   __pyx_t_3 = __pyx_v_dc->is_unkown_number_rows;
   __pyx_v_is_unkown_number_rows = __pyx_t_3;
 
-  /* "pyreadstat/_readstat_parser.pyx":682
+  /* "pyreadstat/_readstat_parser.pyx":678
  *     # check that we still have enough room in our pre-allocated lists
  *     # if not, add more room
  *     iscurnptypeobject = dc.col_dtypes_isobject[index]             # <<<<<<<<<<<<<<
@@ -11016,15 +10969,15 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
   if (unlikely(__pyx_v_dc->col_dtypes_isobject == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 682, __pyx_L1_error)
+    __PYX_ERR(0, 678, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 682, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 678, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 682, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 678, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_iscurnptypeobject = __pyx_t_3;
 
-  /* "pyreadstat/_readstat_parser.pyx":683
+  /* "pyreadstat/_readstat_parser.pyx":679
  *     # if not, add more room
  *     iscurnptypeobject = dc.col_dtypes_isobject[index]
  *     iscurnptypefloat = dc.col_dytpes_isfloat[index]             # <<<<<<<<<<<<<<
@@ -11033,15 +10986,15 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
   if (unlikely(__pyx_v_dc->col_dytpes_isfloat == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 683, __pyx_L1_error)
+    __PYX_ERR(0, 679, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_dytpes_isfloat, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 683, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_dytpes_isfloat, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 679, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 683, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 679, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_iscurnptypefloat = __pyx_t_3;
 
-  /* "pyreadstat/_readstat_parser.pyx":684
+  /* "pyreadstat/_readstat_parser.pyx":680
  *     iscurnptypeobject = dc.col_dtypes_isobject[index]
  *     iscurnptypefloat = dc.col_dytpes_isfloat[index]
  *     if is_unkown_number_rows:             # <<<<<<<<<<<<<<
@@ -11050,7 +11003,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
   if (__pyx_v_is_unkown_number_rows) {
 
-    /* "pyreadstat/_readstat_parser.pyx":685
+    /* "pyreadstat/_readstat_parser.pyx":681
  *     iscurnptypefloat = dc.col_dytpes_isfloat[index]
  *     if is_unkown_number_rows:
  *         if max_n_obs <= obs_index:             # <<<<<<<<<<<<<<
@@ -11060,7 +11013,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     __pyx_t_3 = (__pyx_v_max_n_obs <= __pyx_v_obs_index);
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":686
+      /* "pyreadstat/_readstat_parser.pyx":682
  *     if is_unkown_number_rows:
  *         if max_n_obs <= obs_index:
  *             dc.max_n_obs = obs_index + 1             # <<<<<<<<<<<<<<
@@ -11069,7 +11022,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       __pyx_v_dc->max_n_obs = (__pyx_v_obs_index + 1);
 
-      /* "pyreadstat/_readstat_parser.pyx":685
+      /* "pyreadstat/_readstat_parser.pyx":681
  *     iscurnptypefloat = dc.col_dytpes_isfloat[index]
  *     if is_unkown_number_rows:
  *         if max_n_obs <= obs_index:             # <<<<<<<<<<<<<<
@@ -11078,7 +11031,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":687
+    /* "pyreadstat/_readstat_parser.pyx":683
  *         if max_n_obs <= obs_index:
  *             dc.max_n_obs = obs_index + 1
  *         var_max_rows = dc.col_data_len[index]             # <<<<<<<<<<<<<<
@@ -11087,15 +11040,15 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
     if (unlikely(__pyx_v_dc->col_data_len == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 687, __pyx_L1_error)
+      __PYX_ERR(0, 683, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data_len, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 687, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data_len, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 687, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyLong_As_int(__pyx_t_1); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 683, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_var_max_rows = __pyx_t_2;
 
-    /* "pyreadstat/_readstat_parser.pyx":688
+    /* "pyreadstat/_readstat_parser.pyx":684
  *             dc.max_n_obs = obs_index + 1
  *         var_max_rows = dc.col_data_len[index]
  *         if var_max_rows <= obs_index:             # <<<<<<<<<<<<<<
@@ -11105,17 +11058,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     __pyx_t_3 = (__pyx_v_var_max_rows <= __pyx_v_obs_index);
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":689
+      /* "pyreadstat/_readstat_parser.pyx":685
  *         var_max_rows = dc.col_data_len[index]
  *         if var_max_rows <= obs_index:
  *             if output_format == "pandas":             # <<<<<<<<<<<<<<
  *                 curnptype = dc.col_numpy_dtypes[index]
  *                 buf_list = np.empty(100000, dtype=curnptype)
 */
-      __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 689, __pyx_L1_error)
+      __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 685, __pyx_L1_error)
       if (__pyx_t_3) {
 
-        /* "pyreadstat/_readstat_parser.pyx":690
+        /* "pyreadstat/_readstat_parser.pyx":686
  *         if var_max_rows <= obs_index:
  *             if output_format == "pandas":
  *                 curnptype = dc.col_numpy_dtypes[index]             # <<<<<<<<<<<<<<
@@ -11124,14 +11077,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
         if (unlikely(__pyx_v_dc->col_numpy_dtypes == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 690, __pyx_L1_error)
+          __PYX_ERR(0, 686, __pyx_L1_error)
         }
-        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 690, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 686, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __pyx_v_curnptype = __pyx_t_1;
         __pyx_t_1 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":691
+        /* "pyreadstat/_readstat_parser.pyx":687
  *             if output_format == "pandas":
  *                 curnptype = dc.col_numpy_dtypes[index]
  *                 buf_list = np.empty(100000, dtype=curnptype)             # <<<<<<<<<<<<<<
@@ -11139,9 +11092,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
  *                     buf_list.fill(np.nan)
 */
         __pyx_t_4 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 691, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 687, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 691, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_empty); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 687, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         __pyx_t_7 = 1;
@@ -11158,20 +11111,20 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         #endif
         {
           PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_4, __pyx_mstate_global->__pyx_int_100000};
-          __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 691, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 687, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_v_curnptype, __pyx_t_5, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 691, __pyx_L1_error)
+          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_dtype, __pyx_v_curnptype, __pyx_t_5, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 687, __pyx_L1_error)
           __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_5);
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 691, __pyx_L1_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 687, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __pyx_v_buf_list = __pyx_t_1;
         __pyx_t_1 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":692
+        /* "pyreadstat/_readstat_parser.pyx":688
  *                 curnptype = dc.col_numpy_dtypes[index]
  *                 buf_list = np.empty(100000, dtype=curnptype)
  *                 if iscurnptypeobject or iscurnptypefloat:             # <<<<<<<<<<<<<<
@@ -11187,7 +11140,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         __pyx_L8_bool_binop_done:;
         if (__pyx_t_3) {
 
-          /* "pyreadstat/_readstat_parser.pyx":693
+          /* "pyreadstat/_readstat_parser.pyx":689
  *                 buf_list = np.empty(100000, dtype=curnptype)
  *                 if iscurnptypeobject or iscurnptypefloat:
  *                     buf_list.fill(np.nan)             # <<<<<<<<<<<<<<
@@ -11196,9 +11149,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           __pyx_t_6 = __pyx_v_buf_list;
           __Pyx_INCREF(__pyx_t_6);
-          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 693, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 689, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_nan); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 693, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_nan); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 689, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __pyx_t_7 = 0;
@@ -11207,12 +11160,12 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
             __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_fill, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 693, __pyx_L1_error)
+            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 689, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
           }
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-          /* "pyreadstat/_readstat_parser.pyx":692
+          /* "pyreadstat/_readstat_parser.pyx":688
  *                 curnptype = dc.col_numpy_dtypes[index]
  *                 buf_list = np.empty(100000, dtype=curnptype)
  *                 if iscurnptypeobject or iscurnptypefloat:             # <<<<<<<<<<<<<<
@@ -11221,7 +11174,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":694
+        /* "pyreadstat/_readstat_parser.pyx":690
  *                 if iscurnptypeobject or iscurnptypefloat:
  *                     buf_list.fill(np.nan)
  *                 dc.col_data[index] = np.append(dc.col_data[index], buf_list)             # <<<<<<<<<<<<<<
@@ -11229,16 +11182,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
  *                 buf_list = [None] * 100000
 */
         __pyx_t_4 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 694, __pyx_L1_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 690, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_append); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 694, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_append); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 690, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         if (unlikely(__pyx_v_dc->col_data == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 694, __pyx_L1_error)
+          __PYX_ERR(0, 690, __pyx_L1_error)
         }
-        __pyx_t_6 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 694, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 690, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_7 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -11258,17 +11211,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
           __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 694, __pyx_L1_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 690, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         if (unlikely(__pyx_v_dc->col_data == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 694, __pyx_L1_error)
+          __PYX_ERR(0, 690, __pyx_L1_error)
         }
-        if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data, __pyx_v_index, __pyx_t_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 694, __pyx_L1_error)
+        if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data, __pyx_v_index, __pyx_t_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 690, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":689
+        /* "pyreadstat/_readstat_parser.pyx":685
  *         var_max_rows = dc.col_data_len[index]
  *         if var_max_rows <= obs_index:
  *             if output_format == "pandas":             # <<<<<<<<<<<<<<
@@ -11278,7 +11231,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         goto __pyx_L6;
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":696
+      /* "pyreadstat/_readstat_parser.pyx":692
  *                 dc.col_data[index] = np.append(dc.col_data[index], buf_list)
  *             else:
  *                 buf_list = [None] * 100000             # <<<<<<<<<<<<<<
@@ -11286,19 +11239,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
  *             var_max_rows += 100000
 */
       /*else*/ {
-        __pyx_t_1 = PyList_New(1 * 100000); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 696, __pyx_L1_error)
+        __pyx_t_1 = PyList_New(1 * 100000); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 692, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         { Py_ssize_t __pyx_temp;
           for (__pyx_temp=0; __pyx_temp < 0x186A0; __pyx_temp++) {
             __Pyx_INCREF(Py_None);
             __Pyx_GIVEREF(Py_None);
-            if (__Pyx_PyList_SET_ITEM(__pyx_t_1, __pyx_temp, Py_None) != (0)) __PYX_ERR(0, 696, __pyx_L1_error);
+            if (__Pyx_PyList_SET_ITEM(__pyx_t_1, __pyx_temp, Py_None) != (0)) __PYX_ERR(0, 692, __pyx_L1_error);
           }
         }
         __pyx_v_buf_list = __pyx_t_1;
         __pyx_t_1 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":697
+        /* "pyreadstat/_readstat_parser.pyx":693
  *             else:
  *                 buf_list = [None] * 100000
  *                 dc.col_data[index].extend(buf_list)             # <<<<<<<<<<<<<<
@@ -11307,9 +11260,9 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
         if (unlikely(__pyx_v_dc->col_data == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 697, __pyx_L1_error)
+          __PYX_ERR(0, 693, __pyx_L1_error)
         }
-        __pyx_t_6 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 697, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 693, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         __pyx_t_5 = __pyx_t_6;
         __Pyx_INCREF(__pyx_t_5);
@@ -11319,14 +11272,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
           __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_extend, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 697, __pyx_L1_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 693, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       }
       __pyx_L6:;
 
-      /* "pyreadstat/_readstat_parser.pyx":698
+      /* "pyreadstat/_readstat_parser.pyx":694
  *                 buf_list = [None] * 100000
  *                 dc.col_data[index].extend(buf_list)
  *             var_max_rows += 100000             # <<<<<<<<<<<<<<
@@ -11335,23 +11288,23 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       __pyx_v_var_max_rows = (__pyx_v_var_max_rows + 0x186A0);
 
-      /* "pyreadstat/_readstat_parser.pyx":699
+      /* "pyreadstat/_readstat_parser.pyx":695
  *                 dc.col_data[index].extend(buf_list)
  *             var_max_rows += 100000
  *             dc.col_data_len[index] = var_max_rows             # <<<<<<<<<<<<<<
  * 
  *     # transform to python value types
 */
-      __pyx_t_1 = __Pyx_PyLong_From_int(__pyx_v_var_max_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 699, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyLong_From_int(__pyx_v_var_max_rows); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 695, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (unlikely(__pyx_v_dc->col_data_len == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 699, __pyx_L1_error)
+        __PYX_ERR(0, 695, __pyx_L1_error)
       }
-      if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data_len, __pyx_v_index, __pyx_t_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 699, __pyx_L1_error)
+      if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data_len, __pyx_v_index, __pyx_t_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 695, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":688
+      /* "pyreadstat/_readstat_parser.pyx":684
  *             dc.max_n_obs = obs_index + 1
  *         var_max_rows = dc.col_data_len[index]
  *         if var_max_rows <= obs_index:             # <<<<<<<<<<<<<<
@@ -11360,7 +11313,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":684
+    /* "pyreadstat/_readstat_parser.pyx":680
  *     iscurnptypeobject = dc.col_dtypes_isobject[index]
  *     iscurnptypefloat = dc.col_dytpes_isfloat[index]
  *     if is_unkown_number_rows:             # <<<<<<<<<<<<<<
@@ -11369,7 +11322,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":702
+  /* "pyreadstat/_readstat_parser.pyx":698
  * 
  *     # transform to python value types
  *     if readstat_value_is_missing(value, variable):             # <<<<<<<<<<<<<<
@@ -11379,7 +11332,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   __pyx_t_3 = (readstat_value_is_missing(__pyx_v_value, __pyx_v_variable) != 0);
   if (__pyx_t_3) {
 
-    /* "pyreadstat/_readstat_parser.pyx":704
+    /* "pyreadstat/_readstat_parser.pyx":700
  *     if readstat_value_is_missing(value, variable):
  *         # The user does not want to retrieve missing values
  *         if not dc.usernan or readstat_value_is_system_missing(value):             # <<<<<<<<<<<<<<
@@ -11397,17 +11350,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     __pyx_L12_bool_binop_done:;
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":705
+      /* "pyreadstat/_readstat_parser.pyx":701
  *         # The user does not want to retrieve missing values
  *         if not dc.usernan or readstat_value_is_system_missing(value):
  *             if output_format == "pandas":             # <<<<<<<<<<<<<<
  *                 if iscurnptypefloat == 1 or iscurnptypeobject == 1:
  *                     # already allocated
 */
-      __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 705, __pyx_L1_error)
+      __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 701, __pyx_L1_error)
       if (__pyx_t_3) {
 
-        /* "pyreadstat/_readstat_parser.pyx":706
+        /* "pyreadstat/_readstat_parser.pyx":702
  *         if not dc.usernan or readstat_value_is_system_missing(value):
  *             if output_format == "pandas":
  *                 if iscurnptypefloat == 1 or iscurnptypeobject == 1:             # <<<<<<<<<<<<<<
@@ -11427,7 +11380,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
           goto __pyx_L15;
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":712
+        /* "pyreadstat/_readstat_parser.pyx":708
  *                 # for any type except float, the numpy type will be object as now we have nans
  *                 else:
  *                     dc.col_numpy_dtypes[index] = object             # <<<<<<<<<<<<<<
@@ -11437,11 +11390,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         /*else*/ {
           if (unlikely(__pyx_v_dc->col_numpy_dtypes == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 712, __pyx_L1_error)
+            __PYX_ERR(0, 708, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, __pyx_builtin_object, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 712, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, __pyx_builtin_object, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 708, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":713
+          /* "pyreadstat/_readstat_parser.pyx":709
  *                 else:
  *                     dc.col_numpy_dtypes[index] = object
  *                     dc.col_dtypes_isobject[index] = 1             # <<<<<<<<<<<<<<
@@ -11450,11 +11403,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           if (unlikely(__pyx_v_dc->col_dtypes_isobject == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 713, __pyx_L1_error)
+            __PYX_ERR(0, 709, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, __pyx_mstate_global->__pyx_int_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 713, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, __pyx_mstate_global->__pyx_int_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 709, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":714
+          /* "pyreadstat/_readstat_parser.pyx":710
  *                     dc.col_numpy_dtypes[index] = object
  *                     dc.col_dtypes_isobject[index] = 1
  *                     iscurnptypeobject = 1             # <<<<<<<<<<<<<<
@@ -11463,7 +11416,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           __pyx_v_iscurnptypeobject = 1;
 
-          /* "pyreadstat/_readstat_parser.pyx":715
+          /* "pyreadstat/_readstat_parser.pyx":711
  *                     dc.col_dtypes_isobject[index] = 1
  *                     iscurnptypeobject = 1
  *                     dc.col_data[index] = dc.col_data[index].astype(object, copy=False)             # <<<<<<<<<<<<<<
@@ -11472,57 +11425,57 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 715, __pyx_L1_error)
+            __PYX_ERR(0, 711, __pyx_L1_error)
           }
-          __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 715, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 711, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_6 = __pyx_t_5;
           __Pyx_INCREF(__pyx_t_6);
           __pyx_t_7 = 0;
           {
             PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_6, __pyx_builtin_object};
-            __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 715, __pyx_L1_error)
+            __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 711, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_4);
-            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_copy, Py_False, __pyx_t_4, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 715, __pyx_L1_error)
+            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_copy, Py_False, __pyx_t_4, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 711, __pyx_L1_error)
             __pyx_t_1 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_astype, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_4);
             __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 715, __pyx_L1_error)
+            if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 711, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_1);
           }
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 715, __pyx_L1_error)
+            __PYX_ERR(0, 711, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data, __pyx_v_index, __pyx_t_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 715, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data, __pyx_v_index, __pyx_t_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 711, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-          /* "pyreadstat/_readstat_parser.pyx":716
+          /* "pyreadstat/_readstat_parser.pyx":712
  *                     iscurnptypeobject = 1
  *                     dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
  *                     dc.col_data[index][obs_index:] = np.nan             # <<<<<<<<<<<<<<
  *                     #dc.col_data[index][obs_index] = NAN
  *         elif readstat_value_is_defined_missing(value, variable):
 */
-          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 716, __pyx_L1_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 712, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_nan); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 716, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_nan); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 712, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 716, __pyx_L1_error)
+            __PYX_ERR(0, 712, __pyx_L1_error)
           }
-          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 716, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 712, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          if (__Pyx_PyObject_SetSlice(__pyx_t_1, __pyx_t_5, __pyx_v_obs_index, 0, NULL, NULL, NULL, 1, 0, 1) < (0)) __PYX_ERR(0, 716, __pyx_L1_error)
+          if (__Pyx_PyObject_SetSlice(__pyx_t_1, __pyx_t_5, __pyx_v_obs_index, 0, NULL, NULL, NULL, 1, 0, 1) < (0)) __PYX_ERR(0, 712, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         }
         __pyx_L15:;
 
-        /* "pyreadstat/_readstat_parser.pyx":705
+        /* "pyreadstat/_readstat_parser.pyx":701
  *         # The user does not want to retrieve missing values
  *         if not dc.usernan or readstat_value_is_system_missing(value):
  *             if output_format == "pandas":             # <<<<<<<<<<<<<<
@@ -11531,7 +11484,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":704
+      /* "pyreadstat/_readstat_parser.pyx":700
  *     if readstat_value_is_missing(value, variable):
  *         # The user does not want to retrieve missing values
  *         if not dc.usernan or readstat_value_is_system_missing(value):             # <<<<<<<<<<<<<<
@@ -11541,7 +11494,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
       goto __pyx_L11;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":718
+    /* "pyreadstat/_readstat_parser.pyx":714
  *                     dc.col_data[index][obs_index:] = np.nan
  *                     #dc.col_data[index][obs_index] = NAN
  *         elif readstat_value_is_defined_missing(value, variable):             # <<<<<<<<<<<<<<
@@ -11551,19 +11504,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     __pyx_t_3 = (readstat_value_is_defined_missing(__pyx_v_value, __pyx_v_variable) != 0);
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":720
+      /* "pyreadstat/_readstat_parser.pyx":716
  *         elif readstat_value_is_defined_missing(value, variable):
  *             # SPSS missing values
  *             pyvalue = convert_readstat_to_python_value(value, index, dc)             # <<<<<<<<<<<<<<
  *             dc.col_data[index][obs_index] = pyvalue
  *         elif readstat_value_is_tagged_missing(value):
 */
-      __pyx_t_5 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_value, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 720, __pyx_L1_error)
+      __pyx_t_5 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_value, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 716, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_v_pyvalue = __pyx_t_5;
       __pyx_t_5 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":721
+      /* "pyreadstat/_readstat_parser.pyx":717
  *             # SPSS missing values
  *             pyvalue = convert_readstat_to_python_value(value, index, dc)
  *             dc.col_data[index][obs_index] = pyvalue             # <<<<<<<<<<<<<<
@@ -11572,14 +11525,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       if (unlikely(__pyx_v_dc->col_data == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 721, __pyx_L1_error)
+        __PYX_ERR(0, 717, __pyx_L1_error)
       }
-      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 721, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 717, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (unlikely((__Pyx_SetItemInt(__pyx_t_5, __pyx_v_obs_index, __pyx_v_pyvalue, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 721, __pyx_L1_error)
+      if (unlikely((__Pyx_SetItemInt(__pyx_t_5, __pyx_v_obs_index, __pyx_v_pyvalue, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 717, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":718
+      /* "pyreadstat/_readstat_parser.pyx":714
  *                     dc.col_data[index][obs_index:] = np.nan
  *                     #dc.col_data[index][obs_index] = NAN
  *         elif readstat_value_is_defined_missing(value, variable):             # <<<<<<<<<<<<<<
@@ -11589,7 +11542,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
       goto __pyx_L11;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":722
+    /* "pyreadstat/_readstat_parser.pyx":718
  *             pyvalue = convert_readstat_to_python_value(value, index, dc)
  *             dc.col_data[index][obs_index] = pyvalue
  *         elif readstat_value_is_tagged_missing(value):             # <<<<<<<<<<<<<<
@@ -11599,7 +11552,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     __pyx_t_3 = (readstat_value_is_tagged_missing(__pyx_v_value) != 0);
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":723
+      /* "pyreadstat/_readstat_parser.pyx":719
  *             dc.col_data[index][obs_index] = pyvalue
  *         elif readstat_value_is_tagged_missing(value):
  *             iscurnptypeobject = dc.col_dtypes_isobject[index]             # <<<<<<<<<<<<<<
@@ -11608,15 +11561,15 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       if (unlikely(__pyx_v_dc->col_dtypes_isobject == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 723, __pyx_L1_error)
+        __PYX_ERR(0, 719, __pyx_L1_error)
       }
-      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 723, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 719, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 723, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 719, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_v_iscurnptypeobject = __pyx_t_3;
 
-      /* "pyreadstat/_readstat_parser.pyx":725
+      /* "pyreadstat/_readstat_parser.pyx":721
  *             iscurnptypeobject = dc.col_dtypes_isobject[index]
  *             # SAS and Stata missing values
  *             missing_tag = <int> readstat_value_tag(value)             # <<<<<<<<<<<<<<
@@ -11625,17 +11578,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       __pyx_v_missing_tag = ((int)readstat_value_tag(__pyx_v_value));
 
-      /* "pyreadstat/_readstat_parser.pyx":728
+      /* "pyreadstat/_readstat_parser.pyx":724
  *             # In SAS missing values are A to Z or _ in stata a to z
  *             # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
  *             if output_format == "pandas":             # <<<<<<<<<<<<<<
  *                 if iscurnptypeobject == 1:
  *                     dc.col_data[index][obs_index] =  chr(missing_tag)
 */
-      __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 728, __pyx_L1_error)
+      __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 724, __pyx_L1_error)
       if (__pyx_t_3) {
 
-        /* "pyreadstat/_readstat_parser.pyx":729
+        /* "pyreadstat/_readstat_parser.pyx":725
  *             # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
  *             if output_format == "pandas":
  *                 if iscurnptypeobject == 1:             # <<<<<<<<<<<<<<
@@ -11645,26 +11598,26 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         __pyx_t_3 = (__pyx_v_iscurnptypeobject == 1);
         if (__pyx_t_3) {
 
-          /* "pyreadstat/_readstat_parser.pyx":730
+          /* "pyreadstat/_readstat_parser.pyx":726
  *             if output_format == "pandas":
  *                 if iscurnptypeobject == 1:
  *                     dc.col_data[index][obs_index] =  chr(missing_tag)             # <<<<<<<<<<<<<<
  *                 else:
  *                     dc.col_numpy_dtypes[index] = object
 */
-          __pyx_t_5 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 730, __pyx_L1_error)
+          __pyx_t_5 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 726, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 730, __pyx_L1_error)
+            __PYX_ERR(0, 726, __pyx_L1_error)
           }
-          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 730, __pyx_L1_error)
+          __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 726, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_1);
-          if (unlikely((__Pyx_SetItemInt(__pyx_t_1, __pyx_v_obs_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 730, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_t_1, __pyx_v_obs_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 726, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "pyreadstat/_readstat_parser.pyx":729
+          /* "pyreadstat/_readstat_parser.pyx":725
  *             # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
  *             if output_format == "pandas":
  *                 if iscurnptypeobject == 1:             # <<<<<<<<<<<<<<
@@ -11674,7 +11627,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
           goto __pyx_L19;
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":732
+        /* "pyreadstat/_readstat_parser.pyx":728
  *                     dc.col_data[index][obs_index] =  chr(missing_tag)
  *                 else:
  *                     dc.col_numpy_dtypes[index] = object             # <<<<<<<<<<<<<<
@@ -11684,11 +11637,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         /*else*/ {
           if (unlikely(__pyx_v_dc->col_numpy_dtypes == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 732, __pyx_L1_error)
+            __PYX_ERR(0, 728, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, __pyx_builtin_object, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 732, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_numpy_dtypes, __pyx_v_index, __pyx_builtin_object, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 728, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":733
+          /* "pyreadstat/_readstat_parser.pyx":729
  *                 else:
  *                     dc.col_numpy_dtypes[index] = object
  *                     dc.col_dtypes_isobject[index] = 1             # <<<<<<<<<<<<<<
@@ -11697,11 +11650,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           if (unlikely(__pyx_v_dc->col_dtypes_isobject == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 733, __pyx_L1_error)
+            __PYX_ERR(0, 729, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, __pyx_mstate_global->__pyx_int_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 733, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dtypes_isobject, __pyx_v_index, __pyx_mstate_global->__pyx_int_1, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 729, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":734
+          /* "pyreadstat/_readstat_parser.pyx":730
  *                     dc.col_numpy_dtypes[index] = object
  *                     dc.col_dtypes_isobject[index] = 1
  *                     dc.col_dytpes_isfloat[index] = 0             # <<<<<<<<<<<<<<
@@ -11710,11 +11663,11 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           if (unlikely(__pyx_v_dc->col_dytpes_isfloat == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 734, __pyx_L1_error)
+            __PYX_ERR(0, 730, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dytpes_isfloat, __pyx_v_index, __pyx_mstate_global->__pyx_int_0, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 734, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_dytpes_isfloat, __pyx_v_index, __pyx_mstate_global->__pyx_int_0, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 730, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":735
+          /* "pyreadstat/_readstat_parser.pyx":731
  *                     dc.col_dtypes_isobject[index] = 1
  *                     dc.col_dytpes_isfloat[index] = 0
  *                     iscurnptypeobject = 1             # <<<<<<<<<<<<<<
@@ -11723,7 +11676,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           __pyx_v_iscurnptypeobject = 1;
 
-          /* "pyreadstat/_readstat_parser.pyx":736
+          /* "pyreadstat/_readstat_parser.pyx":732
  *                     dc.col_dytpes_isfloat[index] = 0
  *                     iscurnptypeobject = 1
  *                     dc.col_data[index] = dc.col_data[index].astype(object, copy=False)             # <<<<<<<<<<<<<<
@@ -11732,54 +11685,54 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 736, __pyx_L1_error)
+            __PYX_ERR(0, 732, __pyx_L1_error)
           }
-          __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 736, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
           __pyx_t_1 = __pyx_t_4;
           __Pyx_INCREF(__pyx_t_1);
           __pyx_t_7 = 0;
           {
             PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_1, __pyx_builtin_object};
-            __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 736, __pyx_L1_error)
+            __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 732, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_6);
-            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_copy, Py_False, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 736, __pyx_L1_error)
+            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_copy, Py_False, __pyx_t_6, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 732, __pyx_L1_error)
             __pyx_t_5 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_astype, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
             __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 736, __pyx_L1_error)
+            if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 732, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
           }
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 736, __pyx_L1_error)
+            __PYX_ERR(0, 732, __pyx_L1_error)
           }
-          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data, __pyx_v_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 736, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_v_dc->col_data, __pyx_v_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference) < 0))) __PYX_ERR(0, 732, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "pyreadstat/_readstat_parser.pyx":737
+          /* "pyreadstat/_readstat_parser.pyx":733
  *                     iscurnptypeobject = 1
  *                     dc.col_data[index] = dc.col_data[index].astype(object, copy=False)
  *                     dc.col_data[index][obs_index] =  chr(missing_tag)             # <<<<<<<<<<<<<<
  *             else:
  *                 dc.col_data[index][obs_index] =  chr(missing_tag)
 */
-          __pyx_t_5 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 737, __pyx_L1_error)
+          __pyx_t_5 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 733, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           if (unlikely(__pyx_v_dc->col_data == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 737, __pyx_L1_error)
+            __PYX_ERR(0, 733, __pyx_L1_error)
           }
-          __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 737, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 733, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          if (unlikely((__Pyx_SetItemInt(__pyx_t_4, __pyx_v_obs_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 737, __pyx_L1_error)
+          if (unlikely((__Pyx_SetItemInt(__pyx_t_4, __pyx_v_obs_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 733, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         }
         __pyx_L19:;
 
-        /* "pyreadstat/_readstat_parser.pyx":728
+        /* "pyreadstat/_readstat_parser.pyx":724
  *             # In SAS missing values are A to Z or _ in stata a to z
  *             # if (missing_tag >=65 and missing_tag <= 90) or missing_tag == 95 or (missing_tag >=61 and missing_tag <= 122):
  *             if output_format == "pandas":             # <<<<<<<<<<<<<<
@@ -11789,7 +11742,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
         goto __pyx_L18;
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":739
+      /* "pyreadstat/_readstat_parser.pyx":735
  *                     dc.col_data[index][obs_index] =  chr(missing_tag)
  *             else:
  *                 dc.col_data[index][obs_index] =  chr(missing_tag)             # <<<<<<<<<<<<<<
@@ -11797,21 +11750,21 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
  *             if curset is None:
 */
       /*else*/ {
-        __pyx_t_5 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 739, __pyx_L1_error)
+        __pyx_t_5 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 735, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         if (unlikely(__pyx_v_dc->col_data == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 739, __pyx_L1_error)
+          __PYX_ERR(0, 735, __pyx_L1_error)
         }
-        __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 739, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 735, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        if (unlikely((__Pyx_SetItemInt(__pyx_t_4, __pyx_v_obs_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 739, __pyx_L1_error)
+        if (unlikely((__Pyx_SetItemInt(__pyx_t_4, __pyx_v_obs_index, __pyx_t_5, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 735, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
       __pyx_L18:;
 
-      /* "pyreadstat/_readstat_parser.pyx":740
+      /* "pyreadstat/_readstat_parser.pyx":736
  *             else:
  *                 dc.col_data[index][obs_index] =  chr(missing_tag)
  *             curset = dc.missing_user_values.get(index)             # <<<<<<<<<<<<<<
@@ -11820,18 +11773,18 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       if (unlikely(__pyx_v_dc->missing_user_values == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "get");
-        __PYX_ERR(0, 740, __pyx_L1_error)
+        __PYX_ERR(0, 736, __pyx_L1_error)
       }
-      __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_index); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 740, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_index); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 736, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_4 = __Pyx_PyDict_GetItemDefault(__pyx_v_dc->missing_user_values, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 740, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyDict_GetItemDefault(__pyx_v_dc->missing_user_values, __pyx_t_5, Py_None); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 736, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (!(likely(PySet_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("set", __pyx_t_4))) __PYX_ERR(0, 740, __pyx_L1_error)
+      if (!(likely(PySet_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("set", __pyx_t_4))) __PYX_ERR(0, 736, __pyx_L1_error)
       __pyx_v_curset = ((PyObject*)__pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":741
+      /* "pyreadstat/_readstat_parser.pyx":737
  *                 dc.col_data[index][obs_index] =  chr(missing_tag)
  *             curset = dc.missing_user_values.get(index)
  *             if curset is None:             # <<<<<<<<<<<<<<
@@ -11841,19 +11794,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
       __pyx_t_3 = (__pyx_v_curset == ((PyObject*)Py_None));
       if (__pyx_t_3) {
 
-        /* "pyreadstat/_readstat_parser.pyx":742
+        /* "pyreadstat/_readstat_parser.pyx":738
  *             curset = dc.missing_user_values.get(index)
  *             if curset is None:
  *                 curset = set()             # <<<<<<<<<<<<<<
  *             curset.add(chr(missing_tag))
  *             dc.missing_user_values[index] = curset
 */
-        __pyx_t_4 = PySet_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 742, __pyx_L1_error)
+        __pyx_t_4 = PySet_New(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 738, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_DECREF_SET(__pyx_v_curset, ((PyObject*)__pyx_t_4));
         __pyx_t_4 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":741
+        /* "pyreadstat/_readstat_parser.pyx":737
  *                 dc.col_data[index][obs_index] =  chr(missing_tag)
  *             curset = dc.missing_user_values.get(index)
  *             if curset is None:             # <<<<<<<<<<<<<<
@@ -11862,7 +11815,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":743
+      /* "pyreadstat/_readstat_parser.pyx":739
  *             if curset is None:
  *                 curset = set()
  *             curset.add(chr(missing_tag))             # <<<<<<<<<<<<<<
@@ -11871,14 +11824,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       if (unlikely(__pyx_v_curset == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "add");
-        __PYX_ERR(0, 743, __pyx_L1_error)
+        __PYX_ERR(0, 739, __pyx_L1_error)
       }
-      __pyx_t_4 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 743, __pyx_L1_error)
+      __pyx_t_4 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 739, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_9 = PySet_Add(__pyx_v_curset, __pyx_t_4); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 743, __pyx_L1_error)
+      __pyx_t_9 = PySet_Add(__pyx_v_curset, __pyx_t_4); if (unlikely(__pyx_t_9 == ((int)-1))) __PYX_ERR(0, 739, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":744
+      /* "pyreadstat/_readstat_parser.pyx":740
  *                 curset = set()
  *             curset.add(chr(missing_tag))
  *             dc.missing_user_values[index] = curset             # <<<<<<<<<<<<<<
@@ -11887,14 +11840,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
       if (unlikely(__pyx_v_dc->missing_user_values == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 744, __pyx_L1_error)
+        __PYX_ERR(0, 740, __pyx_L1_error)
       }
-      __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 744, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_v_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 740, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      if (unlikely((PyDict_SetItem(__pyx_v_dc->missing_user_values, __pyx_t_4, __pyx_v_curset) < 0))) __PYX_ERR(0, 744, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_dc->missing_user_values, __pyx_t_4, __pyx_v_curset) < 0))) __PYX_ERR(0, 740, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":722
+      /* "pyreadstat/_readstat_parser.pyx":718
  *             pyvalue = convert_readstat_to_python_value(value, index, dc)
  *             dc.col_data[index][obs_index] = pyvalue
  *         elif readstat_value_is_tagged_missing(value):             # <<<<<<<<<<<<<<
@@ -11904,7 +11857,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     }
     __pyx_L11:;
 
-    /* "pyreadstat/_readstat_parser.pyx":702
+    /* "pyreadstat/_readstat_parser.pyx":698
  * 
  *     # transform to python value types
  *     if readstat_value_is_missing(value, variable):             # <<<<<<<<<<<<<<
@@ -11914,7 +11867,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
     goto __pyx_L10;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":746
+  /* "pyreadstat/_readstat_parser.pyx":742
  *             dc.missing_user_values[index] = curset
  *     else:
  *         pyvalue = convert_readstat_to_python_value(value, index, dc)             # <<<<<<<<<<<<<<
@@ -11922,12 +11875,12 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
  * 
 */
   /*else*/ {
-    __pyx_t_4 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_value, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 746, __pyx_L1_error)
+    __pyx_t_4 = __pyx_f_10pyreadstat_16_readstat_parser_convert_readstat_to_python_value(__pyx_v_value, __pyx_v_index, __pyx_v_dc); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 742, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_v_pyvalue = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":747
+    /* "pyreadstat/_readstat_parser.pyx":743
  *     else:
  *         pyvalue = convert_readstat_to_python_value(value, index, dc)
  *         dc.col_data[index][obs_index] = pyvalue             # <<<<<<<<<<<<<<
@@ -11936,16 +11889,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
 */
     if (unlikely(__pyx_v_dc->col_data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 747, __pyx_L1_error)
+      __PYX_ERR(0, 743, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 747, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetItemInt_List(__pyx_v_dc->col_data, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 743, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (unlikely((__Pyx_SetItemInt(__pyx_t_4, __pyx_v_obs_index, __pyx_v_pyvalue, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 747, __pyx_L1_error)
+    if (unlikely((__Pyx_SetItemInt(__pyx_t_4, __pyx_v_obs_index, __pyx_v_pyvalue, int, 1, __Pyx_PyLong_From_int, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 743, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_L10:;
 
-  /* "pyreadstat/_readstat_parser.pyx":749
+  /* "pyreadstat/_readstat_parser.pyx":745
  *         dc.col_data[index][obs_index] = pyvalue
  * 
  *     return READSTAT_HANDLER_OK             # <<<<<<<<<<<<<<
@@ -11955,7 +11908,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   __pyx_r = READSTAT_HANDLER_OK;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":653
+  /* "pyreadstat/_readstat_parser.pyx":649
  * 
  * 
  * cdef int handle_value(int obs_index, readstat_variable_t * variable, readstat_value_t value, void *ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -11982,7 +11935,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value(int __pyx_v_obs_
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":752
+/* "pyreadstat/_readstat_parser.pyx":748
  * 
  * 
  * cdef int handle_value_label(char *val_labels, readstat_value_t value, char *label, void *ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -12021,7 +11974,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("handle_value_label", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":758
+  /* "pyreadstat/_readstat_parser.pyx":754
  *     """
  * 
  *     cdef  data_container dc = <data_container> ctx             # <<<<<<<<<<<<<<
@@ -12033,14 +11986,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   __pyx_v_dc = ((struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":776
+  /* "pyreadstat/_readstat_parser.pyx":772
  *     cdef str value_label_name
  * 
  *     var_label = <str> val_labels             # <<<<<<<<<<<<<<
  *     value_label_name = <str> label
  * 
 */
-  __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_val_labels); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 776, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_val_labels); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 772, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = __pyx_t_1;
   __Pyx_INCREF(__pyx_t_2);
@@ -12048,14 +12001,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   __pyx_v_var_label = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":777
+  /* "pyreadstat/_readstat_parser.pyx":773
  * 
  *     var_label = <str> val_labels
  *     value_label_name = <str> label             # <<<<<<<<<<<<<<
  * 
  *     cdef readstat_type_t value_type
 */
-  __pyx_t_2 = __Pyx_PyUnicode_FromString(__pyx_v_label); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 777, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyUnicode_FromString(__pyx_v_label); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 773, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_1 = __pyx_t_2;
   __Pyx_INCREF(__pyx_t_1);
@@ -12063,7 +12016,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   __pyx_v_value_label_name = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":780
+  /* "pyreadstat/_readstat_parser.pyx":776
  * 
  *     cdef readstat_type_t value_type
  *     value_type = readstat_value_type(value)             # <<<<<<<<<<<<<<
@@ -12072,7 +12025,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
   __pyx_v_value_type = readstat_value_type(__pyx_v_value);
 
-  /* "pyreadstat/_readstat_parser.pyx":782
+  /* "pyreadstat/_readstat_parser.pyx":778
  *     value_type = readstat_value_type(value)
  * 
  *     labels_raw = dc.labels_raw             # <<<<<<<<<<<<<<
@@ -12084,7 +12037,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   __pyx_v_labels_raw = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":783
+  /* "pyreadstat/_readstat_parser.pyx":779
  * 
  *     labels_raw = dc.labels_raw
  *     cur_dict = labels_raw.get(var_label)             # <<<<<<<<<<<<<<
@@ -12098,36 +12051,36 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_var_label};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 783, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 779, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_cur_dict = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":784
+  /* "pyreadstat/_readstat_parser.pyx":780
  *     labels_raw = dc.labels_raw
  *     cur_dict = labels_raw.get(var_label)
  *     if not cur_dict:             # <<<<<<<<<<<<<<
  *         cur_dict = dict()
  * 
 */
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_cur_dict); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 784, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_cur_dict); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 780, __pyx_L1_error)
   __pyx_t_5 = (!__pyx_t_4);
   if (__pyx_t_5) {
 
-    /* "pyreadstat/_readstat_parser.pyx":785
+    /* "pyreadstat/_readstat_parser.pyx":781
  *     cur_dict = labels_raw.get(var_label)
  *     if not cur_dict:
  *         cur_dict = dict()             # <<<<<<<<<<<<<<
  * 
  *     if readstat_value_is_tagged_missing(value):
 */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 785, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 781, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_cur_dict, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":784
+    /* "pyreadstat/_readstat_parser.pyx":780
  *     labels_raw = dc.labels_raw
  *     cur_dict = labels_raw.get(var_label)
  *     if not cur_dict:             # <<<<<<<<<<<<<<
@@ -12136,7 +12089,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":787
+  /* "pyreadstat/_readstat_parser.pyx":783
  *         cur_dict = dict()
  * 
  *     if readstat_value_is_tagged_missing(value):             # <<<<<<<<<<<<<<
@@ -12146,7 +12099,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   __pyx_t_5 = (readstat_value_is_tagged_missing(__pyx_v_value) != 0);
   if (__pyx_t_5) {
 
-    /* "pyreadstat/_readstat_parser.pyx":789
+    /* "pyreadstat/_readstat_parser.pyx":785
  *     if readstat_value_is_tagged_missing(value):
  *         # SAS and Stata missing values
  *         missing_tag = <int> readstat_value_tag(value)             # <<<<<<<<<<<<<<
@@ -12155,19 +12108,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
     __pyx_v_missing_tag = ((int)readstat_value_tag(__pyx_v_value));
 
-    /* "pyreadstat/_readstat_parser.pyx":791
+    /* "pyreadstat/_readstat_parser.pyx":787
  *         missing_tag = <int> readstat_value_tag(value)
  *         # In SAS missing values are A to Z or _ in stata a to z
  *         cur_dict[chr(missing_tag)] = value_label_name             # <<<<<<<<<<<<<<
  *     else:
  * 
 */
-    __pyx_t_1 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 791, __pyx_L1_error)
+    __pyx_t_1 = PyUnicode_FromOrdinal(__pyx_v_missing_tag); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 787, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (unlikely((PyObject_SetItem(__pyx_v_cur_dict, __pyx_t_1, __pyx_v_value_label_name) < 0))) __PYX_ERR(0, 791, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_cur_dict, __pyx_t_1, __pyx_v_value_label_name) < 0))) __PYX_ERR(0, 787, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":787
+    /* "pyreadstat/_readstat_parser.pyx":783
  *         cur_dict = dict()
  * 
  *     if readstat_value_is_tagged_missing(value):             # <<<<<<<<<<<<<<
@@ -12177,7 +12130,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
     goto __pyx_L4;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":794
+  /* "pyreadstat/_readstat_parser.pyx":790
  *     else:
  * 
  *         if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:             # <<<<<<<<<<<<<<
@@ -12186,7 +12139,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
   /*else*/ {
 
-    /* "pyreadstat/_readstat_parser.pyx":814
+    /* "pyreadstat/_readstat_parser.pyx":810
  *             py_float_value = <double> c_float_value
  *             pyformat = VAR_FORMAT_FLOAT
  *         elif value_type == READSTAT_TYPE_DOUBLE:             # <<<<<<<<<<<<<<
@@ -12196,7 +12149,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
     switch (__pyx_v_value_type) {
       case READSTAT_TYPE_STRING:
 
-      /* "pyreadstat/_readstat_parser.pyx":794
+      /* "pyreadstat/_readstat_parser.pyx":790
  *     else:
  * 
  *         if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:             # <<<<<<<<<<<<<<
@@ -12205,7 +12158,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       case READSTAT_TYPE_STRING_REF:
 
-      /* "pyreadstat/_readstat_parser.pyx":795
+      /* "pyreadstat/_readstat_parser.pyx":791
  * 
  *         if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:
  *             c_str_value = readstat_string_value(value)             # <<<<<<<<<<<<<<
@@ -12214,14 +12167,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_c_str_value = readstat_string_value(__pyx_v_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":796
+      /* "pyreadstat/_readstat_parser.pyx":792
  *         if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:
  *             c_str_value = readstat_string_value(value)
  *             py_str_value = <str> c_str_value             # <<<<<<<<<<<<<<
  *             pyformat = VAR_FORMAT_STRING
  *         elif value_type == READSTAT_TYPE_INT8:
 */
-      __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_c_str_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 796, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_c_str_value); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 792, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_2 = __pyx_t_1;
       __Pyx_INCREF(__pyx_t_2);
@@ -12229,7 +12182,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       __pyx_v_py_str_value = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":797
+      /* "pyreadstat/_readstat_parser.pyx":793
  *             c_str_value = readstat_string_value(value)
  *             py_str_value = <str> c_str_value
  *             pyformat = VAR_FORMAT_STRING             # <<<<<<<<<<<<<<
@@ -12238,7 +12191,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_pyformat = __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_STRING;
 
-      /* "pyreadstat/_readstat_parser.pyx":794
+      /* "pyreadstat/_readstat_parser.pyx":790
  *     else:
  * 
  *         if value_type == READSTAT_TYPE_STRING or value_type == READSTAT_TYPE_STRING_REF:             # <<<<<<<<<<<<<<
@@ -12248,7 +12201,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case READSTAT_TYPE_INT8:
 
-      /* "pyreadstat/_readstat_parser.pyx":799
+      /* "pyreadstat/_readstat_parser.pyx":795
  *             pyformat = VAR_FORMAT_STRING
  *         elif value_type == READSTAT_TYPE_INT8:
  *             c_int8_value = readstat_int8_value(value)             # <<<<<<<<<<<<<<
@@ -12257,7 +12210,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_c_int8_value = readstat_int8_value(__pyx_v_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":800
+      /* "pyreadstat/_readstat_parser.pyx":796
  *         elif value_type == READSTAT_TYPE_INT8:
  *             c_int8_value = readstat_int8_value(value)
  *             py_long_value = <long> c_int8_value             # <<<<<<<<<<<<<<
@@ -12266,7 +12219,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_py_long_value = ((long)__pyx_v_c_int8_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":801
+      /* "pyreadstat/_readstat_parser.pyx":797
  *             c_int8_value = readstat_int8_value(value)
  *             py_long_value = <long> c_int8_value
  *             pyformat = VAR_FORMAT_LONG             # <<<<<<<<<<<<<<
@@ -12275,7 +12228,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_pyformat = __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_LONG;
 
-      /* "pyreadstat/_readstat_parser.pyx":798
+      /* "pyreadstat/_readstat_parser.pyx":794
  *             py_str_value = <str> c_str_value
  *             pyformat = VAR_FORMAT_STRING
  *         elif value_type == READSTAT_TYPE_INT8:             # <<<<<<<<<<<<<<
@@ -12285,7 +12238,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case READSTAT_TYPE_INT16:
 
-      /* "pyreadstat/_readstat_parser.pyx":803
+      /* "pyreadstat/_readstat_parser.pyx":799
  *             pyformat = VAR_FORMAT_LONG
  *         elif value_type == READSTAT_TYPE_INT16:
  *             c_int16_value = readstat_int16_value(value)             # <<<<<<<<<<<<<<
@@ -12294,7 +12247,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_c_int16_value = readstat_int16_value(__pyx_v_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":804
+      /* "pyreadstat/_readstat_parser.pyx":800
  *         elif value_type == READSTAT_TYPE_INT16:
  *             c_int16_value = readstat_int16_value(value)
  *             py_long_value = <long> c_int16_value             # <<<<<<<<<<<<<<
@@ -12303,7 +12256,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_py_long_value = ((long)__pyx_v_c_int16_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":805
+      /* "pyreadstat/_readstat_parser.pyx":801
  *             c_int16_value = readstat_int16_value(value)
  *             py_long_value = <long> c_int16_value
  *             pyformat = VAR_FORMAT_LONG             # <<<<<<<<<<<<<<
@@ -12312,7 +12265,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_pyformat = __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_LONG;
 
-      /* "pyreadstat/_readstat_parser.pyx":802
+      /* "pyreadstat/_readstat_parser.pyx":798
  *             py_long_value = <long> c_int8_value
  *             pyformat = VAR_FORMAT_LONG
  *         elif value_type == READSTAT_TYPE_INT16:             # <<<<<<<<<<<<<<
@@ -12322,7 +12275,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case READSTAT_TYPE_INT32:
 
-      /* "pyreadstat/_readstat_parser.pyx":807
+      /* "pyreadstat/_readstat_parser.pyx":803
  *             pyformat = VAR_FORMAT_LONG
  *         elif value_type == READSTAT_TYPE_INT32:
  *             c_int32_value = readstat_int32_value(value)             # <<<<<<<<<<<<<<
@@ -12331,7 +12284,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_c_int32_value = readstat_int32_value(__pyx_v_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":808
+      /* "pyreadstat/_readstat_parser.pyx":804
  *         elif value_type == READSTAT_TYPE_INT32:
  *             c_int32_value = readstat_int32_value(value)
  *             py_long_value = <long> c_int32_value             # <<<<<<<<<<<<<<
@@ -12340,7 +12293,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_py_long_value = ((long)__pyx_v_c_int32_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":809
+      /* "pyreadstat/_readstat_parser.pyx":805
  *             c_int32_value = readstat_int32_value(value)
  *             py_long_value = <long> c_int32_value
  *             pyformat = VAR_FORMAT_LONG             # <<<<<<<<<<<<<<
@@ -12349,7 +12302,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_pyformat = __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_LONG;
 
-      /* "pyreadstat/_readstat_parser.pyx":806
+      /* "pyreadstat/_readstat_parser.pyx":802
  *             py_long_value = <long> c_int16_value
  *             pyformat = VAR_FORMAT_LONG
  *         elif value_type == READSTAT_TYPE_INT32:             # <<<<<<<<<<<<<<
@@ -12359,7 +12312,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case READSTAT_TYPE_FLOAT:
 
-      /* "pyreadstat/_readstat_parser.pyx":811
+      /* "pyreadstat/_readstat_parser.pyx":807
  *             pyformat = VAR_FORMAT_LONG
  *         elif value_type == READSTAT_TYPE_FLOAT:
  *             c_float_value = readstat_float_value(value)             # <<<<<<<<<<<<<<
@@ -12368,7 +12321,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_c_float_value = readstat_float_value(__pyx_v_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":812
+      /* "pyreadstat/_readstat_parser.pyx":808
  *         elif value_type == READSTAT_TYPE_FLOAT:
  *             c_float_value = readstat_float_value(value)
  *             py_float_value = <double> c_float_value             # <<<<<<<<<<<<<<
@@ -12377,7 +12330,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_py_float_value = ((double)__pyx_v_c_float_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":813
+      /* "pyreadstat/_readstat_parser.pyx":809
  *             c_float_value = readstat_float_value(value)
  *             py_float_value = <double> c_float_value
  *             pyformat = VAR_FORMAT_FLOAT             # <<<<<<<<<<<<<<
@@ -12386,7 +12339,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_pyformat = __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_FLOAT;
 
-      /* "pyreadstat/_readstat_parser.pyx":810
+      /* "pyreadstat/_readstat_parser.pyx":806
  *             py_long_value = <long> c_int32_value
  *             pyformat = VAR_FORMAT_LONG
  *         elif value_type == READSTAT_TYPE_FLOAT:             # <<<<<<<<<<<<<<
@@ -12396,7 +12349,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case READSTAT_TYPE_DOUBLE:
 
-      /* "pyreadstat/_readstat_parser.pyx":815
+      /* "pyreadstat/_readstat_parser.pyx":811
  *             pyformat = VAR_FORMAT_FLOAT
  *         elif value_type == READSTAT_TYPE_DOUBLE:
  *             c_double_value = readstat_double_value(value);             # <<<<<<<<<<<<<<
@@ -12405,7 +12358,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_c_double_value = readstat_double_value(__pyx_v_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":816
+      /* "pyreadstat/_readstat_parser.pyx":812
  *         elif value_type == READSTAT_TYPE_DOUBLE:
  *             c_double_value = readstat_double_value(value);
  *             py_float_value = <double> c_double_value             # <<<<<<<<<<<<<<
@@ -12414,7 +12367,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_py_float_value = ((double)__pyx_v_c_double_value);
 
-      /* "pyreadstat/_readstat_parser.pyx":817
+      /* "pyreadstat/_readstat_parser.pyx":813
  *             c_double_value = readstat_double_value(value);
  *             py_float_value = <double> c_double_value
  *             pyformat = VAR_FORMAT_FLOAT             # <<<<<<<<<<<<<<
@@ -12423,7 +12376,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
 */
       __pyx_v_pyformat = __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_FLOAT;
 
-      /* "pyreadstat/_readstat_parser.pyx":814
+      /* "pyreadstat/_readstat_parser.pyx":810
  *             py_float_value = <double> c_float_value
  *             pyformat = VAR_FORMAT_FLOAT
  *         elif value_type == READSTAT_TYPE_DOUBLE:             # <<<<<<<<<<<<<<
@@ -12433,7 +12386,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       default:
 
-      /* "pyreadstat/_readstat_parser.pyx":819
+      /* "pyreadstat/_readstat_parser.pyx":815
  *             pyformat = VAR_FORMAT_FLOAT
  *         else:
  *             raise PyreadstatError("Unkown data type")             # <<<<<<<<<<<<<<
@@ -12441,7 +12394,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
  * 
 */
       __pyx_t_1 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 819, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 815, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_3 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -12460,16 +12413,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
         __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 819, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 815, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __PYX_ERR(0, 819, __pyx_L1_error)
+      __PYX_ERR(0, 815, __pyx_L1_error)
       break;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":822
+    /* "pyreadstat/_readstat_parser.pyx":818
  * 
  * 
  *         if pyformat == VAR_FORMAT_STRING:             # <<<<<<<<<<<<<<
@@ -12479,17 +12432,17 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
     switch (__pyx_v_pyformat) {
       case __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_STRING:
 
-      /* "pyreadstat/_readstat_parser.pyx":823
+      /* "pyreadstat/_readstat_parser.pyx":819
  * 
  *         if pyformat == VAR_FORMAT_STRING:
  *             cur_dict[py_str_value] = value_label_name             # <<<<<<<<<<<<<<
  *         elif pyformat == VAR_FORMAT_LONG:
  *             cur_dict[py_long_value] = value_label_name
 */
-      if (unlikely(!__pyx_v_py_str_value)) { __Pyx_RaiseUnboundLocalError("py_str_value"); __PYX_ERR(0, 823, __pyx_L1_error) }
-      if (unlikely((PyObject_SetItem(__pyx_v_cur_dict, __pyx_v_py_str_value, __pyx_v_value_label_name) < 0))) __PYX_ERR(0, 823, __pyx_L1_error)
+      if (unlikely(!__pyx_v_py_str_value)) { __Pyx_RaiseUnboundLocalError("py_str_value"); __PYX_ERR(0, 819, __pyx_L1_error) }
+      if (unlikely((PyObject_SetItem(__pyx_v_cur_dict, __pyx_v_py_str_value, __pyx_v_value_label_name) < 0))) __PYX_ERR(0, 819, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":822
+      /* "pyreadstat/_readstat_parser.pyx":818
  * 
  * 
  *         if pyformat == VAR_FORMAT_STRING:             # <<<<<<<<<<<<<<
@@ -12499,16 +12452,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_LONG:
 
-      /* "pyreadstat/_readstat_parser.pyx":825
+      /* "pyreadstat/_readstat_parser.pyx":821
  *             cur_dict[py_str_value] = value_label_name
  *         elif pyformat == VAR_FORMAT_LONG:
  *             cur_dict[py_long_value] = value_label_name             # <<<<<<<<<<<<<<
  *         elif pyformat == VAR_FORMAT_FLOAT:
  *             cur_dict[py_float_value] = value_label_name
 */
-      if (unlikely((__Pyx_SetItemInt(__pyx_v_cur_dict, __pyx_v_py_long_value, __pyx_v_value_label_name, long, 1, __Pyx_PyLong_From_long, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 825, __pyx_L1_error)
+      if (unlikely((__Pyx_SetItemInt(__pyx_v_cur_dict, __pyx_v_py_long_value, __pyx_v_value_label_name, long, 1, __Pyx_PyLong_From_long, 0, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference) < 0))) __PYX_ERR(0, 821, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":824
+      /* "pyreadstat/_readstat_parser.pyx":820
  *         if pyformat == VAR_FORMAT_STRING:
  *             cur_dict[py_str_value] = value_label_name
  *         elif pyformat == VAR_FORMAT_LONG:             # <<<<<<<<<<<<<<
@@ -12518,19 +12471,19 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_FLOAT:
 
-      /* "pyreadstat/_readstat_parser.pyx":827
+      /* "pyreadstat/_readstat_parser.pyx":823
  *             cur_dict[py_long_value] = value_label_name
  *         elif pyformat == VAR_FORMAT_FLOAT:
  *             cur_dict[py_float_value] = value_label_name             # <<<<<<<<<<<<<<
  *         elif pyformat == VAR_FORMAT_MISSING:
  *             pass
 */
-      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_py_float_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 827, __pyx_L1_error)
+      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_py_float_value); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 823, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      if (unlikely((PyObject_SetItem(__pyx_v_cur_dict, __pyx_t_2, __pyx_v_value_label_name) < 0))) __PYX_ERR(0, 827, __pyx_L1_error)
+      if (unlikely((PyObject_SetItem(__pyx_v_cur_dict, __pyx_t_2, __pyx_v_value_label_name) < 0))) __PYX_ERR(0, 823, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":826
+      /* "pyreadstat/_readstat_parser.pyx":822
  *         elif pyformat == VAR_FORMAT_LONG:
  *             cur_dict[py_long_value] = value_label_name
  *         elif pyformat == VAR_FORMAT_FLOAT:             # <<<<<<<<<<<<<<
@@ -12540,7 +12493,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_VAR_FORMAT_MISSING:
 
-      /* "pyreadstat/_readstat_parser.pyx":828
+      /* "pyreadstat/_readstat_parser.pyx":824
  *         elif pyformat == VAR_FORMAT_FLOAT:
  *             cur_dict[py_float_value] = value_label_name
  *         elif pyformat == VAR_FORMAT_MISSING:             # <<<<<<<<<<<<<<
@@ -12550,7 +12503,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
       break;
       default:
 
-      /* "pyreadstat/_readstat_parser.pyx":831
+      /* "pyreadstat/_readstat_parser.pyx":827
  *             pass
  *         else:
  *             raise PyreadstatError("Failed convert C to python value")             # <<<<<<<<<<<<<<
@@ -12558,7 +12511,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
  *     dc.labels_raw[var_label] = cur_dict
 */
       __pyx_t_6 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 831, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 827, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_3 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -12577,27 +12530,27 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
         __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_1, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 831, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 827, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_Raise(__pyx_t_2, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __PYX_ERR(0, 831, __pyx_L1_error)
+      __PYX_ERR(0, 827, __pyx_L1_error)
       break;
     }
   }
   __pyx_L4:;
 
-  /* "pyreadstat/_readstat_parser.pyx":833
+  /* "pyreadstat/_readstat_parser.pyx":829
  *             raise PyreadstatError("Failed convert C to python value")
  * 
  *     dc.labels_raw[var_label] = cur_dict             # <<<<<<<<<<<<<<
  * 
  *     return READSTAT_HANDLER_OK
 */
-  if (unlikely((PyObject_SetItem(__pyx_v_dc->labels_raw, __pyx_v_var_label, __pyx_v_cur_dict) < 0))) __PYX_ERR(0, 833, __pyx_L1_error)
+  if (unlikely((PyObject_SetItem(__pyx_v_dc->labels_raw, __pyx_v_var_label, __pyx_v_cur_dict) < 0))) __PYX_ERR(0, 829, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":835
+  /* "pyreadstat/_readstat_parser.pyx":831
  *     dc.labels_raw[var_label] = cur_dict
  * 
  *     return READSTAT_HANDLER_OK             # <<<<<<<<<<<<<<
@@ -12607,7 +12560,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   __pyx_r = READSTAT_HANDLER_OK;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":752
+  /* "pyreadstat/_readstat_parser.pyx":748
  * 
  * 
  * cdef int handle_value_label(char *val_labels, readstat_value_t value, char *label, void *ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -12633,7 +12586,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_value_label(char *__py
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":837
+/* "pyreadstat/_readstat_parser.pyx":833
  *     return READSTAT_HANDLER_OK
  * 
  * cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -12654,7 +12607,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_note(CYTHON_UNUSED int
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("handle_note", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":843
+  /* "pyreadstat/_readstat_parser.pyx":839
  * 
  *     cdef str pynote
  *     cdef  data_container dc = <data_container> ctx             # <<<<<<<<<<<<<<
@@ -12666,14 +12619,14 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_note(CYTHON_UNUSED int
   __pyx_v_dc = ((struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":845
+  /* "pyreadstat/_readstat_parser.pyx":841
  *     cdef  data_container dc = <data_container> ctx
  * 
  *     pynote = <str> note             # <<<<<<<<<<<<<<
  *     dc.notes.append(pynote)
  * 
 */
-  __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_note); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 845, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyUnicode_FromString(__pyx_v_note); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 841, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = __pyx_t_1;
   __Pyx_INCREF(__pyx_t_2);
@@ -12681,16 +12634,16 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_note(CYTHON_UNUSED int
   __pyx_v_pynote = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":846
+  /* "pyreadstat/_readstat_parser.pyx":842
  * 
  *     pynote = <str> note
  *     dc.notes.append(pynote)             # <<<<<<<<<<<<<<
  * 
  *     return READSTAT_HANDLER_OK
 */
-  __pyx_t_3 = __Pyx_PyObject_Append(__pyx_v_dc->notes, __pyx_v_pynote); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 846, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Append(__pyx_v_dc->notes, __pyx_v_pynote); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(0, 842, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":848
+  /* "pyreadstat/_readstat_parser.pyx":844
  *     dc.notes.append(pynote)
  * 
  *     return READSTAT_HANDLER_OK             # <<<<<<<<<<<<<<
@@ -12700,7 +12653,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_note(CYTHON_UNUSED int
   __pyx_r = READSTAT_HANDLER_OK;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":837
+  /* "pyreadstat/_readstat_parser.pyx":833
  *     return READSTAT_HANDLER_OK
  * 
  * cdef int handle_note (int note_index, char *note, void *ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -12721,7 +12674,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_note(CYTHON_UNUSED int
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":850
+/* "pyreadstat/_readstat_parser.pyx":846
  *     return READSTAT_HANDLER_OK
  * 
  * cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -12748,21 +12701,21 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("handle_open", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":858
+  /* "pyreadstat/_readstat_parser.pyx":854
  *     cdef Py_ssize_t length
  * 
  *     if not os.path.isfile(u8_path):             # <<<<<<<<<<<<<<
  *         return -1
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 858, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 854, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 858, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 854, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_2 = __pyx_t_4;
   __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 858, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 854, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = 0;
   {
@@ -12771,15 +12724,15 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 858, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 854, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 858, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_6 < 0))) __PYX_ERR(0, 854, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_7 = (!__pyx_t_6);
   if (__pyx_t_7) {
 
-    /* "pyreadstat/_readstat_parser.pyx":859
+    /* "pyreadstat/_readstat_parser.pyx":855
  * 
  *     if not os.path.isfile(u8_path):
  *         return -1             # <<<<<<<<<<<<<<
@@ -12789,7 +12742,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
     __pyx_r = -1;
     goto __pyx_L0;
 
-    /* "pyreadstat/_readstat_parser.pyx":858
+    /* "pyreadstat/_readstat_parser.pyx":854
  *     cdef Py_ssize_t length
  * 
  *     if not os.path.isfile(u8_path):             # <<<<<<<<<<<<<<
@@ -12798,36 +12751,36 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":861
+  /* "pyreadstat/_readstat_parser.pyx":857
  *         return -1
  * 
  *     if os.name == "nt":             # <<<<<<<<<<<<<<
  *         u16_path = PyUnicode_AsWideCharString(u8_path, &length)
  *         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 861, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 857, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 861, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 857, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_7 = (__Pyx_PyUnicode_Equals(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_nt, Py_EQ)); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 861, __pyx_L1_error)
+  __pyx_t_7 = (__Pyx_PyUnicode_Equals(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_nt, Py_EQ)); if (unlikely((__pyx_t_7 < 0))) __PYX_ERR(0, 857, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (__pyx_t_7) {
 
-    /* "pyreadstat/_readstat_parser.pyx":862
+    /* "pyreadstat/_readstat_parser.pyx":858
  * 
  *     if os.name == "nt":
  *         u16_path = PyUnicode_AsWideCharString(u8_path, &length)             # <<<<<<<<<<<<<<
  *         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
  *         assign_fd(io_ctx, fd)
 */
-    __pyx_t_4 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 862, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyUnicode_FromString(__pyx_v_u8_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 858, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_8 = PyUnicode_AsWideCharString(__pyx_t_4, (&__pyx_v_length)); if (unlikely(__pyx_t_8 == ((void *)NULL))) __PYX_ERR(0, 862, __pyx_L1_error)
+    __pyx_t_8 = PyUnicode_AsWideCharString(__pyx_t_4, (&__pyx_v_length)); if (unlikely(__pyx_t_8 == ((void *)NULL))) __PYX_ERR(0, 858, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_u16_path = __pyx_t_8;
 
-    /* "pyreadstat/_readstat_parser.pyx":863
+    /* "pyreadstat/_readstat_parser.pyx":859
  *     if os.name == "nt":
  *         u16_path = PyUnicode_AsWideCharString(u8_path, &length)
  *         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)             # <<<<<<<<<<<<<<
@@ -12836,7 +12789,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
 */
     __pyx_v_fd = _wsopen(__pyx_v_u16_path, (_O_RDONLY | _O_BINARY), _SH_DENYWR, 0);
 
-    /* "pyreadstat/_readstat_parser.pyx":864
+    /* "pyreadstat/_readstat_parser.pyx":860
  *         u16_path = PyUnicode_AsWideCharString(u8_path, &length)
  *         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
  *         assign_fd(io_ctx, fd)             # <<<<<<<<<<<<<<
@@ -12845,7 +12798,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
 */
     assign_fd(__pyx_v_io_ctx, __pyx_v_fd);
 
-    /* "pyreadstat/_readstat_parser.pyx":865
+    /* "pyreadstat/_readstat_parser.pyx":861
  *         fd = _wsopen(u16_path, _O_RDONLY | _O_BINARY, _SH_DENYWR, 0)
  *         assign_fd(io_ctx, fd)
  *         return fd             # <<<<<<<<<<<<<<
@@ -12855,7 +12808,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
     __pyx_r = __pyx_v_fd;
     goto __pyx_L0;
 
-    /* "pyreadstat/_readstat_parser.pyx":861
+    /* "pyreadstat/_readstat_parser.pyx":857
  *         return -1
  * 
  *     if os.name == "nt":             # <<<<<<<<<<<<<<
@@ -12864,7 +12817,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":867
+  /* "pyreadstat/_readstat_parser.pyx":863
  *         return fd
  *     else:
  *         return -1             # <<<<<<<<<<<<<<
@@ -12876,7 +12829,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
     goto __pyx_L0;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":850
+  /* "pyreadstat/_readstat_parser.pyx":846
  *     return READSTAT_HANDLER_OK
  * 
  * cdef int handle_open(const char *u8_path, void *io_ctx) except READSTAT_HANDLER_ABORT:             # <<<<<<<<<<<<<<
@@ -12897,7 +12850,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":871
+/* "pyreadstat/_readstat_parser.pyx":867
  * 
  * 
  * cdef int pyobject_open_handler(const char *path, void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -12908,7 +12861,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_handle_open(char const *__pyx
 static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_open_handler(CYTHON_UNUSED char const *__pyx_v_path, CYTHON_UNUSED void *__pyx_v_io_ctx) {
   int __pyx_r;
 
-  /* "pyreadstat/_readstat_parser.pyx":873
+  /* "pyreadstat/_readstat_parser.pyx":869
  * cdef int pyobject_open_handler(const char *path, void *io_ctx) noexcept:
  *     """File is already open - this is a no-op"""
  *     return 0             # <<<<<<<<<<<<<<
@@ -12918,7 +12871,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_open_handler(CYTHON_
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":871
+  /* "pyreadstat/_readstat_parser.pyx":867
  * 
  * 
  * cdef int pyobject_open_handler(const char *path, void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -12931,7 +12884,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_open_handler(CYTHON_
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":875
+/* "pyreadstat/_readstat_parser.pyx":871
  *     return 0
  * 
  * cdef int pyobject_close_handler(void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -12942,7 +12895,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_open_handler(CYTHON_
 static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_close_handler(CYTHON_UNUSED void *__pyx_v_io_ctx) {
   int __pyx_r;
 
-  /* "pyreadstat/_readstat_parser.pyx":877
+  /* "pyreadstat/_readstat_parser.pyx":873
  * cdef int pyobject_close_handler(void *io_ctx) noexcept:
  *     """User manages file lifetime - this is a no-op"""
  *     return 0             # <<<<<<<<<<<<<<
@@ -12952,7 +12905,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_close_handler(CYTHON
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":875
+  /* "pyreadstat/_readstat_parser.pyx":871
  *     return 0
  * 
  * cdef int pyobject_close_handler(void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -12965,7 +12918,7 @@ static int __pyx_f_10pyreadstat_16_readstat_parser_pyobject_close_handler(CYTHON
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":879
+/* "pyreadstat/_readstat_parser.pyx":875
  *     return 0
  * 
  * cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -12995,7 +12948,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("pyobject_read_handler", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":884
+  /* "pyreadstat/_readstat_parser.pyx":880
  *     cdef ssize_t bytes_read
  *     cdef char *data_ptr
  *     cdef object file_obj = <object> io_ctx             # <<<<<<<<<<<<<<
@@ -13007,7 +12960,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
   __pyx_v_file_obj = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":886
+  /* "pyreadstat/_readstat_parser.pyx":882
  *     cdef object file_obj = <object> io_ctx
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13023,7 +12976,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
     __Pyx_XGOTREF(__pyx_t_4);
     /*try:*/ {
 
-      /* "pyreadstat/_readstat_parser.pyx":887
+      /* "pyreadstat/_readstat_parser.pyx":883
  * 
  *     try:
  *         data = file_obj.read(nbyte)             # <<<<<<<<<<<<<<
@@ -13032,7 +12985,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
 */
       __pyx_t_5 = __pyx_v_file_obj;
       __Pyx_INCREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyLong_FromSize_t(__pyx_v_nbyte); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 887, __pyx_L3_error)
+      __pyx_t_6 = __Pyx_PyLong_FromSize_t(__pyx_v_nbyte); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 883, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_7 = 0;
       {
@@ -13040,14 +12993,14 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
         __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_read, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 887, __pyx_L3_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 883, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
-      if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(0, 887, __pyx_L3_error)
+      if (!(likely(PyBytes_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_1))) __PYX_ERR(0, 883, __pyx_L3_error)
       __pyx_v_data = ((PyObject*)__pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":888
+      /* "pyreadstat/_readstat_parser.pyx":884
  *     try:
  *         data = file_obj.read(nbyte)
  *         bytes_read = len(data)             # <<<<<<<<<<<<<<
@@ -13056,12 +13009,12 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
 */
       if (unlikely(__pyx_v_data == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-        __PYX_ERR(0, 888, __pyx_L3_error)
+        __PYX_ERR(0, 884, __pyx_L3_error)
       }
-      __pyx_t_8 = __Pyx_PyBytes_GET_SIZE(__pyx_v_data); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 888, __pyx_L3_error)
+      __pyx_t_8 = __Pyx_PyBytes_GET_SIZE(__pyx_v_data); if (unlikely(__pyx_t_8 == ((Py_ssize_t)-1))) __PYX_ERR(0, 884, __pyx_L3_error)
       __pyx_v_bytes_read = __pyx_t_8;
 
-      /* "pyreadstat/_readstat_parser.pyx":889
+      /* "pyreadstat/_readstat_parser.pyx":885
  *         data = file_obj.read(nbyte)
  *         bytes_read = len(data)
  *         if bytes_read > 0:             # <<<<<<<<<<<<<<
@@ -13071,7 +13024,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
       __pyx_t_9 = (__pyx_v_bytes_read > 0);
       if (__pyx_t_9) {
 
-        /* "pyreadstat/_readstat_parser.pyx":890
+        /* "pyreadstat/_readstat_parser.pyx":886
  *         bytes_read = len(data)
  *         if bytes_read > 0:
  *             data_ptr = <char*>data             # <<<<<<<<<<<<<<
@@ -13080,12 +13033,12 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
 */
         if (unlikely(__pyx_v_data == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-          __PYX_ERR(0, 890, __pyx_L3_error)
+          __PYX_ERR(0, 886, __pyx_L3_error)
         }
-        __pyx_t_10 = __Pyx_PyBytes_AsWritableString(__pyx_v_data); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 890, __pyx_L3_error)
+        __pyx_t_10 = __Pyx_PyBytes_AsWritableString(__pyx_v_data); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 886, __pyx_L3_error)
         __pyx_v_data_ptr = ((char *)__pyx_t_10);
 
-        /* "pyreadstat/_readstat_parser.pyx":891
+        /* "pyreadstat/_readstat_parser.pyx":887
  *         if bytes_read > 0:
  *             data_ptr = <char*>data
  *             memcpy(buf, data_ptr, bytes_read)             # <<<<<<<<<<<<<<
@@ -13094,7 +13047,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
 */
         (void)(memcpy(__pyx_v_buf, __pyx_v_data_ptr, __pyx_v_bytes_read));
 
-        /* "pyreadstat/_readstat_parser.pyx":889
+        /* "pyreadstat/_readstat_parser.pyx":885
  *         data = file_obj.read(nbyte)
  *         bytes_read = len(data)
  *         if bytes_read > 0:             # <<<<<<<<<<<<<<
@@ -13103,7 +13056,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":892
+      /* "pyreadstat/_readstat_parser.pyx":888
  *             data_ptr = <char*>data
  *             memcpy(buf, data_ptr, bytes_read)
  *         return bytes_read             # <<<<<<<<<<<<<<
@@ -13113,7 +13066,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
       __pyx_r = __pyx_v_bytes_read;
       goto __pyx_L7_try_return;
 
-      /* "pyreadstat/_readstat_parser.pyx":886
+      /* "pyreadstat/_readstat_parser.pyx":882
  *     cdef object file_obj = <object> io_ctx
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13126,7 +13079,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":893
+    /* "pyreadstat/_readstat_parser.pyx":889
  *             memcpy(buf, data_ptr, bytes_read)
  *         return bytes_read
  *     except:             # <<<<<<<<<<<<<<
@@ -13136,7 +13089,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
     /*except:*/ {
       __Pyx_ErrRestore(0,0,0);
 
-      /* "pyreadstat/_readstat_parser.pyx":894
+      /* "pyreadstat/_readstat_parser.pyx":890
  *         return bytes_read
  *     except:
  *         return -1             # <<<<<<<<<<<<<<
@@ -13147,7 +13100,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
       goto __pyx_L6_except_return;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":886
+    /* "pyreadstat/_readstat_parser.pyx":882
  *     cdef object file_obj = <object> io_ctx
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13168,7 +13121,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
     goto __pyx_L0;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":879
+  /* "pyreadstat/_readstat_parser.pyx":875
  *     return 0
  * 
  * cdef ssize_t pyobject_read_handler(void *buf, size_t nbyte, void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -13184,7 +13137,7 @@ static Py_ssize_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler(
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":896
+/* "pyreadstat/_readstat_parser.pyx":892
  *         return -1
  * 
  * cdef readstat_off_t pyobject_seek_handler(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -13211,7 +13164,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("pyobject_seek_handler", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":899
+  /* "pyreadstat/_readstat_parser.pyx":895
  *     """Bridge Python file.seek() to C seek operation"""
  *     cdef int py_whence
  *     cdef object file_obj = <object> io_ctx             # <<<<<<<<<<<<<<
@@ -13223,7 +13176,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
   __pyx_v_file_obj = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":901
+  /* "pyreadstat/_readstat_parser.pyx":897
  *     cdef object file_obj = <object> io_ctx
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13239,7 +13192,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
     __Pyx_XGOTREF(__pyx_t_4);
     /*try:*/ {
 
-      /* "pyreadstat/_readstat_parser.pyx":902
+      /* "pyreadstat/_readstat_parser.pyx":898
  * 
  *     try:
  *         if whence == READSTAT_SEEK_SET:             # <<<<<<<<<<<<<<
@@ -13249,7 +13202,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
       switch (__pyx_v_whence) {
         case READSTAT_SEEK_SET:
 
-        /* "pyreadstat/_readstat_parser.pyx":903
+        /* "pyreadstat/_readstat_parser.pyx":899
  *     try:
  *         if whence == READSTAT_SEEK_SET:
  *             py_whence = 0             # <<<<<<<<<<<<<<
@@ -13258,7 +13211,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
 */
         __pyx_v_py_whence = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":902
+        /* "pyreadstat/_readstat_parser.pyx":898
  * 
  *     try:
  *         if whence == READSTAT_SEEK_SET:             # <<<<<<<<<<<<<<
@@ -13268,7 +13221,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
         break;
         case READSTAT_SEEK_CUR:
 
-        /* "pyreadstat/_readstat_parser.pyx":905
+        /* "pyreadstat/_readstat_parser.pyx":901
  *             py_whence = 0
  *         elif whence == READSTAT_SEEK_CUR:
  *             py_whence = 1             # <<<<<<<<<<<<<<
@@ -13277,7 +13230,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
 */
         __pyx_v_py_whence = 1;
 
-        /* "pyreadstat/_readstat_parser.pyx":904
+        /* "pyreadstat/_readstat_parser.pyx":900
  *         if whence == READSTAT_SEEK_SET:
  *             py_whence = 0
  *         elif whence == READSTAT_SEEK_CUR:             # <<<<<<<<<<<<<<
@@ -13287,7 +13240,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
         break;
         default:
 
-        /* "pyreadstat/_readstat_parser.pyx":907
+        /* "pyreadstat/_readstat_parser.pyx":903
  *             py_whence = 1
  *         else:  # READSTAT_SEEK_END
  *             py_whence = 2             # <<<<<<<<<<<<<<
@@ -13298,7 +13251,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
         break;
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":909
+      /* "pyreadstat/_readstat_parser.pyx":905
  *             py_whence = 2
  * 
  *         file_obj.seek(offset, py_whence)             # <<<<<<<<<<<<<<
@@ -13307,9 +13260,9 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
 */
       __pyx_t_5 = __pyx_v_file_obj;
       __Pyx_INCREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyLong_From_off_t(__pyx_v_offset); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 909, __pyx_L3_error)
+      __pyx_t_6 = __Pyx_PyLong_From_off_t(__pyx_v_offset); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 905, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyLong_From_int(__pyx_v_py_whence); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 909, __pyx_L3_error)
+      __pyx_t_7 = __Pyx_PyLong_From_int(__pyx_v_py_whence); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 905, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_8 = 0;
       {
@@ -13318,12 +13271,12 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L3_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 905, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":910
+      /* "pyreadstat/_readstat_parser.pyx":906
  * 
  *         file_obj.seek(offset, py_whence)
  *         return file_obj.tell()             # <<<<<<<<<<<<<<
@@ -13337,15 +13290,15 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
         PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
         __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_tell, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 910, __pyx_L3_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 906, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
-      __pyx_t_9 = __Pyx_PyLong_As_off_t(__pyx_t_1); if (unlikely((__pyx_t_9 == ((readstat_off_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 910, __pyx_L3_error)
+      __pyx_t_9 = __Pyx_PyLong_As_off_t(__pyx_t_1); if (unlikely((__pyx_t_9 == ((readstat_off_t)-1)) && PyErr_Occurred())) __PYX_ERR(0, 906, __pyx_L3_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_9;
       goto __pyx_L7_try_return;
 
-      /* "pyreadstat/_readstat_parser.pyx":901
+      /* "pyreadstat/_readstat_parser.pyx":897
  *     cdef object file_obj = <object> io_ctx
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13359,7 +13312,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":911
+    /* "pyreadstat/_readstat_parser.pyx":907
  *         file_obj.seek(offset, py_whence)
  *         return file_obj.tell()
  *     except:             # <<<<<<<<<<<<<<
@@ -13369,7 +13322,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
     /*except:*/ {
       __Pyx_ErrRestore(0,0,0);
 
-      /* "pyreadstat/_readstat_parser.pyx":912
+      /* "pyreadstat/_readstat_parser.pyx":908
  *         return file_obj.tell()
  *     except:
  *         return -1             # <<<<<<<<<<<<<<
@@ -13380,7 +13333,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
       goto __pyx_L6_except_return;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":901
+    /* "pyreadstat/_readstat_parser.pyx":897
  *     cdef object file_obj = <object> io_ctx
  * 
  *     try:             # <<<<<<<<<<<<<<
@@ -13401,7 +13354,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
     goto __pyx_L0;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":896
+  /* "pyreadstat/_readstat_parser.pyx":892
  *         return -1
  * 
  * cdef readstat_off_t pyobject_seek_handler(readstat_off_t offset, readstat_io_flags_t whence, void *io_ctx) noexcept:             # <<<<<<<<<<<<<<
@@ -13416,7 +13369,7 @@ static readstat_off_t __pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_hand
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":915
+/* "pyreadstat/_readstat_parser.pyx":911
  * 
  * 
  * cdef void check_exit_status(readstat_error_t retcode) except *:             # <<<<<<<<<<<<<<
@@ -13438,7 +13391,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("check_exit_status", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":922
+  /* "pyreadstat/_readstat_parser.pyx":918
  *     cdef const char * err_readstat
  *     cdef str err_message
  *     if retcode != READSTAT_OK:             # <<<<<<<<<<<<<<
@@ -13448,7 +13401,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
   __pyx_t_1 = (__pyx_v_retcode != READSTAT_OK);
   if (unlikely(__pyx_t_1)) {
 
-    /* "pyreadstat/_readstat_parser.pyx":923
+    /* "pyreadstat/_readstat_parser.pyx":919
  *     cdef str err_message
  *     if retcode != READSTAT_OK:
  *         err_readstat = readstat_error_message(retcode)             # <<<<<<<<<<<<<<
@@ -13457,14 +13410,14 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
 */
     __pyx_v_err_readstat = readstat_error_message(__pyx_v_retcode);
 
-    /* "pyreadstat/_readstat_parser.pyx":924
+    /* "pyreadstat/_readstat_parser.pyx":920
  *     if retcode != READSTAT_OK:
  *         err_readstat = readstat_error_message(retcode)
  *         err_message = <str> err_readstat             # <<<<<<<<<<<<<<
  *         raise ReadstatError(err_message)
  * 
 */
-    __pyx_t_2 = __Pyx_PyUnicode_FromString(__pyx_v_err_readstat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 924, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyUnicode_FromString(__pyx_v_err_readstat); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 920, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_3 = __pyx_t_2;
     __Pyx_INCREF(__pyx_t_3);
@@ -13472,7 +13425,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
     __pyx_v_err_message = ((PyObject*)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":925
+    /* "pyreadstat/_readstat_parser.pyx":921
  *         err_readstat = readstat_error_message(retcode)
  *         err_message = <str> err_readstat
  *         raise ReadstatError(err_message)             # <<<<<<<<<<<<<<
@@ -13480,7 +13433,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
  * 
 */
     __pyx_t_2 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_ReadstatError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 925, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_ReadstatError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 921, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = 1;
     #if CYTHON_UNPACK_METHODS
@@ -13499,14 +13452,14 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
       __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 925, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 921, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 925, __pyx_L1_error)
+    __PYX_ERR(0, 921, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":922
+    /* "pyreadstat/_readstat_parser.pyx":918
  *     cdef const char * err_readstat
  *     cdef str err_message
  *     if retcode != READSTAT_OK:             # <<<<<<<<<<<<<<
@@ -13515,7 +13468,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":915
+  /* "pyreadstat/_readstat_parser.pyx":911
  * 
  * 
  * cdef void check_exit_status(readstat_error_t retcode) except *:             # <<<<<<<<<<<<<<
@@ -13535,7 +13488,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_e
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pyreadstat/_readstat_parser.pyx":928
+/* "pyreadstat/_readstat_parser.pyx":924
  * 
  * 
  * cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset, object file_obj=None) except *:             # <<<<<<<<<<<<<<
@@ -13576,7 +13529,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     }
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":953
+  /* "pyreadstat/_readstat_parser.pyx":949
  *     cdef bytes encoding_byte
  * 
  *     metaonly = data.metaonly             # <<<<<<<<<<<<<<
@@ -13586,7 +13539,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_t_1 = __pyx_v_data->metaonly;
   __pyx_v_metaonly = __pyx_t_1;
 
-  /* "pyreadstat/_readstat_parser.pyx":954
+  /* "pyreadstat/_readstat_parser.pyx":950
  * 
  *     metaonly = data.metaonly
  *     ctx = <void *>data             # <<<<<<<<<<<<<<
@@ -13595,7 +13548,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_ctx = ((void *)__pyx_v_data);
 
-  /* "pyreadstat/_readstat_parser.pyx":956
+  /* "pyreadstat/_readstat_parser.pyx":952
  *     ctx = <void *>data
  * 
  *     error = READSTAT_OK;             # <<<<<<<<<<<<<<
@@ -13604,7 +13557,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_error = READSTAT_OK;
 
-  /* "pyreadstat/_readstat_parser.pyx":957
+  /* "pyreadstat/_readstat_parser.pyx":953
  * 
  *     error = READSTAT_OK;
  *     parser = readstat_parser_init()             # <<<<<<<<<<<<<<
@@ -13613,7 +13566,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_parser = readstat_parser_init();
 
-  /* "pyreadstat/_readstat_parser.pyx":958
+  /* "pyreadstat/_readstat_parser.pyx":954
  *     error = READSTAT_OK;
  *     parser = readstat_parser_init()
  *     metadata_handler = <readstat_metadata_handler> handle_metadata             # <<<<<<<<<<<<<<
@@ -13622,7 +13575,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_metadata_handler = ((readstat_metadata_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_metadata);
 
-  /* "pyreadstat/_readstat_parser.pyx":959
+  /* "pyreadstat/_readstat_parser.pyx":955
  *     parser = readstat_parser_init()
  *     metadata_handler = <readstat_metadata_handler> handle_metadata
  *     variable_handler = <readstat_variable_handler> handle_variable             # <<<<<<<<<<<<<<
@@ -13631,7 +13584,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_variable_handler = ((readstat_variable_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_variable);
 
-  /* "pyreadstat/_readstat_parser.pyx":960
+  /* "pyreadstat/_readstat_parser.pyx":956
  *     metadata_handler = <readstat_metadata_handler> handle_metadata
  *     variable_handler = <readstat_variable_handler> handle_variable
  *     value_handler = <readstat_value_handler> handle_value             # <<<<<<<<<<<<<<
@@ -13640,7 +13593,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_value_handler = ((readstat_value_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_value);
 
-  /* "pyreadstat/_readstat_parser.pyx":961
+  /* "pyreadstat/_readstat_parser.pyx":957
  *     variable_handler = <readstat_variable_handler> handle_variable
  *     value_handler = <readstat_value_handler> handle_value
  *     value_label_handler = <readstat_value_label_handler> handle_value_label             # <<<<<<<<<<<<<<
@@ -13649,7 +13602,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_value_label_handler = ((readstat_value_label_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_value_label);
 
-  /* "pyreadstat/_readstat_parser.pyx":962
+  /* "pyreadstat/_readstat_parser.pyx":958
  *     value_handler = <readstat_value_handler> handle_value
  *     value_label_handler = <readstat_value_label_handler> handle_value_label
  *     note_handler = <readstat_note_handler> handle_note             # <<<<<<<<<<<<<<
@@ -13658,43 +13611,43 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_note_handler = ((readstat_note_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_note);
 
-  /* "pyreadstat/_readstat_parser.pyx":965
+  /* "pyreadstat/_readstat_parser.pyx":961
  * 
  * 
  *     check_exit_status(readstat_set_metadata_handler(parser, metadata_handler))             # <<<<<<<<<<<<<<
  *     check_exit_status(readstat_set_variable_handler(parser, variable_handler))
  *     check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))
 */
-  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_metadata_handler(__pyx_v_parser, __pyx_v_metadata_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 965, __pyx_L1_error)
+  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_metadata_handler(__pyx_v_parser, __pyx_v_metadata_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 961, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":966
+  /* "pyreadstat/_readstat_parser.pyx":962
  * 
  *     check_exit_status(readstat_set_metadata_handler(parser, metadata_handler))
  *     check_exit_status(readstat_set_variable_handler(parser, variable_handler))             # <<<<<<<<<<<<<<
  *     check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))
  *     check_exit_status(readstat_set_note_handler(parser, note_handler))
 */
-  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_variable_handler(__pyx_v_parser, __pyx_v_variable_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 966, __pyx_L1_error)
+  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_variable_handler(__pyx_v_parser, __pyx_v_variable_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 962, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":967
+  /* "pyreadstat/_readstat_parser.pyx":963
  *     check_exit_status(readstat_set_metadata_handler(parser, metadata_handler))
  *     check_exit_status(readstat_set_variable_handler(parser, variable_handler))
  *     check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))             # <<<<<<<<<<<<<<
  *     check_exit_status(readstat_set_note_handler(parser, note_handler))
  * 
 */
-  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_value_label_handler(__pyx_v_parser, __pyx_v_value_label_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 967, __pyx_L1_error)
+  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_value_label_handler(__pyx_v_parser, __pyx_v_value_label_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 963, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":968
+  /* "pyreadstat/_readstat_parser.pyx":964
  *     check_exit_status(readstat_set_variable_handler(parser, variable_handler))
  *     check_exit_status(readstat_set_value_label_handler(parser, value_label_handler))
  *     check_exit_status(readstat_set_note_handler(parser, note_handler))             # <<<<<<<<<<<<<<
  * 
  *     # Set up custom I/O handlers for file objects
 */
-  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_note_handler(__pyx_v_parser, __pyx_v_note_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 968, __pyx_L1_error)
+  __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_note_handler(__pyx_v_parser, __pyx_v_note_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 964, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":971
+  /* "pyreadstat/_readstat_parser.pyx":967
  * 
  *     # Set up custom I/O handlers for file objects
  *     if file_obj is not None:             # <<<<<<<<<<<<<<
@@ -13704,7 +13657,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_t_1 = (__pyx_v_file_obj != Py_None);
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":972
+    /* "pyreadstat/_readstat_parser.pyx":968
  *     # Set up custom I/O handlers for file objects
  *     if file_obj is not None:
  *         io_ctx = <void *> file_obj             # <<<<<<<<<<<<<<
@@ -13713,7 +13666,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_io_ctx = ((void *)__pyx_v_file_obj);
 
-    /* "pyreadstat/_readstat_parser.pyx":973
+    /* "pyreadstat/_readstat_parser.pyx":969
  *     if file_obj is not None:
  *         io_ctx = <void *> file_obj
  *         open_handler = <readstat_open_handler> pyobject_open_handler             # <<<<<<<<<<<<<<
@@ -13722,7 +13675,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_open_handler = ((readstat_open_handler)__pyx_f_10pyreadstat_16_readstat_parser_pyobject_open_handler);
 
-    /* "pyreadstat/_readstat_parser.pyx":974
+    /* "pyreadstat/_readstat_parser.pyx":970
  *         io_ctx = <void *> file_obj
  *         open_handler = <readstat_open_handler> pyobject_open_handler
  *         close_handler = <readstat_close_handler> pyobject_close_handler             # <<<<<<<<<<<<<<
@@ -13731,7 +13684,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_close_handler = ((readstat_close_handler)__pyx_f_10pyreadstat_16_readstat_parser_pyobject_close_handler);
 
-    /* "pyreadstat/_readstat_parser.pyx":975
+    /* "pyreadstat/_readstat_parser.pyx":971
  *         open_handler = <readstat_open_handler> pyobject_open_handler
  *         close_handler = <readstat_close_handler> pyobject_close_handler
  *         read_handler = <readstat_read_handler> pyobject_read_handler             # <<<<<<<<<<<<<<
@@ -13740,7 +13693,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_read_handler = ((readstat_read_handler)__pyx_f_10pyreadstat_16_readstat_parser_pyobject_read_handler);
 
-    /* "pyreadstat/_readstat_parser.pyx":976
+    /* "pyreadstat/_readstat_parser.pyx":972
  *         close_handler = <readstat_close_handler> pyobject_close_handler
  *         read_handler = <readstat_read_handler> pyobject_read_handler
  *         seek_handler = <readstat_seek_handler> pyobject_seek_handler             # <<<<<<<<<<<<<<
@@ -13749,7 +13702,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_seek_handler = ((readstat_seek_handler)__pyx_f_10pyreadstat_16_readstat_parser_pyobject_seek_handler);
 
-    /* "pyreadstat/_readstat_parser.pyx":977
+    /* "pyreadstat/_readstat_parser.pyx":973
  *         read_handler = <readstat_read_handler> pyobject_read_handler
  *         seek_handler = <readstat_seek_handler> pyobject_seek_handler
  *         readstat_set_io_ctx(parser, io_ctx)             # <<<<<<<<<<<<<<
@@ -13758,7 +13711,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     (void)(readstat_set_io_ctx(__pyx_v_parser, __pyx_v_io_ctx));
 
-    /* "pyreadstat/_readstat_parser.pyx":978
+    /* "pyreadstat/_readstat_parser.pyx":974
  *         seek_handler = <readstat_seek_handler> pyobject_seek_handler
  *         readstat_set_io_ctx(parser, io_ctx)
  *         readstat_set_open_handler(parser, open_handler)             # <<<<<<<<<<<<<<
@@ -13767,7 +13720,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     (void)(readstat_set_open_handler(__pyx_v_parser, __pyx_v_open_handler));
 
-    /* "pyreadstat/_readstat_parser.pyx":979
+    /* "pyreadstat/_readstat_parser.pyx":975
  *         readstat_set_io_ctx(parser, io_ctx)
  *         readstat_set_open_handler(parser, open_handler)
  *         readstat_set_close_handler(parser, close_handler)             # <<<<<<<<<<<<<<
@@ -13776,7 +13729,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     (void)(readstat_set_close_handler(__pyx_v_parser, __pyx_v_close_handler));
 
-    /* "pyreadstat/_readstat_parser.pyx":980
+    /* "pyreadstat/_readstat_parser.pyx":976
  *         readstat_set_open_handler(parser, open_handler)
  *         readstat_set_close_handler(parser, close_handler)
  *         readstat_set_read_handler(parser, read_handler)             # <<<<<<<<<<<<<<
@@ -13785,7 +13738,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     (void)(readstat_set_read_handler(__pyx_v_parser, __pyx_v_read_handler));
 
-    /* "pyreadstat/_readstat_parser.pyx":981
+    /* "pyreadstat/_readstat_parser.pyx":977
  *         readstat_set_close_handler(parser, close_handler)
  *         readstat_set_read_handler(parser, read_handler)
  *         readstat_set_seek_handler(parser, seek_handler)             # <<<<<<<<<<<<<<
@@ -13794,7 +13747,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     (void)(readstat_set_seek_handler(__pyx_v_parser, __pyx_v_seek_handler));
 
-    /* "pyreadstat/_readstat_parser.pyx":971
+    /* "pyreadstat/_readstat_parser.pyx":967
  * 
  *     # Set up custom I/O handlers for file objects
  *     if file_obj is not None:             # <<<<<<<<<<<<<<
@@ -13804,23 +13757,23 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":982
+  /* "pyreadstat/_readstat_parser.pyx":978
  *         readstat_set_read_handler(parser, read_handler)
  *         readstat_set_seek_handler(parser, seek_handler)
  *     elif os.name == "nt":             # <<<<<<<<<<<<<<
  *         # on windows we need a custom open handler in order to deal with internation characters in the path.
  *         open_handler = <readstat_open_handler> handle_open
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 982, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 978, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 982, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 978, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_nt, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 982, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_nt, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 978, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":984
+    /* "pyreadstat/_readstat_parser.pyx":980
  *     elif os.name == "nt":
  *         # on windows we need a custom open handler in order to deal with internation characters in the path.
  *         open_handler = <readstat_open_handler> handle_open             # <<<<<<<<<<<<<<
@@ -13829,7 +13782,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_open_handler = ((readstat_open_handler)__pyx_f_10pyreadstat_16_readstat_parser_handle_open);
 
-    /* "pyreadstat/_readstat_parser.pyx":985
+    /* "pyreadstat/_readstat_parser.pyx":981
  *         # on windows we need a custom open handler in order to deal with internation characters in the path.
  *         open_handler = <readstat_open_handler> handle_open
  *         readstat_set_open_handler(parser, open_handler)             # <<<<<<<<<<<<<<
@@ -13838,7 +13791,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     (void)(readstat_set_open_handler(__pyx_v_parser, __pyx_v_open_handler));
 
-    /* "pyreadstat/_readstat_parser.pyx":982
+    /* "pyreadstat/_readstat_parser.pyx":978
  *         readstat_set_read_handler(parser, read_handler)
  *         readstat_set_seek_handler(parser, seek_handler)
  *     elif os.name == "nt":             # <<<<<<<<<<<<<<
@@ -13848,7 +13801,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   }
   __pyx_L3:;
 
-  /* "pyreadstat/_readstat_parser.pyx":987
+  /* "pyreadstat/_readstat_parser.pyx":983
  *         readstat_set_open_handler(parser, open_handler)
  * 
  *     if not metaonly:             # <<<<<<<<<<<<<<
@@ -13858,16 +13811,16 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_t_1 = (!__pyx_v_metaonly);
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":988
+    /* "pyreadstat/_readstat_parser.pyx":984
  * 
  *     if not metaonly:
  *         check_exit_status(readstat_set_value_handler(parser, value_handler))             # <<<<<<<<<<<<<<
  * 
  *     # if the user set the encoding manually
 */
-    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_value_handler(__pyx_v_parser, __pyx_v_value_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 988, __pyx_L1_error)
+    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_value_handler(__pyx_v_parser, __pyx_v_value_handler)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 984, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":987
+    /* "pyreadstat/_readstat_parser.pyx":983
  *         readstat_set_open_handler(parser, open_handler)
  * 
  *     if not metaonly:             # <<<<<<<<<<<<<<
@@ -13876,7 +13829,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":991
+  /* "pyreadstat/_readstat_parser.pyx":987
  * 
  *     # if the user set the encoding manually
  *     if data.user_encoding:             # <<<<<<<<<<<<<<
@@ -13887,13 +13840,13 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   else
   {
     Py_ssize_t __pyx_temp = __Pyx_PyUnicode_IS_TRUE(__pyx_v_data->user_encoding);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 991, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 987, __pyx_L1_error)
     __pyx_t_1 = (__pyx_temp != 0);
   }
 
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":992
+    /* "pyreadstat/_readstat_parser.pyx":988
  *     # if the user set the encoding manually
  *     if data.user_encoding:
  *         encoding_bytes = data.user_encoding.encode("utf-8")             # <<<<<<<<<<<<<<
@@ -13902,24 +13855,24 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     if (unlikely(__pyx_v_data->user_encoding == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "encode");
-      __PYX_ERR(0, 992, __pyx_L1_error)
+      __PYX_ERR(0, 988, __pyx_L1_error)
     }
-    __pyx_t_3 = PyUnicode_AsUTF8String(__pyx_v_data->user_encoding); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 992, __pyx_L1_error)
+    __pyx_t_3 = PyUnicode_AsUTF8String(__pyx_v_data->user_encoding); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 988, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_v_encoding_bytes = ((PyObject*)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":993
+    /* "pyreadstat/_readstat_parser.pyx":989
  *     if data.user_encoding:
  *         encoding_bytes = data.user_encoding.encode("utf-8")
  *         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)             # <<<<<<<<<<<<<<
  * 
  *     if row_limit:
 */
-    __pyx_t_4 = __Pyx_PyBytes_AsWritableString(__pyx_v_encoding_bytes); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 993, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyBytes_AsWritableString(__pyx_v_encoding_bytes); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) __PYX_ERR(0, 989, __pyx_L1_error)
     (void)(readstat_set_file_character_encoding(__pyx_v_parser, ((char *)__pyx_t_4)));
 
-    /* "pyreadstat/_readstat_parser.pyx":991
+    /* "pyreadstat/_readstat_parser.pyx":987
  * 
  *     # if the user set the encoding manually
  *     if data.user_encoding:             # <<<<<<<<<<<<<<
@@ -13928,7 +13881,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":995
+  /* "pyreadstat/_readstat_parser.pyx":991
  *         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
  * 
  *     if row_limit:             # <<<<<<<<<<<<<<
@@ -13938,16 +13891,16 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_t_1 = (__pyx_v_row_limit != 0);
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":996
+    /* "pyreadstat/_readstat_parser.pyx":992
  * 
  *     if row_limit:
  *         check_exit_status(readstat_set_row_limit(parser, row_limit))             # <<<<<<<<<<<<<<
  * 
  *     if row_offset:
 */
-    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_row_limit(__pyx_v_parser, __pyx_v_row_limit)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 996, __pyx_L1_error)
+    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_row_limit(__pyx_v_parser, __pyx_v_row_limit)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 992, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":995
+    /* "pyreadstat/_readstat_parser.pyx":991
  *         readstat_set_file_character_encoding(parser, <char *> encoding_bytes)
  * 
  *     if row_limit:             # <<<<<<<<<<<<<<
@@ -13956,7 +13909,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":998
+  /* "pyreadstat/_readstat_parser.pyx":994
  *         check_exit_status(readstat_set_row_limit(parser, row_limit))
  * 
  *     if row_offset:             # <<<<<<<<<<<<<<
@@ -13966,16 +13919,16 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_t_1 = (__pyx_v_row_offset != 0);
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":999
+    /* "pyreadstat/_readstat_parser.pyx":995
  * 
  *     if row_offset:
  *         check_exit_status(readstat_set_row_offset(parser, row_offset))             # <<<<<<<<<<<<<<
  * 
  *     # parse!
 */
-    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_row_offset(__pyx_v_parser, __pyx_v_row_offset)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 999, __pyx_L1_error)
+    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_set_row_offset(__pyx_v_parser, __pyx_v_row_offset)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 995, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":998
+    /* "pyreadstat/_readstat_parser.pyx":994
  *         check_exit_status(readstat_set_row_limit(parser, row_limit))
  * 
  *     if row_offset:             # <<<<<<<<<<<<<<
@@ -13984,7 +13937,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1002
+  /* "pyreadstat/_readstat_parser.pyx":998
  * 
  *     # parse!
  *     if file_extension == FILE_EXT_SAV:             # <<<<<<<<<<<<<<
@@ -13994,7 +13947,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   switch (__pyx_v_file_extension) {
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_SAV:
 
-    /* "pyreadstat/_readstat_parser.pyx":1003
+    /* "pyreadstat/_readstat_parser.pyx":999
  *     # parse!
  *     if file_extension == FILE_EXT_SAV:
  *         error = readstat_parse_sav(parser, filename, ctx);             # <<<<<<<<<<<<<<
@@ -14003,7 +13956,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_error = readstat_parse_sav(__pyx_v_parser, __pyx_v_filename, __pyx_v_ctx);
 
-    /* "pyreadstat/_readstat_parser.pyx":1002
+    /* "pyreadstat/_readstat_parser.pyx":998
  * 
  *     # parse!
  *     if file_extension == FILE_EXT_SAV:             # <<<<<<<<<<<<<<
@@ -14013,7 +13966,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_SAS7BDAT:
 
-    /* "pyreadstat/_readstat_parser.pyx":1005
+    /* "pyreadstat/_readstat_parser.pyx":1001
  *         error = readstat_parse_sav(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_SAS7BDAT:
  *         error = readstat_parse_sas7bdat(parser, filename, ctx);             # <<<<<<<<<<<<<<
@@ -14022,7 +13975,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_error = readstat_parse_sas7bdat(__pyx_v_parser, __pyx_v_filename, __pyx_v_ctx);
 
-    /* "pyreadstat/_readstat_parser.pyx":1004
+    /* "pyreadstat/_readstat_parser.pyx":1000
  *     if file_extension == FILE_EXT_SAV:
  *         error = readstat_parse_sav(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_SAS7BDAT:             # <<<<<<<<<<<<<<
@@ -14032,7 +13985,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_DTA:
 
-    /* "pyreadstat/_readstat_parser.pyx":1007
+    /* "pyreadstat/_readstat_parser.pyx":1003
  *         error = readstat_parse_sas7bdat(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_DTA:
  *         error = readstat_parse_dta(parser, filename, ctx);             # <<<<<<<<<<<<<<
@@ -14041,7 +13994,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_error = readstat_parse_dta(__pyx_v_parser, __pyx_v_filename, __pyx_v_ctx);
 
-    /* "pyreadstat/_readstat_parser.pyx":1006
+    /* "pyreadstat/_readstat_parser.pyx":1002
  *     elif file_extension == FILE_EXT_SAS7BDAT:
  *         error = readstat_parse_sas7bdat(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_DTA:             # <<<<<<<<<<<<<<
@@ -14051,7 +14004,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_XPORT:
 
-    /* "pyreadstat/_readstat_parser.pyx":1009
+    /* "pyreadstat/_readstat_parser.pyx":1005
  *         error = readstat_parse_dta(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_XPORT:
  *         error = readstat_parse_xport(parser, filename, ctx);             # <<<<<<<<<<<<<<
@@ -14060,7 +14013,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_error = readstat_parse_xport(__pyx_v_parser, __pyx_v_filename, __pyx_v_ctx);
 
-    /* "pyreadstat/_readstat_parser.pyx":1008
+    /* "pyreadstat/_readstat_parser.pyx":1004
  *     elif file_extension == FILE_EXT_DTA:
  *         error = readstat_parse_dta(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_XPORT:             # <<<<<<<<<<<<<<
@@ -14070,7 +14023,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_POR:
 
-    /* "pyreadstat/_readstat_parser.pyx":1011
+    /* "pyreadstat/_readstat_parser.pyx":1007
  *         error = readstat_parse_xport(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_POR:
  *         error = readstat_parse_por(parser, filename, ctx);             # <<<<<<<<<<<<<<
@@ -14079,7 +14032,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_error = readstat_parse_por(__pyx_v_parser, __pyx_v_filename, __pyx_v_ctx);
 
-    /* "pyreadstat/_readstat_parser.pyx":1010
+    /* "pyreadstat/_readstat_parser.pyx":1006
  *     elif file_extension == FILE_EXT_XPORT:
  *         error = readstat_parse_xport(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_POR:             # <<<<<<<<<<<<<<
@@ -14089,7 +14042,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_SAS7BCAT:
 
-    /* "pyreadstat/_readstat_parser.pyx":1013
+    /* "pyreadstat/_readstat_parser.pyx":1009
  *         error = readstat_parse_por(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_SAS7BCAT:
  *         error = readstat_parse_sas7bcat(parser, filename, ctx);             # <<<<<<<<<<<<<<
@@ -14098,7 +14051,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
     __pyx_v_error = readstat_parse_sas7bcat(__pyx_v_parser, __pyx_v_filename, __pyx_v_ctx);
 
-    /* "pyreadstat/_readstat_parser.pyx":1012
+    /* "pyreadstat/_readstat_parser.pyx":1008
  *     elif file_extension == FILE_EXT_POR:
  *         error = readstat_parse_por(parser, filename, ctx);
  *     elif file_extension == FILE_EXT_SAS7BCAT:             # <<<<<<<<<<<<<<
@@ -14109,7 +14062,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
     default: break;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1015
+  /* "pyreadstat/_readstat_parser.pyx":1011
  *         error = readstat_parse_sas7bcat(parser, filename, ctx);
  *     #error = parse_func(parser, filename, ctx);
  *     readstat_parser_free(parser)             # <<<<<<<<<<<<<<
@@ -14118,7 +14071,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   readstat_parser_free(__pyx_v_parser);
 
-  /* "pyreadstat/_readstat_parser.pyx":1018
+  /* "pyreadstat/_readstat_parser.pyx":1014
  *     # check if a python error ocurred, if yes, it will be printed by the interpreter,
  *     # if not, make sure that the return from parse_func is OK, if not print
  *     pyerr = PyErr_Occurred()             # <<<<<<<<<<<<<<
@@ -14127,7 +14080,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   __pyx_v_pyerr = PyErr_Occurred();
 
-  /* "pyreadstat/_readstat_parser.pyx":1019
+  /* "pyreadstat/_readstat_parser.pyx":1015
  *     # if not, make sure that the return from parse_func is OK, if not print
  *     pyerr = PyErr_Occurred()
  *     if <void *>pyerr == NULL:             # <<<<<<<<<<<<<<
@@ -14137,16 +14090,16 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __pyx_t_1 = (((void *)__pyx_v_pyerr) == NULL);
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1020
+    /* "pyreadstat/_readstat_parser.pyx":1016
  *     pyerr = PyErr_Occurred()
  *     if <void *>pyerr == NULL:
  *         check_exit_status(error)             # <<<<<<<<<<<<<<
  * 
  * 
 */
-    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(__pyx_v_error); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1020, __pyx_L1_error)
+    __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(__pyx_v_error); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1016, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":1019
+    /* "pyreadstat/_readstat_parser.pyx":1015
  *     # if not, make sure that the return from parse_func is OK, if not print
  *     pyerr = PyErr_Occurred()
  *     if <void *>pyerr == NULL:             # <<<<<<<<<<<<<<
@@ -14155,7 +14108,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":928
+  /* "pyreadstat/_readstat_parser.pyx":924
  * 
  * 
  * cdef void run_readstat_parser(char * filename, data_container data, py_file_extension file_extension, long row_limit, long row_offset, object file_obj=None) except *:             # <<<<<<<<<<<<<<
@@ -14174,7 +14127,7 @@ static void __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(char *__
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pyreadstat/_readstat_parser.pyx":1023
+/* "pyreadstat/_readstat_parser.pyx":1019
  * 
  * 
  * cdef object data_container_to_dict(data_container data):             # <<<<<<<<<<<<<<
@@ -14208,7 +14161,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("data_container_to_dict", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":1037
+  /* "pyreadstat/_readstat_parser.pyx":1033
  *     cdef bint metaonly
  * 
  *     final_container = OrderedDict()             # <<<<<<<<<<<<<<
@@ -14216,7 +14169,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
  *     col_names = data.col_names
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_OrderedDict); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1037, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_OrderedDict); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1033, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -14235,13 +14188,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
     __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1037, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1033, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_final_container = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1038
+  /* "pyreadstat/_readstat_parser.pyx":1034
  * 
  *     final_container = OrderedDict()
  *     col_data = data.col_data             # <<<<<<<<<<<<<<
@@ -14253,7 +14206,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   __pyx_v_col_data = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1039
+  /* "pyreadstat/_readstat_parser.pyx":1035
  *     final_container = OrderedDict()
  *     col_data = data.col_data
  *     col_names = data.col_names             # <<<<<<<<<<<<<<
@@ -14265,7 +14218,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   __pyx_v_col_names = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1040
+  /* "pyreadstat/_readstat_parser.pyx":1036
  *     col_data = data.col_data
  *     col_names = data.col_names
  *     is_unkown_number_rows = data.is_unkown_number_rows             # <<<<<<<<<<<<<<
@@ -14275,7 +14228,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   __pyx_t_5 = __pyx_v_data->is_unkown_number_rows;
   __pyx_v_is_unkown_number_rows = __pyx_t_5;
 
-  /* "pyreadstat/_readstat_parser.pyx":1041
+  /* "pyreadstat/_readstat_parser.pyx":1037
  *     col_names = data.col_names
  *     is_unkown_number_rows = data.is_unkown_number_rows
  *     max_n_obs = data.max_n_obs             # <<<<<<<<<<<<<<
@@ -14285,7 +14238,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   __pyx_t_6 = __pyx_v_data->max_n_obs;
   __pyx_v_max_n_obs = __pyx_t_6;
 
-  /* "pyreadstat/_readstat_parser.pyx":1042
+  /* "pyreadstat/_readstat_parser.pyx":1038
  *     is_unkown_number_rows = data.is_unkown_number_rows
  *     max_n_obs = data.max_n_obs
  *     metaonly = data.metaonly             # <<<<<<<<<<<<<<
@@ -14295,7 +14248,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   __pyx_t_5 = __pyx_v_data->metaonly;
   __pyx_v_metaonly = __pyx_t_5;
 
-  /* "pyreadstat/_readstat_parser.pyx":1044
+  /* "pyreadstat/_readstat_parser.pyx":1040
  *     metaonly = data.metaonly
  * 
  *     for fc_cnt in range(0, len(col_names)):             # <<<<<<<<<<<<<<
@@ -14304,14 +14257,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
 */
   if (unlikely(__pyx_v_col_names == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 1044, __pyx_L1_error)
+    __PYX_ERR(0, 1040, __pyx_L1_error)
   }
-  __pyx_t_7 = __Pyx_PyList_GET_SIZE(__pyx_v_col_names); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1044, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyList_GET_SIZE(__pyx_v_col_names); if (unlikely(__pyx_t_7 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1040, __pyx_L1_error)
   __pyx_t_8 = __pyx_t_7;
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_8; __pyx_t_6+=1) {
     __pyx_v_fc_cnt = __pyx_t_6;
 
-    /* "pyreadstat/_readstat_parser.pyx":1045
+    /* "pyreadstat/_readstat_parser.pyx":1041
  * 
  *     for fc_cnt in range(0, len(col_names)):
  *         cur_name_str = col_names[fc_cnt]             # <<<<<<<<<<<<<<
@@ -14320,15 +14273,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
 */
     if (unlikely(__pyx_v_col_names == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1045, __pyx_L1_error)
+      __PYX_ERR(0, 1041, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_col_names, __pyx_v_fc_cnt, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1045, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_col_names, __pyx_v_fc_cnt, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1041, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 1045, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_1))) __PYX_ERR(0, 1041, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_cur_name_str, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1046
+    /* "pyreadstat/_readstat_parser.pyx":1042
  *     for fc_cnt in range(0, len(col_names)):
  *         cur_name_str = col_names[fc_cnt]
  *         cur_data = col_data[fc_cnt]             # <<<<<<<<<<<<<<
@@ -14337,14 +14290,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
 */
     if (unlikely(__pyx_v_col_data == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1046, __pyx_L1_error)
+      __PYX_ERR(0, 1042, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_col_data, __pyx_v_fc_cnt, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1046, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_col_data, __pyx_v_fc_cnt, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1042, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_XDECREF_SET(__pyx_v_cur_data, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1047
+    /* "pyreadstat/_readstat_parser.pyx":1043
  *         cur_name_str = col_names[fc_cnt]
  *         cur_data = col_data[fc_cnt]
  *         if is_unkown_number_rows and not metaonly:             # <<<<<<<<<<<<<<
@@ -14361,19 +14314,19 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
     __pyx_L6_bool_binop_done:;
     if (__pyx_t_5) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1048
+      /* "pyreadstat/_readstat_parser.pyx":1044
  *         cur_data = col_data[fc_cnt]
  *         if is_unkown_number_rows and not metaonly:
  *             cur_data = cur_data[0:max_n_obs]             # <<<<<<<<<<<<<<
  *         if not metaonly:
  *             final_container[cur_name_str] = cur_data
 */
-      __pyx_t_1 = __Pyx_PyObject_GetSlice(__pyx_v_cur_data, 0, __pyx_v_max_n_obs, NULL, NULL, NULL, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1048, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetSlice(__pyx_v_cur_data, 0, __pyx_v_max_n_obs, NULL, NULL, NULL, 1, 1, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1044, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF_SET(__pyx_v_cur_data, __pyx_t_1);
       __pyx_t_1 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1047
+      /* "pyreadstat/_readstat_parser.pyx":1043
  *         cur_name_str = col_names[fc_cnt]
  *         cur_data = col_data[fc_cnt]
  *         if is_unkown_number_rows and not metaonly:             # <<<<<<<<<<<<<<
@@ -14382,7 +14335,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1049
+    /* "pyreadstat/_readstat_parser.pyx":1045
  *         if is_unkown_number_rows and not metaonly:
  *             cur_data = cur_data[0:max_n_obs]
  *         if not metaonly:             # <<<<<<<<<<<<<<
@@ -14392,16 +14345,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
     __pyx_t_5 = (!__pyx_v_metaonly);
     if (__pyx_t_5) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1050
+      /* "pyreadstat/_readstat_parser.pyx":1046
  *             cur_data = cur_data[0:max_n_obs]
  *         if not metaonly:
  *             final_container[cur_name_str] = cur_data             # <<<<<<<<<<<<<<
  *         else:
  *             final_container[cur_name_str] = list()
 */
-      if (unlikely((PyObject_SetItem(__pyx_v_final_container, __pyx_v_cur_name_str, __pyx_v_cur_data) < 0))) __PYX_ERR(0, 1050, __pyx_L1_error)
+      if (unlikely((PyObject_SetItem(__pyx_v_final_container, __pyx_v_cur_name_str, __pyx_v_cur_data) < 0))) __PYX_ERR(0, 1046, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1049
+      /* "pyreadstat/_readstat_parser.pyx":1045
  *         if is_unkown_number_rows and not metaonly:
  *             cur_data = cur_data[0:max_n_obs]
  *         if not metaonly:             # <<<<<<<<<<<<<<
@@ -14411,7 +14364,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
       goto __pyx_L8;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1052
+    /* "pyreadstat/_readstat_parser.pyx":1048
  *             final_container[cur_name_str] = cur_data
  *         else:
  *             final_container[cur_name_str] = list()             # <<<<<<<<<<<<<<
@@ -14419,15 +14372,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
  *     return final_container
 */
     /*else*/ {
-      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1052, __pyx_L1_error)
+      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1048, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (unlikely((PyObject_SetItem(__pyx_v_final_container, __pyx_v_cur_name_str, __pyx_t_1) < 0))) __PYX_ERR(0, 1052, __pyx_L1_error)
+      if (unlikely((PyObject_SetItem(__pyx_v_final_container, __pyx_v_cur_name_str, __pyx_t_1) < 0))) __PYX_ERR(0, 1048, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __pyx_L8:;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1054
+  /* "pyreadstat/_readstat_parser.pyx":1050
  *             final_container[cur_name_str] = list()
  * 
  *     return final_container             # <<<<<<<<<<<<<<
@@ -14439,7 +14392,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   __pyx_r = __pyx_v_final_container;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1023
+  /* "pyreadstat/_readstat_parser.pyx":1019
  * 
  * 
  * cdef object data_container_to_dict(data_container data):             # <<<<<<<<<<<<<<
@@ -14465,7 +14418,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":1056
+/* "pyreadstat/_readstat_parser.pyx":1052
  *     return final_container
  * 
  * cdef object dict_to_dataframe(object dict_data, data_container dc):             # <<<<<<<<<<<<<<
@@ -14526,7 +14479,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dict_to_dataframe", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":1066
+  /* "pyreadstat/_readstat_parser.pyx":1062
  *     cdef py_datetime_format var_format
  *     cdef list dtypes, sertypes, datetime_cols, date_cols
  *     cdef dict schema = None             # <<<<<<<<<<<<<<
@@ -14536,7 +14489,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   __Pyx_INCREF(Py_None);
   __pyx_v_schema = ((PyObject*)Py_None);
 
-  /* "pyreadstat/_readstat_parser.pyx":1068
+  /* "pyreadstat/_readstat_parser.pyx":1064
  *     cdef dict schema = None
  * 
  *     dates_as_pandas = dc.dates_as_pandas             # <<<<<<<<<<<<<<
@@ -14546,7 +14499,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   __pyx_t_1 = __pyx_v_dc->dates_as_pandas;
   __pyx_v_dates_as_pandas = __pyx_t_1;
 
-  /* "pyreadstat/_readstat_parser.pyx":1069
+  /* "pyreadstat/_readstat_parser.pyx":1065
  * 
  *     dates_as_pandas = dc.dates_as_pandas
  *     output_format = dc.output_format             # <<<<<<<<<<<<<<
@@ -14558,47 +14511,47 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   __pyx_v_output_format = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1071
+  /* "pyreadstat/_readstat_parser.pyx":1067
  *     output_format = dc.output_format
  * 
  *     if dict_data:             # <<<<<<<<<<<<<<
  *         #schema = None
  *         # in polars if missing user values we need to explicitly set the type
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_dict_data); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1071, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_dict_data); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1067, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1075
+    /* "pyreadstat/_readstat_parser.pyx":1071
  *         # in polars if missing user values we need to explicitly set the type
  *         # of that column to Object if not all the elements are of the same type
  *         if output_format != "pandas" and dc.missing_user_values:             # <<<<<<<<<<<<<<
  *             schema = dict()
  *             for indx in range(0, len(dc.col_names)):
 */
-    __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_NE)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_NE)); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 1071, __pyx_L1_error)
     if (__pyx_t_3) {
     } else {
       __pyx_t_1 = __pyx_t_3;
       goto __pyx_L5_bool_binop_done;
     }
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_dc->missing_user_values); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 1075, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_dc->missing_user_values); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 1071, __pyx_L1_error)
     __pyx_t_1 = __pyx_t_3;
     __pyx_L5_bool_binop_done:;
     if (__pyx_t_1) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1076
+      /* "pyreadstat/_readstat_parser.pyx":1072
  *         # of that column to Object if not all the elements are of the same type
  *         if output_format != "pandas" and dc.missing_user_values:
  *             schema = dict()             # <<<<<<<<<<<<<<
  *             for indx in range(0, len(dc.col_names)):
  *                 col_name = dc.col_names[indx]
 */
-      __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1076, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1072, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF_SET(__pyx_v_schema, ((PyObject*)__pyx_t_2));
       __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1077
+      /* "pyreadstat/_readstat_parser.pyx":1073
  *         if output_format != "pandas" and dc.missing_user_values:
  *             schema = dict()
  *             for indx in range(0, len(dc.col_names)):             # <<<<<<<<<<<<<<
@@ -14609,15 +14562,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       __Pyx_INCREF(__pyx_t_2);
       if (unlikely(__pyx_t_2 == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-        __PYX_ERR(0, 1077, __pyx_L1_error)
+        __PYX_ERR(0, 1073, __pyx_L1_error)
       }
-      __pyx_t_4 = __Pyx_PyList_GET_SIZE(__pyx_t_2); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1077, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyList_GET_SIZE(__pyx_t_2); if (unlikely(__pyx_t_4 == ((Py_ssize_t)-1))) __PYX_ERR(0, 1073, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_5 = __pyx_t_4;
       for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
         __pyx_v_indx = __pyx_t_6;
 
-        /* "pyreadstat/_readstat_parser.pyx":1078
+        /* "pyreadstat/_readstat_parser.pyx":1074
  *             schema = dict()
  *             for indx in range(0, len(dc.col_names)):
  *                 col_name = dc.col_names[indx]             # <<<<<<<<<<<<<<
@@ -14626,53 +14579,53 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         if (unlikely(__pyx_v_dc->col_names == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 1078, __pyx_L1_error)
+          __PYX_ERR(0, 1074, __pyx_L1_error)
         }
-        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_dc->col_names, __pyx_v_indx, Py_ssize_t, 1, PyLong_FromSsize_t, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1078, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_dc->col_names, __pyx_v_indx, Py_ssize_t, 1, PyLong_FromSsize_t, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1074, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 1078, __pyx_L1_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 1074, __pyx_L1_error)
         __Pyx_XDECREF_SET(__pyx_v_col_name, ((PyObject*)__pyx_t_2));
         __pyx_t_2 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1079
+        /* "pyreadstat/_readstat_parser.pyx":1075
  *             for indx in range(0, len(dc.col_names)):
  *                 col_name = dc.col_names[indx]
  *                 if indx in dc.missing_user_values.keys():             # <<<<<<<<<<<<<<
  *                     sertypes = [type(x) for x in dict_data[col_name] if x is not None]
  *                     # all missing, let polars decide
 */
-        __pyx_t_2 = PyLong_FromSsize_t(__pyx_v_indx); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1079, __pyx_L1_error)
+        __pyx_t_2 = PyLong_FromSsize_t(__pyx_v_indx); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1075, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         if (unlikely(__pyx_v_dc->missing_user_values == Py_None)) {
           PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-          __PYX_ERR(0, 1079, __pyx_L1_error)
+          __PYX_ERR(0, 1075, __pyx_L1_error)
         }
-        __pyx_t_7 = __Pyx_PyDict_Keys(__pyx_v_dc->missing_user_values); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1079, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyDict_Keys(__pyx_v_dc->missing_user_values); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1075, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
-        __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_2, __pyx_t_7, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1079, __pyx_L1_error)
+        __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_2, __pyx_t_7, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1075, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         if (__pyx_t_1) {
 
-          /* "pyreadstat/_readstat_parser.pyx":1080
+          /* "pyreadstat/_readstat_parser.pyx":1076
  *                 col_name = dc.col_names[indx]
  *                 if indx in dc.missing_user_values.keys():
  *                     sertypes = [type(x) for x in dict_data[col_name] if x is not None]             # <<<<<<<<<<<<<<
  *                     # all missing, let polars decide
  *                     if not sertypes:
 */
-          __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1080, __pyx_L1_error)
+          __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1076, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dict_data, __pyx_v_col_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1080, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_v_dict_data, __pyx_v_col_name); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1076, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
             __pyx_t_8 = __pyx_t_2; __Pyx_INCREF(__pyx_t_8);
             __pyx_t_9 = 0;
             __pyx_t_10 = NULL;
           } else {
-            __pyx_t_9 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1080, __pyx_L1_error)
+            __pyx_t_9 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1076, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
-            __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1080, __pyx_L1_error)
+            __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1076, __pyx_L1_error)
           }
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           for (;;) {
@@ -14681,7 +14634,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_8);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1080, __pyx_L1_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1076, __pyx_L1_error)
                   #endif
                   if (__pyx_t_9 >= __pyx_temp) break;
                 }
@@ -14691,7 +14644,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
                 {
                   Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_8);
                   #if !CYTHON_ASSUME_SAFE_SIZE
-                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1080, __pyx_L1_error)
+                  if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1076, __pyx_L1_error)
                   #endif
                   if (__pyx_t_9 >= __pyx_temp) break;
                 }
@@ -14702,13 +14655,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
                 #endif
                 ++__pyx_t_9;
               }
-              if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1080, __pyx_L1_error)
+              if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1076, __pyx_L1_error)
             } else {
               __pyx_t_2 = __pyx_t_10(__pyx_t_8);
               if (unlikely(!__pyx_t_2)) {
                 PyObject* exc_type = PyErr_Occurred();
                 if (exc_type) {
-                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1080, __pyx_L1_error)
+                  if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1076, __pyx_L1_error)
                   PyErr_Clear();
                 }
                 break;
@@ -14719,14 +14672,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             __pyx_t_2 = 0;
             __pyx_t_1 = (__pyx_v_x != Py_None);
             if (__pyx_t_1) {
-              if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)((PyObject *)Py_TYPE(__pyx_v_x))))) __PYX_ERR(0, 1080, __pyx_L1_error)
+              if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)((PyObject *)Py_TYPE(__pyx_v_x))))) __PYX_ERR(0, 1076, __pyx_L1_error)
             }
           }
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_XDECREF_SET(__pyx_v_sertypes, ((PyObject*)__pyx_t_7));
           __pyx_t_7 = 0;
 
-          /* "pyreadstat/_readstat_parser.pyx":1082
+          /* "pyreadstat/_readstat_parser.pyx":1078
  *                     sertypes = [type(x) for x in dict_data[col_name] if x is not None]
  *                     # all missing, let polars decide
  *                     if not sertypes:             # <<<<<<<<<<<<<<
@@ -14735,23 +14688,23 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_sertypes);
-            if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1082, __pyx_L1_error)
+            if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1078, __pyx_L1_error)
             __pyx_t_1 = (__pyx_temp != 0);
           }
 
           __pyx_t_3 = (!__pyx_t_1);
           if (__pyx_t_3) {
 
-            /* "pyreadstat/_readstat_parser.pyx":1083
+            /* "pyreadstat/_readstat_parser.pyx":1079
  *                     # all missing, let polars decide
  *                     if not sertypes:
  *                         schema[col_name] = None             # <<<<<<<<<<<<<<
  *                         continue
  *                     allsame = all([x==sertypes[0] for x in sertypes])
 */
-            if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, Py_None) < 0))) __PYX_ERR(0, 1083, __pyx_L1_error)
+            if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, Py_None) < 0))) __PYX_ERR(0, 1079, __pyx_L1_error)
 
-            /* "pyreadstat/_readstat_parser.pyx":1084
+            /* "pyreadstat/_readstat_parser.pyx":1080
  *                     if not sertypes:
  *                         schema[col_name] = None
  *                         continue             # <<<<<<<<<<<<<<
@@ -14760,7 +14713,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
             goto __pyx_L7_continue;
 
-            /* "pyreadstat/_readstat_parser.pyx":1082
+            /* "pyreadstat/_readstat_parser.pyx":1078
  *                     sertypes = [type(x) for x in dict_data[col_name] if x is not None]
  *                     # all missing, let polars decide
  *                     if not sertypes:             # <<<<<<<<<<<<<<
@@ -14769,7 +14722,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
           }
 
-          /* "pyreadstat/_readstat_parser.pyx":1085
+          /* "pyreadstat/_readstat_parser.pyx":1081
  *                         schema[col_name] = None
  *                         continue
  *                     allsame = all([x==sertypes[0] for x in sertypes])             # <<<<<<<<<<<<<<
@@ -14777,7 +14730,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  *                     if allsame:
 */
           __pyx_t_8 = NULL;
-          __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1085, __pyx_L1_error)
+          __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1081, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __pyx_t_11 = __pyx_v_sertypes; __Pyx_INCREF(__pyx_t_11);
           __pyx_t_9 = 0;
@@ -14785,21 +14738,21 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_11);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1085, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1081, __pyx_L1_error)
               #endif
               if (__pyx_t_9 >= __pyx_temp) break;
             }
             __pyx_t_12 = __Pyx_PyList_GetItemRefFast(__pyx_t_11, __pyx_t_9, __Pyx_ReferenceSharing_OwnStrongReference);
             ++__pyx_t_9;
-            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1085, __pyx_L1_error)
+            if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1081, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_12);
             __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_12);
             __pyx_t_12 = 0;
-            __pyx_t_12 = __Pyx_GetItemInt_List(__pyx_v_sertypes, 0, long, 1, __Pyx_PyLong_From_long, 1, 0, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1085, __pyx_L1_error)
+            __pyx_t_12 = __Pyx_GetItemInt_List(__pyx_v_sertypes, 0, long, 1, __Pyx_PyLong_From_long, 1, 0, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1081, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_12);
-            __pyx_t_13 = PyObject_RichCompare(__pyx_v_x, __pyx_t_12, Py_EQ); __Pyx_XGOTREF(__pyx_t_13); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1085, __pyx_L1_error)
+            __pyx_t_13 = PyObject_RichCompare(__pyx_v_x, __pyx_t_12, Py_EQ); __Pyx_XGOTREF(__pyx_t_13); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1081, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_13))) __PYX_ERR(0, 1085, __pyx_L1_error)
+            if (unlikely(__Pyx_ListComp_Append(__pyx_t_2, (PyObject*)__pyx_t_13))) __PYX_ERR(0, 1081, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
           }
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
@@ -14809,14 +14762,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_all, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-            if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1085, __pyx_L1_error)
+            if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1081, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_7);
           }
-          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1085, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1081, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __pyx_v_allsame = __pyx_t_3;
 
-          /* "pyreadstat/_readstat_parser.pyx":1087
+          /* "pyreadstat/_readstat_parser.pyx":1083
  *                     allsame = all([x==sertypes[0] for x in sertypes])
  *                     # all the same: let polars decide
  *                     if allsame:             # <<<<<<<<<<<<<<
@@ -14825,16 +14778,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
           if (__pyx_v_allsame) {
 
-            /* "pyreadstat/_readstat_parser.pyx":1088
+            /* "pyreadstat/_readstat_parser.pyx":1084
  *                     # all the same: let polars decide
  *                     if allsame:
  *                         schema[col_name] = None             # <<<<<<<<<<<<<<
  *                     # not all the same type, has to be Object
  *                     else:
 */
-            if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, Py_None) < 0))) __PYX_ERR(0, 1088, __pyx_L1_error)
+            if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, Py_None) < 0))) __PYX_ERR(0, 1084, __pyx_L1_error)
 
-            /* "pyreadstat/_readstat_parser.pyx":1087
+            /* "pyreadstat/_readstat_parser.pyx":1083
  *                     allsame = all([x==sertypes[0] for x in sertypes])
  *                     # all the same: let polars decide
  *                     if allsame:             # <<<<<<<<<<<<<<
@@ -14844,7 +14797,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             goto __pyx_L18;
           }
 
-          /* "pyreadstat/_readstat_parser.pyx":1091
+          /* "pyreadstat/_readstat_parser.pyx":1087
  *                     # not all the same type, has to be Object
  *                     else:
  *                         schema[col_name] = nw.Object             # <<<<<<<<<<<<<<
@@ -14852,17 +14805,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  *                     schema[col_name] = None
 */
           /*else*/ {
-            __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1091, __pyx_L1_error)
+            __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1087, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_7);
-            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_Object); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1091, __pyx_L1_error)
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_Object); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1087, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, __pyx_t_2) < 0))) __PYX_ERR(0, 1091, __pyx_L1_error)
+            if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, __pyx_t_2) < 0))) __PYX_ERR(0, 1087, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           }
           __pyx_L18:;
 
-          /* "pyreadstat/_readstat_parser.pyx":1079
+          /* "pyreadstat/_readstat_parser.pyx":1075
  *             for indx in range(0, len(dc.col_names)):
  *                 col_name = dc.col_names[indx]
  *                 if indx in dc.missing_user_values.keys():             # <<<<<<<<<<<<<<
@@ -14872,7 +14825,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
           goto __pyx_L9;
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":1093
+        /* "pyreadstat/_readstat_parser.pyx":1089
  *                         schema[col_name] = nw.Object
  *                 else:
  *                     schema[col_name] = None             # <<<<<<<<<<<<<<
@@ -14880,13 +14833,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  *         data_frame = nw.from_dict(dict_data, backend=output_format, schema=schema)
 */
         /*else*/ {
-          if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, Py_None) < 0))) __PYX_ERR(0, 1093, __pyx_L1_error)
+          if (unlikely((PyDict_SetItem(__pyx_v_schema, __pyx_v_col_name, Py_None) < 0))) __PYX_ERR(0, 1089, __pyx_L1_error)
         }
         __pyx_L9:;
         __pyx_L7_continue:;
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1075
+      /* "pyreadstat/_readstat_parser.pyx":1071
  *         # in polars if missing user values we need to explicitly set the type
  *         # of that column to Object if not all the elements are of the same type
  *         if output_format != "pandas" and dc.missing_user_values:             # <<<<<<<<<<<<<<
@@ -14895,7 +14848,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1095
+    /* "pyreadstat/_readstat_parser.pyx":1091
  *                     schema[col_name] = None
  * 
  *         data_frame = nw.from_dict(dict_data, backend=output_format, schema=schema)             # <<<<<<<<<<<<<<
@@ -14903,9 +14856,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  *         data_frame = data_frame.to_native()
 */
     __pyx_t_7 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1095, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1091, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_from_dict); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1095, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_from_dict); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1091, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_14 = 1;
@@ -14922,21 +14875,21 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
     #endif
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_7, __pyx_v_dict_data};
-      __pyx_t_8 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1095, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1091, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_backend, __pyx_v_output_format, __pyx_t_8, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1095, __pyx_L1_error)
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_v_schema, __pyx_t_8, __pyx_callargs+2, 1) < (0)) __PYX_ERR(0, 1095, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_backend, __pyx_v_output_format, __pyx_t_8, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1091, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_schema, __pyx_v_schema, __pyx_t_8, __pyx_callargs+2, 1) < (0)) __PYX_ERR(0, 1091, __pyx_L1_error)
       __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_11, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_8);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1095, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1091, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_v_data_frame = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1096
+    /* "pyreadstat/_readstat_parser.pyx":1092
  * 
  *         data_frame = nw.from_dict(dict_data, backend=output_format, schema=schema)
  *         natnamespace = nw.get_native_namespace(data_frame)             # <<<<<<<<<<<<<<
@@ -14944,9 +14897,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  * 
 */
     __pyx_t_11 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1096, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1092, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_get_native_namespace); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1096, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_get_native_namespace); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1092, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __pyx_t_14 = 1;
@@ -14966,13 +14919,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_7, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1096, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1092, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_v_natnamespace = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1097
+    /* "pyreadstat/_readstat_parser.pyx":1093
  *         data_frame = nw.from_dict(dict_data, backend=output_format, schema=schema)
  *         natnamespace = nw.get_native_namespace(data_frame)
  *         data_frame = data_frame.to_native()             # <<<<<<<<<<<<<<
@@ -14986,13 +14939,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_to_native, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1097, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1093, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_DECREF_SET(__pyx_v_data_frame, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1099
+    /* "pyreadstat/_readstat_parser.pyx":1095
  *         data_frame = data_frame.to_native()
  * 
  *         if dates_as_pandas and output_format=="pandas":             # <<<<<<<<<<<<<<
@@ -15004,12 +14957,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       __pyx_t_3 = __pyx_v_dates_as_pandas;
       goto __pyx_L20_bool_binop_done;
     }
-    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1099, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1095, __pyx_L1_error)
     __pyx_t_3 = __pyx_t_1;
     __pyx_L20_bool_binop_done:;
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1100
+      /* "pyreadstat/_readstat_parser.pyx":1096
  * 
  *         if dates_as_pandas and output_format=="pandas":
  *             pd = natnamespace             # <<<<<<<<<<<<<<
@@ -15019,14 +14972,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       __Pyx_INCREF(__pyx_v_natnamespace);
       __pyx_v_pd = __pyx_v_natnamespace;
 
-      /* "pyreadstat/_readstat_parser.pyx":1101
+      /* "pyreadstat/_readstat_parser.pyx":1097
  *         if dates_as_pandas and output_format=="pandas":
  *             pd = natnamespace
  *             dtypes = data_frame.dtypes.tolist()             # <<<<<<<<<<<<<<
  *             # check that datetime columns are datetime type
  *             # this is needed in case all date values are nan
 */
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_dtypes); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1101, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_dtypes); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1097, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_t_7 = __pyx_t_11;
       __Pyx_INCREF(__pyx_t_7);
@@ -15036,14 +14989,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
         __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_tolist, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1101, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1097, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
-      if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 1101, __pyx_L1_error)
+      if (!(likely(PyList_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_2))) __PYX_ERR(0, 1097, __pyx_L1_error)
       __pyx_v_dtypes = ((PyObject*)__pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1104
+      /* "pyreadstat/_readstat_parser.pyx":1100
  *             # check that datetime columns are datetime type
  *             # this is needed in case all date values are nan
  *             for index, column in enumerate(data_frame.columns):             # <<<<<<<<<<<<<<
@@ -15051,16 +15004,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  *                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
 */
       __pyx_t_15 = 0;
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_columns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1104, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_columns); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1100, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
         __pyx_t_11 = __pyx_t_2; __Pyx_INCREF(__pyx_t_11);
         __pyx_t_4 = 0;
         __pyx_t_10 = NULL;
       } else {
-        __pyx_t_4 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1104, __pyx_L1_error)
+        __pyx_t_4 = -1; __pyx_t_11 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1100, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1104, __pyx_L1_error)
+        __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_11); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1100, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       for (;;) {
@@ -15069,7 +15022,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_11);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1104, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1100, __pyx_L1_error)
               #endif
               if (__pyx_t_4 >= __pyx_temp) break;
             }
@@ -15079,7 +15032,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_11);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1104, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1100, __pyx_L1_error)
               #endif
               if (__pyx_t_4 >= __pyx_temp) break;
             }
@@ -15090,26 +15043,26 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             #endif
             ++__pyx_t_4;
           }
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1104, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1100, __pyx_L1_error)
         } else {
           __pyx_t_2 = __pyx_t_10(__pyx_t_11);
           if (unlikely(!__pyx_t_2)) {
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
-              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1104, __pyx_L1_error)
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1100, __pyx_L1_error)
               PyErr_Clear();
             }
             break;
           }
         }
         __Pyx_GOTREF(__pyx_t_2);
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 1104, __pyx_L1_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_2))) __PYX_ERR(0, 1100, __pyx_L1_error)
         __Pyx_XDECREF_SET(__pyx_v_column, ((PyObject*)__pyx_t_2));
         __pyx_t_2 = 0;
         __pyx_v_index = __pyx_t_15;
         __pyx_t_15 = (__pyx_t_15 + 1);
 
-        /* "pyreadstat/_readstat_parser.pyx":1105
+        /* "pyreadstat/_readstat_parser.pyx":1101
  *             # this is needed in case all date values are nan
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]             # <<<<<<<<<<<<<<
@@ -15118,15 +15071,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         if (unlikely(__pyx_v_dc->col_formats == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 1105, __pyx_L1_error)
+          __PYX_ERR(0, 1101, __pyx_L1_error)
         }
-        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_dc->col_formats, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1105, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_dc->col_formats, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1101, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_16 = ((__pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format)__Pyx_PyLong_As___pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format(__pyx_t_2)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1105, __pyx_L1_error)
+        __pyx_t_16 = ((__pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format)__Pyx_PyLong_As___pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format(__pyx_t_2)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1101, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_v_var_format = __pyx_t_16;
 
-        /* "pyreadstat/_readstat_parser.pyx":1106
+        /* "pyreadstat/_readstat_parser.pyx":1102
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]
  *                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):             # <<<<<<<<<<<<<<
@@ -15135,11 +15088,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         if (unlikely(__pyx_v_dtypes == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 1106, __pyx_L1_error)
+          __PYX_ERR(0, 1102, __pyx_L1_error)
         }
-        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_dtypes, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1106, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_GetItemInt_List(__pyx_v_dtypes, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_OwnStrongReference); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1102, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_M8_ns, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1106, __pyx_L1_error)
+        __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_M8_ns, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1102, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         if (__pyx_t_1) {
         } else {
@@ -15159,7 +15112,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
         __pyx_L25_bool_binop_done:;
         if (__pyx_t_3) {
 
-          /* "pyreadstat/_readstat_parser.pyx":1107
+          /* "pyreadstat/_readstat_parser.pyx":1103
  *                 var_format = dc.col_formats[index]
  *                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
  *                     data_frame.loc[:, column] = pd.to_datetime(data_frame[column])             # <<<<<<<<<<<<<<
@@ -15168,7 +15121,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
           __pyx_t_7 = __pyx_v_pd;
           __Pyx_INCREF(__pyx_t_7);
-          __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_data_frame, __pyx_v_column); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1107, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_Dict_GetItem(__pyx_v_data_frame, __pyx_v_column); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1103, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_14 = 0;
           {
@@ -15176,25 +15129,25 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_to_datetime, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1107, __pyx_L1_error)
+            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1103, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_2);
           }
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_loc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1107, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_loc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1103, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1107, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1103, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_INCREF(__pyx_mstate_global->__pyx_slice[0]);
           __Pyx_GIVEREF(__pyx_mstate_global->__pyx_slice[0]);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_mstate_global->__pyx_slice[0]) != (0)) __PYX_ERR(0, 1107, __pyx_L1_error);
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_mstate_global->__pyx_slice[0]) != (0)) __PYX_ERR(0, 1103, __pyx_L1_error);
           __Pyx_INCREF(__pyx_v_column);
           __Pyx_GIVEREF(__pyx_v_column);
-          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_column) != (0)) __PYX_ERR(0, 1107, __pyx_L1_error);
-          if (unlikely((PyObject_SetItem(__pyx_t_8, __pyx_t_7, __pyx_t_2) < 0))) __PYX_ERR(0, 1107, __pyx_L1_error)
+          if (__Pyx_PyTuple_SET_ITEM(__pyx_t_7, 1, __pyx_v_column) != (0)) __PYX_ERR(0, 1103, __pyx_L1_error);
+          if (unlikely((PyObject_SetItem(__pyx_t_8, __pyx_t_7, __pyx_t_2) < 0))) __PYX_ERR(0, 1103, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-          /* "pyreadstat/_readstat_parser.pyx":1106
+          /* "pyreadstat/_readstat_parser.pyx":1102
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]
  *                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):             # <<<<<<<<<<<<<<
@@ -15203,7 +15156,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":1104
+        /* "pyreadstat/_readstat_parser.pyx":1100
  *             # check that datetime columns are datetime type
  *             # this is needed in case all date values are nan
  *             for index, column in enumerate(data_frame.columns):             # <<<<<<<<<<<<<<
@@ -15213,7 +15166,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       }
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1099
+      /* "pyreadstat/_readstat_parser.pyx":1095
  *         data_frame = data_frame.to_native()
  * 
  *         if dates_as_pandas and output_format=="pandas":             # <<<<<<<<<<<<<<
@@ -15222,14 +15175,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1109
+    /* "pyreadstat/_readstat_parser.pyx":1105
  *                     data_frame.loc[:, column] = pd.to_datetime(data_frame[column])
  * 
  *         if output_format == "polars" and not dc.no_datetime_conversion:             # <<<<<<<<<<<<<<
  *             # datetime and date vectorized conversion
  *             pl = natnamespace
 */
-    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_polars, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1109, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_polars, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1105, __pyx_L1_error)
     if (__pyx_t_1) {
     } else {
       __pyx_t_3 = __pyx_t_1;
@@ -15240,7 +15193,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
     __pyx_L29_bool_binop_done:;
     if (__pyx_t_3) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1111
+      /* "pyreadstat/_readstat_parser.pyx":1107
  *         if output_format == "polars" and not dc.no_datetime_conversion:
  *             # datetime and date vectorized conversion
  *             pl = natnamespace             # <<<<<<<<<<<<<<
@@ -15250,31 +15203,31 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       __Pyx_INCREF(__pyx_v_natnamespace);
       __pyx_v_pl = __pyx_v_natnamespace;
 
-      /* "pyreadstat/_readstat_parser.pyx":1112
+      /* "pyreadstat/_readstat_parser.pyx":1108
  *             # datetime and date vectorized conversion
  *             pl = natnamespace
  *             datetime_cols = list()             # <<<<<<<<<<<<<<
  *             date_cols = list()
  *             for index, column in enumerate(data_frame.columns):
 */
-      __pyx_t_11 = PyList_New(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1112, __pyx_L1_error)
+      __pyx_t_11 = PyList_New(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1108, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_v_datetime_cols = ((PyObject*)__pyx_t_11);
       __pyx_t_11 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1113
+      /* "pyreadstat/_readstat_parser.pyx":1109
  *             pl = natnamespace
  *             datetime_cols = list()
  *             date_cols = list()             # <<<<<<<<<<<<<<
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]
 */
-      __pyx_t_11 = PyList_New(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1113, __pyx_L1_error)
+      __pyx_t_11 = PyList_New(0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1109, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __pyx_v_date_cols = ((PyObject*)__pyx_t_11);
       __pyx_t_11 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1114
+      /* "pyreadstat/_readstat_parser.pyx":1110
  *             datetime_cols = list()
  *             date_cols = list()
  *             for index, column in enumerate(data_frame.columns):             # <<<<<<<<<<<<<<
@@ -15282,16 +15235,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
  *                 if var_format == DATE_FORMAT_DATETIME:
 */
       __pyx_t_15 = 0;
-      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_columns); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1114, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_v_data_frame, __pyx_mstate_global->__pyx_n_u_columns); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1110, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       if (likely(PyList_CheckExact(__pyx_t_11)) || PyTuple_CheckExact(__pyx_t_11)) {
         __pyx_t_2 = __pyx_t_11; __Pyx_INCREF(__pyx_t_2);
         __pyx_t_4 = 0;
         __pyx_t_10 = NULL;
       } else {
-        __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1114, __pyx_L1_error)
+        __pyx_t_4 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_11); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1110, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1114, __pyx_L1_error)
+        __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 1110, __pyx_L1_error)
       }
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       for (;;) {
@@ -15300,7 +15253,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             {
               Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_2);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1114, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1110, __pyx_L1_error)
               #endif
               if (__pyx_t_4 >= __pyx_temp) break;
             }
@@ -15310,7 +15263,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             {
               Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_2);
               #if !CYTHON_ASSUME_SAFE_SIZE
-              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1114, __pyx_L1_error)
+              if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1110, __pyx_L1_error)
               #endif
               if (__pyx_t_4 >= __pyx_temp) break;
             }
@@ -15321,26 +15274,26 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             #endif
             ++__pyx_t_4;
           }
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1114, __pyx_L1_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1110, __pyx_L1_error)
         } else {
           __pyx_t_11 = __pyx_t_10(__pyx_t_2);
           if (unlikely(!__pyx_t_11)) {
             PyObject* exc_type = PyErr_Occurred();
             if (exc_type) {
-              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1114, __pyx_L1_error)
+              if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1110, __pyx_L1_error)
               PyErr_Clear();
             }
             break;
           }
         }
         __Pyx_GOTREF(__pyx_t_11);
-        if (!(likely(PyUnicode_CheckExact(__pyx_t_11))||((__pyx_t_11) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_11))) __PYX_ERR(0, 1114, __pyx_L1_error)
+        if (!(likely(PyUnicode_CheckExact(__pyx_t_11))||((__pyx_t_11) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_11))) __PYX_ERR(0, 1110, __pyx_L1_error)
         __Pyx_XDECREF_SET(__pyx_v_column, ((PyObject*)__pyx_t_11));
         __pyx_t_11 = 0;
         __pyx_v_index = __pyx_t_15;
         __pyx_t_15 = (__pyx_t_15 + 1);
 
-        /* "pyreadstat/_readstat_parser.pyx":1115
+        /* "pyreadstat/_readstat_parser.pyx":1111
  *             date_cols = list()
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]             # <<<<<<<<<<<<<<
@@ -15349,15 +15302,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         if (unlikely(__pyx_v_dc->col_formats == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 1115, __pyx_L1_error)
+          __PYX_ERR(0, 1111, __pyx_L1_error)
         }
-        __pyx_t_11 = __Pyx_GetItemInt_List(__pyx_v_dc->col_formats, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1115, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_GetItemInt_List(__pyx_v_dc->col_formats, __pyx_v_index, int, 1, __Pyx_PyLong_From_int, 1, 1, 1, 1, __Pyx_ReferenceSharing_SharedReference); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1111, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_16 = ((__pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format)__Pyx_PyLong_As___pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format(__pyx_t_11)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1115, __pyx_L1_error)
+        __pyx_t_16 = ((__pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format)__Pyx_PyLong_As___pyx_t_10pyreadstat_16_readstat_parser_py_datetime_format(__pyx_t_11)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1111, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_v_var_format = __pyx_t_16;
 
-        /* "pyreadstat/_readstat_parser.pyx":1116
+        /* "pyreadstat/_readstat_parser.pyx":1112
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]
  *                 if var_format == DATE_FORMAT_DATETIME:             # <<<<<<<<<<<<<<
@@ -15367,16 +15320,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
         __pyx_t_3 = (__pyx_v_var_format == __pyx_e_10pyreadstat_16_readstat_parser_DATE_FORMAT_DATETIME);
         if (__pyx_t_3) {
 
-          /* "pyreadstat/_readstat_parser.pyx":1117
+          /* "pyreadstat/_readstat_parser.pyx":1113
  *                 var_format = dc.col_formats[index]
  *                 if var_format == DATE_FORMAT_DATETIME:
  *                     datetime_cols.append(column)             # <<<<<<<<<<<<<<
  *                 if var_format == DATE_FORMAT_DATE:
  *                     date_cols.append(column)
 */
-          __pyx_t_17 = __Pyx_PyList_Append(__pyx_v_datetime_cols, __pyx_v_column); if (unlikely(__pyx_t_17 == ((int)-1))) __PYX_ERR(0, 1117, __pyx_L1_error)
+          __pyx_t_17 = __Pyx_PyList_Append(__pyx_v_datetime_cols, __pyx_v_column); if (unlikely(__pyx_t_17 == ((int)-1))) __PYX_ERR(0, 1113, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":1116
+          /* "pyreadstat/_readstat_parser.pyx":1112
  *             for index, column in enumerate(data_frame.columns):
  *                 var_format = dc.col_formats[index]
  *                 if var_format == DATE_FORMAT_DATETIME:             # <<<<<<<<<<<<<<
@@ -15385,7 +15338,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":1118
+        /* "pyreadstat/_readstat_parser.pyx":1114
  *                 if var_format == DATE_FORMAT_DATETIME:
  *                     datetime_cols.append(column)
  *                 if var_format == DATE_FORMAT_DATE:             # <<<<<<<<<<<<<<
@@ -15395,16 +15348,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
         __pyx_t_3 = (__pyx_v_var_format == __pyx_e_10pyreadstat_16_readstat_parser_DATE_FORMAT_DATE);
         if (__pyx_t_3) {
 
-          /* "pyreadstat/_readstat_parser.pyx":1119
+          /* "pyreadstat/_readstat_parser.pyx":1115
  *                     datetime_cols.append(column)
  *                 if var_format == DATE_FORMAT_DATE:
  *                     date_cols.append(column)             # <<<<<<<<<<<<<<
  *             if datetime_cols:
  *                 data_frame = data_frame.with_columns(
 */
-          __pyx_t_17 = __Pyx_PyList_Append(__pyx_v_date_cols, __pyx_v_column); if (unlikely(__pyx_t_17 == ((int)-1))) __PYX_ERR(0, 1119, __pyx_L1_error)
+          __pyx_t_17 = __Pyx_PyList_Append(__pyx_v_date_cols, __pyx_v_column); if (unlikely(__pyx_t_17 == ((int)-1))) __PYX_ERR(0, 1115, __pyx_L1_error)
 
-          /* "pyreadstat/_readstat_parser.pyx":1118
+          /* "pyreadstat/_readstat_parser.pyx":1114
  *                 if var_format == DATE_FORMAT_DATETIME:
  *                     datetime_cols.append(column)
  *                 if var_format == DATE_FORMAT_DATE:             # <<<<<<<<<<<<<<
@@ -15413,7 +15366,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
         }
 
-        /* "pyreadstat/_readstat_parser.pyx":1114
+        /* "pyreadstat/_readstat_parser.pyx":1110
  *             datetime_cols = list()
  *             date_cols = list()
  *             for index, column in enumerate(data_frame.columns):             # <<<<<<<<<<<<<<
@@ -15423,7 +15376,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1120
+      /* "pyreadstat/_readstat_parser.pyx":1116
  *                 if var_format == DATE_FORMAT_DATE:
  *                     date_cols.append(column)
  *             if datetime_cols:             # <<<<<<<<<<<<<<
@@ -15432,13 +15385,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_datetime_cols);
-        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1120, __pyx_L1_error)
+        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1116, __pyx_L1_error)
         __pyx_t_3 = (__pyx_temp != 0);
       }
 
       if (__pyx_t_3) {
 
-        /* "pyreadstat/_readstat_parser.pyx":1121
+        /* "pyreadstat/_readstat_parser.pyx":1117
  *                     date_cols.append(column)
  *             if datetime_cols:
  *                 data_frame = data_frame.with_columns(             # <<<<<<<<<<<<<<
@@ -15448,17 +15401,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
         __pyx_t_11 = __pyx_v_data_frame;
         __Pyx_INCREF(__pyx_t_11);
 
-        /* "pyreadstat/_readstat_parser.pyx":1122
+        /* "pyreadstat/_readstat_parser.pyx":1118
  *             if datetime_cols:
  *                 data_frame = data_frame.with_columns(
  *                     [             # <<<<<<<<<<<<<<
  *                         pl.from_epoch(
  *                             (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (
 */
-        __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1122, __pyx_L1_error)
+        __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1118, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
 
-        /* "pyreadstat/_readstat_parser.pyx":1128
+        /* "pyreadstat/_readstat_parser.pyx":1124
  *                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
  *                             time_unit='us')
  *                         for c in datetime_cols if data_frame[c].len() > 0             # <<<<<<<<<<<<<<
@@ -15471,17 +15424,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_8);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1128, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1124, __pyx_L1_error)
             #endif
             if (__pyx_t_4 >= __pyx_temp) break;
           }
           __pyx_t_13 = __Pyx_PyList_GetItemRefFast(__pyx_t_8, __pyx_t_4, __Pyx_ReferenceSharing_OwnStrongReference);
           ++__pyx_t_4;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1128, __pyx_L1_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1124, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_XDECREF_SET(__pyx_v_c, __pyx_t_13);
           __pyx_t_13 = 0;
-          __pyx_t_18 = __Pyx_PyObject_GetItem(__pyx_v_data_frame, __pyx_v_c); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1128, __pyx_L1_error)
+          __pyx_t_18 = __Pyx_PyObject_GetItem(__pyx_v_data_frame, __pyx_v_c); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1124, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_18);
           __pyx_t_12 = __pyx_t_18;
           __Pyx_INCREF(__pyx_t_12);
@@ -15491,16 +15444,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             __pyx_t_13 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_len, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
             __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
-            if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1128, __pyx_L1_error)
+            if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1124, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_13);
           }
-          __pyx_t_18 = PyObject_RichCompare(__pyx_t_13, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_18); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1128, __pyx_L1_error)
+          __pyx_t_18 = PyObject_RichCompare(__pyx_t_13, __pyx_mstate_global->__pyx_int_0, Py_GT); __Pyx_XGOTREF(__pyx_t_18); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1124, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_18); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 1128, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_18); if (unlikely((__pyx_t_3 < 0))) __PYX_ERR(0, 1124, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
           if (__pyx_t_3) {
 
-            /* "pyreadstat/_readstat_parser.pyx":1123
+            /* "pyreadstat/_readstat_parser.pyx":1119
  *                 data_frame = data_frame.with_columns(
  *                     [
  *                         pl.from_epoch(             # <<<<<<<<<<<<<<
@@ -15510,7 +15463,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
             __pyx_t_13 = __pyx_v_pl;
             __Pyx_INCREF(__pyx_t_13);
 
-            /* "pyreadstat/_readstat_parser.pyx":1124
+            /* "pyreadstat/_readstat_parser.pyx":1120
  *                     [
  *                         pl.from_epoch(
  *                             (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (             # <<<<<<<<<<<<<<
@@ -15524,12 +15477,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               PyObject *__pyx_callargs[2] = {__pyx_t_25, __pyx_v_c};
               __pyx_t_24 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_col, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_25); __pyx_t_25 = 0;
-              if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1124, __pyx_L1_error)
+              if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1120, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_24);
             }
             __pyx_t_23 = __pyx_t_24;
             __Pyx_INCREF(__pyx_t_23);
-            __pyx_t_25 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Float64); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 1124, __pyx_L1_error)
+            __pyx_t_25 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Float64); if (unlikely(!__pyx_t_25)) __PYX_ERR(0, 1120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_25);
             __pyx_t_14 = 0;
             {
@@ -15538,13 +15491,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __Pyx_XDECREF(__pyx_t_23); __pyx_t_23 = 0;
               __Pyx_DECREF(__pyx_t_25); __pyx_t_25 = 0;
               __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-              if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1124, __pyx_L1_error)
+              if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1120, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_22);
             }
-            __pyx_t_24 = __Pyx_PyLong_RemainderObjC(__pyx_t_22, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1124, __pyx_L1_error)
+            __pyx_t_24 = __Pyx_PyLong_RemainderObjC(__pyx_t_22, __pyx_mstate_global->__pyx_int_1, 1, 0, 0); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_24);
             __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
-            __pyx_t_22 = PyNumber_Multiply(__pyx_t_24, __pyx_mstate_global->__pyx_float_1e6); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1124, __pyx_L1_error)
+            __pyx_t_22 = PyNumber_Multiply(__pyx_t_24, __pyx_mstate_global->__pyx_float_1e6); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_22);
             __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
             __pyx_t_21 = __pyx_t_22;
@@ -15555,12 +15508,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __pyx_t_20 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_round, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
               __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
-              if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1124, __pyx_L1_error)
+              if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1120, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_20);
             }
             __pyx_t_19 = __pyx_t_20;
             __Pyx_INCREF(__pyx_t_19);
-            __pyx_t_22 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Int64); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1124, __pyx_L1_error)
+            __pyx_t_22 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Int64); if (unlikely(!__pyx_t_22)) __PYX_ERR(0, 1120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_22);
             __pyx_t_14 = 0;
             {
@@ -15569,11 +15522,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __Pyx_XDECREF(__pyx_t_19); __pyx_t_19 = 0;
               __Pyx_DECREF(__pyx_t_22); __pyx_t_22 = 0;
               __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
-              if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1124, __pyx_L1_error)
+              if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1120, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_12);
             }
 
-            /* "pyreadstat/_readstat_parser.pyx":1125
+            /* "pyreadstat/_readstat_parser.pyx":1121
  *                         pl.from_epoch(
  *                             (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (
  *                                     pl.col(c).cast(pl.Float64).floor() * 1e6).cast(pl.Int64) - (             # <<<<<<<<<<<<<<
@@ -15587,12 +15540,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               PyObject *__pyx_callargs[2] = {__pyx_t_26, __pyx_v_c};
               __pyx_t_23 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_col, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_26); __pyx_t_26 = 0;
-              if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 1125, __pyx_L1_error)
+              if (unlikely(!__pyx_t_23)) __PYX_ERR(0, 1121, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_23);
             }
             __pyx_t_25 = __pyx_t_23;
             __Pyx_INCREF(__pyx_t_25);
-            __pyx_t_26 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Float64); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 1125, __pyx_L1_error)
+            __pyx_t_26 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Float64); if (unlikely(!__pyx_t_26)) __PYX_ERR(0, 1121, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_26);
             __pyx_t_14 = 0;
             {
@@ -15601,7 +15554,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __Pyx_XDECREF(__pyx_t_25); __pyx_t_25 = 0;
               __Pyx_DECREF(__pyx_t_26); __pyx_t_26 = 0;
               __Pyx_DECREF(__pyx_t_23); __pyx_t_23 = 0;
-              if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1125, __pyx_L1_error)
+              if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1121, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_24);
             }
             __pyx_t_21 = __pyx_t_24;
@@ -15612,15 +15565,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __pyx_t_19 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_floor, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_21); __pyx_t_21 = 0;
               __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-              if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1125, __pyx_L1_error)
+              if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1121, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_19);
             }
-            __pyx_t_24 = PyNumber_Multiply(__pyx_t_19, __pyx_mstate_global->__pyx_float_1e6); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1125, __pyx_L1_error)
+            __pyx_t_24 = PyNumber_Multiply(__pyx_t_19, __pyx_mstate_global->__pyx_float_1e6); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1121, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_24);
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
             __pyx_t_22 = __pyx_t_24;
             __Pyx_INCREF(__pyx_t_22);
-            __pyx_t_19 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Int64); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1125, __pyx_L1_error)
+            __pyx_t_19 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Int64); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1121, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_19);
             __pyx_t_14 = 0;
             {
@@ -15629,23 +15582,23 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __Pyx_XDECREF(__pyx_t_22); __pyx_t_22 = 0;
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
               __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
-              if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1125, __pyx_L1_error)
+              if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1121, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_20);
             }
 
-            /* "pyreadstat/_readstat_parser.pyx":1124
+            /* "pyreadstat/_readstat_parser.pyx":1120
  *                     [
  *                         pl.from_epoch(
  *                             (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (             # <<<<<<<<<<<<<<
  *                                     pl.col(c).cast(pl.Float64).floor() * 1e6).cast(pl.Int64) - (
  *                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
 */
-            __pyx_t_24 = PyNumber_Add(__pyx_t_12, __pyx_t_20); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1124, __pyx_L1_error)
+            __pyx_t_24 = PyNumber_Add(__pyx_t_12, __pyx_t_20); if (unlikely(!__pyx_t_24)) __PYX_ERR(0, 1120, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_24);
             __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
             __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
 
-            /* "pyreadstat/_readstat_parser.pyx":1126
+            /* "pyreadstat/_readstat_parser.pyx":1122
  *                             (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (
  *                                     pl.col(c).cast(pl.Float64).floor() * 1e6).cast(pl.Int64) - (
  *                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),             # <<<<<<<<<<<<<<
@@ -15654,7 +15607,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
             __pyx_t_22 = __pyx_v_pl;
             __Pyx_INCREF(__pyx_t_22);
-            __pyx_t_21 = PyFloat_FromDouble(__pyx_v_dc->unix_to_origin_secs); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1126, __pyx_L1_error)
+            __pyx_t_21 = PyFloat_FromDouble(__pyx_v_dc->unix_to_origin_secs); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1122, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_21);
             __pyx_t_14 = 0;
             {
@@ -15662,15 +15615,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __pyx_t_19 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_lit, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
               __Pyx_XDECREF(__pyx_t_22); __pyx_t_22 = 0;
               __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
-              if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1126, __pyx_L1_error)
+              if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1122, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_19);
             }
-            __pyx_t_21 = PyNumber_Multiply(__pyx_t_19, __pyx_mstate_global->__pyx_float_1e6); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1126, __pyx_L1_error)
+            __pyx_t_21 = PyNumber_Multiply(__pyx_t_19, __pyx_mstate_global->__pyx_float_1e6); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1122, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_21);
             __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
             __pyx_t_12 = __pyx_t_21;
             __Pyx_INCREF(__pyx_t_12);
-            __pyx_t_19 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Int64); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1126, __pyx_L1_error)
+            __pyx_t_19 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_Int64); if (unlikely(!__pyx_t_19)) __PYX_ERR(0, 1122, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_19);
             __pyx_t_14 = 0;
             {
@@ -15679,38 +15632,38 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
               __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
               __Pyx_DECREF(__pyx_t_19); __pyx_t_19 = 0;
               __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
-              if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1126, __pyx_L1_error)
+              if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1122, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_20);
             }
 
-            /* "pyreadstat/_readstat_parser.pyx":1125
+            /* "pyreadstat/_readstat_parser.pyx":1121
  *                         pl.from_epoch(
  *                             (pl.col(c).cast(pl.Float64) % 1 * 1e6).round().cast(pl.Int64) + (
  *                                     pl.col(c).cast(pl.Float64).floor() * 1e6).cast(pl.Int64) - (             # <<<<<<<<<<<<<<
  *                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
  *                             time_unit='us')
 */
-            __pyx_t_21 = PyNumber_Subtract(__pyx_t_24, __pyx_t_20); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1125, __pyx_L1_error)
+            __pyx_t_21 = PyNumber_Subtract(__pyx_t_24, __pyx_t_20); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1121, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_21);
             __Pyx_DECREF(__pyx_t_24); __pyx_t_24 = 0;
             __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
             __pyx_t_14 = 0;
             {
               PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_13, __pyx_t_21};
-              __pyx_t_20 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1123, __pyx_L1_error)
+              __pyx_t_20 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1119, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_20);
-              if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_time_unit, __pyx_mstate_global->__pyx_n_u_us, __pyx_t_20, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1123, __pyx_L1_error)
+              if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_time_unit, __pyx_mstate_global->__pyx_n_u_us, __pyx_t_20, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1119, __pyx_L1_error)
               __pyx_t_18 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_from_epoch, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_20);
               __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
               __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
               __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
-              if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1123, __pyx_L1_error)
+              if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1119, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_18);
             }
-            if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_18))) __PYX_ERR(0, 1122, __pyx_L1_error)
+            if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_18))) __PYX_ERR(0, 1118, __pyx_L1_error)
             __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
 
-            /* "pyreadstat/_readstat_parser.pyx":1128
+            /* "pyreadstat/_readstat_parser.pyx":1124
  *                                     pl.lit(dc.unix_to_origin_secs) * 1e6).cast(pl.Int64),
  *                             time_unit='us')
  *                         for c in datetime_cols if data_frame[c].len() > 0             # <<<<<<<<<<<<<<
@@ -15726,13 +15679,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
           __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_with_columns, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1121, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1117, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF_SET(__pyx_v_data_frame, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1120
+        /* "pyreadstat/_readstat_parser.pyx":1116
  *                 if var_format == DATE_FORMAT_DATE:
  *                     date_cols.append(column)
  *             if datetime_cols:             # <<<<<<<<<<<<<<
@@ -15741,7 +15694,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1131
+      /* "pyreadstat/_readstat_parser.pyx":1127
  *                     ]
  *                 )
  *             if date_cols:             # <<<<<<<<<<<<<<
@@ -15750,13 +15703,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
       {
         Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_date_cols);
-        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1131, __pyx_L1_error)
+        if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1127, __pyx_L1_error)
         __pyx_t_3 = (__pyx_temp != 0);
       }
 
       if (__pyx_t_3) {
 
-        /* "pyreadstat/_readstat_parser.pyx":1132
+        /* "pyreadstat/_readstat_parser.pyx":1128
  *                 )
  *             if date_cols:
  *                 data_frame = data_frame.with_columns(pl.from_epoch(pl.col(*date_cols), time_unit='d'))             # <<<<<<<<<<<<<<
@@ -15767,25 +15720,25 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
         __Pyx_INCREF(__pyx_t_7);
         __pyx_t_8 = __pyx_v_pl;
         __Pyx_INCREF(__pyx_t_8);
-        __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_col); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1132, __pyx_L1_error)
+        __pyx_t_18 = __Pyx_PyObject_GetAttrStr(__pyx_v_pl, __pyx_mstate_global->__pyx_n_u_col); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_18);
-        __pyx_t_20 = PySequence_Tuple(__pyx_v_date_cols); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1132, __pyx_L1_error)
+        __pyx_t_20 = PySequence_Tuple(__pyx_v_date_cols); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_20);
-        __pyx_t_21 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_20, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1132, __pyx_L1_error)
+        __pyx_t_21 = __Pyx_PyObject_Call(__pyx_t_18, __pyx_t_20, NULL); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1128, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_21);
         __Pyx_DECREF(__pyx_t_18); __pyx_t_18 = 0;
         __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
         __pyx_t_14 = 0;
         {
           PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_8, __pyx_t_21};
-          __pyx_t_20 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1132, __pyx_L1_error)
+          __pyx_t_20 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_20)) __PYX_ERR(0, 1128, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_20);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_time_unit, __pyx_mstate_global->__pyx_n_u_d, __pyx_t_20, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1132, __pyx_L1_error)
+          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_time_unit, __pyx_mstate_global->__pyx_n_u_d, __pyx_t_20, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1128, __pyx_L1_error)
           __pyx_t_11 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_from_epoch, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_20);
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
           __Pyx_DECREF(__pyx_t_20); __pyx_t_20 = 0;
-          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1132, __pyx_L1_error)
+          if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 1128, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
         }
         __pyx_t_14 = 0;
@@ -15794,13 +15747,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
           __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_with_columns, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1132, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1128, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF_SET(__pyx_v_data_frame, __pyx_t_2);
         __pyx_t_2 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1131
+        /* "pyreadstat/_readstat_parser.pyx":1127
  *                     ]
  *                 )
  *             if date_cols:             # <<<<<<<<<<<<<<
@@ -15809,7 +15762,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1109
+      /* "pyreadstat/_readstat_parser.pyx":1105
  *                     data_frame.loc[:, column] = pd.to_datetime(data_frame[column])
  * 
  *         if output_format == "polars" and not dc.no_datetime_conversion:             # <<<<<<<<<<<<<<
@@ -15818,7 +15771,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1071
+    /* "pyreadstat/_readstat_parser.pyx":1067
  *     output_format = dc.output_format
  * 
  *     if dict_data:             # <<<<<<<<<<<<<<
@@ -15828,7 +15781,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1135
+  /* "pyreadstat/_readstat_parser.pyx":1131
  * 
  *     else:
  *         data_frame = nw.from_dict(dict_data, backend=output_format).to_native()             # <<<<<<<<<<<<<<
@@ -15837,9 +15790,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
 */
   /*else*/ {
     __pyx_t_20 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_21, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1135, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_21, __pyx_mstate_global->__pyx_n_u_nw); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1131, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_21);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_21, __pyx_mstate_global->__pyx_n_u_from_dict); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1135, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_21, __pyx_mstate_global->__pyx_n_u_from_dict); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1131, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
     __pyx_t_14 = 1;
@@ -15856,14 +15809,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
     #endif
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_20, __pyx_v_dict_data};
-      __pyx_t_21 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1135, __pyx_L1_error)
+      __pyx_t_21 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_21)) __PYX_ERR(0, 1131, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_21);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_backend, __pyx_v_output_format, __pyx_t_21, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1135, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_backend, __pyx_v_output_format, __pyx_t_21, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 1131, __pyx_L1_error)
       __pyx_t_7 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_8, __pyx_callargs+__pyx_t_14, (2-__pyx_t_14) | (__pyx_t_14*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_21);
       __Pyx_XDECREF(__pyx_t_20); __pyx_t_20 = 0;
       __Pyx_DECREF(__pyx_t_21); __pyx_t_21 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1135, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1131, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
     __pyx_t_11 = __pyx_t_7;
@@ -15874,7 +15827,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_to_native, __pyx_callargs+__pyx_t_14, (1-__pyx_t_14) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1135, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1131, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __pyx_v_data_frame = __pyx_t_2;
@@ -15882,7 +15835,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   }
   __pyx_L3:;
 
-  /* "pyreadstat/_readstat_parser.pyx":1137
+  /* "pyreadstat/_readstat_parser.pyx":1133
  *         data_frame = nw.from_dict(dict_data, backend=output_format).to_native()
  * 
  *     return data_frame             # <<<<<<<<<<<<<<
@@ -15894,7 +15847,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   __pyx_r = __pyx_v_data_frame;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1056
+  /* "pyreadstat/_readstat_parser.pyx":1052
  *     return final_container
  * 
  * cdef object dict_to_dataframe(object dict_data, data_container dc):             # <<<<<<<<<<<<<<
@@ -15941,7 +15894,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(PyObj
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":1139
+/* "pyreadstat/_readstat_parser.pyx":1135
  *     return data_frame
  * 
  * cdef object data_container_extract_metadata(data_container data):             # <<<<<<<<<<<<<<
@@ -15989,7 +15942,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("data_container_extract_metadata", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":1156
+  /* "pyreadstat/_readstat_parser.pyx":1152
  *     cdef readstat_type_t var_type
  * 
  *     metaonly = data.metaonly             # <<<<<<<<<<<<<<
@@ -15999,7 +15952,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   __pyx_t_1 = __pyx_v_data->metaonly;
   __pyx_v_metaonly = __pyx_t_1;
 
-  /* "pyreadstat/_readstat_parser.pyx":1157
+  /* "pyreadstat/_readstat_parser.pyx":1153
  * 
  *     metaonly = data.metaonly
  *     is_unkown_number_rows = data.is_unkown_number_rows             # <<<<<<<<<<<<<<
@@ -16009,7 +15962,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   __pyx_t_1 = __pyx_v_data->is_unkown_number_rows;
   __pyx_v_is_unkown_number_rows = __pyx_t_1;
 
-  /* "pyreadstat/_readstat_parser.pyx":1159
+  /* "pyreadstat/_readstat_parser.pyx":1155
  *     is_unkown_number_rows = data.is_unkown_number_rows
  * 
  *     cdef object metadata = metadata_container()             # <<<<<<<<<<<<<<
@@ -16017,7 +15970,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *     # mr sets
 */
   __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_metadata_container); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1159, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_metadata_container); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1155, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -16036,13 +15989,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1159, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1155, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_v_metadata = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1162
+  /* "pyreadstat/_readstat_parser.pyx":1158
  * 
  *     # mr sets
  *     metadata.mr_sets = data.mr_sets             # <<<<<<<<<<<<<<
@@ -16051,22 +16004,22 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_2 = __pyx_v_data->mr_sets;
   __Pyx_INCREF(__pyx_t_2);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_mr_sets, __pyx_t_2) < (0)) __PYX_ERR(0, 1162, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_mr_sets, __pyx_t_2) < (0)) __PYX_ERR(0, 1158, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1165
+  /* "pyreadstat/_readstat_parser.pyx":1161
  * 
  *     # number of rows
  *     metadata.number_columns = data.n_vars             # <<<<<<<<<<<<<<
  *     if is_unkown_number_rows:
  *         if not metaonly:
 */
-  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->n_vars); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1165, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->n_vars); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_columns, __pyx_t_2) < (0)) __PYX_ERR(0, 1165, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_columns, __pyx_t_2) < (0)) __PYX_ERR(0, 1161, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1166
+  /* "pyreadstat/_readstat_parser.pyx":1162
  *     # number of rows
  *     metadata.number_columns = data.n_vars
  *     if is_unkown_number_rows:             # <<<<<<<<<<<<<<
@@ -16075,7 +16028,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   if (__pyx_v_is_unkown_number_rows) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1167
+    /* "pyreadstat/_readstat_parser.pyx":1163
  *     metadata.number_columns = data.n_vars
  *     if is_unkown_number_rows:
  *         if not metaonly:             # <<<<<<<<<<<<<<
@@ -16085,19 +16038,19 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __pyx_t_1 = (!__pyx_v_metaonly);
     if (__pyx_t_1) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1168
+      /* "pyreadstat/_readstat_parser.pyx":1164
  *     if is_unkown_number_rows:
  *         if not metaonly:
  *             metadata.number_rows = data.max_n_obs             # <<<<<<<<<<<<<<
  *     else:
  *         metadata.number_rows = data.n_obs
 */
-      __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->max_n_obs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1168, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->max_n_obs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1164, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 1168, __pyx_L1_error)
+      if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 1164, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1167
+      /* "pyreadstat/_readstat_parser.pyx":1163
  *     metadata.number_columns = data.n_vars
  *     if is_unkown_number_rows:
  *         if not metaonly:             # <<<<<<<<<<<<<<
@@ -16106,7 +16059,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1166
+    /* "pyreadstat/_readstat_parser.pyx":1162
  *     # number of rows
  *     metadata.number_columns = data.n_vars
  *     if is_unkown_number_rows:             # <<<<<<<<<<<<<<
@@ -16116,7 +16069,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1170
+  /* "pyreadstat/_readstat_parser.pyx":1166
  *             metadata.number_rows = data.max_n_obs
  *     else:
  *         metadata.number_rows = data.n_obs             # <<<<<<<<<<<<<<
@@ -16124,14 +16077,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *     # value labels
 */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->n_obs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1170, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->n_obs); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 1170, __pyx_L1_error)
+    if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_rows, __pyx_t_2) < (0)) __PYX_ERR(0, 1166, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_L3:;
 
-  /* "pyreadstat/_readstat_parser.pyx":1173
+  /* "pyreadstat/_readstat_parser.pyx":1169
  * 
  *     # value labels
  *     labels_raw = data.labels_raw             # <<<<<<<<<<<<<<
@@ -16143,7 +16096,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   __pyx_v_labels_raw = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1174
+  /* "pyreadstat/_readstat_parser.pyx":1170
  *     # value labels
  *     labels_raw = data.labels_raw
  *     label_to_var_name = data.label_to_var_name             # <<<<<<<<<<<<<<
@@ -16155,29 +16108,29 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   __pyx_v_label_to_var_name = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1175
+  /* "pyreadstat/_readstat_parser.pyx":1171
  *     labels_raw = data.labels_raw
  *     label_to_var_name = data.label_to_var_name
  *     variable_value_labels = dict()             # <<<<<<<<<<<<<<
  * 
  *     if labels_raw:
 */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1175, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_variable_value_labels = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1177
+  /* "pyreadstat/_readstat_parser.pyx":1173
  *     variable_value_labels = dict()
  * 
  *     if labels_raw:             # <<<<<<<<<<<<<<
  *         for var_name, var_label in label_to_var_name.items():
  *             current_labels = labels_raw.get(var_label)
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_labels_raw); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1177, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_labels_raw); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1173, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1178
+    /* "pyreadstat/_readstat_parser.pyx":1174
  * 
  *     if labels_raw:
  *         for var_name, var_label in label_to_var_name.items():             # <<<<<<<<<<<<<<
@@ -16191,7 +16144,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_items, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1178, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -16199,9 +16152,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
     } else {
-      __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1178, __pyx_L1_error)
+      __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1178, __pyx_L1_error)
+      __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1174, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     for (;;) {
@@ -16210,7 +16163,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1178, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1174, __pyx_L1_error)
             #endif
             if (__pyx_t_6 >= __pyx_temp) break;
           }
@@ -16220,7 +16173,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1178, __pyx_L1_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1174, __pyx_L1_error)
             #endif
             if (__pyx_t_6 >= __pyx_temp) break;
           }
@@ -16231,13 +16184,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           #endif
           ++__pyx_t_6;
         }
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1178, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1174, __pyx_L1_error)
       } else {
         __pyx_t_2 = __pyx_t_7(__pyx_t_4);
         if (unlikely(!__pyx_t_2)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1178, __pyx_L1_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1174, __pyx_L1_error)
             PyErr_Clear();
           }
           break;
@@ -16250,7 +16203,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         if (unlikely(size != 2)) {
           if (size > 2) __Pyx_RaiseTooManyValuesError(2);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 1178, __pyx_L1_error)
+          __PYX_ERR(0, 1174, __pyx_L1_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -16260,22 +16213,22 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           __Pyx_INCREF(__pyx_t_8);
         } else {
           __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1178, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1174, __pyx_L1_error)
           __Pyx_XGOTREF(__pyx_t_3);
           __pyx_t_8 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1178, __pyx_L1_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1174, __pyx_L1_error)
           __Pyx_XGOTREF(__pyx_t_8);
         }
         #else
-        __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1178, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1174, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_8 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1178, __pyx_L1_error)
+        __pyx_t_8 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1174, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         #endif
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1178, __pyx_L1_error)
+        __pyx_t_9 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1174, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_9);
@@ -16283,7 +16236,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         __Pyx_GOTREF(__pyx_t_3);
         index = 1; __pyx_t_8 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_8)) goto __pyx_L8_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_8);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < (0)) __PYX_ERR(0, 1178, __pyx_L1_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < (0)) __PYX_ERR(0, 1174, __pyx_L1_error)
         __pyx_t_10 = NULL;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         goto __pyx_L9_unpacking_done;
@@ -16291,17 +16244,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_t_10 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 1178, __pyx_L1_error)
+        __PYX_ERR(0, 1174, __pyx_L1_error)
         __pyx_L9_unpacking_done:;
       }
-      if (!(likely(PyUnicode_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_3))) __PYX_ERR(0, 1178, __pyx_L1_error)
-      if (!(likely(PyUnicode_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_8))) __PYX_ERR(0, 1178, __pyx_L1_error)
+      if (!(likely(PyUnicode_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_3))) __PYX_ERR(0, 1174, __pyx_L1_error)
+      if (!(likely(PyUnicode_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_8))) __PYX_ERR(0, 1174, __pyx_L1_error)
       __Pyx_XDECREF_SET(__pyx_v_var_name, ((PyObject*)__pyx_t_3));
       __pyx_t_3 = 0;
       __Pyx_XDECREF_SET(__pyx_v_var_label, ((PyObject*)__pyx_t_8));
       __pyx_t_8 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1179
+      /* "pyreadstat/_readstat_parser.pyx":1175
  *     if labels_raw:
  *         for var_name, var_label in label_to_var_name.items():
  *             current_labels = labels_raw.get(var_label)             # <<<<<<<<<<<<<<
@@ -16315,32 +16268,32 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_v_var_label};
         __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1179, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1175, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_XDECREF_SET(__pyx_v_current_labels, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1180
+      /* "pyreadstat/_readstat_parser.pyx":1176
  *         for var_name, var_label in label_to_var_name.items():
  *             current_labels = labels_raw.get(var_label)
  *             if current_labels:             # <<<<<<<<<<<<<<
  *                 variable_value_labels[var_name] = current_labels
  * 
 */
-      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_current_labels); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1180, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_current_labels); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1176, __pyx_L1_error)
       if (__pyx_t_1) {
 
-        /* "pyreadstat/_readstat_parser.pyx":1181
+        /* "pyreadstat/_readstat_parser.pyx":1177
  *             current_labels = labels_raw.get(var_label)
  *             if current_labels:
  *                 variable_value_labels[var_name] = current_labels             # <<<<<<<<<<<<<<
  * 
  *     original_types = dict()
 */
-        if (unlikely((PyDict_SetItem(__pyx_v_variable_value_labels, __pyx_v_var_name, __pyx_v_current_labels) < 0))) __PYX_ERR(0, 1181, __pyx_L1_error)
+        if (unlikely((PyDict_SetItem(__pyx_v_variable_value_labels, __pyx_v_var_name, __pyx_v_current_labels) < 0))) __PYX_ERR(0, 1177, __pyx_L1_error)
 
-        /* "pyreadstat/_readstat_parser.pyx":1180
+        /* "pyreadstat/_readstat_parser.pyx":1176
  *         for var_name, var_label in label_to_var_name.items():
  *             current_labels = labels_raw.get(var_label)
  *             if current_labels:             # <<<<<<<<<<<<<<
@@ -16349,7 +16302,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1178
+      /* "pyreadstat/_readstat_parser.pyx":1174
  * 
  *     if labels_raw:
  *         for var_name, var_label in label_to_var_name.items():             # <<<<<<<<<<<<<<
@@ -16359,7 +16312,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1177
+    /* "pyreadstat/_readstat_parser.pyx":1173
  *     variable_value_labels = dict()
  * 
  *     if labels_raw:             # <<<<<<<<<<<<<<
@@ -16368,43 +16321,43 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1183
+  /* "pyreadstat/_readstat_parser.pyx":1179
  *                 variable_value_labels[var_name] = current_labels
  * 
  *     original_types = dict()             # <<<<<<<<<<<<<<
  *     original_informats = dict()
  *     readstat_types = dict()
 */
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1183, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1179, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_original_types = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1184
+  /* "pyreadstat/_readstat_parser.pyx":1180
  * 
  *     original_types = dict()
  *     original_informats = dict()             # <<<<<<<<<<<<<<
  *     readstat_types = dict()
  *     for indx in range(metadata.number_columns):
 */
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1184, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_original_informats = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1185
+  /* "pyreadstat/_readstat_parser.pyx":1181
  *     original_types = dict()
  *     original_informats = dict()
  *     readstat_types = dict()             # <<<<<<<<<<<<<<
  *     for indx in range(metadata.number_columns):
  *         cur_col = data.col_names[indx]
 */
-  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1185, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1181, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_v_readstat_types = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1186
+  /* "pyreadstat/_readstat_parser.pyx":1182
  *     original_informats = dict()
  *     readstat_types = dict()
  *     for indx in range(metadata.number_columns):             # <<<<<<<<<<<<<<
@@ -16412,7 +16365,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *         cur_type = data.col_formats_original[indx]
 */
   __pyx_t_2 = NULL;
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_columns); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1186, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_number_columns); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1182, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __pyx_t_5 = 1;
   {
@@ -16420,12 +16373,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __pyx_t_4 = __Pyx_PyObject_FastCall((PyObject*)(&PyRange_Type), __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1186, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1182, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
-  __pyx_t_8 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1186, __pyx_L1_error)
+  __pyx_t_8 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1182, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1186, __pyx_L1_error)
+  __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1182, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   for (;;) {
     {
@@ -16433,7 +16386,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       if (unlikely(!__pyx_t_4)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1186, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1182, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -16443,7 +16396,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __Pyx_XDECREF_SET(__pyx_v_indx, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1187
+    /* "pyreadstat/_readstat_parser.pyx":1183
  *     readstat_types = dict()
  *     for indx in range(metadata.number_columns):
  *         cur_col = data.col_names[indx]             # <<<<<<<<<<<<<<
@@ -16452,14 +16405,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
     if (unlikely(__pyx_v_data->col_names == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1187, __pyx_L1_error)
+      __PYX_ERR(0, 1183, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_names, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1187, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_names, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1183, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_cur_col, __pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1188
+    /* "pyreadstat/_readstat_parser.pyx":1184
  *     for indx in range(metadata.number_columns):
  *         cur_col = data.col_names[indx]
  *         cur_type = data.col_formats_original[indx]             # <<<<<<<<<<<<<<
@@ -16468,24 +16421,24 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
     if (unlikely(__pyx_v_data->col_formats_original == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1188, __pyx_L1_error)
+      __PYX_ERR(0, 1184, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_formats_original, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1188, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_formats_original, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 1188, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 1184, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_cur_type, ((PyObject*)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1189
+    /* "pyreadstat/_readstat_parser.pyx":1185
  *         cur_col = data.col_names[indx]
  *         cur_type = data.col_formats_original[indx]
  *         original_types[cur_col] = cur_type             # <<<<<<<<<<<<<<
  *         cur_informat = data.col_informats_original[indx]
  *         original_informats[cur_col] = cur_informat
 */
-    if (unlikely((PyObject_SetItem(__pyx_v_original_types, __pyx_v_cur_col, __pyx_v_cur_type) < 0))) __PYX_ERR(0, 1189, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_original_types, __pyx_v_cur_col, __pyx_v_cur_type) < 0))) __PYX_ERR(0, 1185, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":1190
+    /* "pyreadstat/_readstat_parser.pyx":1186
  *         cur_type = data.col_formats_original[indx]
  *         original_types[cur_col] = cur_type
  *         cur_informat = data.col_informats_original[indx]             # <<<<<<<<<<<<<<
@@ -16494,24 +16447,24 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
     if (unlikely(__pyx_v_data->col_informats_original == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1190, __pyx_L1_error)
+      __PYX_ERR(0, 1186, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_informats_original, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1190, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_informats_original, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1186, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 1190, __pyx_L1_error)
+    if (!(likely(PyUnicode_CheckExact(__pyx_t_4))||((__pyx_t_4) == Py_None) || __Pyx_RaiseUnexpectedTypeError("str", __pyx_t_4))) __PYX_ERR(0, 1186, __pyx_L1_error)
     __Pyx_XDECREF_SET(__pyx_v_cur_informat, ((PyObject*)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1191
+    /* "pyreadstat/_readstat_parser.pyx":1187
  *         original_types[cur_col] = cur_type
  *         cur_informat = data.col_informats_original[indx]
  *         original_informats[cur_col] = cur_informat             # <<<<<<<<<<<<<<
  *         var_type = data.col_dtypes[indx]
  *         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
 */
-    if (unlikely((PyObject_SetItem(__pyx_v_original_informats, __pyx_v_cur_col, __pyx_v_cur_informat) < 0))) __PYX_ERR(0, 1191, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_v_original_informats, __pyx_v_cur_col, __pyx_v_cur_informat) < 0))) __PYX_ERR(0, 1187, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":1192
+    /* "pyreadstat/_readstat_parser.pyx":1188
  *         cur_informat = data.col_informats_original[indx]
  *         original_informats[cur_col] = cur_informat
  *         var_type = data.col_dtypes[indx]             # <<<<<<<<<<<<<<
@@ -16520,15 +16473,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
     if (unlikely(__pyx_v_data->col_dtypes == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1192, __pyx_L1_error)
+      __PYX_ERR(0, 1188, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_dtypes, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1192, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_v_data->col_dtypes, __pyx_v_indx); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1188, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = ((readstat_type_t)__Pyx_PyLong_As_readstat_type_t(__pyx_t_4)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1192, __pyx_L1_error)
+    __pyx_t_11 = ((readstat_type_t)__Pyx_PyLong_As_readstat_type_t(__pyx_t_4)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1188, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_var_type = __pyx_t_11;
 
-    /* "pyreadstat/_readstat_parser.pyx":1193
+    /* "pyreadstat/_readstat_parser.pyx":1189
  *         original_informats[cur_col] = cur_informat
  *         var_type = data.col_dtypes[indx]
  *         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:             # <<<<<<<<<<<<<<
@@ -16539,16 +16492,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       case READSTAT_TYPE_STRING:
       case READSTAT_TYPE_STRING_REF:
 
-      /* "pyreadstat/_readstat_parser.pyx":1194
+      /* "pyreadstat/_readstat_parser.pyx":1190
  *         var_type = data.col_dtypes[indx]
  *         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
  *             readstat_types[cur_col] = "string"             # <<<<<<<<<<<<<<
  *         elif var_type == READSTAT_TYPE_INT8:
  *             readstat_types[cur_col] = "int8"
 */
-      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_string) < 0))) __PYX_ERR(0, 1194, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_string) < 0))) __PYX_ERR(0, 1190, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1193
+      /* "pyreadstat/_readstat_parser.pyx":1189
  *         original_informats[cur_col] = cur_informat
  *         var_type = data.col_dtypes[indx]
  *         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:             # <<<<<<<<<<<<<<
@@ -16558,16 +16511,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       break;
       case READSTAT_TYPE_INT8:
 
-      /* "pyreadstat/_readstat_parser.pyx":1196
+      /* "pyreadstat/_readstat_parser.pyx":1192
  *             readstat_types[cur_col] = "string"
  *         elif var_type == READSTAT_TYPE_INT8:
  *             readstat_types[cur_col] = "int8"             # <<<<<<<<<<<<<<
  *         elif var_type == READSTAT_TYPE_INT16:
  *             readstat_types[cur_col] = "int16"
 */
-      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_int8) < 0))) __PYX_ERR(0, 1196, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_int8) < 0))) __PYX_ERR(0, 1192, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1195
+      /* "pyreadstat/_readstat_parser.pyx":1191
  *         if var_type == READSTAT_TYPE_STRING or var_type == READSTAT_TYPE_STRING_REF:
  *             readstat_types[cur_col] = "string"
  *         elif var_type == READSTAT_TYPE_INT8:             # <<<<<<<<<<<<<<
@@ -16577,16 +16530,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       break;
       case READSTAT_TYPE_INT16:
 
-      /* "pyreadstat/_readstat_parser.pyx":1198
+      /* "pyreadstat/_readstat_parser.pyx":1194
  *             readstat_types[cur_col] = "int8"
  *         elif var_type == READSTAT_TYPE_INT16:
  *             readstat_types[cur_col] = "int16"             # <<<<<<<<<<<<<<
  *         elif var_type == READSTAT_TYPE_INT32:
  *             readstat_types[cur_col] = "int32"
 */
-      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_int16) < 0))) __PYX_ERR(0, 1198, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_int16) < 0))) __PYX_ERR(0, 1194, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1197
+      /* "pyreadstat/_readstat_parser.pyx":1193
  *         elif var_type == READSTAT_TYPE_INT8:
  *             readstat_types[cur_col] = "int8"
  *         elif var_type == READSTAT_TYPE_INT16:             # <<<<<<<<<<<<<<
@@ -16596,16 +16549,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       break;
       case READSTAT_TYPE_INT32:
 
-      /* "pyreadstat/_readstat_parser.pyx":1200
+      /* "pyreadstat/_readstat_parser.pyx":1196
  *             readstat_types[cur_col] = "int16"
  *         elif var_type == READSTAT_TYPE_INT32:
  *             readstat_types[cur_col] = "int32"             # <<<<<<<<<<<<<<
  *         elif var_type == READSTAT_TYPE_FLOAT:
  *             readstat_types[cur_col] = "float"
 */
-      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_int32) < 0))) __PYX_ERR(0, 1200, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_int32) < 0))) __PYX_ERR(0, 1196, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1199
+      /* "pyreadstat/_readstat_parser.pyx":1195
  *         elif var_type == READSTAT_TYPE_INT16:
  *             readstat_types[cur_col] = "int16"
  *         elif var_type == READSTAT_TYPE_INT32:             # <<<<<<<<<<<<<<
@@ -16615,16 +16568,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       break;
       case READSTAT_TYPE_FLOAT:
 
-      /* "pyreadstat/_readstat_parser.pyx":1202
+      /* "pyreadstat/_readstat_parser.pyx":1198
  *             readstat_types[cur_col] = "int32"
  *         elif var_type == READSTAT_TYPE_FLOAT:
  *             readstat_types[cur_col] = "float"             # <<<<<<<<<<<<<<
  *         elif var_type == READSTAT_TYPE_DOUBLE:
  *             readstat_types[cur_col] = "double"
 */
-      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_float) < 0))) __PYX_ERR(0, 1202, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_float) < 0))) __PYX_ERR(0, 1198, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1201
+      /* "pyreadstat/_readstat_parser.pyx":1197
  *         elif var_type == READSTAT_TYPE_INT32:
  *             readstat_types[cur_col] = "int32"
  *         elif var_type == READSTAT_TYPE_FLOAT:             # <<<<<<<<<<<<<<
@@ -16634,16 +16587,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       break;
       case READSTAT_TYPE_DOUBLE:
 
-      /* "pyreadstat/_readstat_parser.pyx":1204
+      /* "pyreadstat/_readstat_parser.pyx":1200
  *             readstat_types[cur_col] = "float"
  *         elif var_type == READSTAT_TYPE_DOUBLE:
  *             readstat_types[cur_col] = "double"             # <<<<<<<<<<<<<<
  *         else:
  *             raise PyreadstatError("Unkown data type")
 */
-      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_double) < 0))) __PYX_ERR(0, 1204, __pyx_L1_error)
+      if (unlikely((PyDict_SetItem(__pyx_v_readstat_types, __pyx_v_cur_col, __pyx_mstate_global->__pyx_n_u_double) < 0))) __PYX_ERR(0, 1200, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1203
+      /* "pyreadstat/_readstat_parser.pyx":1199
  *         elif var_type == READSTAT_TYPE_FLOAT:
  *             readstat_types[cur_col] = "float"
  *         elif var_type == READSTAT_TYPE_DOUBLE:             # <<<<<<<<<<<<<<
@@ -16653,7 +16606,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       break;
       default:
 
-      /* "pyreadstat/_readstat_parser.pyx":1206
+      /* "pyreadstat/_readstat_parser.pyx":1202
  *             readstat_types[cur_col] = "double"
  *         else:
  *             raise PyreadstatError("Unkown data type")             # <<<<<<<<<<<<<<
@@ -16661,7 +16614,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *     for indx, curset in data.missing_user_values.items():
 */
       __pyx_t_2 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1206, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1202, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_5 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -16680,16 +16633,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         __pyx_t_4 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1206, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1202, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_Raise(__pyx_t_4, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __PYX_ERR(0, 1206, __pyx_L1_error)
+      __PYX_ERR(0, 1202, __pyx_L1_error)
       break;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1186
+    /* "pyreadstat/_readstat_parser.pyx":1182
  *     original_informats = dict()
  *     readstat_types = dict()
  *     for indx in range(metadata.number_columns):             # <<<<<<<<<<<<<<
@@ -16699,7 +16652,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   }
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1208
+  /* "pyreadstat/_readstat_parser.pyx":1204
  *             raise PyreadstatError("Unkown data type")
  * 
  *     for indx, curset in data.missing_user_values.items():             # <<<<<<<<<<<<<<
@@ -16708,18 +16661,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   if (unlikely(__pyx_v_data->missing_user_values == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "items");
-    __PYX_ERR(0, 1208, __pyx_L1_error)
+    __PYX_ERR(0, 1204, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyDict_Items(__pyx_v_data->missing_user_values); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1208, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyDict_Items(__pyx_v_data->missing_user_values); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   if (likely(PyList_CheckExact(__pyx_t_8)) || PyTuple_CheckExact(__pyx_t_8)) {
     __pyx_t_4 = __pyx_t_8; __Pyx_INCREF(__pyx_t_4);
     __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
   } else {
-    __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1208, __pyx_L1_error)
+    __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1204, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1208, __pyx_L1_error)
+    __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1204, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   for (;;) {
@@ -16728,7 +16681,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1208, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1204, __pyx_L1_error)
           #endif
           if (__pyx_t_6 >= __pyx_temp) break;
         }
@@ -16738,7 +16691,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         {
           Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_4);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1208, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1204, __pyx_L1_error)
           #endif
           if (__pyx_t_6 >= __pyx_temp) break;
         }
@@ -16749,13 +16702,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         #endif
         ++__pyx_t_6;
       }
-      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1208, __pyx_L1_error)
+      if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1204, __pyx_L1_error)
     } else {
       __pyx_t_8 = __pyx_t_7(__pyx_t_4);
       if (unlikely(!__pyx_t_8)) {
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
-          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1208, __pyx_L1_error)
+          if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1204, __pyx_L1_error)
           PyErr_Clear();
         }
         break;
@@ -16768,7 +16721,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 1208, __pyx_L1_error)
+        __PYX_ERR(0, 1204, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -16778,22 +16731,22 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         __Pyx_INCREF(__pyx_t_2);
       } else {
         __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1208, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1204, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_3);
         __pyx_t_2 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1208, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1204, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_2);
       }
       #else
-      __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1208, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1204, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1208, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1204, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       #endif
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_9 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1208, __pyx_L1_error)
+      __pyx_t_9 = PyObject_GetIter(__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1204, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_9);
@@ -16801,7 +16754,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_2 = __pyx_t_10(__pyx_t_9); if (unlikely(!__pyx_t_2)) goto __pyx_L17_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_2);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < (0)) __PYX_ERR(0, 1208, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_9), 2) < (0)) __PYX_ERR(0, 1204, __pyx_L1_error)
       __pyx_t_10 = NULL;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       goto __pyx_L18_unpacking_done;
@@ -16809,7 +16762,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __pyx_t_10 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 1208, __pyx_L1_error)
+      __PYX_ERR(0, 1204, __pyx_L1_error)
       __pyx_L18_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_indx, __pyx_t_3);
@@ -16817,7 +16770,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __Pyx_XDECREF_SET(__pyx_v_curset, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1209
+    /* "pyreadstat/_readstat_parser.pyx":1205
  * 
  *     for indx, curset in data.missing_user_values.items():
  *         cur_col = data.col_names[indx]             # <<<<<<<<<<<<<<
@@ -16826,33 +16779,33 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
     if (unlikely(__pyx_v_data->col_names == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 1209, __pyx_L1_error)
+      __PYX_ERR(0, 1205, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_data->col_names, __pyx_v_indx); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1209, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_v_data->col_names, __pyx_v_indx); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1205, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_XDECREF_SET(__pyx_v_cur_col, __pyx_t_8);
     __pyx_t_8 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1210
+    /* "pyreadstat/_readstat_parser.pyx":1206
  *     for indx, curset in data.missing_user_values.items():
  *         cur_col = data.col_names[indx]
  *         metadata.missing_user_values[cur_col] = sorted(list(curset))             # <<<<<<<<<<<<<<
  * 
  *     metadata.notes = data.notes
 */
-    __pyx_t_8 = PySequence_List(__pyx_v_curset); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1210, __pyx_L1_error)
+    __pyx_t_8 = PySequence_List(__pyx_v_curset); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_2 = PySequence_List(__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1210, __pyx_L1_error)
+    __pyx_t_2 = PySequence_List(__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely((PyList_Sort(__pyx_t_2) < 0))) __PYX_ERR(0, 1210, __pyx_L1_error)
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_missing_user_values); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1210, __pyx_L1_error)
+    if (unlikely((PyList_Sort(__pyx_t_2) < 0))) __PYX_ERR(0, 1206, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_missing_user_values); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1206, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    if (unlikely((PyObject_SetItem(__pyx_t_8, __pyx_v_cur_col, __pyx_t_2) < 0))) __PYX_ERR(0, 1210, __pyx_L1_error)
+    if (unlikely((PyObject_SetItem(__pyx_t_8, __pyx_v_cur_col, __pyx_t_2) < 0))) __PYX_ERR(0, 1206, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1208
+    /* "pyreadstat/_readstat_parser.pyx":1204
  *             raise PyreadstatError("Unkown data type")
  * 
  *     for indx, curset in data.missing_user_values.items():             # <<<<<<<<<<<<<<
@@ -16862,7 +16815,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1212
+  /* "pyreadstat/_readstat_parser.pyx":1208
  *         metadata.missing_user_values[cur_col] = sorted(list(curset))
  * 
  *     metadata.notes = data.notes             # <<<<<<<<<<<<<<
@@ -16871,10 +16824,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->notes;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_notes, __pyx_t_4) < (0)) __PYX_ERR(0, 1212, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_notes, __pyx_t_4) < (0)) __PYX_ERR(0, 1208, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1213
+  /* "pyreadstat/_readstat_parser.pyx":1209
  * 
  *     metadata.notes = data.notes
  *     metadata.column_names = data.col_names             # <<<<<<<<<<<<<<
@@ -16883,10 +16836,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->col_names;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_column_names, __pyx_t_4) < (0)) __PYX_ERR(0, 1213, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_column_names, __pyx_t_4) < (0)) __PYX_ERR(0, 1209, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1214
+  /* "pyreadstat/_readstat_parser.pyx":1210
  *     metadata.notes = data.notes
  *     metadata.column_names = data.col_names
  *     metadata.column_labels = data.col_labels             # <<<<<<<<<<<<<<
@@ -16895,10 +16848,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->col_labels;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_column_labels, __pyx_t_4) < (0)) __PYX_ERR(0, 1214, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_column_labels, __pyx_t_4) < (0)) __PYX_ERR(0, 1210, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1215
+  /* "pyreadstat/_readstat_parser.pyx":1211
  *     metadata.column_names = data.col_names
  *     metadata.column_labels = data.col_labels
  *     metadata.column_names_to_labels = {k:v for k,v in zip(data.col_names, data.col_labels)}             # <<<<<<<<<<<<<<
@@ -16906,7 +16859,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
  *     metadata.file_label = data.file_label
 */
   { /* enter inner scope */
-    __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1215, __pyx_L22_error)
+    __pyx_t_4 = PyDict_New(); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1211, __pyx_L22_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_8 = NULL;
     __pyx_t_5 = 1;
@@ -16914,7 +16867,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       PyObject *__pyx_callargs[3] = {__pyx_t_8, __pyx_v_data->col_names, __pyx_v_data->col_labels};
       __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_zip, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1215, __pyx_L22_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1211, __pyx_L22_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
@@ -16922,9 +16875,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
       __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
     } else {
-      __pyx_t_6 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1215, __pyx_L22_error)
+      __pyx_t_6 = -1; __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1211, __pyx_L22_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1215, __pyx_L22_error)
+      __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1211, __pyx_L22_error)
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     for (;;) {
@@ -16933,7 +16886,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           {
             Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_8);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1215, __pyx_L22_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1211, __pyx_L22_error)
             #endif
             if (__pyx_t_6 >= __pyx_temp) break;
           }
@@ -16943,7 +16896,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           {
             Py_ssize_t __pyx_temp = __Pyx_PyTuple_GET_SIZE(__pyx_t_8);
             #if !CYTHON_ASSUME_SAFE_SIZE
-            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1215, __pyx_L22_error)
+            if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1211, __pyx_L22_error)
             #endif
             if (__pyx_t_6 >= __pyx_temp) break;
           }
@@ -16954,13 +16907,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           #endif
           ++__pyx_t_6;
         }
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1215, __pyx_L22_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1211, __pyx_L22_error)
       } else {
         __pyx_t_2 = __pyx_t_7(__pyx_t_8);
         if (unlikely(!__pyx_t_2)) {
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
-            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1215, __pyx_L22_error)
+            if (unlikely(!__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) __PYX_ERR(0, 1211, __pyx_L22_error)
             PyErr_Clear();
           }
           break;
@@ -16973,7 +16926,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         if (unlikely(size != 2)) {
           if (size > 2) __Pyx_RaiseTooManyValuesError(2);
           else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-          __PYX_ERR(0, 1215, __pyx_L22_error)
+          __PYX_ERR(0, 1211, __pyx_L22_error)
         }
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
         if (likely(PyTuple_CheckExact(sequence))) {
@@ -16983,22 +16936,22 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
           __Pyx_INCREF(__pyx_t_9);
         } else {
           __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1215, __pyx_L22_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1211, __pyx_L22_error)
           __Pyx_XGOTREF(__pyx_t_3);
           __pyx_t_9 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1215, __pyx_L22_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1211, __pyx_L22_error)
           __Pyx_XGOTREF(__pyx_t_9);
         }
         #else
-        __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1215, __pyx_L22_error)
+        __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1211, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_9 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1215, __pyx_L22_error)
+        __pyx_t_9 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1211, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_9);
         #endif
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       } else {
         Py_ssize_t index = -1;
-        __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1215, __pyx_L22_error)
+        __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1211, __pyx_L22_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_t_10 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_12);
@@ -17006,7 +16959,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         __Pyx_GOTREF(__pyx_t_3);
         index = 1; __pyx_t_9 = __pyx_t_10(__pyx_t_12); if (unlikely(!__pyx_t_9)) goto __pyx_L25_unpacking_failed;
         __Pyx_GOTREF(__pyx_t_9);
-        if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_12), 2) < (0)) __PYX_ERR(0, 1215, __pyx_L22_error)
+        if (__Pyx_IternextUnpackEndCheck(__pyx_t_10(__pyx_t_12), 2) < (0)) __PYX_ERR(0, 1211, __pyx_L22_error)
         __pyx_t_10 = NULL;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         goto __pyx_L26_unpacking_done;
@@ -17014,14 +16967,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __pyx_t_10 = NULL;
         if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-        __PYX_ERR(0, 1215, __pyx_L22_error)
+        __PYX_ERR(0, 1211, __pyx_L22_error)
         __pyx_L26_unpacking_done:;
       }
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_k, __pyx_t_3);
       __pyx_t_3 = 0;
       __Pyx_XDECREF_SET(__pyx_7genexpr__pyx_v_v, __pyx_t_9);
       __pyx_t_9 = 0;
-      if (unlikely(PyDict_SetItem(__pyx_t_4, (PyObject*)__pyx_7genexpr__pyx_v_k, (PyObject*)__pyx_7genexpr__pyx_v_v))) __PYX_ERR(0, 1215, __pyx_L22_error)
+      if (unlikely(PyDict_SetItem(__pyx_t_4, (PyObject*)__pyx_7genexpr__pyx_v_k, (PyObject*)__pyx_7genexpr__pyx_v_v))) __PYX_ERR(0, 1211, __pyx_L22_error)
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_XDECREF(__pyx_7genexpr__pyx_v_k); __pyx_7genexpr__pyx_v_k = 0;
@@ -17033,10 +16986,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     goto __pyx_L1_error;
     __pyx_L28_exit_scope:;
   } /* exit inner scope */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_column_names_to_labels, __pyx_t_4) < (0)) __PYX_ERR(0, 1215, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_column_names_to_labels, __pyx_t_4) < (0)) __PYX_ERR(0, 1211, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1216
+  /* "pyreadstat/_readstat_parser.pyx":1212
  *     metadata.column_labels = data.col_labels
  *     metadata.column_names_to_labels = {k:v for k,v in zip(data.col_names, data.col_labels)}
  *     metadata.file_encoding = data.file_encoding             # <<<<<<<<<<<<<<
@@ -17045,10 +16998,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->file_encoding;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_file_encoding, __pyx_t_4) < (0)) __PYX_ERR(0, 1216, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_file_encoding, __pyx_t_4) < (0)) __PYX_ERR(0, 1212, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1217
+  /* "pyreadstat/_readstat_parser.pyx":1213
  *     metadata.column_names_to_labels = {k:v for k,v in zip(data.col_names, data.col_labels)}
  *     metadata.file_encoding = data.file_encoding
  *     metadata.file_label = data.file_label             # <<<<<<<<<<<<<<
@@ -17057,64 +17010,64 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->file_label;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_file_label, __pyx_t_4) < (0)) __PYX_ERR(0, 1217, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_file_label, __pyx_t_4) < (0)) __PYX_ERR(0, 1213, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1218
+  /* "pyreadstat/_readstat_parser.pyx":1214
  *     metadata.file_encoding = data.file_encoding
  *     metadata.file_label = data.file_label
  *     metadata.variable_value_labels = variable_value_labels             # <<<<<<<<<<<<<<
  *     metadata.value_labels = labels_raw
  *     metadata.variable_to_label = label_to_var_name
 */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_value_labels, __pyx_v_variable_value_labels) < (0)) __PYX_ERR(0, 1218, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_value_labels, __pyx_v_variable_value_labels) < (0)) __PYX_ERR(0, 1214, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1219
+  /* "pyreadstat/_readstat_parser.pyx":1215
  *     metadata.file_label = data.file_label
  *     metadata.variable_value_labels = variable_value_labels
  *     metadata.value_labels = labels_raw             # <<<<<<<<<<<<<<
  *     metadata.variable_to_label = label_to_var_name
  *     metadata.original_variable_types = original_types
 */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_value_labels, __pyx_v_labels_raw) < (0)) __PYX_ERR(0, 1219, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_value_labels, __pyx_v_labels_raw) < (0)) __PYX_ERR(0, 1215, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1220
+  /* "pyreadstat/_readstat_parser.pyx":1216
  *     metadata.variable_value_labels = variable_value_labels
  *     metadata.value_labels = labels_raw
  *     metadata.variable_to_label = label_to_var_name             # <<<<<<<<<<<<<<
  *     metadata.original_variable_types = original_types
  *     metadata.original_variable_informats = original_informats
 */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_to_label, __pyx_v_label_to_var_name) < (0)) __PYX_ERR(0, 1220, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_to_label, __pyx_v_label_to_var_name) < (0)) __PYX_ERR(0, 1216, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1221
+  /* "pyreadstat/_readstat_parser.pyx":1217
  *     metadata.value_labels = labels_raw
  *     metadata.variable_to_label = label_to_var_name
  *     metadata.original_variable_types = original_types             # <<<<<<<<<<<<<<
  *     metadata.original_variable_informats = original_informats
  *     metadata.readstat_variable_types = readstat_types
 */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_original_variable_types, __pyx_v_original_types) < (0)) __PYX_ERR(0, 1221, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_original_variable_types, __pyx_v_original_types) < (0)) __PYX_ERR(0, 1217, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1222
+  /* "pyreadstat/_readstat_parser.pyx":1218
  *     metadata.variable_to_label = label_to_var_name
  *     metadata.original_variable_types = original_types
  *     metadata.original_variable_informats = original_informats             # <<<<<<<<<<<<<<
  *     metadata.readstat_variable_types = readstat_types
  *     metadata.table_name = data.table_name
 */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_original_variable_informats, __pyx_v_original_informats) < (0)) __PYX_ERR(0, 1222, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_original_variable_informats, __pyx_v_original_informats) < (0)) __PYX_ERR(0, 1218, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1223
+  /* "pyreadstat/_readstat_parser.pyx":1219
  *     metadata.original_variable_types = original_types
  *     metadata.original_variable_informats = original_informats
  *     metadata.readstat_variable_types = readstat_types             # <<<<<<<<<<<<<<
  *     metadata.table_name = data.table_name
  *     metadata.missing_ranges = data.missing_ranges
 */
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_readstat_variable_types, __pyx_v_readstat_types) < (0)) __PYX_ERR(0, 1223, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_readstat_variable_types, __pyx_v_readstat_types) < (0)) __PYX_ERR(0, 1219, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1224
+  /* "pyreadstat/_readstat_parser.pyx":1220
  *     metadata.original_variable_informats = original_informats
  *     metadata.readstat_variable_types = readstat_types
  *     metadata.table_name = data.table_name             # <<<<<<<<<<<<<<
@@ -17123,10 +17076,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->table_name;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_table_name, __pyx_t_4) < (0)) __PYX_ERR(0, 1224, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_table_name, __pyx_t_4) < (0)) __PYX_ERR(0, 1220, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1225
+  /* "pyreadstat/_readstat_parser.pyx":1221
  *     metadata.readstat_variable_types = readstat_types
  *     metadata.table_name = data.table_name
  *     metadata.missing_ranges = data.missing_ranges             # <<<<<<<<<<<<<<
@@ -17135,10 +17088,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->missing_ranges;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_missing_ranges, __pyx_t_4) < (0)) __PYX_ERR(0, 1225, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_missing_ranges, __pyx_t_4) < (0)) __PYX_ERR(0, 1221, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1226
+  /* "pyreadstat/_readstat_parser.pyx":1222
  *     metadata.table_name = data.table_name
  *     metadata.missing_ranges = data.missing_ranges
  *     metadata.variable_storage_width = data.variable_storage_width             # <<<<<<<<<<<<<<
@@ -17147,10 +17100,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->variable_storage_width;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_storage_width, __pyx_t_4) < (0)) __PYX_ERR(0, 1226, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_storage_width, __pyx_t_4) < (0)) __PYX_ERR(0, 1222, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1227
+  /* "pyreadstat/_readstat_parser.pyx":1223
  *     metadata.missing_ranges = data.missing_ranges
  *     metadata.variable_storage_width = data.variable_storage_width
  *     metadata.variable_display_width = data.variable_display_width             # <<<<<<<<<<<<<<
@@ -17159,10 +17112,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->variable_display_width;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_display_width, __pyx_t_4) < (0)) __PYX_ERR(0, 1227, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_display_width, __pyx_t_4) < (0)) __PYX_ERR(0, 1223, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1228
+  /* "pyreadstat/_readstat_parser.pyx":1224
  *     metadata.variable_storage_width = data.variable_storage_width
  *     metadata.variable_display_width = data.variable_display_width
  *     metadata.variable_alignment = data.variable_alignment             # <<<<<<<<<<<<<<
@@ -17171,10 +17124,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->variable_alignment;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_alignment, __pyx_t_4) < (0)) __PYX_ERR(0, 1228, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_alignment, __pyx_t_4) < (0)) __PYX_ERR(0, 1224, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1229
+  /* "pyreadstat/_readstat_parser.pyx":1225
  *     metadata.variable_display_width = data.variable_display_width
  *     metadata.variable_alignment = data.variable_alignment
  *     metadata.variable_measure = data.variable_measure             # <<<<<<<<<<<<<<
@@ -17183,24 +17136,24 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
 */
   __pyx_t_4 = __pyx_v_data->variable_measure;
   __Pyx_INCREF(__pyx_t_4);
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_measure, __pyx_t_4) < (0)) __PYX_ERR(0, 1229, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_variable_measure, __pyx_t_4) < (0)) __PYX_ERR(0, 1225, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1230
+  /* "pyreadstat/_readstat_parser.pyx":1226
  *     metadata.variable_alignment = data.variable_alignment
  *     metadata.variable_measure = data.variable_measure
  *     metadata.creation_time = datetime.datetime.fromtimestamp(data.ctime)             # <<<<<<<<<<<<<<
  *     metadata.modification_time = datetime.datetime.fromtimestamp(data.mtime)
  * 
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1230, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1230, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_8 = __pyx_t_9;
   __Pyx_INCREF(__pyx_t_8);
-  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->ctime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1230, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->ctime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = 0;
   {
@@ -17209,27 +17162,27 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1230, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1226, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_creation_time, __pyx_t_4) < (0)) __PYX_ERR(0, 1230, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_creation_time, __pyx_t_4) < (0)) __PYX_ERR(0, 1226, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1231
+  /* "pyreadstat/_readstat_parser.pyx":1227
  *     metadata.variable_measure = data.variable_measure
  *     metadata.creation_time = datetime.datetime.fromtimestamp(data.ctime)
  *     metadata.modification_time = datetime.datetime.fromtimestamp(data.mtime)             # <<<<<<<<<<<<<<
  * 
  *     return metadata
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1231, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1231, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_datetime); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_9 = __pyx_t_8;
   __Pyx_INCREF(__pyx_t_9);
-  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->mtime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1231, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_v_data->mtime); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1227, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = 0;
   {
@@ -17238,13 +17191,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1231, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1227, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
-  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_modification_time, __pyx_t_4) < (0)) __PYX_ERR(0, 1231, __pyx_L1_error)
+  if (__Pyx_PyObject_SetAttrStr(__pyx_v_metadata, __pyx_mstate_global->__pyx_n_u_modification_time, __pyx_t_4) < (0)) __PYX_ERR(0, 1227, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1233
+  /* "pyreadstat/_readstat_parser.pyx":1229
  *     metadata.modification_time = datetime.datetime.fromtimestamp(data.mtime)
  * 
  *     return metadata             # <<<<<<<<<<<<<<
@@ -17256,7 +17209,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   __pyx_r = __pyx_v_metadata;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1139
+  /* "pyreadstat/_readstat_parser.pyx":1135
  *     return data_frame
  * 
  * cdef object data_container_extract_metadata(data_container data):             # <<<<<<<<<<<<<<
@@ -17297,7 +17250,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":1236
+/* "pyreadstat/_readstat_parser.pyx":1232
  * 
  * 
  * cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,             # <<<<<<<<<<<<<<
@@ -17353,7 +17306,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_RefNannySetupContext("run_conversion", 0);
   __Pyx_INCREF(__pyx_v_output_format);
 
-  /* "pyreadstat/_readstat_parser.pyx":1255
+  /* "pyreadstat/_readstat_parser.pyx":1251
  *     cdef object data_dict
  *     cdef object data_frame
  *     cdef object file_obj = None             # <<<<<<<<<<<<<<
@@ -17363,25 +17316,25 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_INCREF(Py_None);
   __pyx_v_file_obj = Py_None;
 
-  /* "pyreadstat/_readstat_parser.pyx":1258
+  /* "pyreadstat/_readstat_parser.pyx":1254
  * 
  *     # Check if filename_path is a file-like object
  *     if hasattr(filename_path, 'read') and hasattr(filename_path, 'seek'):             # <<<<<<<<<<<<<<
  *         file_obj = filename_path
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used
 */
-  __pyx_t_2 = __Pyx_HasAttr(__pyx_v_filename_path, __pyx_mstate_global->__pyx_n_u_read); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 1258, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_HasAttr(__pyx_v_filename_path, __pyx_mstate_global->__pyx_n_u_read); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 1254, __pyx_L1_error)
   if (__pyx_t_2) {
   } else {
     __pyx_t_1 = __pyx_t_2;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = __Pyx_HasAttr(__pyx_v_filename_path, __pyx_mstate_global->__pyx_n_u_seek); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 1258, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_HasAttr(__pyx_v_filename_path, __pyx_mstate_global->__pyx_n_u_seek); if (unlikely(__pyx_t_2 == ((int)-1))) __PYX_ERR(0, 1254, __pyx_L1_error)
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1259
+    /* "pyreadstat/_readstat_parser.pyx":1255
  *     # Check if filename_path is a file-like object
  *     if hasattr(filename_path, 'read') and hasattr(filename_path, 'seek'):
  *         file_obj = filename_path             # <<<<<<<<<<<<<<
@@ -17391,7 +17344,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_filename_path);
     __Pyx_DECREF_SET(__pyx_v_file_obj, __pyx_v_filename_path);
 
-    /* "pyreadstat/_readstat_parser.pyx":1260
+    /* "pyreadstat/_readstat_parser.pyx":1256
  *     if hasattr(filename_path, 'read') and hasattr(filename_path, 'seek'):
  *         file_obj = filename_path
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used             # <<<<<<<<<<<<<<
@@ -17401,7 +17354,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_mstate_global->__pyx_kp_b_);
     __pyx_v_filename_bytes = __pyx_mstate_global->__pyx_kp_b_;
 
-    /* "pyreadstat/_readstat_parser.pyx":1258
+    /* "pyreadstat/_readstat_parser.pyx":1254
  * 
  *     # Check if filename_path is a file-like object
  *     if hasattr(filename_path, 'read') and hasattr(filename_path, 'seek'):             # <<<<<<<<<<<<<<
@@ -17411,20 +17364,20 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1261
+  /* "pyreadstat/_readstat_parser.pyx":1257
  *         file_obj = filename_path
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used
  *     elif hasattr(os, 'fsencode'):             # <<<<<<<<<<<<<<
  *         try:
  *             filename_bytes = os.fsencode(filename_path)
 */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1261, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1257, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __Pyx_HasAttr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_fsencode); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 1261, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_HasAttr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_fsencode); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 1257, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1262
+    /* "pyreadstat/_readstat_parser.pyx":1258
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used
  *     elif hasattr(os, 'fsencode'):
  *         try:             # <<<<<<<<<<<<<<
@@ -17440,7 +17393,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XGOTREF(__pyx_t_6);
       /*try:*/ {
 
-        /* "pyreadstat/_readstat_parser.pyx":1263
+        /* "pyreadstat/_readstat_parser.pyx":1259
  *     elif hasattr(os, 'fsencode'):
  *         try:
  *             filename_bytes = os.fsencode(filename_path)             # <<<<<<<<<<<<<<
@@ -17448,9 +17401,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
 */
         __pyx_t_7 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1263, __pyx_L6_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1259, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_8);
-        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_fsencode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1263, __pyx_L6_error)
+        __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_fsencode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1259, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __pyx_t_10 = 1;
@@ -17470,14 +17423,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_9, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1263, __pyx_L6_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1259, __pyx_L6_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
-        if (!(likely(PyBytes_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_3))) __PYX_ERR(0, 1263, __pyx_L6_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_3))) __PYX_ERR(0, 1259, __pyx_L6_error)
         __pyx_v_filename_bytes = ((PyObject*)__pyx_t_3);
         __pyx_t_3 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1262
+        /* "pyreadstat/_readstat_parser.pyx":1258
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used
  *     elif hasattr(os, 'fsencode'):
  *         try:             # <<<<<<<<<<<<<<
@@ -17495,7 +17448,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1264
+      /* "pyreadstat/_readstat_parser.pyx":1260
  *         try:
  *             filename_bytes = os.fsencode(filename_path)
  *         except UnicodeError:             # <<<<<<<<<<<<<<
@@ -17505,12 +17458,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_UnicodeError))));
       if (__pyx_t_11) {
         __Pyx_AddTraceback("pyreadstat._readstat_parser.run_conversion", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_9, &__pyx_t_7) < 0) __PYX_ERR(0, 1264, __pyx_L8_except_error)
+        if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_9, &__pyx_t_7) < 0) __PYX_ERR(0, 1260, __pyx_L8_except_error)
         __Pyx_XGOTREF(__pyx_t_3);
         __Pyx_XGOTREF(__pyx_t_9);
         __Pyx_XGOTREF(__pyx_t_7);
 
-        /* "pyreadstat/_readstat_parser.pyx":1265
+        /* "pyreadstat/_readstat_parser.pyx":1261
  *             filename_bytes = os.fsencode(filename_path)
  *         except UnicodeError:
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())             # <<<<<<<<<<<<<<
@@ -17518,15 +17471,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *     else:
 */
         __pyx_t_12 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_warnings); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_warnings); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_13);
-        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_warn); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+        __pyx_t_14 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_mstate_global->__pyx_n_u_warn); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_14);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __pyx_t_15 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_sys); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_16);
-        __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_getfilesystemencoding); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+        __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_getfilesystemencoding); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_17);
         __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
         __pyx_t_10 = 1;
@@ -17546,10 +17499,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           __pyx_t_13 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_17, __pyx_callargs+__pyx_t_10, (1-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
           __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+          if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
           __Pyx_GOTREF(__pyx_t_13);
         }
-        __pyx_t_17 = __Pyx_PyUnicode_FormatSafe(__pyx_mstate_global->__pyx_kp_u_file_path_could_not_be_encoded_w, __pyx_t_13); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+        __pyx_t_17 = __Pyx_PyUnicode_FormatSafe(__pyx_mstate_global->__pyx_kp_u_file_path_could_not_be_encoded_w, __pyx_t_13); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_17);
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
         __pyx_t_10 = 1;
@@ -17570,12 +17523,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1265, __pyx_L8_except_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1261, __pyx_L8_except_error)
           __Pyx_GOTREF(__pyx_t_8);
         }
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1266
+        /* "pyreadstat/_readstat_parser.pyx":1262
  *         except UnicodeError:
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
  *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")             # <<<<<<<<<<<<<<
@@ -17583,9 +17536,9 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *         if type(filename_path) == str:
 */
         __pyx_t_14 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_17, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1266, __pyx_L8_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_17, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 1262, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_17);
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_17, __pyx_mstate_global->__pyx_n_u_fsdecode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1266, __pyx_L8_except_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_17, __pyx_mstate_global->__pyx_n_u_fsdecode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1262, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
         __pyx_t_10 = 1;
@@ -17605,16 +17558,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           __pyx_t_8 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_12, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1266, __pyx_L8_except_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1262, __pyx_L8_except_error)
           __Pyx_GOTREF(__pyx_t_8);
         }
-        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_encode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1266, __pyx_L8_except_error)
+        __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_encode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1262, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_mstate_global->__pyx_tuple[0], NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1266, __pyx_L8_except_error)
+        __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_mstate_global->__pyx_tuple[0], NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1262, __pyx_L8_except_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_8))) __PYX_ERR(0, 1266, __pyx_L8_except_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_t_8))||((__pyx_t_8) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_8))) __PYX_ERR(0, 1262, __pyx_L8_except_error)
         __Pyx_XDECREF_SET(__pyx_v_filename_bytes, ((PyObject*)__pyx_t_8));
         __pyx_t_8 = 0;
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -17624,7 +17577,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       }
       goto __pyx_L8_except_error;
 
-      /* "pyreadstat/_readstat_parser.pyx":1262
+      /* "pyreadstat/_readstat_parser.pyx":1258
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used
  *     elif hasattr(os, 'fsencode'):
  *         try:             # <<<<<<<<<<<<<<
@@ -17645,7 +17598,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_L11_try_end:;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1261
+    /* "pyreadstat/_readstat_parser.pyx":1257
  *         file_obj = filename_path
  *         filename_bytes = b""  # Empty path - will be ignored when file_obj is used
  *     elif hasattr(os, 'fsencode'):             # <<<<<<<<<<<<<<
@@ -17655,7 +17608,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1268
+  /* "pyreadstat/_readstat_parser.pyx":1264
  *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
  *     else:
  *         if type(filename_path) == str:             # <<<<<<<<<<<<<<
@@ -17663,12 +17616,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *         elif type(filename_path) == bytes:
 */
   /*else*/ {
-    __pyx_t_7 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_filename_path)), ((PyObject *)(&PyUnicode_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1268, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1268, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_filename_path)), ((PyObject *)(&PyUnicode_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1264, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1264, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if (__pyx_t_1) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1269
+      /* "pyreadstat/_readstat_parser.pyx":1265
  *     else:
  *         if type(filename_path) == str:
  *             filename_bytes = filename_path.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -17682,14 +17635,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_mstate_global->__pyx_kp_u_utf_8};
         __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1269, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1265, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
-      if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1269, __pyx_L1_error)
+      if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1265, __pyx_L1_error)
       __pyx_v_filename_bytes = ((PyObject*)__pyx_t_7);
       __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1268
+      /* "pyreadstat/_readstat_parser.pyx":1264
  *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")
  *     else:
  *         if type(filename_path) == str:             # <<<<<<<<<<<<<<
@@ -17699,19 +17652,19 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       goto __pyx_L14;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1270
+    /* "pyreadstat/_readstat_parser.pyx":1266
  *         if type(filename_path) == str:
  *             filename_bytes = filename_path.encode('utf-8')
  *         elif type(filename_path) == bytes:             # <<<<<<<<<<<<<<
  *             filename_bytes = filename_path
  *         else:
 */
-    __pyx_t_7 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_filename_path)), ((PyObject *)(&PyBytes_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1270, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1270, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(((PyObject *)Py_TYPE(__pyx_v_filename_path)), ((PyObject *)(&PyBytes_Type)), Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1266, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1266, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if (likely(__pyx_t_1)) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1271
+      /* "pyreadstat/_readstat_parser.pyx":1267
  *             filename_bytes = filename_path.encode('utf-8')
  *         elif type(filename_path) == bytes:
  *             filename_bytes = filename_path             # <<<<<<<<<<<<<<
@@ -17720,11 +17673,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       __pyx_t_7 = __pyx_v_filename_path;
       __Pyx_INCREF(__pyx_t_7);
-      if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1271, __pyx_L1_error)
+      if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1267, __pyx_L1_error)
       __pyx_v_filename_bytes = ((PyObject*)__pyx_t_7);
       __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1270
+      /* "pyreadstat/_readstat_parser.pyx":1266
  *         if type(filename_path) == str:
  *             filename_bytes = filename_path.encode('utf-8')
  *         elif type(filename_path) == bytes:             # <<<<<<<<<<<<<<
@@ -17734,7 +17687,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       goto __pyx_L14;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1273
+    /* "pyreadstat/_readstat_parser.pyx":1269
  *             filename_bytes = filename_path
  *         else:
  *             raise PyreadstatError("path must be either str or bytes")             # <<<<<<<<<<<<<<
@@ -17743,7 +17696,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
     /*else*/ {
       __pyx_t_9 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1273, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1269, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_10 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -17762,16 +17715,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1273, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1269, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_Raise(__pyx_t_7, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 1273, __pyx_L1_error)
+      __PYX_ERR(0, 1269, __pyx_L1_error)
     }
     __pyx_L14:;
 
-    /* "pyreadstat/_readstat_parser.pyx":1274
+    /* "pyreadstat/_readstat_parser.pyx":1270
  *         else:
  *             raise PyreadstatError("path must be either str or bytes")
  *         if type(filename_path) not in (str, bytes, unicode):             # <<<<<<<<<<<<<<
@@ -17780,24 +17733,24 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
     __Pyx_INCREF(((PyObject *)Py_TYPE(__pyx_v_filename_path)));
     __pyx_t_7 = ((PyObject *)Py_TYPE(__pyx_v_filename_path));
-    __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_t_7), ((PyObject *)(&PyUnicode_Type)), Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1274, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1274, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_t_7), ((PyObject *)(&PyUnicode_Type)), Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1270, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1270, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_2) {
     } else {
       __pyx_t_1 = __pyx_t_2;
       goto __pyx_L16_bool_binop_done;
     }
-    __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_t_7), ((PyObject *)(&PyBytes_Type)), Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1274, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1274, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_t_7), ((PyObject *)(&PyBytes_Type)), Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1270, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1270, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_2) {
     } else {
       __pyx_t_1 = __pyx_t_2;
       goto __pyx_L16_bool_binop_done;
     }
-    __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_t_7), ((PyObject *)(&PyUnicode_Type)), Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1274, __pyx_L1_error)
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1274, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(((PyObject *)__pyx_t_7), ((PyObject *)(&PyUnicode_Type)), Py_NE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1270, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1270, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_1 = __pyx_t_2;
     __pyx_L16_bool_binop_done:;
@@ -17805,7 +17758,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __pyx_t_2 = __pyx_t_1;
     if (unlikely(__pyx_t_2)) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1275
+      /* "pyreadstat/_readstat_parser.pyx":1271
  *             raise PyreadstatError("path must be either str or bytes")
  *         if type(filename_path) not in (str, bytes, unicode):
  *             raise PyreadstatError("path must be str, bytes or unicode")             # <<<<<<<<<<<<<<
@@ -17813,7 +17766,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  * 
 */
       __pyx_t_3 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1275, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1271, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __pyx_t_10 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -17832,14 +17785,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_9, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1275, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1271, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_Raise(__pyx_t_7, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 1275, __pyx_L1_error)
+      __PYX_ERR(0, 1271, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1274
+      /* "pyreadstat/_readstat_parser.pyx":1270
  *         else:
  *             raise PyreadstatError("path must be either str or bytes")
  *         if type(filename_path) not in (str, bytes, unicode):             # <<<<<<<<<<<<<<
@@ -17848,7 +17801,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1276
+    /* "pyreadstat/_readstat_parser.pyx":1272
  *         if type(filename_path) not in (str, bytes, unicode):
  *             raise PyreadstatError("path must be str, bytes or unicode")
  *         filename_bytes = filename_path.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -17862,16 +17815,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_mstate_global->__pyx_kp_u_utf_8};
       __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_encode, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1276, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1272, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1276, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1272, __pyx_L1_error)
     __Pyx_DECREF_SET(__pyx_v_filename_bytes, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
   }
   __pyx_L3:;
 
-  /* "pyreadstat/_readstat_parser.pyx":1279
+  /* "pyreadstat/_readstat_parser.pyx":1275
  * 
  *     # Only check file existence for path-based reads
  *     if file_obj is None:             # <<<<<<<<<<<<<<
@@ -17881,16 +17834,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __pyx_t_2 = (__pyx_v_file_obj == Py_None);
   if (__pyx_t_2) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1280
+    /* "pyreadstat/_readstat_parser.pyx":1276
  *     # Only check file existence for path-based reads
  *     if file_obj is None:
  *         filename_bytes = os.path.expanduser(filename_bytes)             # <<<<<<<<<<<<<<
  *         if not os.path.isfile(filename_bytes):
  *             raise PyreadstatError("File {0} does not exist!".format(filename_path))
 */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1280, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1280, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_path); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_9 = __pyx_t_8;
@@ -17901,23 +17854,23 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_expanduser, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1280, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1276, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
-    if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1280, __pyx_L1_error)
+    if (!(likely(PyBytes_CheckExact(__pyx_t_7))||((__pyx_t_7) == Py_None) || __Pyx_RaiseUnexpectedTypeError("bytes", __pyx_t_7))) __PYX_ERR(0, 1276, __pyx_L1_error)
     __Pyx_DECREF_SET(__pyx_v_filename_bytes, ((PyObject*)__pyx_t_7));
     __pyx_t_7 = 0;
 
-    /* "pyreadstat/_readstat_parser.pyx":1281
+    /* "pyreadstat/_readstat_parser.pyx":1277
  *     if file_obj is None:
  *         filename_bytes = os.path.expanduser(filename_bytes)
  *         if not os.path.isfile(filename_bytes):             # <<<<<<<<<<<<<<
  *             raise PyreadstatError("File {0} does not exist!".format(filename_path))
  * 
 */
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1281, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_os); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1281, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_path); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_t_8 = __pyx_t_3;
@@ -17928,15 +17881,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_t_7 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_isfile, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1281, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1277, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1281, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1277, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_1 = (!__pyx_t_2);
     if (unlikely(__pyx_t_1)) {
 
-      /* "pyreadstat/_readstat_parser.pyx":1282
+      /* "pyreadstat/_readstat_parser.pyx":1278
  *         filename_bytes = os.path.expanduser(filename_bytes)
  *         if not os.path.isfile(filename_bytes):
  *             raise PyreadstatError("File {0} does not exist!".format(filename_path))             # <<<<<<<<<<<<<<
@@ -17944,7 +17897,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *     if output_format is None:
 */
       __pyx_t_3 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1282, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1278, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_12 = __pyx_mstate_global->__pyx_kp_u_File_0_does_not_exist;
       __Pyx_INCREF(__pyx_t_12);
@@ -17953,7 +17906,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_filename_path};
         __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_format, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1282, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1278, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
       __pyx_t_10 = 1;
@@ -17974,14 +17927,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1282, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1278, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_Raise(__pyx_t_7, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 1282, __pyx_L1_error)
+      __PYX_ERR(0, 1278, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1281
+      /* "pyreadstat/_readstat_parser.pyx":1277
  *     if file_obj is None:
  *         filename_bytes = os.path.expanduser(filename_bytes)
  *         if not os.path.isfile(filename_bytes):             # <<<<<<<<<<<<<<
@@ -17990,7 +17943,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1279
+    /* "pyreadstat/_readstat_parser.pyx":1275
  * 
  *     # Only check file existence for path-based reads
  *     if file_obj is None:             # <<<<<<<<<<<<<<
@@ -17999,7 +17952,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1284
+  /* "pyreadstat/_readstat_parser.pyx":1280
  *             raise PyreadstatError("File {0} does not exist!".format(filename_path))
  * 
  *     if output_format is None:             # <<<<<<<<<<<<<<
@@ -18009,7 +17962,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __pyx_t_1 = (__pyx_v_output_format == ((PyObject*)Py_None));
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1285
+    /* "pyreadstat/_readstat_parser.pyx":1281
  * 
  *     if output_format is None:
  *         output_format = 'pandas'             # <<<<<<<<<<<<<<
@@ -18019,7 +17972,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_mstate_global->__pyx_n_u_pandas);
     __Pyx_DECREF_SET(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas);
 
-    /* "pyreadstat/_readstat_parser.pyx":1284
+    /* "pyreadstat/_readstat_parser.pyx":1280
  *             raise PyreadstatError("File {0} does not exist!".format(filename_path))
  * 
  *     if output_format is None:             # <<<<<<<<<<<<<<
@@ -18028,32 +17981,32 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1286
+  /* "pyreadstat/_readstat_parser.pyx":1282
  *     if output_format is None:
  *         output_format = 'pandas'
  *     allowed_formats = {'pandas', 'dict', 'polars'}             # <<<<<<<<<<<<<<
  *     if output_format not in allowed_formats:
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
 */
-  __pyx_t_7 = PySet_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1286, __pyx_L1_error)
+  __pyx_t_7 = PySet_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (PySet_Add(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pandas) < (0)) __PYX_ERR(0, 1286, __pyx_L1_error)
-  if (PySet_Add(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_dict) < (0)) __PYX_ERR(0, 1286, __pyx_L1_error)
-  if (PySet_Add(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_polars) < (0)) __PYX_ERR(0, 1286, __pyx_L1_error)
+  if (PySet_Add(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_pandas) < (0)) __PYX_ERR(0, 1282, __pyx_L1_error)
+  if (PySet_Add(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_dict) < (0)) __PYX_ERR(0, 1282, __pyx_L1_error)
+  if (PySet_Add(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_polars) < (0)) __PYX_ERR(0, 1282, __pyx_L1_error)
   __pyx_v_allowed_formats = ((PyObject*)__pyx_t_7);
   __pyx_t_7 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1287
+  /* "pyreadstat/_readstat_parser.pyx":1283
  *         output_format = 'pandas'
  *     allowed_formats = {'pandas', 'dict', 'polars'}
  *     if output_format not in allowed_formats:             # <<<<<<<<<<<<<<
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
  *     if output_format == "pandas":
 */
-  __pyx_t_1 = (__Pyx_PySet_ContainsTF(__pyx_v_output_format, __pyx_v_allowed_formats, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1287, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PySet_ContainsTF(__pyx_v_output_format, __pyx_v_allowed_formats, Py_NE)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1283, __pyx_L1_error)
   if (unlikely(__pyx_t_1)) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1288
+    /* "pyreadstat/_readstat_parser.pyx":1284
  *     allowed_formats = {'pandas', 'dict', 'polars'}
  *     if output_format not in allowed_formats:
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))             # <<<<<<<<<<<<<<
@@ -18061,21 +18014,21 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *         try:
 */
     __pyx_t_8 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1288, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1284, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_12 = __pyx_mstate_global->__pyx_kp_u_output_format_must_be_one_of_all;
     __Pyx_INCREF(__pyx_t_12);
     __pyx_t_10 = 0;
     {
       PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_12, NULL};
-      __pyx_t_14 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1288, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_14);
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_allowed_formats, __pyx_v_allowed_formats, __pyx_t_14, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 1288, __pyx_L1_error)
-      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_output_format, __pyx_v_output_format, __pyx_t_14, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 1288, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_allowed_formats, __pyx_v_allowed_formats, __pyx_t_14, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 1284, __pyx_L1_error)
+      if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_output_format, __pyx_v_output_format, __pyx_t_14, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 1284, __pyx_L1_error)
       __pyx_t_3 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_format, __pyx_callargs+__pyx_t_10, (1-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_14);
       __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1288, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __pyx_t_10 = 1;
@@ -18096,14 +18049,14 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1288, __pyx_L1_error)
+      if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
     }
     __Pyx_Raise(__pyx_t_7, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __PYX_ERR(0, 1288, __pyx_L1_error)
+    __PYX_ERR(0, 1284, __pyx_L1_error)
 
-    /* "pyreadstat/_readstat_parser.pyx":1287
+    /* "pyreadstat/_readstat_parser.pyx":1283
  *         output_format = 'pandas'
  *     allowed_formats = {'pandas', 'dict', 'polars'}
  *     if output_format not in allowed_formats:             # <<<<<<<<<<<<<<
@@ -18112,17 +18065,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1289
+  /* "pyreadstat/_readstat_parser.pyx":1285
  *     if output_format not in allowed_formats:
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
  *     if output_format == "pandas":             # <<<<<<<<<<<<<<
  *         try:
  *             import pandas
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1289, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_pandas, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1285, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1290
+    /* "pyreadstat/_readstat_parser.pyx":1286
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
  *     if output_format == "pandas":
  *         try:             # <<<<<<<<<<<<<<
@@ -18138,20 +18091,20 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XGOTREF(__pyx_t_4);
       /*try:*/ {
 
-        /* "pyreadstat/_readstat_parser.pyx":1291
+        /* "pyreadstat/_readstat_parser.pyx":1287
  *     if output_format == "pandas":
  *         try:
  *             import pandas             # <<<<<<<<<<<<<<
  *         except:
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
 */
-        __pyx_t_18 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_pandas, 0, 0, __pyx_mstate_global->__pyx_kp_u_pyreadstat_pandas, -1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1291, __pyx_L24_error)
+        __pyx_t_18 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_pandas, 0, 0, __pyx_mstate_global->__pyx_kp_u_pyreadstat_pandas, -1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1287, __pyx_L24_error)
         __pyx_t_7 = __pyx_t_18;
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_v_pandas = __pyx_t_7;
         __pyx_t_7 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1290
+        /* "pyreadstat/_readstat_parser.pyx":1286
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
  *     if output_format == "pandas":
  *         try:             # <<<<<<<<<<<<<<
@@ -18175,7 +18128,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1292
+      /* "pyreadstat/_readstat_parser.pyx":1288
  *         try:
  *             import pandas
  *         except:             # <<<<<<<<<<<<<<
@@ -18184,12 +18137,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       /*except:*/ {
         __Pyx_AddTraceback("pyreadstat._readstat_parser.run_conversion", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_9, &__pyx_t_3) < 0) __PYX_ERR(0, 1292, __pyx_L26_except_error)
+        if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_9, &__pyx_t_3) < 0) __PYX_ERR(0, 1288, __pyx_L26_except_error)
         __Pyx_XGOTREF(__pyx_t_7);
         __Pyx_XGOTREF(__pyx_t_9);
         __Pyx_XGOTREF(__pyx_t_3);
 
-        /* "pyreadstat/_readstat_parser.pyx":1293
+        /* "pyreadstat/_readstat_parser.pyx":1289
  *             import pandas
  *         except:
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")             # <<<<<<<<<<<<<<
@@ -18197,7 +18150,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *         try:
 */
         __pyx_t_14 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1293, __pyx_L26_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 1289, __pyx_L26_except_error)
         __Pyx_GOTREF(__pyx_t_12);
         __pyx_t_10 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -18216,15 +18169,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           __pyx_t_8 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_12, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1293, __pyx_L26_except_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1289, __pyx_L26_except_error)
           __Pyx_GOTREF(__pyx_t_8);
         }
         __Pyx_Raise(__pyx_t_8, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __PYX_ERR(0, 1293, __pyx_L26_except_error)
+        __PYX_ERR(0, 1289, __pyx_L26_except_error)
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1290
+      /* "pyreadstat/_readstat_parser.pyx":1286
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
  *     if output_format == "pandas":
  *         try:             # <<<<<<<<<<<<<<
@@ -18240,7 +18193,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_L29_try_end:;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1289
+    /* "pyreadstat/_readstat_parser.pyx":1285
  *     if output_format not in allowed_formats:
  *         raise PyreadstatError("output format must be one of {allowed_formats}, '{output_format}' was given".format(allowed_formats=allowed_formats, output_format=output_format))
  *     if output_format == "pandas":             # <<<<<<<<<<<<<<
@@ -18249,17 +18202,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1294
+  /* "pyreadstat/_readstat_parser.pyx":1290
  *         except:
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
  *     if output_format == "polars":             # <<<<<<<<<<<<<<
  *         try:
  *             import polars
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_polars, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1294, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_polars, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1290, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1295
+    /* "pyreadstat/_readstat_parser.pyx":1291
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
  *     if output_format == "polars":
  *         try:             # <<<<<<<<<<<<<<
@@ -18275,20 +18228,20 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XGOTREF(__pyx_t_6);
       /*try:*/ {
 
-        /* "pyreadstat/_readstat_parser.pyx":1296
+        /* "pyreadstat/_readstat_parser.pyx":1292
  *     if output_format == "polars":
  *         try:
  *             import polars             # <<<<<<<<<<<<<<
  *         except:
  *             raise PyreadstatError("You requested polars as output_format but cannot import polars")
 */
-        __pyx_t_18 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_polars, 0, 0, __pyx_mstate_global->__pyx_kp_u_pyreadstat_polars, -1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1296, __pyx_L33_error)
+        __pyx_t_18 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_polars, 0, 0, __pyx_mstate_global->__pyx_kp_u_pyreadstat_polars, -1); if (unlikely(!__pyx_t_18)) __PYX_ERR(0, 1292, __pyx_L33_error)
         __pyx_t_3 = __pyx_t_18;
         __Pyx_GOTREF(__pyx_t_3);
         __pyx_v_polars = __pyx_t_3;
         __pyx_t_3 = 0;
 
-        /* "pyreadstat/_readstat_parser.pyx":1295
+        /* "pyreadstat/_readstat_parser.pyx":1291
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
  *     if output_format == "polars":
  *         try:             # <<<<<<<<<<<<<<
@@ -18312,7 +18265,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1297
+      /* "pyreadstat/_readstat_parser.pyx":1293
  *         try:
  *             import polars
  *         except:             # <<<<<<<<<<<<<<
@@ -18321,12 +18274,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       /*except:*/ {
         __Pyx_AddTraceback("pyreadstat._readstat_parser.run_conversion", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_9, &__pyx_t_7) < 0) __PYX_ERR(0, 1297, __pyx_L35_except_error)
+        if (__Pyx_GetException(&__pyx_t_3, &__pyx_t_9, &__pyx_t_7) < 0) __PYX_ERR(0, 1293, __pyx_L35_except_error)
         __Pyx_XGOTREF(__pyx_t_3);
         __Pyx_XGOTREF(__pyx_t_9);
         __Pyx_XGOTREF(__pyx_t_7);
 
-        /* "pyreadstat/_readstat_parser.pyx":1298
+        /* "pyreadstat/_readstat_parser.pyx":1294
  *             import polars
  *         except:
  *             raise PyreadstatError("You requested polars as output_format but cannot import polars")             # <<<<<<<<<<<<<<
@@ -18334,7 +18287,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  * 
 */
         __pyx_t_12 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1298, __pyx_L35_except_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_14, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1294, __pyx_L35_except_error)
         __Pyx_GOTREF(__pyx_t_14);
         __pyx_t_10 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -18353,15 +18306,15 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           __pyx_t_8 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_14, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1298, __pyx_L35_except_error)
+          if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1294, __pyx_L35_except_error)
           __Pyx_GOTREF(__pyx_t_8);
         }
         __Pyx_Raise(__pyx_t_8, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __PYX_ERR(0, 1298, __pyx_L35_except_error)
+        __PYX_ERR(0, 1294, __pyx_L35_except_error)
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1295
+      /* "pyreadstat/_readstat_parser.pyx":1291
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
  *     if output_format == "polars":
  *         try:             # <<<<<<<<<<<<<<
@@ -18377,7 +18330,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_L38_try_end:;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1294
+    /* "pyreadstat/_readstat_parser.pyx":1290
  *         except:
  *             raise PyreadstatError("You requested pandas as output_format but cannot import pandas")
  *     if output_format == "polars":             # <<<<<<<<<<<<<<
@@ -18386,7 +18339,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1301
+  /* "pyreadstat/_readstat_parser.pyx":1297
  * 
  * 
  *     if extra_date_formats is not None:             # <<<<<<<<<<<<<<
@@ -18396,7 +18349,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __pyx_t_1 = (__pyx_v_extra_date_formats != ((PyObject*)Py_None));
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1302
+    /* "pyreadstat/_readstat_parser.pyx":1298
  * 
  *     if extra_date_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -18406,7 +18359,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     switch (__pyx_v_file_format) {
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS:
 
-      /* "pyreadstat/_readstat_parser.pyx":1303
+      /* "pyreadstat/_readstat_parser.pyx":1299
  *     if extra_date_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:
  *             sas_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])             # <<<<<<<<<<<<<<
@@ -18415,13 +18368,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_sas_date_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1303, __pyx_L1_error)
+        __PYX_ERR(0, 1299, __pyx_L1_error)
       }
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1303, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1299, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_extra_date_formats == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 1303, __pyx_L1_error)
+        __PYX_ERR(0, 1299, __pyx_L1_error)
       }
       __pyx_t_9 = __pyx_v_extra_date_formats; __Pyx_INCREF(__pyx_t_9);
       __pyx_t_19 = 0;
@@ -18429,13 +18382,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_9);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1303, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1299, __pyx_L1_error)
           #endif
           if (__pyx_t_19 >= __pyx_temp) break;
         }
         __pyx_t_3 = __Pyx_PyList_GetItemRefFast(__pyx_t_9, __pyx_t_19, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_19;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1303, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1299, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_XDECREF_SET(__pyx_v_edf, __pyx_t_3);
         __pyx_t_3 = 0;
@@ -18446,10 +18399,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_v_edf};
           __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1303, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1299, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1303, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1299, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_1) {
           __pyx_t_12 = __pyx_v_10pyreadstat_16_readstat_parser_format_regex;
@@ -18459,7 +18412,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_edf};
             __pyx_t_14 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1303, __pyx_L1_error)
+            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1299, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
           }
           __pyx_t_8 = __pyx_t_14;
@@ -18470,18 +18423,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_group, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1303, __pyx_L1_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1299, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1303, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1299, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_sas_date_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1303, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_sas_date_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1299, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1302
+      /* "pyreadstat/_readstat_parser.pyx":1298
  * 
  *     if extra_date_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -18491,7 +18444,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SPSS:
 
-      /* "pyreadstat/_readstat_parser.pyx":1305
+      /* "pyreadstat/_readstat_parser.pyx":1301
  *             sas_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])
  *         elif file_format == FILE_FORMAT_SPSS:
  *             spss_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])             # <<<<<<<<<<<<<<
@@ -18500,13 +18453,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1305, __pyx_L1_error)
+        __PYX_ERR(0, 1301, __pyx_L1_error)
       }
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1305, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1301, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_extra_date_formats == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 1305, __pyx_L1_error)
+        __PYX_ERR(0, 1301, __pyx_L1_error)
       }
       __pyx_t_9 = __pyx_v_extra_date_formats; __Pyx_INCREF(__pyx_t_9);
       __pyx_t_19 = 0;
@@ -18514,13 +18467,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_9);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1305, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1301, __pyx_L1_error)
           #endif
           if (__pyx_t_19 >= __pyx_temp) break;
         }
         __pyx_t_3 = __Pyx_PyList_GetItemRefFast(__pyx_t_9, __pyx_t_19, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_19;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1305, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1301, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_XDECREF_SET(__pyx_v_edf, __pyx_t_3);
         __pyx_t_3 = 0;
@@ -18531,10 +18484,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           PyObject *__pyx_callargs[2] = {__pyx_t_14, __pyx_v_edf};
           __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1305, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1301, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1305, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1301, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_1) {
           __pyx_t_12 = __pyx_v_10pyreadstat_16_readstat_parser_format_regex;
@@ -18544,7 +18497,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_edf};
             __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1305, __pyx_L1_error)
+            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1301, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
           }
           __pyx_t_14 = __pyx_t_8;
@@ -18555,18 +18508,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_group, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1305, __pyx_L1_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1301, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1305, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1301, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1305, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1301, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1304
+      /* "pyreadstat/_readstat_parser.pyx":1300
  *         if file_format == FILE_FORMAT_SAS:
  *             sas_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])
  *         elif file_format == FILE_FORMAT_SPSS:             # <<<<<<<<<<<<<<
@@ -18576,7 +18529,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_STATA:
 
-      /* "pyreadstat/_readstat_parser.pyx":1307
+      /* "pyreadstat/_readstat_parser.pyx":1303
  *             spss_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])
  *         elif file_format == FILE_FORMAT_STATA:
  *             stata_date_formats.extend(extra_date_formats)             # <<<<<<<<<<<<<<
@@ -18585,11 +18538,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_stata_date_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1307, __pyx_L1_error)
+        __PYX_ERR(0, 1303, __pyx_L1_error)
       }
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_stata_date_formats, __pyx_v_extra_date_formats); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1307, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_stata_date_formats, __pyx_v_extra_date_formats); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1303, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1306
+      /* "pyreadstat/_readstat_parser.pyx":1302
  *         elif file_format == FILE_FORMAT_SPSS:
  *             spss_date_formats.extend([format_regex.match(edf).group(1) for edf in extra_date_formats if format_regex.match(edf)])
  *         elif file_format == FILE_FORMAT_STATA:             # <<<<<<<<<<<<<<
@@ -18599,7 +18552,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       default:
 
-      /* "pyreadstat/_readstat_parser.pyx":1309
+      /* "pyreadstat/_readstat_parser.pyx":1305
  *             stata_date_formats.extend(extra_date_formats)
  *         else:
  *             raise PyreadstatError("Unknown file format")             # <<<<<<<<<<<<<<
@@ -18607,7 +18560,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *         if file_format == FILE_FORMAT_SAS:
 */
       __pyx_t_9 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1309, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1305, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_10 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -18626,16 +18579,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1309, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1305, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_Raise(__pyx_t_7, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 1309, __pyx_L1_error)
+      __PYX_ERR(0, 1305, __pyx_L1_error)
       break;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1301
+    /* "pyreadstat/_readstat_parser.pyx":1297
  * 
  * 
  *     if extra_date_formats is not None:             # <<<<<<<<<<<<<<
@@ -18644,7 +18597,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1310
+  /* "pyreadstat/_readstat_parser.pyx":1306
  *         else:
  *             raise PyreadstatError("Unknown file format")
  *     if extra_datetime_formats is not None:             # <<<<<<<<<<<<<<
@@ -18654,7 +18607,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __pyx_t_1 = (__pyx_v_extra_datetime_formats != ((PyObject*)Py_None));
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1311
+    /* "pyreadstat/_readstat_parser.pyx":1307
  *             raise PyreadstatError("Unknown file format")
  *     if extra_datetime_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -18664,7 +18617,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     switch (__pyx_v_file_format) {
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS:
 
-      /* "pyreadstat/_readstat_parser.pyx":1312
+      /* "pyreadstat/_readstat_parser.pyx":1308
  *     if extra_datetime_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:
  *             sas_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])             # <<<<<<<<<<<<<<
@@ -18673,13 +18626,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1312, __pyx_L1_error)
+        __PYX_ERR(0, 1308, __pyx_L1_error)
       }
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1312, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1308, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_extra_datetime_formats == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 1312, __pyx_L1_error)
+        __PYX_ERR(0, 1308, __pyx_L1_error)
       }
       __pyx_t_3 = __pyx_v_extra_datetime_formats; __Pyx_INCREF(__pyx_t_3);
       __pyx_t_19 = 0;
@@ -18687,13 +18640,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_3);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1312, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1308, __pyx_L1_error)
           #endif
           if (__pyx_t_19 >= __pyx_temp) break;
         }
         __pyx_t_9 = __Pyx_PyList_GetItemRefFast(__pyx_t_3, __pyx_t_19, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_19;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1312, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1308, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_XDECREF_SET(__pyx_v_edtf, __pyx_t_9);
         __pyx_t_9 = 0;
@@ -18704,10 +18657,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_v_edtf};
           __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1312, __pyx_L1_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1308, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
         }
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1312, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1308, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         if (__pyx_t_1) {
           __pyx_t_12 = __pyx_v_10pyreadstat_16_readstat_parser_format_regex;
@@ -18717,7 +18670,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_edtf};
             __pyx_t_14 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1312, __pyx_L1_error)
+            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1308, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
           }
           __pyx_t_8 = __pyx_t_14;
@@ -18728,18 +18681,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_group, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-            if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1312, __pyx_L1_error)
+            if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1308, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_9))) __PYX_ERR(0, 1312, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_9))) __PYX_ERR(0, 1308, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1312, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1308, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1311
+      /* "pyreadstat/_readstat_parser.pyx":1307
  *             raise PyreadstatError("Unknown file format")
  *     if extra_datetime_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -18749,7 +18702,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SPSS:
 
-      /* "pyreadstat/_readstat_parser.pyx":1314
+      /* "pyreadstat/_readstat_parser.pyx":1310
  *             sas_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])
  *         elif file_format == FILE_FORMAT_SPSS:
  *             spss_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])             # <<<<<<<<<<<<<<
@@ -18758,13 +18711,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_spss_datetime_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1314, __pyx_L1_error)
+        __PYX_ERR(0, 1310, __pyx_L1_error)
       }
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1314, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1310, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_extra_datetime_formats == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 1314, __pyx_L1_error)
+        __PYX_ERR(0, 1310, __pyx_L1_error)
       }
       __pyx_t_3 = __pyx_v_extra_datetime_formats; __Pyx_INCREF(__pyx_t_3);
       __pyx_t_19 = 0;
@@ -18772,13 +18725,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_3);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1314, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1310, __pyx_L1_error)
           #endif
           if (__pyx_t_19 >= __pyx_temp) break;
         }
         __pyx_t_9 = __Pyx_PyList_GetItemRefFast(__pyx_t_3, __pyx_t_19, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_19;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1314, __pyx_L1_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1310, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_XDECREF_SET(__pyx_v_edtf, __pyx_t_9);
         __pyx_t_9 = 0;
@@ -18789,10 +18742,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           PyObject *__pyx_callargs[2] = {__pyx_t_14, __pyx_v_edtf};
           __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1314, __pyx_L1_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1310, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
         }
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1314, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_9); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1310, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         if (__pyx_t_1) {
           __pyx_t_12 = __pyx_v_10pyreadstat_16_readstat_parser_format_regex;
@@ -18802,7 +18755,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_edtf};
             __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1314, __pyx_L1_error)
+            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1310, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
           }
           __pyx_t_14 = __pyx_t_8;
@@ -18813,18 +18766,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_group, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1314, __pyx_L1_error)
+            if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1310, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_9);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_9))) __PYX_ERR(0, 1314, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_9))) __PYX_ERR(0, 1310, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_spss_datetime_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1314, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_spss_datetime_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1310, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1313
+      /* "pyreadstat/_readstat_parser.pyx":1309
  *         if file_format == FILE_FORMAT_SAS:
  *             sas_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])
  *         elif file_format == FILE_FORMAT_SPSS:             # <<<<<<<<<<<<<<
@@ -18834,7 +18787,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_STATA:
 
-      /* "pyreadstat/_readstat_parser.pyx":1316
+      /* "pyreadstat/_readstat_parser.pyx":1312
  *             spss_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])
  *         elif file_format == FILE_FORMAT_STATA:
  *             stata_datetime_formats.extend(extra_datetime_formats)             # <<<<<<<<<<<<<<
@@ -18843,11 +18796,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_stata_datetime_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1316, __pyx_L1_error)
+        __PYX_ERR(0, 1312, __pyx_L1_error)
       }
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_stata_datetime_formats, __pyx_v_extra_datetime_formats); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1316, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_stata_datetime_formats, __pyx_v_extra_datetime_formats); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1312, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1315
+      /* "pyreadstat/_readstat_parser.pyx":1311
  *         elif file_format == FILE_FORMAT_SPSS:
  *             spss_datetime_formats.extend([format_regex.match(edtf).group(1) for edtf in extra_datetime_formats if format_regex.match(edtf)])
  *         elif file_format == FILE_FORMAT_STATA:             # <<<<<<<<<<<<<<
@@ -18857,7 +18810,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       default:
 
-      /* "pyreadstat/_readstat_parser.pyx":1318
+      /* "pyreadstat/_readstat_parser.pyx":1314
  *             stata_datetime_formats.extend(extra_datetime_formats)
  *         else:
  *             raise PyreadstatError("Unknown file format")             # <<<<<<<<<<<<<<
@@ -18865,7 +18818,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *         if file_format == FILE_FORMAT_SAS:
 */
       __pyx_t_3 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1318, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1314, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __pyx_t_10 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -18884,16 +18837,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_9, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1318, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1314, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_Raise(__pyx_t_7, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 1318, __pyx_L1_error)
+      __PYX_ERR(0, 1314, __pyx_L1_error)
       break;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1310
+    /* "pyreadstat/_readstat_parser.pyx":1306
  *         else:
  *             raise PyreadstatError("Unknown file format")
  *     if extra_datetime_formats is not None:             # <<<<<<<<<<<<<<
@@ -18902,7 +18855,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1319
+  /* "pyreadstat/_readstat_parser.pyx":1315
  *         else:
  *             raise PyreadstatError("Unknown file format")
  *     if extra_time_formats is not None:             # <<<<<<<<<<<<<<
@@ -18912,7 +18865,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __pyx_t_1 = (__pyx_v_extra_time_formats != ((PyObject*)Py_None));
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1320
+    /* "pyreadstat/_readstat_parser.pyx":1316
  *             raise PyreadstatError("Unknown file format")
  *     if extra_time_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -18922,7 +18875,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     switch (__pyx_v_file_format) {
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS:
 
-      /* "pyreadstat/_readstat_parser.pyx":1321
+      /* "pyreadstat/_readstat_parser.pyx":1317
  *     if extra_time_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:
  *             sas_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])             # <<<<<<<<<<<<<<
@@ -18931,13 +18884,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_sas_time_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1321, __pyx_L1_error)
+        __PYX_ERR(0, 1317, __pyx_L1_error)
       }
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1321, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1317, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_extra_time_formats == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 1321, __pyx_L1_error)
+        __PYX_ERR(0, 1317, __pyx_L1_error)
       }
       __pyx_t_9 = __pyx_v_extra_time_formats; __Pyx_INCREF(__pyx_t_9);
       __pyx_t_19 = 0;
@@ -18945,13 +18898,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_9);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1321, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1317, __pyx_L1_error)
           #endif
           if (__pyx_t_19 >= __pyx_temp) break;
         }
         __pyx_t_3 = __Pyx_PyList_GetItemRefFast(__pyx_t_9, __pyx_t_19, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_19;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1321, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1317, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_XDECREF_SET(__pyx_v_etf, __pyx_t_3);
         __pyx_t_3 = 0;
@@ -18962,10 +18915,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           PyObject *__pyx_callargs[2] = {__pyx_t_8, __pyx_v_etf};
           __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1321, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1317, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1321, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1317, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_1) {
           __pyx_t_12 = __pyx_v_10pyreadstat_16_readstat_parser_format_regex;
@@ -18975,7 +18928,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_etf};
             __pyx_t_14 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1321, __pyx_L1_error)
+            if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 1317, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_14);
           }
           __pyx_t_8 = __pyx_t_14;
@@ -18986,18 +18939,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_group, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1321, __pyx_L1_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1317, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1321, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1317, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_sas_time_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1321, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_sas_time_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1317, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1320
+      /* "pyreadstat/_readstat_parser.pyx":1316
  *             raise PyreadstatError("Unknown file format")
  *     if extra_time_formats is not None:
  *         if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -19007,7 +18960,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SPSS:
 
-      /* "pyreadstat/_readstat_parser.pyx":1323
+      /* "pyreadstat/_readstat_parser.pyx":1319
  *             sas_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])
  *         elif file_format == FILE_FORMAT_SPSS:
  *             spss_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])             # <<<<<<<<<<<<<<
@@ -19016,13 +18969,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_spss_time_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1323, __pyx_L1_error)
+        __PYX_ERR(0, 1319, __pyx_L1_error)
       }
-      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1323, __pyx_L1_error)
+      __pyx_t_7 = PyList_New(0); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1319, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       if (unlikely(__pyx_v_extra_time_formats == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 1323, __pyx_L1_error)
+        __PYX_ERR(0, 1319, __pyx_L1_error)
       }
       __pyx_t_9 = __pyx_v_extra_time_formats; __Pyx_INCREF(__pyx_t_9);
       __pyx_t_19 = 0;
@@ -19030,13 +18983,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         {
           Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_9);
           #if !CYTHON_ASSUME_SAFE_SIZE
-          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1323, __pyx_L1_error)
+          if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 1319, __pyx_L1_error)
           #endif
           if (__pyx_t_19 >= __pyx_temp) break;
         }
         __pyx_t_3 = __Pyx_PyList_GetItemRefFast(__pyx_t_9, __pyx_t_19, __Pyx_ReferenceSharing_OwnStrongReference);
         ++__pyx_t_19;
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1323, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1319, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_XDECREF_SET(__pyx_v_etf, __pyx_t_3);
         __pyx_t_3 = 0;
@@ -19047,10 +19000,10 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
           PyObject *__pyx_callargs[2] = {__pyx_t_14, __pyx_v_etf};
           __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1323, __pyx_L1_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1319, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
-        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1323, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1319, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         if (__pyx_t_1) {
           __pyx_t_12 = __pyx_v_10pyreadstat_16_readstat_parser_format_regex;
@@ -19060,7 +19013,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_v_etf};
             __pyx_t_8 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_match, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1323, __pyx_L1_error)
+            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1319, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
           }
           __pyx_t_14 = __pyx_t_8;
@@ -19071,18 +19024,18 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
             __pyx_t_3 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_group, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1323, __pyx_L1_error)
+            if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1319, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
           }
-          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1323, __pyx_L1_error)
+          if (unlikely(__Pyx_ListComp_Append(__pyx_t_7, (PyObject*)__pyx_t_3))) __PYX_ERR(0, 1319, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_spss_time_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1323, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_spss_time_formats, __pyx_t_7); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1319, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "pyreadstat/_readstat_parser.pyx":1322
+      /* "pyreadstat/_readstat_parser.pyx":1318
  *         if file_format == FILE_FORMAT_SAS:
  *             sas_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])
  *         elif file_format == FILE_FORMAT_SPSS:             # <<<<<<<<<<<<<<
@@ -19092,7 +19045,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_STATA:
 
-      /* "pyreadstat/_readstat_parser.pyx":1325
+      /* "pyreadstat/_readstat_parser.pyx":1321
  *             spss_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])
  *         elif file_format == FILE_FORMAT_STATA:
  *             stata_time_formats.extend(extra_time_formats)             # <<<<<<<<<<<<<<
@@ -19101,11 +19054,11 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
       if (unlikely(__pyx_v_10pyreadstat_16_readstat_parser_stata_time_formats == Py_None)) {
         PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "extend");
-        __PYX_ERR(0, 1325, __pyx_L1_error)
+        __PYX_ERR(0, 1321, __pyx_L1_error)
       }
-      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_stata_time_formats, __pyx_v_extra_time_formats); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1325, __pyx_L1_error)
+      __pyx_t_20 = __Pyx_PyList_Extend(__pyx_v_10pyreadstat_16_readstat_parser_stata_time_formats, __pyx_v_extra_time_formats); if (unlikely(__pyx_t_20 == ((int)-1))) __PYX_ERR(0, 1321, __pyx_L1_error)
 
-      /* "pyreadstat/_readstat_parser.pyx":1324
+      /* "pyreadstat/_readstat_parser.pyx":1320
  *         elif file_format == FILE_FORMAT_SPSS:
  *             spss_time_formats.extend([format_regex.match(etf).group(1) for etf in extra_time_formats if format_regex.match(etf)])
  *         elif file_format == FILE_FORMAT_STATA:             # <<<<<<<<<<<<<<
@@ -19115,7 +19068,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       break;
       default:
 
-      /* "pyreadstat/_readstat_parser.pyx":1327
+      /* "pyreadstat/_readstat_parser.pyx":1323
  *             stata_time_formats.extend(extra_time_formats)
  *         else:
  *             raise PyreadstatError("Unknown file format")             # <<<<<<<<<<<<<<
@@ -19123,7 +19076,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *     sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
 */
       __pyx_t_9 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1327, __pyx_L1_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1323, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_10 = 1;
       #if CYTHON_UNPACK_METHODS
@@ -19142,16 +19095,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
         __pyx_t_7 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1327, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1323, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
       }
       __Pyx_Raise(__pyx_t_7, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __PYX_ERR(0, 1327, __pyx_L1_error)
+      __PYX_ERR(0, 1323, __pyx_L1_error)
       break;
     }
 
-    /* "pyreadstat/_readstat_parser.pyx":1319
+    /* "pyreadstat/_readstat_parser.pyx":1315
  *         else:
  *             raise PyreadstatError("Unknown file format")
  *     if extra_time_formats is not None:             # <<<<<<<<<<<<<<
@@ -19160,16 +19113,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1329
+  /* "pyreadstat/_readstat_parser.pyx":1325
  *             raise PyreadstatError("Unknown file format")
  *     global sas_all_formats, spss_all_formats, stata_all_formats
  *     sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats             # <<<<<<<<<<<<<<
  *     stata_all_formats = stata_date_formats + stata_datetime_formats + stata_time_formats
  *     spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
 */
-  __pyx_t_7 = PyNumber_Add(__pyx_v_10pyreadstat_16_readstat_parser_sas_date_formats, __pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1329, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Add(__pyx_v_10pyreadstat_16_readstat_parser_sas_date_formats, __pyx_v_10pyreadstat_16_readstat_parser_sas_datetime_formats); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1325, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_v_10pyreadstat_16_readstat_parser_sas_time_formats); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1329, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_v_10pyreadstat_16_readstat_parser_sas_time_formats); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1325, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_XGOTREF(__pyx_v_10pyreadstat_16_readstat_parser_sas_all_formats);
@@ -19177,16 +19130,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_GIVEREF(__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1330
+  /* "pyreadstat/_readstat_parser.pyx":1326
  *     global sas_all_formats, spss_all_formats, stata_all_formats
  *     sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
  *     stata_all_formats = stata_date_formats + stata_datetime_formats + stata_time_formats             # <<<<<<<<<<<<<<
  *     spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
  * 
 */
-  __pyx_t_3 = PyNumber_Add(__pyx_v_10pyreadstat_16_readstat_parser_stata_date_formats, __pyx_v_10pyreadstat_16_readstat_parser_stata_datetime_formats); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1330, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_v_10pyreadstat_16_readstat_parser_stata_date_formats, __pyx_v_10pyreadstat_16_readstat_parser_stata_datetime_formats); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_7 = PyNumber_Add(__pyx_t_3, __pyx_v_10pyreadstat_16_readstat_parser_stata_time_formats); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1330, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Add(__pyx_t_3, __pyx_v_10pyreadstat_16_readstat_parser_stata_time_formats); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_XGOTREF(__pyx_v_10pyreadstat_16_readstat_parser_stata_all_formats);
@@ -19194,16 +19147,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_GIVEREF(__pyx_t_7);
   __pyx_t_7 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1331
+  /* "pyreadstat/_readstat_parser.pyx":1327
  *     sas_all_formats = sas_date_formats + sas_datetime_formats + sas_time_formats
  *     stata_all_formats = stata_date_formats + stata_datetime_formats + stata_time_formats
  *     spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats             # <<<<<<<<<<<<<<
  * 
  *     filename = <char *> filename_bytes
 */
-  __pyx_t_7 = PyNumber_Add(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats, __pyx_v_10pyreadstat_16_readstat_parser_spss_datetime_formats); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1331, __pyx_L1_error)
+  __pyx_t_7 = PyNumber_Add(__pyx_v_10pyreadstat_16_readstat_parser_spss_date_formats, __pyx_v_10pyreadstat_16_readstat_parser_spss_datetime_formats); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_v_10pyreadstat_16_readstat_parser_spss_time_formats); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1331, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Add(__pyx_t_7, __pyx_v_10pyreadstat_16_readstat_parser_spss_time_formats); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1327, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_XGOTREF(__pyx_v_10pyreadstat_16_readstat_parser_spss_all_formats);
@@ -19211,7 +19164,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_GIVEREF(__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1333
+  /* "pyreadstat/_readstat_parser.pyx":1329
  *     spss_all_formats = spss_date_formats + spss_datetime_formats + spss_time_formats
  * 
  *     filename = <char *> filename_bytes             # <<<<<<<<<<<<<<
@@ -19220,12 +19173,12 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   if (unlikely(__pyx_v_filename_bytes == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 1333, __pyx_L1_error)
+    __PYX_ERR(0, 1329, __pyx_L1_error)
   }
-  __pyx_t_21 = __Pyx_PyBytes_AsWritableString(__pyx_v_filename_bytes); if (unlikely((!__pyx_t_21) && PyErr_Occurred())) __PYX_ERR(0, 1333, __pyx_L1_error)
+  __pyx_t_21 = __Pyx_PyBytes_AsWritableString(__pyx_v_filename_bytes); if (unlikely((!__pyx_t_21) && PyErr_Occurred())) __PYX_ERR(0, 1329, __pyx_L1_error)
   __pyx_v_filename = ((char *)__pyx_t_21);
 
-  /* "pyreadstat/_readstat_parser.pyx":1335
+  /* "pyreadstat/_readstat_parser.pyx":1331
  *     filename = <char *> filename_bytes
  * 
  *     data = data_container()             # <<<<<<<<<<<<<<
@@ -19238,13 +19191,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
     __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_mstate_global->__pyx_ptype_10pyreadstat_16_readstat_parser_data_container, __pyx_callargs+__pyx_t_10, (1-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1335, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1331, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_3);
   }
   __pyx_v_data = ((struct __pyx_obj_10pyreadstat_16_readstat_parser_data_container *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1336
+  /* "pyreadstat/_readstat_parser.pyx":1332
  * 
  *     data = data_container()
  *     ctx = <void *>data             # <<<<<<<<<<<<<<
@@ -19253,7 +19206,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_v_ctx = ((void *)__pyx_v_data);
 
-  /* "pyreadstat/_readstat_parser.pyx":1338
+  /* "pyreadstat/_readstat_parser.pyx":1334
  *     ctx = <void *>data
  * 
  *     data.file_format = file_format             # <<<<<<<<<<<<<<
@@ -19262,7 +19215,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_v_data->file_format = __pyx_v_file_format;
 
-  /* "pyreadstat/_readstat_parser.pyx":1339
+  /* "pyreadstat/_readstat_parser.pyx":1335
  * 
  *     data.file_format = file_format
  *     data.metaonly = metaonly             # <<<<<<<<<<<<<<
@@ -19271,7 +19224,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_v_data->metaonly = __pyx_v_metaonly;
 
-  /* "pyreadstat/_readstat_parser.pyx":1340
+  /* "pyreadstat/_readstat_parser.pyx":1336
  *     data.file_format = file_format
  *     data.metaonly = metaonly
  *     data.dates_as_pandas = dates_as_pandas             # <<<<<<<<<<<<<<
@@ -19280,7 +19233,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_v_data->dates_as_pandas = __pyx_v_dates_as_pandas;
 
-  /* "pyreadstat/_readstat_parser.pyx":1341
+  /* "pyreadstat/_readstat_parser.pyx":1337
  *     data.metaonly = metaonly
  *     data.dates_as_pandas = dates_as_pandas
  *     data.output_format = output_format             # <<<<<<<<<<<<<<
@@ -19293,7 +19246,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_DECREF(__pyx_v_data->output_format);
   __pyx_v_data->output_format = __pyx_v_output_format;
 
-  /* "pyreadstat/_readstat_parser.pyx":1343
+  /* "pyreadstat/_readstat_parser.pyx":1339
  *     data.output_format = output_format
  * 
  *     if encoding:             # <<<<<<<<<<<<<<
@@ -19304,13 +19257,13 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   else
   {
     Py_ssize_t __pyx_temp = __Pyx_PyUnicode_IS_TRUE(__pyx_v_encoding);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1343, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 1339, __pyx_L1_error)
     __pyx_t_1 = (__pyx_temp != 0);
   }
 
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1344
+    /* "pyreadstat/_readstat_parser.pyx":1340
  * 
  *     if encoding:
  *         data.user_encoding = encoding             # <<<<<<<<<<<<<<
@@ -19323,7 +19276,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_DECREF(__pyx_v_data->user_encoding);
     __pyx_v_data->user_encoding = __pyx_v_encoding;
 
-    /* "pyreadstat/_readstat_parser.pyx":1343
+    /* "pyreadstat/_readstat_parser.pyx":1339
  *     data.output_format = output_format
  * 
  *     if encoding:             # <<<<<<<<<<<<<<
@@ -19332,7 +19285,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1346
+  /* "pyreadstat/_readstat_parser.pyx":1342
  *         data.user_encoding = encoding
  * 
  *     if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -19342,7 +19295,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   switch (__pyx_v_file_format) {
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS:
 
-    /* "pyreadstat/_readstat_parser.pyx":1347
+    /* "pyreadstat/_readstat_parser.pyx":1343
  * 
  *     if file_format == FILE_FORMAT_SAS:
  *         origin = sas_origin             # <<<<<<<<<<<<<<
@@ -19352,7 +19305,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_10pyreadstat_16_readstat_parser_sas_origin);
     __pyx_v_origin = __pyx_v_10pyreadstat_16_readstat_parser_sas_origin;
 
-    /* "pyreadstat/_readstat_parser.pyx":1348
+    /* "pyreadstat/_readstat_parser.pyx":1344
  *     if file_format == FILE_FORMAT_SAS:
  *         origin = sas_origin
  *         unix_to_origin_secs = sas_secs_from_unix             # <<<<<<<<<<<<<<
@@ -19362,7 +19315,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_10pyreadstat_16_readstat_parser_sas_secs_from_unix);
     __pyx_v_unix_to_origin_secs = __pyx_v_10pyreadstat_16_readstat_parser_sas_secs_from_unix;
 
-    /* "pyreadstat/_readstat_parser.pyx":1346
+    /* "pyreadstat/_readstat_parser.pyx":1342
  *         data.user_encoding = encoding
  * 
  *     if file_format == FILE_FORMAT_SAS:             # <<<<<<<<<<<<<<
@@ -19372,7 +19325,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SPSS:
 
-    /* "pyreadstat/_readstat_parser.pyx":1350
+    /* "pyreadstat/_readstat_parser.pyx":1346
  *         unix_to_origin_secs = sas_secs_from_unix
  *     elif file_format == FILE_FORMAT_SPSS:
  *         origin = spss_origin             # <<<<<<<<<<<<<<
@@ -19382,7 +19335,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_10pyreadstat_16_readstat_parser_spss_origin);
     __pyx_v_origin = __pyx_v_10pyreadstat_16_readstat_parser_spss_origin;
 
-    /* "pyreadstat/_readstat_parser.pyx":1351
+    /* "pyreadstat/_readstat_parser.pyx":1347
  *     elif file_format == FILE_FORMAT_SPSS:
  *         origin = spss_origin
  *         unix_to_origin_secs = spss_secs_from_unix             # <<<<<<<<<<<<<<
@@ -19392,7 +19345,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_10pyreadstat_16_readstat_parser_spss_secs_from_unix);
     __pyx_v_unix_to_origin_secs = __pyx_v_10pyreadstat_16_readstat_parser_spss_secs_from_unix;
 
-    /* "pyreadstat/_readstat_parser.pyx":1349
+    /* "pyreadstat/_readstat_parser.pyx":1345
  *         origin = sas_origin
  *         unix_to_origin_secs = sas_secs_from_unix
  *     elif file_format == FILE_FORMAT_SPSS:             # <<<<<<<<<<<<<<
@@ -19402,7 +19355,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     break;
     case __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_STATA:
 
-    /* "pyreadstat/_readstat_parser.pyx":1353
+    /* "pyreadstat/_readstat_parser.pyx":1349
  *         unix_to_origin_secs = spss_secs_from_unix
  *     elif file_format == FILE_FORMAT_STATA:
  *         origin = stata_origin             # <<<<<<<<<<<<<<
@@ -19412,7 +19365,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_10pyreadstat_16_readstat_parser_stata_origin);
     __pyx_v_origin = __pyx_v_10pyreadstat_16_readstat_parser_stata_origin;
 
-    /* "pyreadstat/_readstat_parser.pyx":1354
+    /* "pyreadstat/_readstat_parser.pyx":1350
  *     elif file_format == FILE_FORMAT_STATA:
  *         origin = stata_origin
  *         unix_to_origin_secs = stata_secs_from_unix             # <<<<<<<<<<<<<<
@@ -19422,7 +19375,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_10pyreadstat_16_readstat_parser_stata_secs_from_unix);
     __pyx_v_unix_to_origin_secs = __pyx_v_10pyreadstat_16_readstat_parser_stata_secs_from_unix;
 
-    /* "pyreadstat/_readstat_parser.pyx":1352
+    /* "pyreadstat/_readstat_parser.pyx":1348
  *         origin = spss_origin
  *         unix_to_origin_secs = spss_secs_from_unix
  *     elif file_format == FILE_FORMAT_STATA:             # <<<<<<<<<<<<<<
@@ -19432,7 +19385,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     break;
     default:
 
-    /* "pyreadstat/_readstat_parser.pyx":1356
+    /* "pyreadstat/_readstat_parser.pyx":1352
  *         unix_to_origin_secs = stata_secs_from_unix
  *     else:
  *         raise PyreadstatError("Unknown file format")             # <<<<<<<<<<<<<<
@@ -19440,7 +19393,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  *     data.origin = origin
 */
     __pyx_t_7 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1356, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 1352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     __pyx_t_10 = 1;
     #if CYTHON_UNPACK_METHODS
@@ -19459,16 +19412,16 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
       __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_9, __pyx_callargs+__pyx_t_10, (2-__pyx_t_10) | (__pyx_t_10*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1356, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1352, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 1356, __pyx_L1_error)
+    __PYX_ERR(0, 1352, __pyx_L1_error)
     break;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1358
+  /* "pyreadstat/_readstat_parser.pyx":1354
  *         raise PyreadstatError("Unknown file format")
  * 
  *     data.origin = origin             # <<<<<<<<<<<<<<
@@ -19481,17 +19434,17 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __Pyx_DECREF(__pyx_v_data->origin);
   __pyx_v_data->origin = __pyx_v_origin;
 
-  /* "pyreadstat/_readstat_parser.pyx":1359
+  /* "pyreadstat/_readstat_parser.pyx":1355
  * 
  *     data.origin = origin
  *     data.unix_to_origin_secs = unix_to_origin_secs             # <<<<<<<<<<<<<<
  * 
  *     if usecols is not None:
 */
-  __pyx_t_22 = __Pyx_PyFloat_AsDouble(__pyx_v_unix_to_origin_secs); if (unlikely((__pyx_t_22 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1359, __pyx_L1_error)
+  __pyx_t_22 = __Pyx_PyFloat_AsDouble(__pyx_v_unix_to_origin_secs); if (unlikely((__pyx_t_22 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 1355, __pyx_L1_error)
   __pyx_v_data->unix_to_origin_secs = __pyx_t_22;
 
-  /* "pyreadstat/_readstat_parser.pyx":1361
+  /* "pyreadstat/_readstat_parser.pyx":1357
  *     data.unix_to_origin_secs = unix_to_origin_secs
  * 
  *     if usecols is not None:             # <<<<<<<<<<<<<<
@@ -19501,7 +19454,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   __pyx_t_1 = (__pyx_v_usecols != ((PyObject*)Py_None));
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1362
+    /* "pyreadstat/_readstat_parser.pyx":1358
  * 
  *     if usecols is not None:
  *         data.filter_cols = 1             # <<<<<<<<<<<<<<
@@ -19510,7 +19463,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
     __pyx_v_data->filter_cols = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":1363
+    /* "pyreadstat/_readstat_parser.pyx":1359
  *     if usecols is not None:
  *         data.filter_cols = 1
  *         data.use_cols = usecols             # <<<<<<<<<<<<<<
@@ -19523,7 +19476,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_DECREF(__pyx_v_data->use_cols);
     __pyx_v_data->use_cols = __pyx_v_usecols;
 
-    /* "pyreadstat/_readstat_parser.pyx":1361
+    /* "pyreadstat/_readstat_parser.pyx":1357
  *     data.unix_to_origin_secs = unix_to_origin_secs
  * 
  *     if usecols is not None:             # <<<<<<<<<<<<<<
@@ -19532,7 +19485,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1365
+  /* "pyreadstat/_readstat_parser.pyx":1361
  *         data.use_cols = usecols
  * 
  *     data.usernan = usernan             # <<<<<<<<<<<<<<
@@ -19541,7 +19494,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_v_data->usernan = __pyx_v_usernan;
 
-  /* "pyreadstat/_readstat_parser.pyx":1366
+  /* "pyreadstat/_readstat_parser.pyx":1362
  * 
  *     data.usernan = usernan
  *     data.no_datetime_conversion = no_datetime_conversion             # <<<<<<<<<<<<<<
@@ -19550,7 +19503,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_v_data->no_datetime_conversion = __pyx_v_no_datetime_conversion;
 
-  /* "pyreadstat/_readstat_parser.pyx":1369
+  /* "pyreadstat/_readstat_parser.pyx":1365
  * 
  *     # go!
  *     run_readstat_parser(filename, data, file_extension, row_limit, row_offset, file_obj)             # <<<<<<<<<<<<<<
@@ -19559,31 +19512,31 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
 */
   __pyx_t_23.__pyx_n = 1;
   __pyx_t_23.file_obj = __pyx_v_file_obj;
-  __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(__pyx_v_filename, __pyx_v_data, __pyx_v_file_extension, __pyx_v_row_limit, __pyx_v_row_offset, &__pyx_t_23); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1369, __pyx_L1_error)
+  __pyx_f_10pyreadstat_16_readstat_parser_run_readstat_parser(__pyx_v_filename, __pyx_v_data, __pyx_v_file_extension, __pyx_v_row_limit, __pyx_v_row_offset, &__pyx_t_23); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 1365, __pyx_L1_error)
 
-  /* "pyreadstat/_readstat_parser.pyx":1370
+  /* "pyreadstat/_readstat_parser.pyx":1366
  *     # go!
  *     run_readstat_parser(filename, data, file_extension, row_limit, row_offset, file_obj)
  *     data_dict = data_container_to_dict(data)             # <<<<<<<<<<<<<<
  *     if output_format == 'dict':
  *         data_frame = data_dict
 */
-  __pyx_t_3 = __pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(__pyx_v_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1370, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_10pyreadstat_16_readstat_parser_data_container_to_dict(__pyx_v_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_data_dict = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1371
+  /* "pyreadstat/_readstat_parser.pyx":1367
  *     run_readstat_parser(filename, data, file_extension, row_limit, row_offset, file_obj)
  *     data_dict = data_container_to_dict(data)
  *     if output_format == 'dict':             # <<<<<<<<<<<<<<
  *         data_frame = data_dict
  *     else:
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_dict, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1371, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_output_format, __pyx_mstate_global->__pyx_n_u_dict, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1367, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1372
+    /* "pyreadstat/_readstat_parser.pyx":1368
  *     data_dict = data_container_to_dict(data)
  *     if output_format == 'dict':
  *         data_frame = data_dict             # <<<<<<<<<<<<<<
@@ -19593,7 +19546,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     __Pyx_INCREF(__pyx_v_data_dict);
     __pyx_v_data_frame = __pyx_v_data_dict;
 
-    /* "pyreadstat/_readstat_parser.pyx":1371
+    /* "pyreadstat/_readstat_parser.pyx":1367
  *     run_readstat_parser(filename, data, file_extension, row_limit, row_offset, file_obj)
  *     data_dict = data_container_to_dict(data)
  *     if output_format == 'dict':             # <<<<<<<<<<<<<<
@@ -19603,7 +19556,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
     goto __pyx_L70;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1374
+  /* "pyreadstat/_readstat_parser.pyx":1370
  *         data_frame = data_dict
  *     else:
  *         data_frame = dict_to_dataframe(data_dict, data)             # <<<<<<<<<<<<<<
@@ -19611,26 +19564,26 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  * 
 */
   /*else*/ {
-    __pyx_t_3 = __pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(__pyx_v_data_dict, __pyx_v_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1374, __pyx_L1_error)
+    __pyx_t_3 = __pyx_f_10pyreadstat_16_readstat_parser_dict_to_dataframe(__pyx_v_data_dict, __pyx_v_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1370, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_v_data_frame = __pyx_t_3;
     __pyx_t_3 = 0;
   }
   __pyx_L70:;
 
-  /* "pyreadstat/_readstat_parser.pyx":1375
+  /* "pyreadstat/_readstat_parser.pyx":1371
  *     else:
  *         data_frame = dict_to_dataframe(data_dict, data)
  *     metadata = data_container_extract_metadata(data)             # <<<<<<<<<<<<<<
  * 
  *     return data_frame, metadata
 */
-  __pyx_t_3 = __pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_metadata(__pyx_v_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1375, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_10pyreadstat_16_readstat_parser_data_container_extract_metadata(__pyx_v_data); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1371, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_v_metadata = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1377
+  /* "pyreadstat/_readstat_parser.pyx":1373
  *     metadata = data_container_extract_metadata(data)
  * 
  *     return data_frame, metadata             # <<<<<<<<<<<<<<
@@ -19638,19 +19591,19 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
  * def parser_entry_point(filename_path, str parser_format=None,
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1377, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(__pyx_v_data_frame);
   __Pyx_GIVEREF(__pyx_v_data_frame);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_data_frame) != (0)) __PYX_ERR(0, 1377, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_data_frame) != (0)) __PYX_ERR(0, 1373, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_metadata);
   __Pyx_GIVEREF(__pyx_v_metadata);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_metadata) != (0)) __PYX_ERR(0, 1377, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_metadata) != (0)) __PYX_ERR(0, 1373, __pyx_L1_error);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1236
+  /* "pyreadstat/_readstat_parser.pyx":1232
  * 
  * 
  * cdef object run_conversion(object filename_path, py_file_format file_format, py_file_extension file_extension,             # <<<<<<<<<<<<<<
@@ -19693,7 +19646,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_parser_run_conversion(PyObject
   return __pyx_r;
 }
 
-/* "pyreadstat/_readstat_parser.pyx":1379
+/* "pyreadstat/_readstat_parser.pyx":1375
  *     return data_frame, metadata
  * 
  * def parser_entry_point(filename_path, str parser_format=None,             # <<<<<<<<<<<<<<
@@ -19755,81 +19708,81 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_filename_path,&__pyx_mstate_global->__pyx_n_u_parser_format,&__pyx_mstate_global->__pyx_n_u_metadataonly,&__pyx_mstate_global->__pyx_n_u_dates_as_pandas_datetime,&__pyx_mstate_global->__pyx_n_u_formats_as_category,&__pyx_mstate_global->__pyx_n_u_formats_as_ordered_category,&__pyx_mstate_global->__pyx_n_u_encoding,&__pyx_mstate_global->__pyx_n_u_usecols,&__pyx_mstate_global->__pyx_n_u_user_missing,&__pyx_mstate_global->__pyx_n_u_disable_datetime_conversion,&__pyx_mstate_global->__pyx_n_u_row_limit,&__pyx_mstate_global->__pyx_n_u_row_offset,&__pyx_mstate_global->__pyx_n_u_output_format,&__pyx_mstate_global->__pyx_n_u_extra_datetime_formats,&__pyx_mstate_global->__pyx_n_u_extra_date_formats,&__pyx_mstate_global->__pyx_n_u_extra_time_formats,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 1379, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 1375, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case 16:
         values[15] = __Pyx_ArgRef_FASTCALL(__pyx_args, 15);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[15])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[15])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 15:
         values[14] = __Pyx_ArgRef_FASTCALL(__pyx_args, 14);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[14])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[14])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 14:
         values[13] = __Pyx_ArgRef_FASTCALL(__pyx_args, 13);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[13])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[13])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 13:
         values[12] = __Pyx_ArgRef_FASTCALL(__pyx_args, 12);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[12])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[12])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 12:
         values[11] = __Pyx_ArgRef_FASTCALL(__pyx_args, 11);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[11])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[11])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 11:
         values[10] = __Pyx_ArgRef_FASTCALL(__pyx_args, 10);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[10])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[10])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 10:
         values[9] = __Pyx_ArgRef_FASTCALL(__pyx_args, 9);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[9])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[9])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  9:
         values[8] = __Pyx_ArgRef_FASTCALL(__pyx_args, 8);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[8])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[8])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  8:
         values[7] = __Pyx_ArgRef_FASTCALL(__pyx_args, 7);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  7:
         values[6] = __Pyx_ArgRef_FASTCALL(__pyx_args, 6);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  6:
         values[5] = __Pyx_ArgRef_FASTCALL(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "parser_entry_point", 0) < (0)) __PYX_ERR(0, 1379, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "parser_entry_point", 0) < (0)) __PYX_ERR(0, 1375, __pyx_L3_error)
       if (!values[1]) values[1] = __Pyx_NewRef(((PyObject*)Py_None));
 
-      /* "pyreadstat/_readstat_parser.pyx":1380
+      /* "pyreadstat/_readstat_parser.pyx":1376
  * 
  * def parser_entry_point(filename_path, str parser_format=None,
  *                        metadataonly=False, dates_as_pandas_datetime=False,             # <<<<<<<<<<<<<<
@@ -19839,7 +19792,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[2]) values[2] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
       if (!values[3]) values[3] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
 
-      /* "pyreadstat/_readstat_parser.pyx":1381
+      /* "pyreadstat/_readstat_parser.pyx":1377
  * def parser_entry_point(filename_path, str parser_format=None,
  *                        metadataonly=False, dates_as_pandas_datetime=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,             # <<<<<<<<<<<<<<
@@ -19852,7 +19805,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[7]) values[7] = __Pyx_NewRef(((PyObject*)Py_None));
       if (!values[8]) values[8] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
 
-      /* "pyreadstat/_readstat_parser.pyx":1382
+      /* "pyreadstat/_readstat_parser.pyx":1378
  *                        metadataonly=False, dates_as_pandas_datetime=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None,             # <<<<<<<<<<<<<<
@@ -19863,7 +19816,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[12]) values[12] = __Pyx_NewRef(((PyObject*)Py_None));
       if (!values[13]) values[13] = __Pyx_NewRef(((PyObject*)Py_None));
 
-      /* "pyreadstat/_readstat_parser.pyx":1383
+      /* "pyreadstat/_readstat_parser.pyx":1379
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None,
  *              list extra_date_formats=None, list extra_time_formats=None):             # <<<<<<<<<<<<<<
@@ -19873,78 +19826,78 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[14]) values[14] = __Pyx_NewRef(((PyObject*)Py_None));
       if (!values[15]) values[15] = __Pyx_NewRef(((PyObject*)Py_None));
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("parser_entry_point", 0, 1, 16, i); __PYX_ERR(0, 1379, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("parser_entry_point", 0, 1, 16, i); __PYX_ERR(0, 1375, __pyx_L3_error) }
       }
     } else {
       switch (__pyx_nargs) {
         case 16:
         values[15] = __Pyx_ArgRef_FASTCALL(__pyx_args, 15);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[15])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[15])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 15:
         values[14] = __Pyx_ArgRef_FASTCALL(__pyx_args, 14);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[14])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[14])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 14:
         values[13] = __Pyx_ArgRef_FASTCALL(__pyx_args, 13);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[13])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[13])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 13:
         values[12] = __Pyx_ArgRef_FASTCALL(__pyx_args, 12);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[12])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[12])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 12:
         values[11] = __Pyx_ArgRef_FASTCALL(__pyx_args, 11);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[11])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[11])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 11:
         values[10] = __Pyx_ArgRef_FASTCALL(__pyx_args, 10);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[10])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[10])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case 10:
         values[9] = __Pyx_ArgRef_FASTCALL(__pyx_args, 9);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[9])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[9])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  9:
         values[8] = __Pyx_ArgRef_FASTCALL(__pyx_args, 8);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[8])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[8])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  8:
         values[7] = __Pyx_ArgRef_FASTCALL(__pyx_args, 7);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[7])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  7:
         values[6] = __Pyx_ArgRef_FASTCALL(__pyx_args, 6);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[6])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  6:
         values[5] = __Pyx_ArgRef_FASTCALL(__pyx_args, 5);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[5])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  5:
         values[4] = __Pyx_ArgRef_FASTCALL(__pyx_args, 4);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[4])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  4:
         values[3] = __Pyx_ArgRef_FASTCALL(__pyx_args, 3);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[3])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 1375, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 1379, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 1375, __pyx_L3_error)
         break;
         default: goto __pyx_L5_argtuple_error;
       }
 
-      /* "pyreadstat/_readstat_parser.pyx":1379
+      /* "pyreadstat/_readstat_parser.pyx":1375
  *     return data_frame, metadata
  * 
  * def parser_entry_point(filename_path, str parser_format=None,             # <<<<<<<<<<<<<<
@@ -19957,7 +19910,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[4]) values[4] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_True)));
       if (!values[5]) values[5] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
 
-      /* "pyreadstat/_readstat_parser.pyx":1381
+      /* "pyreadstat/_readstat_parser.pyx":1377
  * def parser_entry_point(filename_path, str parser_format=None,
  *                        metadataonly=False, dates_as_pandas_datetime=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,             # <<<<<<<<<<<<<<
@@ -19969,7 +19922,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[8]) values[8] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
       if (!values[9]) values[9] = __Pyx_NewRef(((PyObject *)((PyObject*)Py_False)));
 
-      /* "pyreadstat/_readstat_parser.pyx":1382
+      /* "pyreadstat/_readstat_parser.pyx":1378
  *                        metadataonly=False, dates_as_pandas_datetime=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None,             # <<<<<<<<<<<<<<
@@ -19979,7 +19932,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!values[12]) values[12] = __Pyx_NewRef(((PyObject*)Py_None));
       if (!values[13]) values[13] = __Pyx_NewRef(((PyObject*)Py_None));
 
-      /* "pyreadstat/_readstat_parser.pyx":1383
+      /* "pyreadstat/_readstat_parser.pyx":1379
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None,
  *              list extra_date_formats=None, list extra_time_formats=None):             # <<<<<<<<<<<<<<
@@ -20000,12 +19953,12 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
     __pyx_v_user_missing = values[8];
     __pyx_v_disable_datetime_conversion = values[9];
     if (values[10]) {
-      __pyx_v_row_limit = __Pyx_PyLong_As_int(values[10]); if (unlikely((__pyx_v_row_limit == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1382, __pyx_L3_error)
+      __pyx_v_row_limit = __Pyx_PyLong_As_int(values[10]); if (unlikely((__pyx_v_row_limit == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1378, __pyx_L3_error)
     } else {
       __pyx_v_row_limit = ((int)((int)0));
     }
     if (values[11]) {
-      __pyx_v_row_offset = __Pyx_PyLong_As_int(values[11]); if (unlikely((__pyx_v_row_offset == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1382, __pyx_L3_error)
+      __pyx_v_row_offset = __Pyx_PyLong_As_int(values[11]); if (unlikely((__pyx_v_row_offset == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1378, __pyx_L3_error)
     } else {
       __pyx_v_row_offset = ((int)((int)0));
     }
@@ -20016,7 +19969,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("parser_entry_point", 0, 1, 16, __pyx_nargs); __PYX_ERR(0, 1379, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("parser_entry_point", 0, 1, 16, __pyx_nargs); __PYX_ERR(0, 1375, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -20027,16 +19980,16 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_parser_format), (&PyUnicode_Type), 1, "parser_format", 1))) __PYX_ERR(0, 1379, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyUnicode_Type), 1, "encoding", 1))) __PYX_ERR(0, 1381, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 1381, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_format), (&PyUnicode_Type), 1, "output_format", 1))) __PYX_ERR(0, 1382, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_extra_datetime_formats), (&PyList_Type), 1, "extra_datetime_formats", 1))) __PYX_ERR(0, 1382, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_extra_date_formats), (&PyList_Type), 1, "extra_date_formats", 1))) __PYX_ERR(0, 1383, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_extra_time_formats), (&PyList_Type), 1, "extra_time_formats", 1))) __PYX_ERR(0, 1383, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_parser_format), (&PyUnicode_Type), 1, "parser_format", 1))) __PYX_ERR(0, 1375, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_encoding), (&PyUnicode_Type), 1, "encoding", 1))) __PYX_ERR(0, 1377, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_usecols), (&PyList_Type), 1, "usecols", 1))) __PYX_ERR(0, 1377, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_output_format), (&PyUnicode_Type), 1, "output_format", 1))) __PYX_ERR(0, 1378, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_extra_datetime_formats), (&PyList_Type), 1, "extra_datetime_formats", 1))) __PYX_ERR(0, 1378, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_extra_date_formats), (&PyList_Type), 1, "extra_date_formats", 1))) __PYX_ERR(0, 1379, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_extra_time_formats), (&PyList_Type), 1, "extra_time_formats", 1))) __PYX_ERR(0, 1379, __pyx_L1_error)
   __pyx_r = __pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(__pyx_self, __pyx_v_filename_path, __pyx_v_parser_format, __pyx_v_metadataonly, __pyx_v_dates_as_pandas_datetime, __pyx_v_formats_as_category, __pyx_v_formats_as_ordered_category, __pyx_v_encoding, __pyx_v_usecols, __pyx_v_user_missing, __pyx_v_disable_datetime_conversion, __pyx_v_row_limit, __pyx_v_row_offset, __pyx_v_output_format, __pyx_v_extra_datetime_formats, __pyx_v_extra_date_formats, __pyx_v_extra_time_formats);
 
-  /* "pyreadstat/_readstat_parser.pyx":1379
+  /* "pyreadstat/_readstat_parser.pyx":1375
  *     return data_frame, metadata
  * 
  * def parser_entry_point(filename_path, str parser_format=None,             # <<<<<<<<<<<<<<
@@ -20084,17 +20037,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("parser_entry_point", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":1389
+  /* "pyreadstat/_readstat_parser.pyx":1385
  *     cdef py_file_extension file_extension
  * 
  *     if parser_format == "sav/zsav":             # <<<<<<<<<<<<<<
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_SAV
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_kp_u_sav_zsav, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1389, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_kp_u_sav_zsav, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1385, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1390
+    /* "pyreadstat/_readstat_parser.pyx":1386
  * 
  *     if parser_format == "sav/zsav":
  *         file_format = FILE_FORMAT_SPSS             # <<<<<<<<<<<<<<
@@ -20103,7 +20056,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_format = __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SPSS;
 
-    /* "pyreadstat/_readstat_parser.pyx":1391
+    /* "pyreadstat/_readstat_parser.pyx":1387
  *     if parser_format == "sav/zsav":
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_SAV             # <<<<<<<<<<<<<<
@@ -20112,7 +20065,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_extension = __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_SAV;
 
-    /* "pyreadstat/_readstat_parser.pyx":1389
+    /* "pyreadstat/_readstat_parser.pyx":1385
  *     cdef py_file_extension file_extension
  * 
  *     if parser_format == "sav/zsav":             # <<<<<<<<<<<<<<
@@ -20122,17 +20075,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1392
+  /* "pyreadstat/_readstat_parser.pyx":1388
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_SAV
  *     elif parser_format == "sas7bdat":             # <<<<<<<<<<<<<<
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_SAS7BDAT
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_sas7bdat, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1392, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_sas7bdat, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1388, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1393
+    /* "pyreadstat/_readstat_parser.pyx":1389
  *         file_extension = FILE_EXT_SAV
  *     elif parser_format == "sas7bdat":
  *         file_format = FILE_FORMAT_SAS             # <<<<<<<<<<<<<<
@@ -20141,7 +20094,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_format = __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS;
 
-    /* "pyreadstat/_readstat_parser.pyx":1394
+    /* "pyreadstat/_readstat_parser.pyx":1390
  *     elif parser_format == "sas7bdat":
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_SAS7BDAT             # <<<<<<<<<<<<<<
@@ -20150,7 +20103,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_extension = __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_SAS7BDAT;
 
-    /* "pyreadstat/_readstat_parser.pyx":1392
+    /* "pyreadstat/_readstat_parser.pyx":1388
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_SAV
  *     elif parser_format == "sas7bdat":             # <<<<<<<<<<<<<<
@@ -20160,17 +20113,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1395
+  /* "pyreadstat/_readstat_parser.pyx":1391
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_SAS7BDAT
  *     elif parser_format == "xport":             # <<<<<<<<<<<<<<
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_XPORT
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_xport, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1395, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_xport, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1391, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1396
+    /* "pyreadstat/_readstat_parser.pyx":1392
  *         file_extension = FILE_EXT_SAS7BDAT
  *     elif parser_format == "xport":
  *         file_format = FILE_FORMAT_SAS             # <<<<<<<<<<<<<<
@@ -20179,7 +20132,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_format = __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS;
 
-    /* "pyreadstat/_readstat_parser.pyx":1397
+    /* "pyreadstat/_readstat_parser.pyx":1393
  *     elif parser_format == "xport":
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_XPORT             # <<<<<<<<<<<<<<
@@ -20188,7 +20141,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_extension = __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_XPORT;
 
-    /* "pyreadstat/_readstat_parser.pyx":1395
+    /* "pyreadstat/_readstat_parser.pyx":1391
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_SAS7BDAT
  *     elif parser_format == "xport":             # <<<<<<<<<<<<<<
@@ -20198,17 +20151,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1398
+  /* "pyreadstat/_readstat_parser.pyx":1394
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_XPORT
  *     elif parser_format == "dta":             # <<<<<<<<<<<<<<
  *         file_format = FILE_FORMAT_STATA
  *         file_extension = FILE_EXT_DTA
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_dta, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1398, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_dta, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1394, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1399
+    /* "pyreadstat/_readstat_parser.pyx":1395
  *         file_extension = FILE_EXT_XPORT
  *     elif parser_format == "dta":
  *         file_format = FILE_FORMAT_STATA             # <<<<<<<<<<<<<<
@@ -20217,7 +20170,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_format = __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_STATA;
 
-    /* "pyreadstat/_readstat_parser.pyx":1400
+    /* "pyreadstat/_readstat_parser.pyx":1396
  *     elif parser_format == "dta":
  *         file_format = FILE_FORMAT_STATA
  *         file_extension = FILE_EXT_DTA             # <<<<<<<<<<<<<<
@@ -20226,7 +20179,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_extension = __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_DTA;
 
-    /* "pyreadstat/_readstat_parser.pyx":1398
+    /* "pyreadstat/_readstat_parser.pyx":1394
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_XPORT
  *     elif parser_format == "dta":             # <<<<<<<<<<<<<<
@@ -20236,17 +20189,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1401
+  /* "pyreadstat/_readstat_parser.pyx":1397
  *         file_format = FILE_FORMAT_STATA
  *         file_extension = FILE_EXT_DTA
  *     elif parser_format == "por":             # <<<<<<<<<<<<<<
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_POR
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_por, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1401, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_por, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1397, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1402
+    /* "pyreadstat/_readstat_parser.pyx":1398
  *         file_extension = FILE_EXT_DTA
  *     elif parser_format == "por":
  *         file_format = FILE_FORMAT_SPSS             # <<<<<<<<<<<<<<
@@ -20255,7 +20208,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_format = __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SPSS;
 
-    /* "pyreadstat/_readstat_parser.pyx":1403
+    /* "pyreadstat/_readstat_parser.pyx":1399
  *     elif parser_format == "por":
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_POR             # <<<<<<<<<<<<<<
@@ -20264,7 +20217,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_extension = __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_POR;
 
-    /* "pyreadstat/_readstat_parser.pyx":1401
+    /* "pyreadstat/_readstat_parser.pyx":1397
  *         file_format = FILE_FORMAT_STATA
  *         file_extension = FILE_EXT_DTA
  *     elif parser_format == "por":             # <<<<<<<<<<<<<<
@@ -20274,17 +20227,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1404
+  /* "pyreadstat/_readstat_parser.pyx":1400
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_POR
  *     elif parser_format == "sas7bcat":             # <<<<<<<<<<<<<<
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_SAS7BCAT
 */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_sas7bcat, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1404, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_parser_format, __pyx_mstate_global->__pyx_n_u_sas7bcat, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1400, __pyx_L1_error)
   if (likely(__pyx_t_1)) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1405
+    /* "pyreadstat/_readstat_parser.pyx":1401
  *         file_extension = FILE_EXT_POR
  *     elif parser_format == "sas7bcat":
  *         file_format = FILE_FORMAT_SAS             # <<<<<<<<<<<<<<
@@ -20293,7 +20246,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_format = __pyx_e_10pyreadstat_16_readstat_parser_FILE_FORMAT_SAS;
 
-    /* "pyreadstat/_readstat_parser.pyx":1406
+    /* "pyreadstat/_readstat_parser.pyx":1402
  *     elif parser_format == "sas7bcat":
  *         file_format = FILE_FORMAT_SAS
  *         file_extension = FILE_EXT_SAS7BCAT             # <<<<<<<<<<<<<<
@@ -20302,7 +20255,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_file_extension = __pyx_e_10pyreadstat_16_readstat_parser_FILE_EXT_SAS7BCAT;
 
-    /* "pyreadstat/_readstat_parser.pyx":1404
+    /* "pyreadstat/_readstat_parser.pyx":1400
  *         file_format = FILE_FORMAT_SPSS
  *         file_extension = FILE_EXT_POR
  *     elif parser_format == "sas7bcat":             # <<<<<<<<<<<<<<
@@ -20312,7 +20265,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1408
+  /* "pyreadstat/_readstat_parser.pyx":1404
  *         file_extension = FILE_EXT_SAS7BCAT
  *     else:
  *         raise PyreadstatError("wrong parser format")             # <<<<<<<<<<<<<<
@@ -20321,7 +20274,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   /*else*/ {
     __pyx_t_3 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1408, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = 1;
     #if CYTHON_UNPACK_METHODS
@@ -20340,16 +20293,16 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
       __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1408, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 1408, __pyx_L1_error)
+    __PYX_ERR(0, 1404, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "pyreadstat/_readstat_parser.pyx":1410
+  /* "pyreadstat/_readstat_parser.pyx":1406
  *         raise PyreadstatError("wrong parser format")
  * 
  *     cdef bint metaonly = 0             # <<<<<<<<<<<<<<
@@ -20358,17 +20311,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   __pyx_v_metaonly = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1411
+  /* "pyreadstat/_readstat_parser.pyx":1407
  * 
  *     cdef bint metaonly = 0
  *     if metadataonly:             # <<<<<<<<<<<<<<
  *         metaonly = 1
  * 
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_metadataonly); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1411, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_metadataonly); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1407, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1412
+    /* "pyreadstat/_readstat_parser.pyx":1408
  *     cdef bint metaonly = 0
  *     if metadataonly:
  *         metaonly = 1             # <<<<<<<<<<<<<<
@@ -20377,7 +20330,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_metaonly = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":1411
+    /* "pyreadstat/_readstat_parser.pyx":1407
  * 
  *     cdef bint metaonly = 0
  *     if metadataonly:             # <<<<<<<<<<<<<<
@@ -20386,7 +20339,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1414
+  /* "pyreadstat/_readstat_parser.pyx":1410
  *         metaonly = 1
  * 
  *     cdef bint dates_as_pandas = 0             # <<<<<<<<<<<<<<
@@ -20395,17 +20348,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   __pyx_v_dates_as_pandas = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1415
+  /* "pyreadstat/_readstat_parser.pyx":1411
  * 
  *     cdef bint dates_as_pandas = 0
  *     if dates_as_pandas_datetime:             # <<<<<<<<<<<<<<
  *         dates_as_pandas = 1
  * 
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_dates_as_pandas_datetime); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1415, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_dates_as_pandas_datetime); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1411, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1416
+    /* "pyreadstat/_readstat_parser.pyx":1412
  *     cdef bint dates_as_pandas = 0
  *     if dates_as_pandas_datetime:
  *         dates_as_pandas = 1             # <<<<<<<<<<<<<<
@@ -20414,7 +20367,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_dates_as_pandas = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":1415
+    /* "pyreadstat/_readstat_parser.pyx":1411
  * 
  *     cdef bint dates_as_pandas = 0
  *     if dates_as_pandas_datetime:             # <<<<<<<<<<<<<<
@@ -20423,7 +20376,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1418
+  /* "pyreadstat/_readstat_parser.pyx":1414
  *         dates_as_pandas = 1
  * 
  *     cdef bint usernan = 0             # <<<<<<<<<<<<<<
@@ -20432,17 +20385,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   __pyx_v_usernan = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1419
+  /* "pyreadstat/_readstat_parser.pyx":1415
  * 
  *     cdef bint usernan = 0
  *     if user_missing:             # <<<<<<<<<<<<<<
  *         usernan = 1
  * 
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_user_missing); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1419, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_user_missing); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1415, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1420
+    /* "pyreadstat/_readstat_parser.pyx":1416
  *     cdef bint usernan = 0
  *     if user_missing:
  *         usernan = 1             # <<<<<<<<<<<<<<
@@ -20451,7 +20404,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_usernan = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":1419
+    /* "pyreadstat/_readstat_parser.pyx":1415
  * 
  *     cdef bint usernan = 0
  *     if user_missing:             # <<<<<<<<<<<<<<
@@ -20460,7 +20413,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1422
+  /* "pyreadstat/_readstat_parser.pyx":1418
  *         usernan = 1
  * 
  *     cdef bint no_datetime_conversion = 0             # <<<<<<<<<<<<<<
@@ -20469,17 +20422,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   __pyx_v_no_datetime_conversion = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1423
+  /* "pyreadstat/_readstat_parser.pyx":1419
  * 
  *     cdef bint no_datetime_conversion = 0
  *     if disable_datetime_conversion:             # <<<<<<<<<<<<<<
  *         no_datetime_conversion = 1
  * 
 */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_disable_datetime_conversion); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1423, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_disable_datetime_conversion); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1419, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "pyreadstat/_readstat_parser.pyx":1424
+    /* "pyreadstat/_readstat_parser.pyx":1420
  *     cdef bint no_datetime_conversion = 0
  *     if disable_datetime_conversion:
  *         no_datetime_conversion = 1             # <<<<<<<<<<<<<<
@@ -20488,7 +20441,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
     __pyx_v_no_datetime_conversion = 1;
 
-    /* "pyreadstat/_readstat_parser.pyx":1423
+    /* "pyreadstat/_readstat_parser.pyx":1419
  * 
  *     cdef bint no_datetime_conversion = 0
  *     if disable_datetime_conversion:             # <<<<<<<<<<<<<<
@@ -20497,14 +20450,14 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
 */
   }
 
-  /* "pyreadstat/_readstat_parser.pyx":1426
+  /* "pyreadstat/_readstat_parser.pyx":1422
  *         no_datetime_conversion = 1
  * 
  *     data_frame, metadata = run_conversion(filename_path, file_format, file_extension, encoding, metaonly,             # <<<<<<<<<<<<<<
  *                                           dates_as_pandas, usecols, usernan, no_datetime_conversion, <long>row_limit, <long>row_offset,
  *                                           output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
 */
-  __pyx_t_2 = __pyx_f_10pyreadstat_16_readstat_parser_run_conversion(__pyx_v_filename_path, __pyx_v_file_format, __pyx_v_file_extension, __pyx_v_encoding, __pyx_v_metaonly, __pyx_v_dates_as_pandas, __pyx_v_usecols, __pyx_v_usernan, __pyx_v_no_datetime_conversion, ((long)__pyx_v_row_limit), ((long)__pyx_v_row_offset), __pyx_v_output_format, __pyx_v_extra_datetime_formats, __pyx_v_extra_date_formats, __pyx_v_extra_time_formats); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1426, __pyx_L1_error)
+  __pyx_t_2 = __pyx_f_10pyreadstat_16_readstat_parser_run_conversion(__pyx_v_filename_path, __pyx_v_file_format, __pyx_v_file_extension, __pyx_v_encoding, __pyx_v_metaonly, __pyx_v_dates_as_pandas, __pyx_v_usecols, __pyx_v_usernan, __pyx_v_no_datetime_conversion, ((long)__pyx_v_row_limit), ((long)__pyx_v_row_offset), __pyx_v_output_format, __pyx_v_extra_datetime_formats, __pyx_v_extra_date_formats, __pyx_v_extra_time_formats); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1422, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
     PyObject* sequence = __pyx_t_2;
@@ -20512,7 +20465,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 1426, __pyx_L1_error)
+      __PYX_ERR(0, 1422, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -20522,22 +20475,22 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
       __Pyx_INCREF(__pyx_t_3);
     } else {
       __pyx_t_4 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1426, __pyx_L1_error)
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1422, __pyx_L1_error)
       __Pyx_XGOTREF(__pyx_t_4);
       __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1426, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1422, __pyx_L1_error)
       __Pyx_XGOTREF(__pyx_t_3);
     }
     #else
-    __pyx_t_4 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1426, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1422, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1426, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1422, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1426, __pyx_L1_error)
+    __pyx_t_6 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1422, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_7 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_6);
@@ -20545,7 +20498,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     __Pyx_GOTREF(__pyx_t_4);
     index = 1; __pyx_t_3 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_3)) goto __pyx_L8_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < (0)) __PYX_ERR(0, 1426, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < (0)) __PYX_ERR(0, 1422, __pyx_L1_error)
     __pyx_t_7 = NULL;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     goto __pyx_L9_unpacking_done;
@@ -20553,7 +20506,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __pyx_t_7 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 1426, __pyx_L1_error)
+    __PYX_ERR(0, 1422, __pyx_L1_error)
     __pyx_L9_unpacking_done:;
   }
   __pyx_v_data_frame = __pyx_t_4;
@@ -20561,26 +20514,26 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_parser_parser_entry_point(CYT
   __pyx_v_metadata = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1430
+  /* "pyreadstat/_readstat_parser.pyx":1426
  *                                           output_format, extra_datetime_formats, extra_date_formats, extra_time_formats)
  * 
  *     return data_frame, metadata             # <<<<<<<<<<<<<<
  * 
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1430, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1426, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_v_data_frame);
   __Pyx_GIVEREF(__pyx_v_data_frame);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_data_frame) != (0)) __PYX_ERR(0, 1430, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_data_frame) != (0)) __PYX_ERR(0, 1426, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_metadata);
   __Pyx_GIVEREF(__pyx_v_metadata);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_metadata) != (0)) __PYX_ERR(0, 1430, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_metadata) != (0)) __PYX_ERR(0, 1426, __pyx_L1_error);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1379
+  /* "pyreadstat/_readstat_parser.pyx":1375
  *     return data_frame, metadata
  * 
  * def parser_entry_point(filename_path, str parser_format=None,             # <<<<<<<<<<<<<<
@@ -22068,37 +22021,37 @@ __Pyx_RefNannySetupContext("PyInit__readstat_parser", 0);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
 
-  /* "pyreadstat/_readstat_parser.pyx":1382
+  /* "pyreadstat/_readstat_parser.pyx":1378
  *                        metadataonly=False, dates_as_pandas_datetime=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
  *              disable_datetime_conversion=False, int row_limit=0, int row_offset=0, str output_format=None, list extra_datetime_formats=None,             # <<<<<<<<<<<<<<
  *              list extra_date_formats=None, list extra_time_formats=None):
  * 
 */
-  __pyx_t_6 = __Pyx_PyLong_From_int(((int)0)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1382, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyLong_From_int(((int)0)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 1378, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_2 = __Pyx_PyLong_From_int(((int)0)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1382, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyLong_From_int(((int)0)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1378, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "pyreadstat/_readstat_parser.pyx":1379
+  /* "pyreadstat/_readstat_parser.pyx":1375
  *     return data_frame, metadata
  * 
  * def parser_entry_point(filename_path, str parser_format=None,             # <<<<<<<<<<<<<<
  *                        metadataonly=False, dates_as_pandas_datetime=False,
  *              formats_as_category=True, formats_as_ordered_category=False, str encoding=None, list usecols=None, user_missing=False,
 */
-  __pyx_t_7 = PyTuple_Pack(15, Py_None, ((PyObject*)Py_False), ((PyObject*)Py_False), ((PyObject*)Py_True), ((PyObject*)Py_False), Py_None, Py_None, ((PyObject*)Py_False), ((PyObject*)Py_False), __pyx_t_6, __pyx_t_2, Py_None, Py_None, Py_None, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1379, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_Pack(15, Py_None, ((PyObject*)Py_False), ((PyObject*)Py_False), ((PyObject*)Py_True), ((PyObject*)Py_False), Py_None, Py_None, ((PyObject*)Py_False), ((PyObject*)Py_False), __pyx_t_6, __pyx_t_2, Py_None, Py_None, Py_None, Py_None); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 1375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_10pyreadstat_16_readstat_parser_1parser_entry_point, 0, __pyx_mstate_global->__pyx_n_u_parser_entry_point, NULL, __pyx_mstate_global->__pyx_n_u_pyreadstat__readstat_parser, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1379, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_10pyreadstat_16_readstat_parser_1parser_entry_point, 0, __pyx_mstate_global->__pyx_n_u_parser_entry_point, NULL, __pyx_mstate_global->__pyx_n_u_pyreadstat__readstat_parser, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
   #endif
   __Pyx_CyFunction_SetDefaultsTuple(__pyx_t_2, __pyx_t_7);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_parser_entry_point, __pyx_t_2) < (0)) __PYX_ERR(0, 1379, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_parser_entry_point, __pyx_t_2) < (0)) __PYX_ERR(0, 1375, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "pyreadstat/_readstat_parser.pyx":1
@@ -22152,9 +22105,9 @@ static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __pyx_builtin_object = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_object); if (!__pyx_builtin_object) __PYX_ERR(0, 80, __pyx_L1_error)
   __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_round); if (!__pyx_builtin_round) __PYX_ERR(0, 257, __pyx_L1_error)
-  __pyx_builtin_all = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_all); if (!__pyx_builtin_all) __PYX_ERR(0, 1085, __pyx_L1_error)
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 1104, __pyx_L1_error)
-  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 1215, __pyx_L1_error)
+  __pyx_builtin_all = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_all); if (!__pyx_builtin_all) __PYX_ERR(0, 1081, __pyx_L1_error)
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(0, 1100, __pyx_L1_error)
+  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_zip); if (!__pyx_builtin_zip) __PYX_ERR(0, 1211, __pyx_L1_error)
 
   /* Cached unbound methods */
   __pyx_mstate->__pyx_umethod_PyDict_Type_get.type = (PyObject*)&PyDict_Type;
@@ -22178,25 +22131,25 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "pyreadstat/_readstat_parser.pyx":1107
+  /* "pyreadstat/_readstat_parser.pyx":1103
  *                 var_format = dc.col_formats[index]
  *                 if dtypes[index] != '<M8[ns]' and (var_format == DATE_FORMAT_DATE or var_format == DATE_FORMAT_DATETIME):
  *                     data_frame.loc[:, column] = pd.to_datetime(data_frame[column])             # <<<<<<<<<<<<<<
  * 
  *         if output_format == "polars" and not dc.no_datetime_conversion:
 */
-  __pyx_mstate_global->__pyx_slice[0] = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_slice[0])) __PYX_ERR(0, 1107, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_slice[0] = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_mstate_global->__pyx_slice[0])) __PYX_ERR(0, 1103, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_slice[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_slice[0]);
 
-  /* "pyreadstat/_readstat_parser.pyx":1266
+  /* "pyreadstat/_readstat_parser.pyx":1262
  *         except UnicodeError:
  *             warnings.warn("file path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly." % sys.getfilesystemencoding())
  *             filename_bytes = os.fsdecode(filename_path).encode("utf-8", "surrogateescape")             # <<<<<<<<<<<<<<
  *     else:
  *         if type(filename_path) == str:
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_kp_u_utf_8, __pyx_mstate_global->__pyx_n_u_surrogateescape); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 1266, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_kp_u_utf_8, __pyx_mstate_global->__pyx_n_u_surrogateescape); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 1262, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
   #if CYTHON_IMMORTAL_CONSTANTS
@@ -22393,7 +22346,7 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591_Q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {16, 0, 0, 24, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1379};
+    const __Pyx_PyCode_New_function_description descr = {16, 0, 0, 24, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1375};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_filename_path, __pyx_mstate->__pyx_n_u_parser_format, __pyx_mstate->__pyx_n_u_metadataonly, __pyx_mstate->__pyx_n_u_dates_as_pandas_datetime, __pyx_mstate->__pyx_n_u_formats_as_category, __pyx_mstate->__pyx_n_u_formats_as_ordered_category, __pyx_mstate->__pyx_n_u_encoding, __pyx_mstate->__pyx_n_u_usecols, __pyx_mstate->__pyx_n_u_user_missing, __pyx_mstate->__pyx_n_u_disable_datetime_conversion, __pyx_mstate->__pyx_n_u_row_limit, __pyx_mstate->__pyx_n_u_row_offset, __pyx_mstate->__pyx_n_u_output_format, __pyx_mstate->__pyx_n_u_extra_datetime_formats, __pyx_mstate->__pyx_n_u_extra_date_formats, __pyx_mstate->__pyx_n_u_extra_time_formats, __pyx_mstate->__pyx_n_u_file_format, __pyx_mstate->__pyx_n_u_file_extension, __pyx_mstate->__pyx_n_u_metaonly, __pyx_mstate->__pyx_n_u_dates_as_pandas, __pyx_mstate->__pyx_n_u_usernan, __pyx_mstate->__pyx_n_u_no_datetime_conversion, __pyx_mstate->__pyx_n_u_data_frame, __pyx_mstate->__pyx_n_u_metadata};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_pyreadstat__readstat_parser_pyx, __pyx_mstate->__pyx_n_u_parser_entry_point, __pyx_mstate->__pyx_kp_b_iso88591_a_1_JJ_ppq_00AASSkkl_1_S_a_s_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
