@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 dev = [
     "setuptools>=80.0.0",
     "numpy>=2.0.0",
-    "pandas>=2.0.0",
+    "pandas>=2.2.2",
     "polars>=1.30.0",
     "cython>=3.0.0",
     "narwhals>=2.10.1",
@@ -20,7 +20,7 @@ test = [
     "mypy>=1.20.0",
     "pytest-mypy-plugins>=4.0.0",
     "pandas-stubs>=2.0.0",
-    "pandas>=2.0.0",
+    "pandas>=2.2.2",
     "polars>=1.30.0",
     "narwhals>=2.10.1",
 ]

@@ -14,8 +14,7 @@
 # limitations under the License.
 # #############################################################################
 
-import setuptools
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 import os
 import sys
 import Cython
