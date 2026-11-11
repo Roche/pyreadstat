@@ -1,5 +1,5 @@
 # 1.3.8 (github, pypi and conda 2026.xx.xx)
-* Updated Readstat sources to e36e4fb250927346e4a480694fb6a447a7803057
+* Updated Readstat sources to 758a6b68001b8a65b6e29823289e4d0a2a6efc5d
 * XPORT, sas7bdat and sas7bcat formats and informats without decimals now end with a dot
   (e.g. YYMMDD10. instead of YYMMDD10, DATETIME. instead of DATETIME), as written by SAS.
   The changes come from Readstat.

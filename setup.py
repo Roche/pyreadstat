@@ -57,12 +57,16 @@ for dirname, _ , filenames in os.walk(source_dir_root):
 source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname not in omitted_source_dirs]
 
 def is_conda():
-    """Check if running in a conda/miniforge environment."""
+    """
+    Check if running in a conda/miniforge environment with GNU libiconv installed.
+    The libiconv iconv.h renames iconv_open/iconv/iconv_close to libiconv_open/libiconv/libiconv_close,
+    so when that header is picked up, libiconv must be linked. Without it, glibc's iconv is used.
+    """
     if os.environ.get('CONDA_BUILD'):
         return False
     if not os.path.exists(os.path.join(sys.prefix, 'conda-meta')):
         return False
-    return (3, 11) <= sys.version_info[:2] <= (3, 13)
+    return os.path.isfile(os.path.join(sys.prefix, 'include', 'iconv.h'))
 
 data_files = []
 libraries = []

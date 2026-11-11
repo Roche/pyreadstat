@@ -143,5 +143,8 @@ const char *readstat_error_message(readstat_error_t error_code) {
     if (error_code == READSTAT_ERROR_DUPLICATE_VARIABLE_NAME)
         return "Two or more variables have the same name";
 
+    if (error_code == READSTAT_ERROR_TOO_MANY_ROWS)
+        return "Too many rows for the file format";
+
     return "Unknown error";
 }

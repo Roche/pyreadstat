@@ -114,6 +114,7 @@ typedef enum sas_subheader_type_e {
 
 #define SAS_PAGE_TYPE_DELETED_ROWS  0x0080
 #define SAS_PAGE_TYPE_META2         0x4000
+#define SAS_PAGE_TYPE_INDEX_LEAF    0x8000
 #define SAS_PAGE_TYPE_COMP          0x9000
 
 #define SAS_SUBHEADER_POINTER_SIZE_32BIT    12
