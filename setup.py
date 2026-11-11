@@ -21,12 +21,6 @@ import sys
 import Cython
 from Cython.Build import cythonize
 
-PY_MAJOR_VERSION = sys.version_info[0]
-PY_MINOR_VERSION = sys.version_info[1]
-
-if PY_MAJOR_VERSION < 3 and os.name == 'nt':
-    raise Exception("Python 2 is not supported on Windows.")
-
 cyver = int(Cython.__version__.split(".")[0])
 if cyver < 3:
     msg = "Cython version 3 or newer required"
@@ -119,9 +113,8 @@ extensions = [Extension("pyreadstat._readstat_parser",
 for e in extensions:
     e.cython_directives = {"embedsignature": True}
 
-# let's use cython with force so that it always recompiles in case 
-# somebody is switching between python 2 and 3
-extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
+# let's use cython with force so that the C files are always regenerated
+extensions = cythonize(extensions, force=True)
 
 long_description = """ A Python package to read and write SAS
 (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas and polars data frames. It is a wrapper

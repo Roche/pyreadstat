@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
@@ -34,9 +34,9 @@ import re
 import narwhals.stable.v2 as nw
 import numpy as np
 
-from readstat_api cimport *
+from .readstat_api cimport *
 
-from pyclasses import metadata_container
+from .pyclasses import metadata_container
 
 # necessary to work with the datetime C API
 import_datetime()

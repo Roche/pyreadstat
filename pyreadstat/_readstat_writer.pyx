@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 # ###cython: profile=True
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
@@ -27,10 +27,10 @@ from datetime import timezone
 import numpy as np
 import narwhals.stable.v2 as nw
 
-from readstat_api cimport *
+from .readstat_api cimport *
 from libc.errno cimport errno
-from _readstat_parser import ReadstatError, PyreadstatError
-from _readstat_parser cimport check_exit_status
+from ._readstat_parser import ReadstatError, PyreadstatError
+from ._readstat_parser cimport check_exit_status
 
 cdef set int_types = {nw.Int32, nw.Int16, nw.Int8, nw.UInt16, nw.UInt8, }
 cdef set float_types = {nw.Float64, nw.Float32, nw.Decimal, nw.Int128, nw.Int64, nw.UInt128, nw.UInt64, nw.UInt32}
