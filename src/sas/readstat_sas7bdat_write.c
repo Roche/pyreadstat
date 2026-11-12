@@ -10,6 +10,7 @@
 #include "../readstat_writer.h"
 #include "readstat_sas.h"
 #include "readstat_sas_rle.h"
+#include "readstat_sas_rdc.h"
 #include "readstat_xport.h"
 #include "readstat_xport_parse_format.h"
 
@@ -23,19 +24,22 @@
  *
  *   header | META page ... | MIX page (last metadata + first rows) | DATA page ...
  *
- * File layout (RLE compressed):
+ * File layout (RLE or RDC compressed):
  *
  *   header | META page ... (metadata subheaders, then row subheaders) | COMP page | META page ...
  */
 
-#define SAS7BDAT_PAGE_NUMBER_MASK        0xFEDCBA98u
-#define SAS7BDAT_MAX_SUBHEADER_SIZE      32740
+#define SAS7BDAT_PAGE_NUMBER_MASK         0xFEDCBA98u
+#define SAS7BDAT_MAX_SUBHEADER_SIZE       32740
 #define SAS7BDAT_MAX_ATTRS_SUBHEADER_SIZE 24588
-#define SAS7BDAT_MAX_NAMES_PER_SUBHEADER 4089
-#define SAS7BDAT_COUNTS_VECTOR_COUNT     12
+#define SAS7BDAT_MAX_NAMES_PER_SUBHEADER  4089
+#define SAS7BDAT_COUNTS_VECTOR_COUNT      12
+#define SAS7BDAT_INDEX_KEY_LEN            8
 
-#define SAS7BDAT_ROW_SIZE_UNCOMPRESSED_FLAGS   0x00223011
-#define SAS7BDAT_ROW_SIZE_COMPRESSED_FLAGS     0x0022703A
+#define SAS7BDAT_ROW_SIZE_UNCOMPRESSED_FLAGS      0x00223011
+#define SAS7BDAT_ROW_SIZE_COMPRESSED_FLAGS        0x0022703A
+#define SAS7BDAT_ROW_SIZE_RDC_COMPRESSED_FLAGS    0x0022303A
+#define SAS7BDAT_ROW_SIZE_FLAG_EXTEND_OBS_COUNTER 0x04000000
 
 typedef struct sas7bdat_subheader_s {
     uint32_t        signature;
@@ -66,6 +70,10 @@ typedef struct sas7bdat_write_ctx_s {
     sas_header_info_t      *hinfo;
     int                     u64;
     int                     compressed;
+    /* Set if compressed: RLE (COMPRESS=CHAR) or RDC (COMPRESS=BINARY) */
+    ssize_t               (*compress)(void *, size_t, const void *, size_t);
+    const char             *compression_signature;
+    uint32_t                compressed_row_size_flags;
     size_t                  sig_len;
     size_t                  footer_len;
     size_t                  int_len;
@@ -510,7 +518,7 @@ static readstat_error_t sas7bdat_add_column_text(readstat_writer_t *writer, sas7
     if ((retval = sas7bdat_text_add_bytes(ctx, first_entry, sizeof(first_entry), NULL)) != READSTAT_OK)
         goto cleanup;
     if (ctx->compressed) {
-        if ((retval = sas7bdat_text_add(ctx, SAS_COMPRESSION_SIGNATURE_RLE, &ctx->compression_ref)) != READSTAT_OK)
+        if ((retval = sas7bdat_text_add(ctx, ctx->compression_signature, &ctx->compression_ref)) != READSTAT_OK)
             goto cleanup;
     }
     if ((retval = sas7bdat_text_add(ctx, blank, &ctx->blank_ref)) != READSTAT_OK)
@@ -829,15 +837,17 @@ static void sas7bdat_fill_row_size_subheader(readstat_writer_t *writer, sas7bdat
     sas7bdat_subheader_t *last_meta = ctx->subheaders[ctx->meta_subheader_count-1];
     sas7bdat_page_t *last_meta_page = &ctx->pages[ctx->last_meta_page-1];
 
-    wint(ctx, &d[1*il], ctx->compressed ? 0x131 : 0xF0);
+    wint(ctx, &d[1*il], !ctx->u64 ? 0x28B : ctx->compressed ? 0x131 : 0xF0);
     wint(ctx, &d[2*il], ctx->compressed
             ? ctx->meta_subheader_count + writer->row_count + 2
             : total_subheaders + 2);
-    wint(ctx, &d[4*il], ctx->compressed ? SAS7BDAT_ROW_SIZE_COMPRESSED_FLAGS : SAS7BDAT_ROW_SIZE_UNCOMPRESSED_FLAGS);
+    wint(ctx, &d[4*il], (ctx->compressed ? ctx->compressed_row_size_flags
+                : SAS7BDAT_ROW_SIZE_UNCOMPRESSED_FLAGS)
+            | (ctx->u64 ? 0 : SAS7BDAT_ROW_SIZE_FLAG_EXTEND_OBS_COUNTER));
     wint(ctx, &d[5*il], ctx->row_length);
     wint(ctx, &d[6*il], writer->row_count);
     wint(ctx, &d[7*il], 0); /* deleted rows */
-    wint(ctx, &d[8*il], ctx->compressed ? 2 : 0);
+    wint(ctx, &d[8*il], ctx->compressed ? ctx->last_meta_page + 1 : 0);
     wint(ctx, &d[9*il], formats_on_first_page);
     wint(ctx, &d[10*il], formats_on_second_page);
     wint(ctx, &d[11*il], ctx->hash_payload_size);
@@ -1043,9 +1053,10 @@ static readstat_error_t sas7bdat_flush_page(readstat_writer_t *writer, sas7bdat_
  * leaf) follows the last metadata page; SAS writes further leaves between
  * the data pages as they fill up, while ReadStat writes all index pages
  * right after the last metadata page. Each leaf record
- * describes one page holding rows and is 2*int_len+2 bytes:
+ * describes one page holding rows and is 8+int_len+2 bytes:
  *
- *   int_len bytes  cumulative row count up to and including the page (big-endian)
+ *   8 bytes        cumulative row count up to and including the page (big-endian,
+ *                  8 bytes in 32-bit files, too)
  *   int_len bytes  1-based physical page number (native byte order)
  *   2 bytes        number of subheader pointers on the page, without the terminator
  *
@@ -1058,7 +1069,7 @@ static readstat_error_t sas7bdat_flush_page(readstat_writer_t *writer, sas7bdat_
  * Root entries are a shortened separator key (big-endian, cut after the
  * first byte where the first key of the next leaf differs from the last key
  * of this leaf; all 0xFF for the last leaf) followed by the 1-based child
- * page. Their 2-byte offsets follow the level field at phs+8.
+ * page. Their 2-byte offsets follow the level field at phs+int_len.
  *
  * Page header fields of index pages:
  *
@@ -1068,7 +1079,7 @@ static readstat_error_t sas7bdat_flush_page(readstat_writer_t *writer, sas7bdat_
  *   phs-6          see sas7bdat_index_page_marker()
  *   phs-4          number of records / root entries
  *   phs-2          free bytes between the header (or root offsets) and the entries
- *   phs            level (8 bytes; 0 for leaves, 1 for the root)
+ *   phs            level (int_len bytes; 0 for leaves, 1 for the root)
  *
  * Pages holding compressed rows carry the 1-based number of their first
  * row at offset 16/8 (0 on the first page). The data step doesn't need it,
@@ -1099,11 +1110,12 @@ static size_t sas7bdat_index_region(sas7bdat_write_ctx_t *ctx) {
 }
 
 static size_t sas7bdat_index_record_len(sas7bdat_write_ctx_t *ctx) {
-    return 2 * ctx->int_len + 2;
+    return SAS7BDAT_INDEX_KEY_LEN + ctx->int_len + 2;
 }
 
 static size_t sas7bdat_index_records_per_leaf(sas7bdat_write_ctx_t *ctx) {
-    return (sas7bdat_index_region(ctx) - ctx->phs - ctx->sps) / sas7bdat_index_record_len(ctx);
+    size_t record_len = sas7bdat_index_record_len(ctx);
+    return (sas7bdat_index_region(ctx) - ctx->phs - ctx->int_len - record_len) / record_len;
 }
 
 static int64_t sas7bdat_index_leaf_count(sas7bdat_write_ctx_t *ctx, int64_t record_count) {
@@ -1141,21 +1153,23 @@ static readstat_error_t sas7bdat_build_index_records(readstat_writer_t *writer, 
     return READSTAT_OK;
 }
 
-static void sas7bdat_write_index_key(sas7bdat_write_ctx_t *ctx, char *key, int64_t value) {
-    for (size_t k=0; k<ctx->int_len; k++) {
-        key[k] = (value >> (8 * (ctx->int_len - 1 - k))) & 0xFF;
+static void sas7bdat_write_index_key(char *key, int64_t value) {
+    for (size_t k=0; k<SAS7BDAT_INDEX_KEY_LEN; k++) {
+        key[k] = (value >> (8 * (SAS7BDAT_INDEX_KEY_LEN - 1 - k))) & 0xFF;
     }
 }
 
 /* The value at phs-6 of index pages. Its meaning is unclear; these are the
  * values observed in files written by SAS:
  *
- *   single leaf (no root)   total page count
+ *   single leaf (no root)   number of records + 1 (equal to the total page
+ *                           count only if no page is metadata-only; 1 for
+ *                           files without rows)
  *   last leaf below a root  total page count - 1
  *   other leaves            1819 for a leaf indexing up to 0-based page 1816,
  *                           written as page 1821 (possibly the last page
  *                           number at the time the leaf was split off)
- *   root                    total page count - 2
+ *   root                    total page count - number of leaves
  *
  * SAS writes leaves where they fill up, between data pages, so the last
  * case can't be reproduced; the 0-based number of the last indexed page is
@@ -1165,9 +1179,9 @@ static void sas7bdat_write_index_key(sas7bdat_write_ctx_t *ctx, char *key, int64
 static int64_t sas7bdat_index_page_marker(sas7bdat_write_ctx_t *ctx,
         const sas7bdat_index_record_t *leaf_records, int64_t leaf_record_count) {
     if (leaf_records == NULL)
-        return ctx->total_pages - 2;
-    if (ctx->index_pages == 1 || leaf_record_count == 0)
-        return ctx->total_pages;
+        return ctx->total_pages - (ctx->index_pages - 1);
+    if (ctx->index_pages == 1)
+        return leaf_record_count + 1;
     return leaf_records[leaf_record_count-1].page - 1;
 }
 
@@ -1182,7 +1196,7 @@ static void sas7bdat_init_index_page(sas7bdat_write_ctx_t *ctx, char *buffer, in
     w2(&buffer[ctx->phs-6], marker);
     w2(&buffer[ctx->phs-4], entries);
     w2(&buffer[ctx->phs-2], free_bytes);
-    w8(&buffer[ctx->phs], level);
+    wint(ctx, &buffer[ctx->phs], level);
 }
 
 static readstat_error_t sas7bdat_write_index_leaf(readstat_writer_t *writer, sas7bdat_write_ctx_t *ctx,
@@ -1193,14 +1207,14 @@ static readstat_error_t sas7bdat_write_index_leaf(readstat_writer_t *writer, sas
     size_t record_len = sas7bdat_index_record_len(ctx);
 
     sas7bdat_init_index_page(ctx, buffer, physical_page, page_type, 0, count,
-            region - (ctx->phs + 8) - count * record_len,
+            region - (ctx->phs + ctx->int_len) - count * record_len,
             sas7bdat_index_page_marker(ctx, records, count), next_leaf);
 
     for (int64_t r=0; r<count; r++) {
         char *record = &buffer[region - (r + 1) * record_len];
-        sas7bdat_write_index_key(ctx, record, records[r].cumulative_rows);
-        wint(ctx, record + ctx->int_len, records[r].page);
-        w2(record + 2 * ctx->int_len, records[r].count);
+        sas7bdat_write_index_key(record, records[r].cumulative_rows);
+        wint(ctx, record + SAS7BDAT_INDEX_KEY_LEN, records[r].page);
+        w2(record + SAS7BDAT_INDEX_KEY_LEN + ctx->int_len, records[r].count);
     }
 
     return readstat_write_bytes(writer, buffer, ctx->page_size);
@@ -1208,29 +1222,29 @@ static readstat_error_t sas7bdat_write_index_leaf(readstat_writer_t *writer, sas
 
 /* Fills key with the separator key of root entry l and returns its length */
 static size_t sas7bdat_index_root_key(sas7bdat_write_ctx_t *ctx, const sas7bdat_index_record_t *records,
-        int64_t leaf_count, int64_t l, char key[8]) {
+        int64_t leaf_count, int64_t l, char key[SAS7BDAT_INDEX_KEY_LEN]) {
     if (l == leaf_count - 1) {
-        memset(key, 0xFF, 8);
-        return ctx->int_len;
+        memset(key, 0xFF, SAS7BDAT_INDEX_KEY_LEN);
+        return SAS7BDAT_INDEX_KEY_LEN;
     }
 
     int64_t last = (l + 1) * (int64_t)sas7bdat_index_records_per_leaf(ctx) - 1;
-    char last_key[8];
-    sas7bdat_write_index_key(ctx, last_key, records[last].cumulative_rows);
-    sas7bdat_write_index_key(ctx, key, records[last + 1].cumulative_rows);
+    char last_key[SAS7BDAT_INDEX_KEY_LEN];
+    sas7bdat_write_index_key(last_key, records[last].cumulative_rows);
+    sas7bdat_write_index_key(key, records[last + 1].cumulative_rows);
 
     size_t len = 0;
-    while (len < ctx->int_len && last_key[len] == key[len])
+    while (len < SAS7BDAT_INDEX_KEY_LEN && last_key[len] == key[len])
         len++;
-    return len < ctx->int_len ? len + 1 : len;
+    return len < SAS7BDAT_INDEX_KEY_LEN ? len + 1 : len;
 }
 
 /* Returns the offset of the lowest root entry, or 0 if the entries don't fit */
 static size_t sas7bdat_index_root_entry_end(sas7bdat_write_ctx_t *ctx,
         const sas7bdat_index_record_t *records, int64_t leaf_count) {
     size_t entry_end = sas7bdat_index_region(ctx);
-    size_t offsets_end = ctx->phs + 8 + 2 * leaf_count;
-    char key[8];
+    size_t offsets_end = ctx->phs + ctx->int_len + 2 * leaf_count;
+    char key[SAS7BDAT_INDEX_KEY_LEN];
     for (int64_t l=0; l<leaf_count; l++) {
         size_t entry_len = sas7bdat_index_root_key(ctx, records, leaf_count, l, key) + ctx->int_len;
         if (entry_end < offsets_end + entry_len)
@@ -1244,7 +1258,7 @@ static readstat_error_t sas7bdat_write_index_root(readstat_writer_t *writer, sas
         const sas7bdat_index_record_t *records, int64_t leaf_count, int64_t physical_page,
         int64_t first_leaf_page) {
     char *buffer = ctx->page;
-    size_t offsets_end = ctx->phs + 8 + 2 * leaf_count;
+    size_t offsets_end = ctx->phs + ctx->int_len + 2 * leaf_count;
     size_t entry_end = sas7bdat_index_root_entry_end(ctx, records, leaf_count);
 
     /* Checked up front by sas7bdat_end_compressed */
@@ -1255,13 +1269,13 @@ static readstat_error_t sas7bdat_write_index_root(readstat_writer_t *writer, sas
             entry_end - offsets_end, sas7bdat_index_page_marker(ctx, NULL, 0), 0);
 
     size_t entry_offset = sas7bdat_index_region(ctx);
-    char key[8];
+    char key[SAS7BDAT_INDEX_KEY_LEN];
     for (int64_t l=0; l<leaf_count; l++) {
         size_t key_len = sas7bdat_index_root_key(ctx, records, leaf_count, l, key);
         entry_offset -= key_len + ctx->int_len;
         memcpy(&buffer[entry_offset], key, key_len);
         wint(ctx, &buffer[entry_offset + key_len], first_leaf_page + l + 1);
-        w2(&buffer[ctx->phs + 8 + 2 * l], entry_offset);
+        w2(&buffer[ctx->phs + ctx->int_len + 2 * l], entry_offset);
     }
 
     return readstat_write_bytes(writer, buffer, ctx->page_size);
@@ -1379,7 +1393,17 @@ static readstat_error_t sas7bdat_write_ctx_init(readstat_writer_t *writer, sas7b
     }
     ctx->hinfo->page_number_mask = SAS7BDAT_PAGE_NUMBER_MASK;
     ctx->u64 = ctx->hinfo->u64;
-    ctx->compressed = (writer->compression == READSTAT_COMPRESS_ROWS);
+    if (writer->compression == READSTAT_COMPRESS_ROWS) {
+        ctx->compressed = 1;
+        ctx->compress = &sas_rle_compress;
+        ctx->compression_signature = SAS_COMPRESSION_SIGNATURE_RLE;
+        ctx->compressed_row_size_flags = SAS7BDAT_ROW_SIZE_COMPRESSED_FLAGS;
+    } else if (writer->compression == READSTAT_COMPRESS_BINARY) {
+        ctx->compressed = 1;
+        ctx->compress = &sas_rdc_compress;
+        ctx->compression_signature = SAS_COMPRESSION_SIGNATURE_RDC;
+        ctx->compressed_row_size_flags = SAS7BDAT_ROW_SIZE_RDC_COMPRESSED_FLAGS;
+    }
     ctx->sig_len = ctx->u64 ? 8 : 4;
     ctx->int_len = ctx->u64 ? 8 : 4;
     ctx->footer_len = ctx->u64 ? 12 : 8;
@@ -1750,10 +1774,12 @@ cleanup:
 static readstat_error_t sas7bdat_write_row_compressed(readstat_writer_t *writer, sas7bdat_write_ctx_t *ctx) {
     readstat_error_t retval = READSTAT_OK;
     size_t len = ctx->row_length;
-    size_t compressed_len = sas_rle_compressed_len(ctx->phys_row, len);
+    ssize_t compressed_len = ctx->compress(NULL, 0, ctx->phys_row, len);
+    if (compressed_len < 0)
+        return READSTAT_ERROR_ROW_WIDTH_MISMATCH;
 
     sas7bdat_subheader_t *subheader = NULL;
-    if (compressed_len < len) {
+    if ((size_t)compressed_len < len) {
         subheader = sas7bdat_subheader_init(0, compressed_len, 0, 1);
         if (subheader == NULL) {
             retval = READSTAT_ERROR_MALLOC;
@@ -1761,7 +1787,7 @@ static readstat_error_t sas7bdat_write_row_compressed(readstat_writer_t *writer,
         }
         subheader->is_row_data = 1;
         subheader->comp = SAS_COMPRESSION_ROW;
-        size_t actual_len = sas_rle_compress(subheader->data, subheader->len, ctx->phys_row, len);
+        ssize_t actual_len = ctx->compress(subheader->data, subheader->len, ctx->phys_row, len);
         if (actual_len != compressed_len) {
             retval = READSTAT_ERROR_ROW_WIDTH_MISMATCH;
             goto cleanup;
@@ -1802,7 +1828,8 @@ static readstat_error_t sas7bdat_metadata_ok(void *writer_ctx) {
     readstat_writer_t *writer = (readstat_writer_t *)writer_ctx;
 
     if (writer->compression != READSTAT_COMPRESS_NONE &&
-            writer->compression != READSTAT_COMPRESS_ROWS)
+            writer->compression != READSTAT_COMPRESS_ROWS &&
+            writer->compression != READSTAT_COMPRESS_BINARY)
         return READSTAT_ERROR_UNSUPPORTED_COMPRESSION;
 
     return sas_validate_unique_names(writer);

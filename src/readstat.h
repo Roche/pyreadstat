@@ -616,7 +616,7 @@ readstat_error_t readstat_writer_set_file_format_is_64bit(readstat_writer_t *wri
         int is_64bit); // applies only to SAS files; defaults to 1=true
 readstat_error_t readstat_writer_set_compression(readstat_writer_t *writer,
         readstat_compress_t compression); 
-        // READSTAT_COMPRESS_BINARY is supported only with SAV files (i.e. ZSAV files)
+        // READSTAT_COMPRESS_BINARY is supported only with sas7bdat and SAV files (i.e. ZSAV files)
         // READSTAT_COMPRESS_ROWS is supported only with sas7bdat and SAV files
 
 // Optional error handler

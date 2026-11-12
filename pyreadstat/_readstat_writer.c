@@ -45,6 +45,7 @@
             "./src/sas/readstat_sas7bcat_write.c",
             "./src/sas/readstat_sas7bdat_read.c",
             "./src/sas/readstat_sas7bdat_write.c",
+            "./src/sas/readstat_sas_rdc.c",
             "./src/sas/readstat_sas_rle.c",
             "./src/sas/readstat_xport.c",
             "./src/sas/readstat_xport_parse_format.c",
@@ -3260,7 +3261,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_open_file(PyObject *); /*prot
 static int __pyx_f_10pyreadstat_16_readstat_writer_close_file(int); /*proto*/
 static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_filepath_to_bytes(PyObject *); /*proto*/
 static void __pyx_f_10pyreadstat_16_readstat_writer_initial_checks(int, int, PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *); /*proto*/
-static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *, int, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int, int); /*proto*/
+static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *, int, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, readstat_compress_t, int); /*proto*/
 static readstat_label_set_t *__pyx_f_10pyreadstat_16_readstat_writer_set_value_label(readstat_writer_t *, PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *); /*proto*/
 static void __pyx_f_10pyreadstat_16_readstat_writer_add_missing_ranges(PyObject *, readstat_variable_t *, __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type, PyObject *); /*proto*/
 static void __pyx_f_10pyreadstat_16_readstat_writer_set_variable_alignment(readstat_variable_t *, PyObject *, PyObject *); /*proto*/
@@ -3473,71 +3474,71 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_columns __pyx_string_tab[111]
 #define __pyx_n_u_combine __pyx_string_tab[112]
 #define __pyx_n_u_compress __pyx_string_tab[113]
-#define __pyx_n_u_d __pyx_string_tab[114]
-#define __pyx_n_u_date __pyx_string_tab[115]
-#define __pyx_n_u_datetime __pyx_string_tab[116]
-#define __pyx_n_u_datetime64 __pyx_string_tab[117]
-#define __pyx_n_u_days __pyx_string_tab[118]
-#define __pyx_n_u_df __pyx_string_tab[119]
-#define __pyx_n_u_dirname __pyx_string_tab[120]
-#define __pyx_n_u_drop_nulls __pyx_string_tab[121]
-#define __pyx_n_u_dst_path __pyx_string_tab[122]
-#define __pyx_n_u_dta __pyx_string_tab[123]
-#define __pyx_n_u_dtype __pyx_string_tab[124]
-#define __pyx_n_u_eager_only __pyx_string_tab[125]
-#define __pyx_n_u_encode __pyx_string_tab[126]
-#define __pyx_n_u_expanduser __pyx_string_tab[127]
-#define __pyx_n_u_file_format_version __pyx_string_tab[128]
-#define __pyx_n_u_file_label __pyx_string_tab[129]
-#define __pyx_n_u_filter __pyx_string_tab[130]
-#define __pyx_n_u_from_native __pyx_string_tab[131]
-#define __pyx_n_u_fsdecode __pyx_string_tab[132]
-#define __pyx_n_u_fsencode __pyx_string_tab[133]
-#define __pyx_n_u_get __pyx_string_tab[134]
-#define __pyx_n_u_get_categories __pyx_string_tab[135]
-#define __pyx_n_u_get_native_namespace __pyx_string_tab[136]
-#define __pyx_n_u_getfilesystemencoding __pyx_string_tab[137]
-#define __pyx_n_u_hi __pyx_string_tab[138]
-#define __pyx_n_u_implementation __pyx_string_tab[139]
-#define __pyx_n_u_is_64bit __pyx_string_tab[140]
-#define __pyx_n_u_is_in __pyx_string_tab[141]
-#define __pyx_n_u_is_pandas __pyx_string_tab[142]
-#define __pyx_n_u_is_polars __pyx_string_tab[143]
-#define __pyx_n_u_isalpha __pyx_string_tab[144]
-#define __pyx_n_u_isdir __pyx_string_tab[145]
-#define __pyx_n_u_isna __pyx_string_tab[146]
-#define __pyx_n_u_items __pyx_string_tab[147]
-#define __pyx_n_u_iter_columns __pyx_string_tab[148]
-#define __pyx_n_u_iter_rows __pyx_string_tab[149]
-#define __pyx_n_u_keys __pyx_string_tab[150]
-#define __pyx_n_u_left __pyx_string_tab[151]
-#define __pyx_n_u_lo __pyx_string_tab[152]
-#define __pyx_n_u_min __pyx_string_tab[153]
-#define __pyx_n_u_missing_ranges __pyx_string_tab[154]
-#define __pyx_n_u_missing_user_values __pyx_string_tab[155]
-#define __pyx_n_u_ms __pyx_string_tab[156]
-#define __pyx_n_u_name __pyx_string_tab[157]
-#define __pyx_n_u_narwhals_stable_v2 __pyx_string_tab[158]
-#define __pyx_n_u_nominal __pyx_string_tab[159]
-#define __pyx_n_u_note __pyx_string_tab[160]
-#define __pyx_n_u_np __pyx_string_tab[161]
-#define __pyx_n_u_ns __pyx_string_tab[162]
-#define __pyx_n_u_nt __pyx_string_tab[163]
-#define __pyx_n_u_nth __pyx_string_tab[164]
-#define __pyx_n_u_null_count __pyx_string_tab[165]
-#define __pyx_n_u_numpy __pyx_string_tab[166]
-#define __pyx_n_u_nw __pyx_string_tab[167]
-#define __pyx_n_u_ordinal __pyx_string_tab[168]
-#define __pyx_n_u_os __pyx_string_tab[169]
-#define __pyx_n_u_path __pyx_string_tab[170]
-#define __pyx_n_u_pop __pyx_string_tab[171]
-#define __pyx_n_u_por __pyx_string_tab[172]
-#define __pyx_n_u_pyreadstat__readstat_writer __pyx_string_tab[173]
-#define __pyx_n_u_replace __pyx_string_tab[174]
-#define __pyx_n_u_right __pyx_string_tab[175]
-#define __pyx_n_u_round __pyx_string_tab[176]
-#define __pyx_n_u_row_compress __pyx_string_tab[177]
-#define __pyx_n_u_row_compression __pyx_string_tab[178]
+#define __pyx_n_u_compression __pyx_string_tab[114]
+#define __pyx_n_u_d __pyx_string_tab[115]
+#define __pyx_n_u_date __pyx_string_tab[116]
+#define __pyx_n_u_datetime __pyx_string_tab[117]
+#define __pyx_n_u_datetime64 __pyx_string_tab[118]
+#define __pyx_n_u_days __pyx_string_tab[119]
+#define __pyx_n_u_df __pyx_string_tab[120]
+#define __pyx_n_u_dirname __pyx_string_tab[121]
+#define __pyx_n_u_drop_nulls __pyx_string_tab[122]
+#define __pyx_n_u_dst_path __pyx_string_tab[123]
+#define __pyx_n_u_dta __pyx_string_tab[124]
+#define __pyx_n_u_dtype __pyx_string_tab[125]
+#define __pyx_n_u_eager_only __pyx_string_tab[126]
+#define __pyx_n_u_encode __pyx_string_tab[127]
+#define __pyx_n_u_expanduser __pyx_string_tab[128]
+#define __pyx_n_u_file_format_version __pyx_string_tab[129]
+#define __pyx_n_u_file_label __pyx_string_tab[130]
+#define __pyx_n_u_filter __pyx_string_tab[131]
+#define __pyx_n_u_from_native __pyx_string_tab[132]
+#define __pyx_n_u_fsdecode __pyx_string_tab[133]
+#define __pyx_n_u_fsencode __pyx_string_tab[134]
+#define __pyx_n_u_get __pyx_string_tab[135]
+#define __pyx_n_u_get_categories __pyx_string_tab[136]
+#define __pyx_n_u_get_native_namespace __pyx_string_tab[137]
+#define __pyx_n_u_getfilesystemencoding __pyx_string_tab[138]
+#define __pyx_n_u_hi __pyx_string_tab[139]
+#define __pyx_n_u_implementation __pyx_string_tab[140]
+#define __pyx_n_u_is_64bit __pyx_string_tab[141]
+#define __pyx_n_u_is_in __pyx_string_tab[142]
+#define __pyx_n_u_is_pandas __pyx_string_tab[143]
+#define __pyx_n_u_is_polars __pyx_string_tab[144]
+#define __pyx_n_u_isalpha __pyx_string_tab[145]
+#define __pyx_n_u_isdir __pyx_string_tab[146]
+#define __pyx_n_u_isna __pyx_string_tab[147]
+#define __pyx_n_u_items __pyx_string_tab[148]
+#define __pyx_n_u_iter_columns __pyx_string_tab[149]
+#define __pyx_n_u_iter_rows __pyx_string_tab[150]
+#define __pyx_n_u_keys __pyx_string_tab[151]
+#define __pyx_n_u_left __pyx_string_tab[152]
+#define __pyx_n_u_lo __pyx_string_tab[153]
+#define __pyx_n_u_min __pyx_string_tab[154]
+#define __pyx_n_u_missing_ranges __pyx_string_tab[155]
+#define __pyx_n_u_missing_user_values __pyx_string_tab[156]
+#define __pyx_n_u_ms __pyx_string_tab[157]
+#define __pyx_n_u_name __pyx_string_tab[158]
+#define __pyx_n_u_narwhals_stable_v2 __pyx_string_tab[159]
+#define __pyx_n_u_nominal __pyx_string_tab[160]
+#define __pyx_n_u_note __pyx_string_tab[161]
+#define __pyx_n_u_np __pyx_string_tab[162]
+#define __pyx_n_u_ns __pyx_string_tab[163]
+#define __pyx_n_u_nt __pyx_string_tab[164]
+#define __pyx_n_u_nth __pyx_string_tab[165]
+#define __pyx_n_u_null_count __pyx_string_tab[166]
+#define __pyx_n_u_numpy __pyx_string_tab[167]
+#define __pyx_n_u_nw __pyx_string_tab[168]
+#define __pyx_n_u_ordinal __pyx_string_tab[169]
+#define __pyx_n_u_os __pyx_string_tab[170]
+#define __pyx_n_u_path __pyx_string_tab[171]
+#define __pyx_n_u_pop __pyx_string_tab[172]
+#define __pyx_n_u_por __pyx_string_tab[173]
+#define __pyx_n_u_pyreadstat__readstat_writer __pyx_string_tab[174]
+#define __pyx_n_u_replace __pyx_string_tab[175]
+#define __pyx_n_u_right __pyx_string_tab[176]
+#define __pyx_n_u_round __pyx_string_tab[177]
+#define __pyx_n_u_row_compress __pyx_string_tab[178]
 #define __pyx_n_u_sas7bdat __pyx_string_tab[179]
 #define __pyx_n_u_sav __pyx_string_tab[180]
 #define __pyx_n_u_scale __pyx_string_tab[181]
@@ -3579,7 +3580,7 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_kp_b_PyObject_readstat_to_numpy_types __pyx_string_tab[217]
 #define __pyx_kp_b_PyObject_PyObject_PyObject_PyObj __pyx_string_tab[218]
 #define __pyx_kp_b_void_readstat_error_t_check_exit __pyx_string_tab[219]
-#define __pyx_kp_b_iso88591_Q_22BBVVW_11K1_1_S_Q_a_9D_1_1_a __pyx_string_tab[220]
+#define __pyx_kp_b_iso88591_Q_22BBVVW_11K1_1_1_S_Q_a_9D_1_1 __pyx_string_tab[220]
 #define __pyx_float_1e3 __pyx_number_tab[0]
 #define __pyx_float_1e6 __pyx_number_tab[1]
 #define __pyx_float_1e9 __pyx_number_tab[2]
@@ -13762,7 +13763,7 @@ static PyObject *__pyx_f_10pyreadstat_16_readstat_writer_filepath_to_bytes(PyObj
  *                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
 */
 
-static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_df, PyObject *__pyx_v_filename_path, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format __pyx_v_file_format, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels, int __pyx_v_file_format_version, PyObject *__pyx_v_note, PyObject *__pyx_v_table_name, PyObject *__pyx_v_variable_value_labels, PyObject *__pyx_v_missing_ranges, PyObject *__pyx_v_missing_user_values, PyObject *__pyx_v_variable_alignment, PyObject *__pyx_v_variable_display_width, PyObject *__pyx_v_variable_measure, PyObject *__pyx_v_variable_format, PyObject *__pyx_v_variable_informat, int __pyx_v_row_compression, int __pyx_v_is_64bit) {
+static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_df, PyObject *__pyx_v_filename_path, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format __pyx_v_file_format, PyObject *__pyx_v_file_label, PyObject *__pyx_v_column_labels, int __pyx_v_file_format_version, PyObject *__pyx_v_note, PyObject *__pyx_v_table_name, PyObject *__pyx_v_variable_value_labels, PyObject *__pyx_v_missing_ranges, PyObject *__pyx_v_missing_user_values, PyObject *__pyx_v_variable_alignment, PyObject *__pyx_v_variable_display_width, PyObject *__pyx_v_variable_measure, PyObject *__pyx_v_variable_format, PyObject *__pyx_v_variable_informat, readstat_compress_t __pyx_v_compression, int __pyx_v_is_64bit) {
   PyObject *__pyx_v_natnamespace = 0;
   PyObject *__pyx_v_pd = 0;
   int __pyx_v_is_pandas;
@@ -14953,7 +14954,7 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_d
  *         if file_format_version > -1:
  *             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))             # <<<<<<<<<<<<<<
  * 
- *         if row_compression:
+ *         if compression != READSTAT_COMPRESS_NONE:
 */
           __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_writer_set_file_format_version(__pyx_v_writer, __pyx_v_file_format_version)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 798, __pyx_L27_error)
 
@@ -14969,26 +14970,29 @@ static int __pyx_f_10pyreadstat_16_readstat_writer_run_write(PyObject *__pyx_v_d
         /* "pyreadstat/_readstat_writer.pyx":800
  *             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))
  * 
- *         if row_compression:             # <<<<<<<<<<<<<<
- *             check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))
+ *         if compression != READSTAT_COMPRESS_NONE:             # <<<<<<<<<<<<<<
+ *             check_exit_status(readstat_writer_set_compression(writer, compression))
  * 
 */
-        if (__pyx_v_row_compression) {
+        __pyx_t_6 = (__pyx_v_compression != READSTAT_COMPRESS_NONE);
+
+        if (__pyx_t_6) {
+
 
           /* "pyreadstat/_readstat_writer.pyx":801
  * 
- *         if row_compression:
- *             check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))             # <<<<<<<<<<<<<<
+ *         if compression != READSTAT_COMPRESS_NONE:
+ *             check_exit_status(readstat_writer_set_compression(writer, compression))             # <<<<<<<<<<<<<<
  * 
  *         # only used by SAS formats (sas7bdat, sas7bcat)
 */
-          __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_writer_set_compression(__pyx_v_writer, READSTAT_COMPRESS_ROWS)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 801, __pyx_L27_error)
+          __pyx_f_10pyreadstat_16_readstat_parser_check_exit_status(readstat_writer_set_compression(__pyx_v_writer, __pyx_v_compression)); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 801, __pyx_L27_error)
 
           /* "pyreadstat/_readstat_writer.pyx":800
  *             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))
  * 
- *         if row_compression:             # <<<<<<<<<<<<<<
- *             check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))
+ *         if compression != READSTAT_COMPRESS_NONE:             # <<<<<<<<<<<<<<
+ *             check_exit_status(readstat_writer_set_compression(writer, compression))
  * 
 */
         }
@@ -18749,7 +18753,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 
 static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_df, PyObject *__pyx_v_dst_path, PyObject *__pyx_v_writer_format, PyObject *__pyx_v_file_label, int __pyx_v_version, PyObject *__pyx_v_table_name, PyObject *__pyx_v_column_labels, PyObject *__pyx_v_compress, PyObject *__pyx_v_row_compress, PyObject *__pyx_v_note, PyObject *__pyx_v_variable_value_labels, PyObject *__pyx_v_missing_ranges, PyObject *__pyx_v_variable_display_width, PyObject *__pyx_v_variable_measure, PyObject *__pyx_v_missing_user_values, PyObject *__pyx_v_variable_format, PyObject *__pyx_v_variable_alignment, PyObject *__pyx_v_variable_informat, int __pyx_v_is_64bit) {
   int __pyx_v_file_format_version;
-  int __pyx_v_row_compression;
+  readstat_compress_t __pyx_v_compression;
   __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format __pyx_v_writer_file_format;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -18770,7 +18774,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
  * 
  * 
  *     cdef int file_format_version = 0             # <<<<<<<<<<<<<<
- *     cdef bint row_compression = 0
+ *     cdef readstat_compress_t compression = READSTAT_COMPRESS_NONE
  * 
 */
   __pyx_v_file_format_version = 0;
@@ -18778,11 +18782,11 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
   /* "pyreadstat/_readstat_writer.pyx":1022
  * 
  *     cdef int file_format_version = 0
- *     cdef bint row_compression = 0             # <<<<<<<<<<<<<<
+ *     cdef readstat_compress_t compression = READSTAT_COMPRESS_NONE             # <<<<<<<<<<<<<<
  * 
  *     cdef dst_file_format writer_file_format
 */
-  __pyx_v_row_compression = 0;
+  __pyx_v_compression = READSTAT_COMPRESS_NONE;
 
   /* "pyreadstat/_readstat_writer.pyx":1026
  *     cdef dst_file_format writer_file_format
@@ -18896,7 +18900,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
  *         if compress:
  *             file_format_version = 3             # <<<<<<<<<<<<<<
  *         if row_compress:
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
 */
       __pyx_v_file_format_version = 3;
 
@@ -18913,7 +18917,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
  *         if compress:
  *             file_format_version = 3
  *         if row_compress:             # <<<<<<<<<<<<<<
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
  *     elif writer_format == "dta":
 */
     __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_row_compress); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1033, __pyx_L1_error)
@@ -18923,17 +18927,17 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
       /* "pyreadstat/_readstat_writer.pyx":1034
  *             file_format_version = 3
  *         if row_compress:
- *             row_compression = 1             # <<<<<<<<<<<<<<
+ *             compression = READSTAT_COMPRESS_ROWS             # <<<<<<<<<<<<<<
  *     elif writer_format == "dta":
  *         writer_file_format = FILE_FORMAT_DTA
 */
-      __pyx_v_row_compression = 1;
+      __pyx_v_compression = READSTAT_COMPRESS_ROWS;
 
       /* "pyreadstat/_readstat_writer.pyx":1033
  *         if compress:
  *             file_format_version = 3
  *         if row_compress:             # <<<<<<<<<<<<<<
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
  *     elif writer_format == "dta":
 */
     }
@@ -18950,7 +18954,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
 
   /* "pyreadstat/_readstat_writer.pyx":1035
  *         if row_compress:
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
  *     elif writer_format == "dta":             # <<<<<<<<<<<<<<
  *         writer_file_format = FILE_FORMAT_DTA
  *         if version == 15:
@@ -18960,7 +18964,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
 
 
     /* "pyreadstat/_readstat_writer.pyx":1036
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
  *     elif writer_format == "dta":
  *         writer_file_format = FILE_FORMAT_DTA             # <<<<<<<<<<<<<<
  *         if version == 15:
@@ -19158,7 +19162,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
 
     /* "pyreadstat/_readstat_writer.pyx":1035
  *         if row_compress:
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
  *     elif writer_format == "dta":             # <<<<<<<<<<<<<<
  *         writer_file_format = FILE_FORMAT_DTA
  *         if version == 15:
@@ -19240,7 +19244,7 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
  *         writer_file_format = FILE_FORMAT_POR
  *     elif writer_format == "sas7bdat":             # <<<<<<<<<<<<<<
  *         writer_file_format = FILE_FORMAT_SAS7BDAT
- *         # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
+ *         if compress and row_compress:
 */
   __pyx_t_1 = __Pyx_PyObject_CompareBoolEq_str_str(__pyx_v_writer_format, __pyx_mstate_global->__pyx_n_u_sas7bdat, Py_EQ); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1057, __pyx_L1_error)
   if (likely(__pyx_t_1)) {
@@ -19250,36 +19254,132 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
  *         writer_file_format = FILE_FORMAT_POR
  *     elif writer_format == "sas7bdat":
  *         writer_file_format = FILE_FORMAT_SAS7BDAT             # <<<<<<<<<<<<<<
- *         # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
- *         # compression, which Readstat cannot write yet
+ *         if compress and row_compress:
+ *             raise PyreadstatError("compress and row_compress cannot be both True")
 */
     __pyx_v_writer_file_format = __pyx_e_10pyreadstat_16_readstat_writer_FILE_FORMAT_SAS7BDAT;
 
-    /* "pyreadstat/_readstat_writer.pyx":1061
- *         # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
- *         # compression, which Readstat cannot write yet
- *         if row_compress:             # <<<<<<<<<<<<<<
- *             row_compression = 1
- *     else:
+    /* "pyreadstat/_readstat_writer.pyx":1059
+ *     elif writer_format == "sas7bdat":
+ *         writer_file_format = FILE_FORMAT_SAS7BDAT
+ *         if compress and row_compress:             # <<<<<<<<<<<<<<
+ *             raise PyreadstatError("compress and row_compress cannot be both True")
+ *         # binary compression: RDC (SAS COMPRESS=BINARY)
 */
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_row_compress); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1061, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_compress); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1059, __pyx_L1_error)
+    if (__pyx_t_2) {
+
+    } else {
+
+      __pyx_t_1 = __pyx_t_2;
+
+      goto __pyx_L10_bool_binop_done;
+    }
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_row_compress); if (unlikely((__pyx_t_2 < 0))) __PYX_ERR(0, 1059, __pyx_L1_error)
+
+    __pyx_t_1 = __pyx_t_2;
+
+    __pyx_L10_bool_binop_done:;
+    if (unlikely(__pyx_t_1)) {
+
+
+      /* "pyreadstat/_readstat_writer.pyx":1060
+ *         writer_file_format = FILE_FORMAT_SAS7BDAT
+ *         if compress and row_compress:
+ *             raise PyreadstatError("compress and row_compress cannot be both True")             # <<<<<<<<<<<<<<
+ *         # binary compression: RDC (SAS COMPRESS=BINARY)
+ *         if compress:
+*/
+      __pyx_t_4 = NULL;
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1060, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_6 = 1;
+      #if CYTHON_UNPACK_METHODS
+      if (unlikely(PyMethod_Check(__pyx_t_5))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
+        assert(__pyx_t_4);
+        PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
+        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(__pyx__function);
+        __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
+        __pyx_t_6 = 0;
+      }
+      #endif
+      {
+        PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u_compress_and_row_compress_cannot};
+        __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1060, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+      }
+      __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __PYX_ERR(0, 1060, __pyx_L1_error)
+
+      /* "pyreadstat/_readstat_writer.pyx":1059
+ *     elif writer_format == "sas7bdat":
+ *         writer_file_format = FILE_FORMAT_SAS7BDAT
+ *         if compress and row_compress:             # <<<<<<<<<<<<<<
+ *             raise PyreadstatError("compress and row_compress cannot be both True")
+ *         # binary compression: RDC (SAS COMPRESS=BINARY)
+*/
+    }
+
+    /* "pyreadstat/_readstat_writer.pyx":1062
+ *             raise PyreadstatError("compress and row_compress cannot be both True")
+ *         # binary compression: RDC (SAS COMPRESS=BINARY)
+ *         if compress:             # <<<<<<<<<<<<<<
+ *             compression = READSTAT_COMPRESS_BINARY
+ *         # row compression: RLE (SAS COMPRESS=CHAR)
+*/
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_compress); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1062, __pyx_L1_error)
     if (__pyx_t_1) {
 
 
-      /* "pyreadstat/_readstat_writer.pyx":1062
- *         # compression, which Readstat cannot write yet
+      /* "pyreadstat/_readstat_writer.pyx":1063
+ *         # binary compression: RDC (SAS COMPRESS=BINARY)
+ *         if compress:
+ *             compression = READSTAT_COMPRESS_BINARY             # <<<<<<<<<<<<<<
+ *         # row compression: RLE (SAS COMPRESS=CHAR)
  *         if row_compress:
- *             row_compression = 1             # <<<<<<<<<<<<<<
+*/
+      __pyx_v_compression = READSTAT_COMPRESS_BINARY;
+
+      /* "pyreadstat/_readstat_writer.pyx":1062
+ *             raise PyreadstatError("compress and row_compress cannot be both True")
+ *         # binary compression: RDC (SAS COMPRESS=BINARY)
+ *         if compress:             # <<<<<<<<<<<<<<
+ *             compression = READSTAT_COMPRESS_BINARY
+ *         # row compression: RLE (SAS COMPRESS=CHAR)
+*/
+    }
+
+    /* "pyreadstat/_readstat_writer.pyx":1065
+ *             compression = READSTAT_COMPRESS_BINARY
+ *         # row compression: RLE (SAS COMPRESS=CHAR)
+ *         if row_compress:             # <<<<<<<<<<<<<<
+ *             compression = READSTAT_COMPRESS_ROWS
+ *     else:
+*/
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_row_compress); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 1065, __pyx_L1_error)
+    if (__pyx_t_1) {
+
+
+      /* "pyreadstat/_readstat_writer.pyx":1066
+ *         # row compression: RLE (SAS COMPRESS=CHAR)
+ *         if row_compress:
+ *             compression = READSTAT_COMPRESS_ROWS             # <<<<<<<<<<<<<<
  *     else:
  *         raise PyreadstatError("wrong writer format")
 */
-      __pyx_v_row_compression = 1;
+      __pyx_v_compression = READSTAT_COMPRESS_ROWS;
 
-      /* "pyreadstat/_readstat_writer.pyx":1061
- *         # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
- *         # compression, which Readstat cannot write yet
+      /* "pyreadstat/_readstat_writer.pyx":1065
+ *             compression = READSTAT_COMPRESS_BINARY
+ *         # row compression: RLE (SAS COMPRESS=CHAR)
  *         if row_compress:             # <<<<<<<<<<<<<<
- *             row_compression = 1
+ *             compression = READSTAT_COMPRESS_ROWS
  *     else:
 */
     }
@@ -19289,56 +19389,56 @@ static PyObject *__pyx_pf_10pyreadstat_16_readstat_writer_writer_entry_point(CYT
  *         writer_file_format = FILE_FORMAT_POR
  *     elif writer_format == "sas7bdat":             # <<<<<<<<<<<<<<
  *         writer_file_format = FILE_FORMAT_SAS7BDAT
- *         # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
+ *         if compress and row_compress:
 */
     goto __pyx_L3;
   }
 
-  /* "pyreadstat/_readstat_writer.pyx":1064
- *             row_compression = 1
+  /* "pyreadstat/_readstat_writer.pyx":1068
+ *             compression = READSTAT_COMPRESS_ROWS
  *     else:
  *         raise PyreadstatError("wrong writer format")             # <<<<<<<<<<<<<<
  * 
  *     run_write(df, dst_path, writer_file_format, file_label, column_labels,
 */
   /*else*/ {
-    __pyx_t_4 = NULL;
-    __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1064, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_5 = NULL;
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_PyreadstatError); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1068, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_6 = 1;
     #if CYTHON_UNPACK_METHODS
-    if (unlikely(PyMethod_Check(__pyx_t_5))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_5);
-      assert(__pyx_t_4);
-      PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
-      __Pyx_INCREF(__pyx_t_4);
+    if (unlikely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_4);
+      assert(__pyx_t_5);
+      PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(__pyx__function);
-      __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
+      __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
       __pyx_t_6 = 0;
     }
     #endif
     {
-      PyObject *__pyx_callargs[2] = {__pyx_t_4, __pyx_mstate_global->__pyx_kp_u_wrong_writer_format};
-      __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1064, __pyx_L1_error)
+      PyObject *__pyx_callargs[2] = {__pyx_t_5, __pyx_mstate_global->__pyx_kp_u_wrong_writer_format};
+      __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_6, (2-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1068, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
     }
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 1064, __pyx_L1_error)
+    __PYX_ERR(0, 1068, __pyx_L1_error)
   }
   __pyx_L3:;
 
-  /* "pyreadstat/_readstat_writer.pyx":1066
+  /* "pyreadstat/_readstat_writer.pyx":1070
  *         raise PyreadstatError("wrong writer format")
  * 
  *     run_write(df, dst_path, writer_file_format, file_label, column_labels,             # <<<<<<<<<<<<<<
  *         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
- *         variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression,
+ *         variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, compression,
 */
-  __pyx_t_7 = __pyx_f_10pyreadstat_16_readstat_writer_run_write(__pyx_v_df, __pyx_v_dst_path, __pyx_v_writer_file_format, __pyx_v_file_label, __pyx_v_column_labels, __pyx_v_file_format_version, __pyx_v_note, __pyx_v_table_name, __pyx_v_variable_value_labels, __pyx_v_missing_ranges, __pyx_v_missing_user_values, __pyx_v_variable_alignment, __pyx_v_variable_display_width, __pyx_v_variable_measure, __pyx_v_variable_format, __pyx_v_variable_informat, __pyx_v_row_compression, __pyx_v_is_64bit); if (unlikely(__pyx_t_7 == ((int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1066, __pyx_L1_error)
+  __pyx_t_7 = __pyx_f_10pyreadstat_16_readstat_writer_run_write(__pyx_v_df, __pyx_v_dst_path, __pyx_v_writer_file_format, __pyx_v_file_label, __pyx_v_column_labels, __pyx_v_file_format_version, __pyx_v_note, __pyx_v_table_name, __pyx_v_variable_value_labels, __pyx_v_missing_ranges, __pyx_v_missing_user_values, __pyx_v_variable_alignment, __pyx_v_variable_display_width, __pyx_v_variable_measure, __pyx_v_variable_format, __pyx_v_variable_informat, __pyx_v_compression, __pyx_v_is_64bit); if (unlikely(__pyx_t_7 == ((int)-1) && PyErr_Occurred())) __PYX_ERR(0, 1070, __pyx_L1_error)
 
 
   /* "pyreadstat/_readstat_writer.pyx":1007
@@ -19432,7 +19532,7 @@ static int __Pyx_modinit_Function_export_code(__pyx_mstatetype *__pyx_mstate) {
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (unlikely(!__pyx_export_signature)) __PYX_ERR(0, 1, __pyx_L1_error)
     #endif
-    const char * __pyx_export_name = __pyx_export_signature + 1049;
+    const char * __pyx_export_name = __pyx_export_signature + 1065;
     void (*const __pyx_export_pointers[])(void) = {(void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_filepath_to_bytes, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_get_narwhals_column_types, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_vectorized_convert_datetime_to_number, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_vectorized_convert_date_to_number, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_vectorized_convert_time_to_number, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_write_bytes, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_get_datetimelike_format_for_readstat, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_convert_datetimelike_to_number, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_open_file, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_check_series_all_same_types, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_run_write, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_get_narwhals_str_series_max_length, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_close_file, (void (*)(void))&__pyx_f_10pyreadstat_16_readstat_writer_initial_checks, (void (*)(void)) NULL};
     void (*const *__pyx_export_pointer)(void) = __pyx_export_pointers;
     const char *__pyx_export_current_signature = __pyx_export_signature;
@@ -20843,40 +20943,40 @@ static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   int __pyx_clineno = 0;
   CYTHON_UNUSED_VAR(__pyx_mstate);
   {
-    const struct { const unsigned int length: 8; } str_length_index[] = {{0},{1},{8},{48},{16},{13},{8},{29},{19},{55},{51},{12},{16},{15},{85},{11},{15},{13},{76},{1},{82},{1},{1},{29},{21},{50},{4},{179},{29},{32},{21},{8},{23},{66},{42},{45},{44},{59},{149},{61},{21},{78},{70},{96},{54},{66},{56},{62},{49},{68},{57},{93},{54},{39},{62},{32},{27},{31},{23},{19},{5},{15},{57},{67},{37},{37},{37},{19},{7},{11},{4},{8},{7},{4},{7},{7},{6},{5},{5},{5},{4},{6},{15},{13},{6},{4},{7},{6},{6},{6},{5},{1},{20},{12},{17},{8},{8},{10},{8},{12},{12},{8},{13},{16},{18},{4},{3},{6},{18},{5},{13},{7},{7},{8},{1},{4},{8},{10},{4},{2},{7},{10},{8},{3},{5},{10},{6},{10},{19},{10},{6},{11},{8},{8},{3},{14},{20},{21},{2},{14},{8},{5},{9},{9},{7},{5},{4},{5},{12},{9},{4},{4},{2},{3},{14},{19},{2},{4},{18},{7},{4},{2},{2},{2},{3},{10},{5},{2},{7},{2},{4},{3},{3},{27},{7},{5},{5},{12},{15},{8},{3},{5},{10},{6},{8},{15},{3},{10},{4},{4},{9},{9},{8},{13},{6},{7},{5},{2},{3},{2},{6},{18},{22},{15},{17},{16},{21},{7},{4},{8},{4},{12},{18},{18},{13},{5},{3}};
-    const struct { const unsigned int length: 11; } bytes_length_index[] = {{310},{1387},{41},{342}};
+    const struct { const unsigned int length: 8; } str_length_index[] = {{0},{1},{8},{48},{16},{13},{8},{29},{19},{55},{51},{12},{16},{15},{85},{11},{15},{13},{76},{1},{82},{1},{1},{29},{21},{50},{4},{179},{29},{32},{21},{8},{23},{66},{42},{45},{44},{59},{149},{61},{21},{78},{70},{96},{54},{66},{56},{62},{49},{68},{57},{93},{54},{39},{62},{32},{27},{31},{23},{19},{5},{15},{57},{67},{37},{37},{37},{19},{7},{11},{4},{8},{7},{4},{7},{7},{6},{5},{5},{5},{4},{6},{15},{13},{6},{4},{7},{6},{6},{6},{5},{1},{20},{12},{17},{8},{8},{10},{8},{12},{12},{8},{13},{16},{18},{4},{3},{6},{18},{5},{13},{7},{7},{8},{11},{1},{4},{8},{10},{4},{2},{7},{10},{8},{3},{5},{10},{6},{10},{19},{10},{6},{11},{8},{8},{3},{14},{20},{21},{2},{14},{8},{5},{9},{9},{7},{5},{4},{5},{12},{9},{4},{4},{2},{3},{14},{19},{2},{4},{18},{7},{4},{2},{2},{2},{3},{10},{5},{2},{7},{2},{4},{3},{3},{27},{7},{5},{5},{12},{8},{3},{5},{10},{6},{8},{15},{3},{10},{4},{4},{9},{9},{8},{13},{6},{7},{5},{2},{3},{2},{6},{18},{22},{15},{17},{16},{21},{7},{4},{8},{4},{12},{18},{18},{13},{5},{3}};
+    const struct { const unsigned int length: 11; } bytes_length_index[] = {{310},{1403},{41},{368}};
     #ifndef CYTHON_COMPRESS_STRINGS
       #define CYTHON_COMPRESS_STRINGS 90
     #endif
-    #if (CYTHON_COMPRESS_STRINGS) == 3 && __PYX_LIMITED_VERSION_HEX >= 0x030e0000 /* compression: zstd (2220 bytes) */
-static const char cstring[] = "(\265/\375`\276\026\025E\000\332Zt\020= \223\322\001\000\034\265@DP\r\004p\005\240\247\200@\351@\360\333\022\262S\022\355\224\326\026\323&$I)\231\274\233\371\325C\335\266\347\333\362K\026\013\325\213D\023\326\375\377\377(\r\034$\341\000\345\000\361\000\334\321W%\360S\277W(\010/6}\246\257\r]\245d\252\306\366\212\020\326\251\233\243\272\204\273s%Dl6\334\353\276\322\323\tU?\031Q]\271+\35375\047V\034l\332\302\332U)\241\272\355\240F0p32\362\364Y\276\214\030\216\350k\346O\033S\257\031\331\276r2\232\\\272\364\250s\213\234\036\342\373a\037\250\203!(\202!\322>\211rT\312\327\311\317\306\022\345\232u\032u\252\0361b\237\022\333\247\274\337Q\207$O\237\225E\236}\014jnaJ]2o\257\221\304%\257\324\214O\025\277=H\362l\333\206\222\327\310\251\256\233\323R\337Q\035\047\367\345\007y\021\344}]\024]\273\341\010\210?\345H\024c\364\013B\017\357\277|\307o\026\301\367\216\312\301wJ\302_l\234\210\315\357\251\010b\323Z\233\317\367\226\372\252\311\365+NN\221\343\213\021k\306\210\374\374\0276\322\327S\247\252\024\317K\347\034\232\202\332\271\234x9\322\352\353c\276\rK\320%\245\316\353\017\372(O\225\334\235E\357au\233\312=\365T\267\202\233\224\014\235\247\026\253\367H\"\351{\345\370<}1b\033\201\260ik\306,\247v\033\241W\332\302\213\256\373\222{\321_\272\236rR\352\301\300\350\331\002\265\273\276Ij\006\342\353\226_\340f\326\317zP)\347\352\341|\313\303\370\254\022{\326\245~\363j-\233\376\353i\242\374)\313\253\246\177\352\274\237R\214\215\272\313\023\372\331g\372\266a\310\342\336\317o\346\014yud\317\t\373\261\251r\007\005n\234\367\335R\034uO\3078\224\243?S\032\372NRN2\254\230XA\256\234~>\345\254[\014T\276\372\047\235\323\301\323\271\267=e\351&}=5\210\253I\242\250\350\371\331yb\223\317\346}\343.#\320Kv\3119\250\337\362d\337\267\315w\1779\047(\313\327M\322n\344\312\2266\357$/\251\337\177\326r\321\312q\257\247\236\324\226\337\326{s\347(^S\277\366\266u\232W\331NP\232+\267c-,9\312\362\275c\237\354=\231oz\031W\236\312\373T\277f\313\367]\337%Uc\247d\223\243Z\363\246\304\230\352H\372\373\352YK\327\352\250\213w""\321\025\353\331\252\270T+k\255\224\0301Pb\300x\341\342\365{&V8,R\030\005J\212I\3113\212\023\024\023\016\237\355N\230p)-S\025\025\025\227l_{\364\263\004\211~ dA\025\037\220\244\372I\322\014$\312x\363\271\031\206\370\205\020\336\2166\327\373\311\373\256.\325\264\321\360\324_\006\004>fZh\204h\310\010\3118\t\235H\010I\3708\021:\241!\004B\206e\204\016\00396H\010a\200i/-^\016\004h\021\323/\010>x\030 \240\031\320\243\306K\002\036#b\0328\210\201\361\340@\302p\200I\001\211q\030\010\004*\030\230)\001\221Y \243\001\206\201\001\025\030\017/\005>f2\206\302\307L\213\230\t\0373\000b^\300\334\300\361\001@\006\003\314\224\310X\020\240\371\350\261@\301L\311\216\024%\241\022\00532XB,$B$LB&\021 \314\264\320\021\342B\350\202&\344\324\372u\321\221_\276\\\356/\257z;\246Y\357\235\251\247\373\324W\013S\326\2515-\353\376\351\207\333\353\217F\004\221\352\246\031\361\266\375\021\301_jc\335\327B\331P\262\376y\221D3\"\342\023o;\227\313\3235k\365k0`\2652\275\236\\\236\267\247U\275g]\240\227 \336\350\333\202V\225n\362m&\037\366\224SO\273\303k\343\275q3\365\345\362\373\225\333\306$\3752\265&\375\364P\256\357\375]\202\026\250\342\233\022:\204\210HF\222$i\016B\030\010\212F$9X[\017\022\271dLB\032\021C\244$\220@&\020\221 IR\220\202\202B\206\0032D\245_\333|\023\351\201\300\367\263<\274\262\246\264~QW\243x\237\037wG}\371!\322\317\365\233\000\243US\223\n\003k\217\215\260i\232oe\333\367\324\365\027\224\302\234\211\374]\375\225\274\325\332\337]\000\224\241\203\027\014M\217\221\276\357\272\306Q\"o\230\020m\022\300\036]\252\365\225\366o+mUv\242H\3429\034S&\234f\346e\023\024\263\310\215\273FFW7\032S\003c\243\243\372l\0034M\367\301\351\"\260\010b\235\217\017/kD\314\3313\237bT\014\202\007\305\r\370\327s\337L\314\365\220v@\215\024$=\014\354Q\003i\302\225\260Nx/[\375\212\227\230d\023\334\216\375\203\026\371\355q0\212\300\257\221\030cD\342\200\251\324\310pax\255s\362a\237\223\216\001\261\216\316\364z\033\357%\375e\267\256\267\007\346|6\312\320\360L\375\367\262\201\013U\371-X\001\357\332\356DY\003s!\254\275\001""\240\023\255\352=\367M\033\236\230X\265\365\230\014\205\025\347\214\226\256\314T_.\234}\360\303#\004\351\342y\200\347\260\245\026PW\347\352\326<8#\010\243-\222\256\326\257\214\014~\3114\213\271\007\202\227\302+\250Ov\327\214e\270~\010\036\313\241\233_\200\023%9\331\361\\\222\361\027\205\361\330\332_B\250\231\271\177\315#\203\333J\257\225\232\304;/\264\307\034\316\373\261\233\307t\242)L\225\200:\023)\337\020-\267.\023%\2167\000)\223\331\005\023\037\030HiCF\326Y\305\224\254^5\221\324\353\254\2072\336a\020\036\267\014\001SVB7b\256\206\t4\216\334\211\006c(\263\021\346\207\031\2476\347\234\036\260\370(\320\361\210\332\271@\305d:\304\326Mk\277\370\355\225\003\0264\346\252\361u\371\240\031\306IR!&\077\077\002\024\215\3013\335\367\235\016\310\231\247\037=\031\\\375\365j\306+N\007 \243t$03\371\004\225=\325-\203y\366)b^?QL\221A\356\326\276\306\342$pj\334\261\265)g4\304H\016\233\2042\003\n\216\240\377D\313\350[\"b3i\037\222g\340\225\200\227\366\322 \350p\003\222ST\310q\t!2\220\013\246\014\264Rm\222\250Hy6D(\376w\002x\342\241\200\225\200\rM\232*6\331\222I\264\353X\303\207\260\241&V{K`)H\0219\244\346t\202\020Ug\214E\232\224\205\316\236\227\266$\251\251\342\274\037\306\215\020\n\n\334\224A\210\005\306t\000\261E\232\311\335q\341\366L\207M2\0013\370j\2304w\035\374\223\030mL\200G\351:\047\274\013\346R\004\031\346\331\002z\365\007\237\306\352;\003\352\2701\275n\303\262-\271\343\253\302aP/\240J\202\304\220\300\244\030\364\244p\315!6)B\312#\276\264\202\203\217\021\030fT}\227\226\013Xjc\330\215\374kN\341p2\037U\016=G\207|i\\\364v\273\365\nS`L\225\021\264\361/F\222\037\323\303\021\342_9\216\016\205Sr\211\300\337\301\304\343\255\327f``E\261\255>\371\245\r,\215t \225\262\350\322*\353l\236\200!\030 \024\362\202\027\214\033$\255\337\214$\227\363\047t\337\367\351\210s\345\214\246\205\357\360\221\013\217?\006|\010\277\221\003\311%\334\037\0473\334v\003\202&\252\366\2668\347\334\005\377\0312\276\264\204\262J6\233\225\206\316\352}4U\312}\367\026\207\203\252\343(\327\243\272\340m:\223\013\021""\320q\3126\033\325\237\255\261\310K\227\005\202\271\217\031`9k\034\014\265\351\222\240\205\216\204\202m\243\231\313\273\2576\336b\231{\274P\217\375\324\266\275\004\347\325Y\325\247b\025\275\212\007\265h\372\220w\206P\274<\361\006\333\217\200\366S\207NeI\333\312\022\246r\005\2529n\203f^\275W\335\263\034\300\031A\301\002M\205p\232\205\350nW\312\004\340\233ET\006\266\36520\246\007\375\005\353\310%\302\362\346\323\300\203=\030m\367\272\304\326\210jL\326o\024t\330l\367\032+\253\003p\031\271\ny\022\375\222p\303O\220\313V";
-    PyObject *data = __Pyx_DecompressString(cstring, 2220, 3);
+    #if (CYTHON_COMPRESS_STRINGS) == 3 && __PYX_LIMITED_VERSION_HEX >= 0x030e0000 /* compression: zstd (2230 bytes) */
+static const char cstring[] = "(\265/\375`\344\026eE\000z[\214\020= s\323\001\000\034\265@\"\250\006\002\270\001ET@\301\250%\234\265\326vJ\242\235\322\372#\233\220$rB\027\366\256\257\036\352\367\031\365\177~\306\357\275\262\307\324\013d\325\335\335$WG$\343\000\347\000\362\000\375\371\312\004~\3527\013\025\341\305\246\317\364\265\241\253\224L\331\330f1\302:usT\233pw\316\304\010\215\206{\335Wz:\241*(?TW\356\312\372M\315\211\025\007\233\272\260vUJ\250n;\250\237\030\250))y\372,_~\030\226\350k\346O\033S\257\031\331\276r\3623\271t\351Q\347\0269}\304\027\304\276P\007G\220\004G\244}\023\345\250\224\257\223\237\215%\3125\3534\352T=\342\207}Jl\237\362~G\035\232<}V\366\361\354\343P\263\013S\352\222y{\215&.y\245f|\252\370\355A\223g\3338l^#\247\272nNK}\347ET\307\311}\tB^\024y\337\027E\327nX\"\342O9\022\305\370\371\r\241\207\367_\276\3437\223\340{G\345\340;%\341/6N\304\346\367\224\00419\255\245\371|o\251\257\232\\\277\342\344\364q\204Ab\321 \221\237\017\343F\372z\352T\245\342y\351\274C\323P;\227\023/GZ}}\314\267\341\006_R\352\274\006\241\217\362T\311\335\331\347=\254NS\271\247\236\352XP\243\242\241\363\324b\365\036M$}\257\034\237\247/~\330~B\330\2645c\226S\273\375\240W\352\302\213\256\373\222{\321_\272\236rR\352\305\300\317\263\025jw}\223\324L\304\327-\277\300\315\254\240\365\240R\316\325\303\371\226\207\361Y%\366\254K\375\346\325Z6\375\327\323D\371\323\226WM\377\324y?%\031\032u\227(\024\264\317\364m\303\221\305\275\237\337\3149\362\352\310\236\023\366cS\345N\n\3248\357\273\2458\352\236\216q(G\177\2465\364\241\250\240h`9\301\202\\9\375|\312Y\267\310\001\016J\377l\034\017\236\336\236\262t\223\276\236:\304\325$Q\324\347\371\331y\342\023\220\346]\343.?\241\227\354\222\363P\277\345\311\276o\233\357\376rPR\226\257\233\244\335\217+[\332\274\223\274\244~\017Z\353E+\307\275\236zR[~[\357\315\235\243xM\375\332\333\326i^eCI\321\317\326\270\327\225\3331\027\226\034e\371\336\261O\366\236\3145\275\214+O\345}\252_\263\345\373\256\357\222\262\261S\262\311Q\255ySbLu$\375}\365\254\245ku\364\305\277(\213\365lW^*\226\265\226\212""\014\031)2b\300x\361\372\275\023,\234\026*\234\"E\345d\363\234\002%\345\244\303g;\024\047\\J\313tee\305%\333\327\036\3754Q\242_\010[p\005\0104\251~\222T\203\2112\336|n\206#~a\204\267\243\315\365~\362\276\353K5i6<\365\027\003BF.5D5f\210f\240\210P$\210$\204\240\020\241\330 \n\261\243\205\204\217\002=8H\020a\200i:\\\3500\020\000H\306\270\210i\035\007l\350@\000\204D\014\203\00611\034\030H\230\0160*\016\363`\300H$&B\205\002\243\215\310\016\005;6\300,(\260\002\363A\007\201\220Q\306P\010\031\271\210\231\0202\002\020\003\003\006G\216\220\r\217\014\001F\233\035\026\004dB\202(H0\332\374P\261\021m\022\214f\264\210ZJ\210J\234\210N <\030\271\360!\342\202\350BF\344\324\372}\321\222_\276\\\356/\257z;\226Y\357\235\251\247\373\324\227\013S\326\2513.\353\376)\210\333kP\346\027\t\"\325-S\342m\033D\202\277\364\306\272\257\225\302a\263\376y\321$SB\342\023o;\227\313\3233k\365g0`\3052\275\236^\236\267\247U\275g]\241\227!\336\317\267\r\255*\335\344\333N@\354)\247\236v\207\367\306{\343f\352\313\345\367+\367\215I\372ejM\372\351\241\\\337\373;*_\003\202\027\250\342\233\022:\204\250HF\222\024\322\034B\020\010\024\rHr\264\266\036\022\231`LR\036\"\210H\021\221@&\020\221 IRP\220\202B\206\0032\204\350W=no\034\226a\336\351\334\363\347T.\322b\005L=\001\346\204\001\374}\276\031ey\0472\307\272\253\022\334\322\271F\025\366\321\376\202\312ii\262Q\276\245\217\356\017\247l\356<\311\347\202.\344\\\007\3377%\320\356\016$\030\242\035\337+\277q\2553\211\035`\"\225\211\000\013v\331\352\351D\264\255\353\325\364D\"y\357\330B\201p\302\371\327Hx\233M\030n\026);]\\\\\301\017NQ\325\204\017 \227]\005)\223\201\021\320\327z\365\377T\242\0176\336\231\225\225\002\020\004\252*\347\017\356\311]g\372m\006\007{H;\250\306\301\222j\006\366\310@\022w%\254\023\320\227\215\277\342\345\047\321\004\227c\377\247\205\177z\022\230\201\260\267H\214\021!a\240^fI!1\234\366\274C\312\265t\"\301Npj\332e\232\270N\372\327n\335\336\016\314\241nHA\345)\375\3672\030\007P\305m\335\000\035\265\354*\331\020s\214-\275q \034\255\326<\373\346\034~f""\344\332D\220\026vMgBK\030\310\034\260F \355 \000/\374\230\361|\004#l\027\363V\227\021\311\200|\251\"\361Q\017\220F\313\374\372l=\311\303\303\0203\225\213\000\022G6e\005\022\312\034;\374\246\303\256\246\361\364C\320\234\324a_\256s\336\014\353\327Dp\200 \273\032\3773SFl\047\221fy\231\3469;\273L\3611\225h\344\252R[G\177\345\213\255%P\3148\306\307s\210\226\025tu\017464=6\227\311\253\036\226,UE\t\217=%X\331QgD\036\241\307\243X\210mGG\327tv\033}\304\300\r\234\2603\013\"P|\314\006\232\344=\330\242\243\024\224\206\213\272\223L(\037\005n\245\227\365K\324\270\037j3f\372\215\362\2364\020[\367K\204\r{0\360\001.y\200z \236d\tsS+\264\313\314\000;\200\211\274#\017`\212t?\260=\371\004\370\235\256\353\031<\343^\022\210k\242Ej\336\266\302<X\013\222\262S\376\271iN\332\234L\214\3440HH2\240\320\362\236#\307\030\030\213\207\362$1B\371\214{\tvi;\r\202\004\316\260p\272\204\304\225b/K\274`L\240Em\323\276\002\301S\004\001\376\337\007\020\036\252\321f\332zt\372\014\262\t\016&\023\\\013\214 \305\2066\r\332\243\002\275A6\304\371\315\207\021\241\205n\356E?\022U\235\035.\024I\336\246b:\036FU\021\t+0\215\301\276\005\200\366\324\261\305\275\311\3711\261\367\236\034\"\310\004\304P\325=\342\271\047\360cbf\227\000\023\245\303\230h\027\\\262\010+\354\361\005\274\342Y\014\002?\362\314\344!\207i\004\032Ol\321*W\025\016`}a\225\000\022\341\0044\304\340\047\225i\266\262I\0109\026\021\256\347\021\340\"`\330Q\305]B/$\256\364b+\360\235\013E\205\227\341\2502i5\006\312%$!\354SC\005L&\343S\2146\212\357iI\374\230\002\217\220\377\3568z8\034\350B\201\r\203\234\367\274~~@Z\005e\252\316\337;\035\254\264u\030)o\253\313\001\250\003m\302$Af\001\020\025\021B\352\320\243u\200\341e\334z\355\366\2718\335?\307d\324WH\210\017\204\370)c\312\024q4r\220\246\304@\314\271\205)\307\020\320\274\325r\013r\316\236\360\023CB\227|(\263\313\256Fi\352\254\326\243\375J\311\320\341\343\260Pu\035%{T\002<\253Ora\000\244N\031k\233\373\2234\226\355\251\271`2\2271w,\347\213\203C\333t\ne\355\230S\326\026Z\277\362\225j6V\214\207\217dt\313^0;ANBP]""\365\247\322\024\275v\010\352a:#?\030Bfyn\033\224\037\201\034N\014z\213\213q+\357\235Z4\224\025\276\3254s\371\375\212\236\230\200\047\004\013\0070\010\212i\311\306T^=w\275\357\365\370\231\337\\\226\244\231j\362\377\257\333J<\245\213\217\376\007%\360\037\357\024w,SU\230F\263D\010\374\250\370\216\3756\022p\030\356\217\217s\324i\237\300\244\255";
+    PyObject *data = __Pyx_DecompressString(cstring, 2230, 3);
     #define __Pyx_DecompressString_LZSS_UNUSED
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #elif (CYTHON_COMPRESS_STRINGS) == 1 /* compression: zlib (2246 bytes) */
-static const char cstring[] = "x\332\305XKo\034\307\021^\003N@\301rb\347\001\347\240\004\255 \004I\203Z\211\024\3010B\202@O\300H\240P\326\013\310e\320;\323\273\333\342L\367\250\273\207\344\360\020\344\310#\217<\352\047\344\350\237\220\343\036y\364O\360O\310W\3253\263\017/eK\210abw\247\273\272\253\272\352\253G\327P\210u\345\234\261BH\223\t\035DQ\371 \006J\370\340\304\272\261\001\003\351\2026#q\244\303X\230\252\030(\347\257o\210\314*/h\203:\326>\\\027\332\210C\351\264\034\344J`\342\203\222Y\047m`m\256\244\021\326\321l\213\236\267\272\305L\247aS\214 \252#)\234\245\034\304\027\332\310|\023\373\2638\360\251\204|\260W\346\300\330#\263\224\315\351\321\030\022Se\202r\233\"W\303p)\2136S\233a\234r:\235\305\200\014\347i!C:\026\020/B]B\203!\217S\233W\205!\3333\031\344\320\311B1\220\203\270\203vbAm\362o\320\005\253N\3175\261\336\330$\326\304\020\304#\247\t\345;\230j\3371\257E\370}\004\037\000\352<W#0\255\233\306V\231\227c9\200\354\024h9\332R\231\014\036J\255S\033\"\035K\047S\240\000\271\033\033}\361\014:\0175\020,dMJ\3466=PP\267\006\243ey\245\263\251\362\236\364\254m\305\373\310\311cy\250XG%J\345\n\355\275\266\246\337\377\353\375\010@\016\025r\277\000\234\277o\253<cv[*\023\017^{lIE\375\272\352\3203@\315\213L\005\005M3\002\223\240\355\000\275\016\016\365\330\342\3440\226A\334\257\303\030\"4q\344\032\301\010d\363\232\217$Ci\223\021\373\017\367o\354\354\355\260/\234z\005\301^\370j\220\346\322{\305\360\016*\235\007:\n0\373\276\370b\310\346\032\005\005\202\025%\366\3152@!#\274\n\254\331\2324\260I\006 \220\200\035\226\256!\206\035\016\321\000\t\334\217d\356U\377y\023nd\010\271\030\021D\213H\r\345B\273X\326\014\252\233\346N\334\371\002.\204|\006\317Wei\035\240\221Y\226\200\240d\256G\246@ts\344t\234\235\263\005\373\307\214\022\047\315\010\332\037\312\034h\217\240\235a\016\003\301\323\315\035\377\252\217\016I\026\274\331DZ\2164\247\260\240t\275\236\332\242t\024\047\214\260=J:B\312\350\304\244G\314>s\225\232\346F+\262\004\233\344 +m.\235\237z\233\244\303p\350\004\305\341\237\005SX\000\007#y\342@\325^\2145+\221[\216""\257R\342\320\264\013<R\337\2446\203[9\205V\221Jc\215LF\374\220?\241\004\374\356\204\257Q\260\212\270\027\307m\212\340j\312}8,\362Sm\304\346*\014o\354\365\305>\252\231W,a\031;\024p\024\017y\335\317\225\031\341\\D\\\2724U\310\014\317e\3037\305u\272\327\0278\245rj\336\315\363\210\334\231\332\037\375\354g\212.\016n\234\007\231mu\203\254\246\260Q\354\277\233\264N\333\341\333\245\024\362\030U>\323>uH\353\356\350\030\210\232\354+\006\332\264N\331\022\314\327,\227\2631)\363\334\036\251l\271\374\367\341\272}\211V\376\035$4\206\277\003\337<G\023\023\214l\023\244H\202Q[\274\366\026\271\0336\272e\332\354\250;\277PZ^\302\360^\201P\241<%\215\000R\256\261\210=\276\264h,clJ\226o5\221\224H\047,\343i\240zH1v\227\210\377\344a\022\227\356>\215}\300\252o;\210%\302\277\007\036T$\205\037s\025\230\0260jil\254c\361\230\356\276\377\356r9\215\225\316n\2564\0135\2629bP\007\345\313\332\301\000\334\337\241\237\264\243\244D\261Sn\272ts\272\024/\202~Y\037\363\365\247<\256\047\276d\240D\216+\275\353_\270\316\305k\202\313Q\247\023]\244bma\272\352\327\220n&H \n?@\355\024\375HW\004g\\<\3078\215\036\230\177C\025e\250\333k}S\\\332\027\266\"\242\253\232\213\344N\3272\375\235\346\342;6\275`\370/\331\024}C^A\355GCbI\201x\203FD\356\305N\363>\272\202\221\205\307d\376\000\303\007M\373\365@\245\272\220\371C\250\373(\2672\334\336\346\307\356\316\027&lm\357\321\357.~no\343\207\211{\377\030P\367\260\3379\354\241s\326}9;y\312\250<\203\364\347Q\n?v\237\263\234\347,\210~\367\222$\331\257\217\361}\200\240M\036\253\343\360\245\032&I\323L(,\047\334n$#\250\212\333\204\010\303\312\244\364,\340=~\332\254\312y+\371\210\236\010\227$\225\245\246\361\353J\346-\035\001\030\360\320\0367\263\263\025<\245\026\243P\372\332\244\332\366\273\rh\256}H\321\350r\343\234\346\304\203s\003r^\rdz\220\346\350\304\346z\204\346\236j\312y\333\003d\324\355\266\035o\373\334\335\311d\355\263!:%\3221s\266LL\225\347\036*%\224KY\220\031\305\200\222\250\204\2115y\035o^uL\335\002\025\000\n\374$\27299\214\r\022\223X\027\214\240\364\320\331\"\241\2649TC""\237)\342\037\372(\007\260\342\003\260bd(O\263\270\225\321\344\314\000\215D\306\373\274\275\316\307Z\027eN\363\330\365\001\324\335\235\001\372u\017x\360\023\273\031\032p3\243=7\345\332\303T\355\215$gz\n\321\244\201\213\307h\232<\365/\364v\222\323{\316|\025ZR\370\nOj\242\330\035\215\321`\366\341I\344G\377p\273yK\242\242gJ\343M0aL\310\342\270\n\223\252(ks\324\274mX.[\245\245\362\274\264@\305dr\252\314\201\006\277H!8L6\333\342\315\216\201\206\227\376\217\003x\331\313C~;CS\004\320e\225\207\250!\252\206\242<A\047\343\354\010\350S\234\225\0141\0478\031E\3755\005\t}\023\274\035\004\032`\035e\007\203\023\204]@\222\344\211\207G\r\024=\321fh\233z\210\253F\271\312W!=\334\216@u\265\243k\224;\n.\177XV\047G:\013\343\216\032c\252\233\222\3609B\323\207-\255IM \036I\307_*\220G\260\206\252b\353\357\210i\002=\\\215\030\301+gC\231\t\350\226\302\223c\272<Ot\271_\307\362#>\357-\374u\376\n6a\017\047\374\"\323\2033`u\336\310\211s\312\300o\021\030\351Y\"Rb\244\r\017\347\327J\277 \222\010\3632[\312\267\031[\2514\236_\2456`^.S\346\005w\244%\274\255h\236\314\256OQ[\237\0167zK\311\233\342\2621\274t)O,\273!\331\2725\315\241dkw1\213\022*m3>\376\021\017\343\003pB\202\224=QI\020\353\207Vg\324\030x^\217\324M\301T\200E\235\036\364x\357\263\277/c\373\376\233t\271Eq\274\321\313lE\235\310\217\245\300,x\033=\372\037\321\372[\010o\335=\357\207\037\"r._\374\241\307|8\207\326[\215\236\356\340\021\307\330z\313{\271\364\3773V\033=\332D\327\037\025Mn\321{\261\005\210\027jS\255\233Bz\010\036T\230\023\225\201nP\344\303\264\016\305\232\213~\367\262]o\337\261 \203\255\230\321\247=&\327\007]\267\203GgvoQ\037\3368\225G\377kc<\220\304*=\300\235I\315\016\227Zzuo\354s\225\211\370\315c\200\313\272e\300\273n\022\337T{h\374\274\2122\321\360\004\215\233\230e\373\350\312\316!|\317\047a\2439Y\035\353\220\320B\345\047\275\325\311\352_\276zr\361\331o\370\263=\331\2767\271\367b\362\342\345\305\047[\223\255\277\375w\353\342\223O\027>\337\254\364~\362\2077[\027\037\2127\037\320x\345\337\377:{z\376\301\305\312o\317\237\\\254\374""\356\\^\254|t\372\247\263\007 ]\375\305\331\3157\237\276\271N\224\255\213\253\277\357F\264\353\312gg\376\374z\303\366\321\351\336\331\3553\031\367|\374k\026\370]\343g\347\277\002\353t\366\313\363\273<\373zz\354\317O_\317\237\263x\360\314\370\233\237\366\256\\m\224\373z\345g\247\366\374\t\006\037~|\372\3444;\373|r\355\326\177\256~u\227v\276x\363\347\311\315G\223G\014\323\312\265\311\265\235\311\016\246/\047/_M^\035\\\254\\\371\037\327E\350Y";
-    PyObject *data = __Pyx_DecompressString(cstring, 2246, 1);
+    #elif (CYTHON_COMPRESS_STRINGS) == 1 /* compression: zlib (2256 bytes) */
+static const char cstring[] = "x\332\305XKo\034\307\021\336\000\016@\303rb\347\001\007\201\0224\203\020$\035j\245\245\010\206\021\022\004z\002F\002\205\262^@.\203\336\231\336\335\026g\273G\335=$\207\207 G\036y\344Q\307\034s\364O\310q\217<\372\047\344\047\344\253\352\231\331\207\227\224%\3040\261\273\323]\335U]\365\325\243k(\304\206r\316X!\244\311\204\016b\\\372 \372J\370\340\304\206\261\001\003\351\2026Cq\244\303H\230r\334W\316\257n\212\314*/h\203:\326>\254\nm\304\241tZ\366s%0\361A\311\254\225\326\2676W\322\010\353h\326\243\347\255v1\323i\330\022C\210jI\ng)\007\361cmd\276\205\375Y\034\370TB>\330Ks`\354\221Y\312\346\364p\004\211\2512A\271-\221\253A\270\224E\233\251\3150N9\235\316b@\206\363t,C:\022\020/BU@\203\001\217S\233\227cC\266g2\310\201\223c\305@\366\343\016\332\211\005\265\305\277A\217Yuz\256\213\215\332&\261.\006 \0369M(\337\301T\373\226y=\302\357#\370\000P\347\271\032\202i\303\324\266\312\274\030\311>d\247@\313\321\226\322d\360Pj\235\332\024\351H:\231\002\005\310\335\334\354\212g\320y\240\201\340XV\244dn\323\003\005u+0Z\226W8\233*\357I\317\312\226\274\217\234<\222\207\212uT\242Pn\254\275\327\326t\273\177\276\037\001\310\241B\356\027\200\363\367m\231g\314n\013e\342\301\353\217-\251\250_\227-z\006\250y\221\251\240\240iF`\022\264-\240\253\340P\217-N\016#\031\304\375*\214 B\023G\256\021\214@6\257\370H2\2246\031\261\377p\377\306\316\336\016\373\302\251W\020\354\205/\373i.\275W\014o\277\324y\240\243\000\263\357\212/\006l\256QP XQ`\337,\003\0242\302\253\300\232\255K\003\233d\000\002\t\330a\351:b\330\341\020\r\220\300\375H\346^u\237\327\341F\206\220\213\021A\264\210\324P.4\213E\305\240\272i\356\304\235/\340B\310g\360|Y\024\326\001\032\231e\t\010J\346zh\306\210n\216\234\226\263u\266`\377\230a\342\244\031B\373C\231\003\355!\2643\314a x\272\271\345_\363\321!\311\2027\353H\313\221\346\024\026\224\256\253\251\035\027\216\342\204\021\266GIKH\031\235\230\364\210\331g\256T\323\334hD\026`\223\034d\205\315\245\363So\223t\030\016\235\2408\374\263`\n\013\340`$O\034\250\312\213\221f%r\313\361UH\034\232\266""\201G\352\233\324fp+\247\320\032Ri\244\221\311\210\037\362\047\224\200\337\235\360\025\n\3268\356\305q[\"\270\212r\037\016\213\374T\033\261\271\014\203\033{]\261\217j\346\025KX\306\016\005\034\305C^use\2068\027\021\227.M\0252\303s\331\360uq\235\356\365c\234R:5\357\346yD\356L\355\217~\3663E\027\007\327\316\203\314\246\272AV]\330(\366\337MZ\253\355\340j)cy\214*\237i\237:\244u{t\014DM\366\215\373\3324N\351\t\346\253\227\213\331\230\224yn\217T\266\\\376\373p\335\276D+\377\016\022j\303\337\201o\236\243\216\tF\266\016R$\301\260)^{\213\3345\033\3352MvT\255_(-/ax\257@(Q\236\222Z\000)W[\304\036_Z4\2261\326%\3137\232HJ\244\023\226\3614P=\244\030\273K\304\277\3630\211Kw\237\306>`\3157\035\304\022\341\337\002\017*\222\302\217\270\nL\013\030\26546\326\261xL{\337\277\275\\Nc\245\265\233+\315B\215\254\217\350WA\371\242r0\000\367w\350&\315()P\354\224\233.\335\234.\305\213\240[T\307|\375)\217\353\211/\031(\221\343Jo\373\027\256s\361\232\340r\324\352D\027\251X_\230\256\371u\244\233\t\022\210\302\017P;E?\322\026\301\031\027\3171N\243\007\346\337P\343\"T\315\265\276%.\355\013\033\021\321U\365Er\247m\231\376Js\361\226M/\030\376K6E\337\220WP\373\321\220XR \336\240\021\221{\261\323\274\217\256`h\3411\231?\300\360A\335~=P\251\036\313\374!\324}\224[\031no\363cw\347\013\023z\333{\364\273\213\237\333\333\370a\342\336\337\372\324=\354\267\016{\350\234u_\316N\2362*\317 \375y\224\302\217\335\347,\3479\013\242\337\275$I\366\253c|\037 h\223\307\3528|\251\006IR7\023\n\313\t\267\033\311\020\252\3426!\302\2404)=\307\360\036?mV\346\274\225|DO\204K\222\312B\323\370u)\363\206\216\000\014xh\217\233\331\331\022\236R\213Q(}eRm\273\355\0064\327>\244ht\271qNs\342\301\271\0019\257\3722=Hstbs=B}O\325\345\274\351\001\232\047b7\243\306\267i~\233\347\356N&+\237\r\3204\221\272\231\263Eb\312<\367\320.\241\264\312\202\314(\034\224DQL\254\311\253x\t\253cj\034\250\026P\016$\321\343\311a\354\225\230\304ja\004\375\007\316\216\023\312\240C5\360\231\"\376\201\217r\2000>\300-\006\211\3624\213[\031XN\022\320Hd\274\332\233""\233}\244\365\270\310i\036\033@\340\273\273\323G\353\356\201\024~bcC\003\356k\264\347\376\\{\230\252\275\221\344WO\321\232\324\310\361\030\375\223\247V\206^Trz\345\231/HKj\340\330\223\232\250{G#\364\232]8\025\251\322=\334\256_\230\250\376\231\302x\023L\030\021\2628\256\304\244\034\027\2259\252_<,W\260\302R\245^Z\253b^9U\344@\203\337\251\020\047&\233\355\366\274\364\277\357\303\255^\036\362\233\031\032\"\240,\313<D\225P1\024\345\010\272\030g\207\200\233b\254`L9\271\311\n\352\255)*\350\233\340\315 \320\000\353(9\030\234 \344\002\022$O<\\h\240\331\2116\003[\327B\\3\312\225\276\014\351\341vD\246\255\033m\223\334Rp\361\303\224*9\322Y\030\265\324\030D\355\224\204\317\021\352\036li=\252#\357H:\376Rq<\2025T\021\033\007G\020\023\350\341*\004\005^7k\312L\0047\024\236\034\323\305y\242\213\375*\226\036\361yg\341\257uP\260\t\2734\341\227\230\016\234\001\253\363ZN\234S\312}\203\300H\317\022\221\003Cmx8\277V\370\005\221D\230\227\331P\276\311\330H\245\361\374*\265\000\363r\2312/\270%-\341mD\363dv}\212\332\306t\270\331YJ\336\022\227\215\341\245Kyb\311\rI\357\3264i\222\336\356b\332$T\313f|\374=\036\306\007\340\204\004e\344D%Al\034Z\235QS\340y=R\267\004S\001\026uy\320\343\275\317\376\266\214\315\273o\322\346\026\305\361f\047\263%u!\337\227\002\263\340mv\350\377C\033W\020\256\334=\357\207\357\"r._\374\256\307\255\326\315]@!\304\241v%\010\323\035<\342\230\333`C\256\264\346\377\214\335f\2076\321\375GE\224\333\365N\354\001\342\215ZW\357\272\260\036\202\007\025\347De\240\033\024\3750\255K\261\006\243\367\275l\327\325;\026d\260\0253\3724\307\344\372\240mw\360h\315\356,\352\303\033\247\362\350\377n\214\007\222Z\245\007\270C\251\333\341\322K\257\361\265}\2564\021\277y\014py7\014x\357M\342[k\007M\240WQ&:\236\240q3\263l\037]\331:\204\357\375$l\326\047\253c\035\022Z(\375\244\2636Y\373\323WO.>\373\005\177\266\047\333\367&\367^L^\274\274\370\2447\351\375\345?\275\213O>]\370\374w\245\363\303\337\276\351]|\360\273\177\365h\274\362\317\177\234==\377\301\305\312\257\316\237\\\254\374\372\\^\254|t\372""\207\263\007 ]\373\311\331\3157\237\276Y%J\357\342\332o\332\321/\317W/>\374\354\314\343\021\331>:\335;\273}&\343\236\217\177\316\002\3376~v\3763\260Ng?=\277\313\263\257\247\307\376\370\364\365\3749\244\336,aA\211y\265\277n\225\235\035\375\350\324\236?9\227_\177\360\361\351\223\323\354\354\363\311\365[\377\276\366\325]\222\361\342\315\037\0477\037M\0361\200+\327\047\327w&;\230\276\234\274|5yup\261\362\341\377\000\214\250\366\223";
+    PyObject *data = __Pyx_DecompressString(cstring, 2256, 1);
     #define __Pyx_DecompressString_LZSS_UNUSED
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #elif (CYTHON_COMPRESS_STRINGS) > 0 && (CYTHON_COMPRESS_STRINGS) <= 90 /* compression: lzss (3154 bytes) */
-static const char cstring[] = "\377  (errno\377  and it\377 must be\377 str (no\375t\006\000arting\377 with nu\377mbers!) \337does \035\001ex\377ist! in \377variable} \n\000steadE\006\377boolean \253orX\0011\004\0010b\006d?ict, gi\000u\006\355ei\000er\\\000min\327al,5\000d\003\003sc\371a]\000D\000unkno{wn\"\022righO\000\377center, \337left \033\025in<\352\007\332\000eric\370\t\365\001\376\216\"match t\377he type \373of\007\002colum\375n\370\001datafr\027ame\304\"b\034\003&\001\026\0007e, \002\001ti\033\000\377\000\276\004\001\047 (or\317\002 w\047 f\224 wri\342!M:\014\000isZ\002c\001\047\371#\371s\367#\276 illeg\363al\230@\234$alph/abet\264\000n\333 \341 \367und\237@core\377) charac|\203 U\000)). T\275\000\273fi\237@may\342Al\377ocked by\372\374@o\332\000r pro\367ces\177\000r yo\363u $\001\202ahave\375 \240\001e perm\377ission..k?C\373\003l\200\000ls\252,\277sCould\237bo\357pen t\002\047No\377n unique\365 \267$n\263 s de\213te\247\000d\305a\343!\310&!\336/\000eNot\367 ha?t Cyth@\000\242 \377delibera\217tely\254\204\001\304`\261`t\375h\345`PEP-48\3354\320\204\002rejV\000s \377subclass\375e\332\"builti}n\311Bs. If\352\002{ne\213 to p%\000|%\t\365@n set\374B\377\047annotat\372\377\000_\212`ing\047 \227dir\273\000i\242 ;\000F?alse.U\233\204\004\226a\364\337A\277` X\000inse[rt\025\005py\320\"r\262\205\007\234\212`\351`Ver\336!\334\205\002s\377upported\337add_n\206 al\177ignment\265b\364\355\205\006\344F \233Bng_r\377anges vaUl\353 g\233\000n\347bn\200@,#\007\255\206\006%s\311\204\003_\277L\206\206\004\347lis\302\205\002\253\206\001!co\347mpr\244a\263\207\001row\245_\010\006c\231\"\277\207\001b\317` \317True\222\205\007\326\207\005pa\367nda\340bpola\341r\373@\267\205\005\211\207\001\330`ari\203es\320\207\001\274\014\232\210\002\210\204\002\207\206\001k\277eys hi\267\210\002l=o\324\204\002path\326`\361e\377be encod\373ed\272\210\003%s wh?ich is\313B\202\000\377your sys\367tem&\003ing,\017 try\361\210\001\211`:\003\230\211\001\376\257\000utf-8. ?Please\215b+\021\357 cor\214aly.\277length\254\207\001c""\224\226\205\022\316\207\001s\262\207\002s\326\211\004\"\007s\235mc\000ure\331K\317K:\340\366\007\342C\374\205\007\373\"\303\211\004of 6\326\210\005or\250\205\002ng\305\210\002 +\372\245\006f(\033max 1\377 discret\271er\006\203\204\003if \274`b\233in\215E1 \244\204\002\241\204\004p\375e\203\205\010allowe\321d\344\rZ\003\00213\177\024s \342P%3\267%\322\205\002\022#str\340\277\215\001+\004\215d\346\215\002\337\215\001be /larg\265\210\0058\322Mb\004\027in \225\205\006y\240\216\006\223\206\001\032\024|\304\216\005\334\202*user_\324\004\000\374\216\001\373$\240\214\002\240\207\022\345\207\005-\t\254\210\004\364\207\004\327s a\366\210\001z\344\214\002StWata\351\217\002A\213\211\001Z\364\217\002m_\025\003AS\202\217\003%s\272\217\005\346J\020: \357\036\241\211\001 shp\372\213\002\376\206\001\310\217\003\317\220\001or \304\210\001\000\351\217\003\347\216\006\313\214\001\221\211\033\223\217\005\242\211\010\345\207\002\247\221\005\375eV\nbytesp\377yreadsta\367t._\002\005_par\227ser\021\007/\021\007\203\213\003.\367pyx\372\214\002esti\375n\340\213\002 folde\003r \353\220\005\274\216\002\241\213\003\212\210\002\356\221\006\305\215\001\373 \047\000\014%s\047 c\277ontain\204As\037pace,\373\210\007\330H;\n\376\303\216\007non-emp}t\336\215\003ngs, \377\222\026\250\372\222\005\273c\302\213\004:\252\221\006L\243\217\001 \302\006\034V\251\214\0023\024\305\214\003\255\221\001ke\337y wro\225\224\001ri\327ter\334\215\004B\344\223\003Ca\377tegorica\237lDate\000\001\373\221\001D\377ecimalEn\377umFloat3\3752\002\00264Int1k28\002\0016\010\00032\r\000\256\020\0028Ob\272\217\001P\303FE\237rrorR\322D\010\002S>\327\206\002TimeU@\003\002\002m6\t\00132\017\00164\025\001\1778___Pyx\001\000\377Dict_Nex\277tRef__\306\217\004ez\034\000_\233\220\002_get\316\000\275m\r\001func\025\001m<\273@\003\002odul&\002\261\221\001|/\001\254`_capi;\001Oqual\020\005\376`to\000\377is_corou\357tine\366masy\337ncio.\030\006sc\277astcat\263\225\003c}l0\001in_tr\260`\377backclonIe\227\217\n\372\224\003s\310\212\004\215""\217\005d\360\224\001\374\352\224\005\362\224\00564days\337dfdir\355\222\001dr\377op_nulls\357dst_\262\216\001dta\375d\330\225\001eager_oonly\264\216\003ex\252\217\0014\223\210\001\266\224\001_\232\221\003_v\233\221\003\016\002\376\371\223\002filterf\357rom_\263\205\001vef\013sd\252\000d\005\000\374\216\003\324 \327 L\252 \224ces\n\001%\003_\376\223\002\340\226\205\001\371 \234\225\001\211\217\003\265\217\002ing\177hiimple\356\221\001|\361\222\002\322 64bit\332 \303in\337 \310\220\003\005\001\310\220\002is\376\220\226\002isdiris+na\311As\237\204\001_\250$\007\002\317rows\274\220\001\232\230\001lo\247min\247\222\013\303\211\020mI\000m\377enarwhal\357s.st\350\231\001.v2\371n:\001\367@otenp\177nsntnth\326!\357_cou\n\000ump\267ynw\347\227\004os\235\221\001p\361o\316\223\001\214\210\022\211\224\003replgace\304\231\002\273`nd\327\222\t\376\343\222\tionsas7\177bdatsav\231\232\002\367set\362 ault\336\234\003stre\261\205\001su\377rrogatee\037scape\356\221\001\251\233\001\367\"\370\334\225\001\233\231\001\237\231\001_unit\276\250\231\001stamp\261\231\001z\376\364`total_s\376\374`ndstzin\373fo\374\232\004upper\177usutcv2\215\216\003\270\375\207\006\240\225\006\217\210\006dis\327\000y?_width\245\210\006\356\225\003<\264\210\006Y\001rmat\305\210\006\201\222\004\274\311\210\022\202\204\004warn\000\001i\177ngswhen\252\235\001\374\350E\335\226\003_entry?_point\013\004\306\204\010\352\n\005ou\001x\354\226\001zip\373Py\371\207\003 *\000\000\000\360\000\000\000\003\010\001\310\213\006to_n\334\336A\206\230\001es\000\212@_a\003ll\237\205\004\n\003\376\233\001\000\016\345\"\346\227\003~0\003origin<\002\016\016\013pssE\013\r\001F\013\n\005\000\047\017N\005A\001e\013\203\217\001\235\013\r\002\237\013@\n\006)\020\251\005D\002\303\t\254\047(\267\047\233)\000\002\022, \332\047\000\t,o int\033\026__\363\211\001\357t_10\333\216\007_16\202\274\216\r_\327\210\001\252\210\010\000j\273\020\200 _\377ssize_t \337(void\225\217\001sto *, \020\003, \021\002w*)\000\265\237\001 *(\260\2006\344\372\200%""\370\234\005_\261\217\006\333\241\001)\000dcou\305\243\001\tu\213i)\000\240\243\001\000\276j\002\014\021\032\324k\346\202Q\252\204\027\304\204\025\334\204\025\016\000-int\242\205\004\367\030\026\t\320\205\002b\365b(4\005\350\205\027\227\205L)\000\366\244\001^\234\237\001_to_\236\226\002\000\375\216\003\370\313\215\003\227\216\004\302\211\004vecto\377rized_co\277nvert_\274\246\005_\036\356\211\003ber\000\017\024\004\033\340\214\002\360:\007\321\245\002\205\010\243\247\005like.\346\220\005for\273\227\006\000\200\r$\002\364\212\007\350\245\001_\341\246\001\000che\037ck_se\310\241\001\221\213\002\345\237\001\236\242\213\004run_\313\246\002\366\013s{tr)\005max_\270\240\003\277\000closeN\003i\177nitial_W\002qs\305C\325\230\006\343\216\002_t)s\004\337exit_\375\230\001us\377\320\000%\320%=\270Q\367\330\027\030\000\000\330\0272\320\3772B\320BV\320VW\377\330\0201\3201K\3101\307\330\020\021\000\000\000\003\006\003\360\010\377\000\005$\2401\330\004 \373\240\001\010\001\010\200~\220S\377\230\001\330\010\035\230Q\330\377\010\036\230a\330\010\013\210\3679\220D\020\000\014\022\220/\357\240\021\240!\016\0011\330\014\371\"\001\006\"\001\t\027\220s\230\375!0\004\013\2108\2203\220\ra\036\003\r\025L\002+\002\000\t\t\014\347T\230\024o\000\036\005T\230\023\353\230A_\002\340m\007\017\210q\361\330[\ni\rz\010\360\006\000\t\363\014\210\244\000\300\000\340\010\016\210\377o\230Q\230a\340\004\r\377\210Q\210d\220*\320\034\3370\260\014\270A\342\001V\240\277<\320/F\320F\242\"\010\277\034\320\0344\3204\014\000W\377\320Wj\320jk\330\010\001\t";
-    PyObject *data = __Pyx_DecompressString_LZSS(cstring, 3154, 6078);
+    #elif (CYTHON_COMPRESS_STRINGS) > 0 && (CYTHON_COMPRESS_STRINGS) <= 90 /* compression: lzss (3165 bytes) */
+static const char cstring[] = "\377  (errno\377  and it\377 must be\377 str (no\375t\006\000arting\377 with nu\377mbers!) \337does \035\001ex\377ist! in \377variable} \n\000steadE\006\377boolean \253orX\0011\004\0010b\006d?ict, gi\000u\006\355ei\000er\\\000min\327al,5\000d\003\003sc\371a]\000D\000unkno{wn\"\022righO\000\377center, \337left \033\025in<\352\007\332\000eric\370\t\365\001\376\216\"match t\377he type \373of\007\002colum\375n\370\001datafr\027ame\304\"b\034\003&\001\026\0007e, \002\001ti\033\000\377\000\276\004\001\047 (or\317\002 w\047 f\224 wri\342!M:\014\000isZ\002c\001\047\371#\371s\367#\276 illeg\363al\230@\234$alph/abet\264\000n\333 \341 \367und\237@core\377) charac|\203 U\000)). T\275\000\273fi\237@may\342Al\377ocked by\372\374@o\332\000r pro\367ces\177\000r yo\363u $\001\202ahave\375 \240\001e perm\377ission..k?C\373\003l\200\000ls\252,\277sCould\237bo\357pen t\002\047No\377n unique\365 \267$n\263 s de\213te\247\000d\305a\343!\310&!\336/\000eNot\367 ha?t Cyth@\000\242 \377delibera\217tely\254\204\001\304`\261`t\375h\345`PEP-48\3354\320\204\002rejV\000s \377subclass\375e\332\"builti}n\311Bs. If\352\002{ne\213 to p%\000|%\t\365@n set\374B\377\047annotat\372\377\000_\212`ing\047 \227dir\273\000i\242 ;\000F?alse.U\233\204\004\226a\364\337A\277` X\000inse[rt\025\005py\320\"r\262\205\007\234\212`\351`Ver\336!\334\205\002s\377upported\337add_n\206 al\177ignment\265b\364\355\205\006\344F \233Bng_r\377anges vaUl\353 g\233\000n\347bn\200@,#\007\255\206\006%s\311\204\003_\277L\206\206\004\347lis\302\205\002\253\206\001!co\347mpr\244a\263\207\001row\245_\010\006c\231\"\277\207\001b\317` \317True\222\205\007\326\207\005pa\367nda\340bpola\341r\373@\267\205\005\211\207\001\330`ari\203es\320\207\001\274\014\232\210\002\210\204\002\207\206\001k\277eys hi\267\210\002l=o\324\204\002path\326`\361e\377be encod\373ed\272\210\003%s wh?ich is\313B\202\000\377your sys\367tem&\003ing,\017 try\361\210\001\211`:\003\230\211\001\376\257\000utf-8. ?Please\215b+\021\357 cor\214aly.\277length\254\207\001c""\224\226\205\022\316\207\001s\262\207\002s\326\211\004\"\007s\235mc\000ure\331K\317K:\340\366\007\342C\374\205\007\373\"\303\211\004of 6\326\210\005or\250\205\002ng\305\210\002 +\372\245\006f(\033max 1\377 discret\271er\006\203\204\003if \274`b\233in\215E1 \244\204\002\241\204\004p\375e\203\205\010allowe\321d\344\rZ\003\00213\177\024s \342P%3\267%\322\205\002\022#str\340\277\215\001+\004\215d\346\215\002\337\215\001be /larg\265\210\0058\322Mb\004\027in \225\205\006y\240\216\006\223\206\001\032\024|\304\216\005\334\202*user_\324\004\000\374\216\001\373$\240\214\002\240\207\022\345\207\005-\t\254\210\004\364\207\004\327s a\366\210\001z\344\214\002StWata\351\217\002A\213\211\001Z\364\217\002m_\025\003AS\202\217\003%s\272\217\005\346J\020: \357\036\241\211\001 shp\372\213\002\376\206\001\310\217\003\317\220\001or \304\210\001\000\351\217\003\347\216\006\313\214\001\221\211\033\223\217\005\242\211\010\345\207\002\247\221\005\375eV\nbytesp\377yreadsta\367t._\002\005_par\227ser\021\007/\021\007\203\213\003.\367pyx\372\214\002esti\375n\340\213\002 folde\003r \353\220\005\274\216\002\241\213\003\212\210\002\356\221\006\305\215\001\373 \047\000\014%s\047 c\277ontain\204As\037pace,\373\210\007\330H;\n\376\303\216\007non-emp}t\336\215\003ngs, \377\222\026\250\372\222\005\273c\302\213\004:\252\221\006L\243\217\001 \302\006\034V\251\214\0023\024\305\214\003\255\221\001ke\337y wro\225\224\001ri\327ter\334\215\004B\344\223\003Ca\377tegorica\237lDate\000\001\373\221\001D\377ecimalEn\377umFloat3\3752\002\00264Int1k28\002\0016\010\00032\r\000\256\020\0028Ob\272\217\001P\303FE\237rrorR\322D\010\002S>\327\206\002TimeU@\003\002\002m6\t\00132\017\00164\025\001\1778___Pyx\001\000\377Dict_Nex\277tRef__\306\217\004ez\034\000_\233\220\002_get\316\000\275m\r\001func\025\001m<\273@\003\002odul&\002\261\221\001|/\001\254`_capi;\001Oqual\020\005\376`to\000\377is_corou\357tine\366masy\337ncio.\030\006sc\277astcat\263\225\003c}l0\001in_tr\260`\377backclon\211e\227\217\n\372\224\003s\310\212\004""\215\217\005\225\217\005i\307ond\373\224\001\365\224\005\375\224\00564\377daysdfdi\375r\370\222\001drop_n\377ullsdst_\336\275\216\001dtad\343\225\001ea\377ger_onlyF\277\216\003ex\265\217\001\236\210\001\301\224\001_\245\221\003\343_v\246\221\003\016\002\204\224\002fil\377terfrom_\276\276\205\001vefsd\265\000d\300\005\000\207\217\003\337 \342 \265 \237ces\004\n\001%\003_\211\224\002\241\205\001\204@\247\225\001\224\217\003\376\300\217\002inghiim\307ple\371\221\001\374\222\002\335 647bit\345 in\352 \323\220\003\354\005\001\323\220\002is\233\226\002isd\277irisna\324As\362\252\204\001_\263$\007\002rows|\307\220\001\245\230\001lomin\262\222\013\372\316\211\020mI\000menar\377whals.st\236\363\231\001.v2n:\001\202`o\377tenpnsnt\367nth\326!_cou~\n\000umpynw\362\227\004\033os\250\221\001po\331\223\001\227\210\022\224\224\003\177replace\317\231\002\366\306`nd\342\222\tsas7\177bdatsav\225\232\002\367set\343 ault\336\215\003stre\255\205\001su\377rrogatee\037scape\352\221\001\245\233\001\350\"\370\330\225\001\227\231\001\233\231\001_unit\276\244\231\001stamp\255\231\001z\376\360`total_s\376\370`ndstzin\373fo\370\232\004upper\177usutcv2\211\216\003\270\371\207\006\234\225\006\213\210\006dis\310\000y?_width\241\210\006\352\225\003<\260\210\006Y\001rmat\301\210\006\375\221\004\274\305\210\022\363dwarn\000\001i\177ngswhen\246\235\001\374\331E\331\226\003_entry?_point\013\004\267\204\010\352\n\005ou\001x\350\226\001zip\373Py\365\207\003 *\000\000\000\360\000\000\000\003\010\001\304\213\006to_n\334\317A\202\230\001es\000\212@_a\003ll\220\205\004\n\003\372\233\001\000\016\345\"\342\227\003~0\003origin<\002\016\016\013pssE\013\r\001F\013\n\005\000\047\017N\005A\001e\013\377\216\001\235\013\r\002\237\013@\n\006)\020\251\005D\002\303\t\254\047(\267\047\233)\000\002\022, \332\047\000\t,o int\033\026__\357\211\001\357t_10\327\216\007_16\202\270\216\r_\310\210\001\233\210\010\000j\273\020\200 _\377ssize_t \337(void\221\217\001sto *, \020\003, \021\002w*)\000\261\237\001 *(\260\2006\344\372""\200%\364\234\005_\255\217\006\327\241\001)\000dcou\301\243\001\tu\213i)\000\234\243\001\000\276j\002\014\021\032\324k\346\202Q\252\204\027\304\204\025\334\204\025\030\000-\312\224\006\203\237\005_t\262\205\004\2078\026\t\034\340\205\002\205\204\002(in6\003\370\205\027\247\205L\363)\000\202\245\001\250\237\001_to_\302\252\226\002\000\376\216\003\314\215\003\230\216\004\322\211\004ve\377ctorized\377_convert\365_\310\246\005_\376\211\003ber\000\200\017\024\004\033\360\214\002:\007\335\245\002\205\010\257\247\005lwike\347\220\005for\307\227\006\241\000\200\r$\002\212\007\364\245\001_\355\246\001\000\377check_se\360\324\241\001\241\213\002\361\237\001\262\213\004run_\334\327\246\002\366\013str)\005ma\373x_\304\240\003\000clos\375eN\003initia\213l_W\002s\305C\341\230\006\363\216\002_\373t)s\004exit_\376\211\231\001us\320\000%\320%\277=\270Q\330\027\030\000\000\330\377\0272\3202B\320BV\377\320VW\330\0201\3201?K\3101\330\020\021\000\000\000\003\376\006\003\360\010\000\005$\2401\337\330\004+\2501\010\001\010\200\377~\220S\230\001\330\010\035\377\230Q\330\010\036\230a\330\277\010\013\2109\220D\020\000\014\177\022\220/\240\021\240!\016\001\3571\330\014\"\001\006\032\230!\237\330\t\027\220s\004\0001\003\013\277\2108\2203\220a\036\003\r\341\025L\002+\002\000\t\t\014T\230\024|o\000\036\005T\230\023\230A_\002\035\340m\007\017\210qZ\013\233\001m\t\204v\014\251\013\340\306\000\264\000\252\000\000\007\340\377\010\016\210o\230Q\230a\377\340\004\r\210Q\210d\220\377*\320\0340\260\014\270A\376\374\001V\240<\320/F\320\375F\274\"\010\034\320\0344\320\3754\014\000W\320Wj\320j\017k\330\010\t";
+    PyObject *data = __Pyx_DecompressString_LZSS(cstring, 3165, 6116);
     #define __Pyx_DecompressString_UNUSED
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #else /* compression: none (6078 bytes) */
-static const char bytes[] = "  (errno  and it must be str (not starting with numbers!) does not exist! in variable  instead must be boolean or be 1 or 0 must be dict, got  must be either nominal, ordinal, scale or unknown got  must be either right, center, left or unknown got  must be int must be numeric must be string must match the type of the column in dataframe and be of type date, datetime or time\047 (ordinal \047 for writing: \047 is of type \047 starts with an illegal (neither alphabetic nor an underscore) character: \047)). The file may be locked by another process or you may not have write permission..?Column labels must be stringsCould not open file \047Non unique column names detected in the dataframe!NoneNote that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the \047annotation_typing\047 directive to False.Unknown data format to insertUnknown pywriter variable formatVersion not supportedadd_notealignment for variable character missing_ranges value given for non character variable %scolumn_labels must be either list or dict!compress and row_compress cannot be both Truedataframe must be pandas or polars dataframedictionaries in missing_ranges must have the keys hi and lofile path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly.length of column labels must be the same as number of columnsmeasure for variable missing_ranges: hi and lo values must be both either of numeric or string typemissing_ranges: hi and lo values must be both the same for string typemissing_ranges: max 1 discrete numeric value if combined with 1 range value per variable allowedmissing_ranges: max 1 range value per variable allowedmissing_ranges: max 3 discrete numeric values per variable allowedmissing_ranges: max 3 string values per variable allowedmissing_ranges: string values length must not be larger than 8missing_ranges: values in dictionar""y must be listmissing_ranges: values must be both either of numeric or string typemissing_user_values not allowed for character variable %smissing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s insteadmissing_user_values: values in dictionary must be listnote should be either str or list, got numeric missing_ranges value given for non numeric variable %spath must be either str or bytespyreadstat._readstat_parserpyreadstat/_readstat_writer.pyxthe destination folder unknown file formatutf-8variable name \047variable name \047%s\047 contains a space, which is not allowedvariable names must be non-empty strings, not starting with numbersvariable_value_labels: type of Label variable_value_labels: type of Value variable_value_labels: value for key wrong writer formatBooleanCategoricalDateDatetimeDecimalEnumFloat32Float64Int128Int16Int32Int64Int8ObjectPyreadstatErrorReadstatErrorStringTimeUInt128UInt16UInt32UInt64UInt8___Pyx_PyDict_NextRef__annotate____class_getitem____func____main____module____name____pyx_capi____qualname____test___is_coroutine_readstat_parserasyncio.coroutinescastcatcentercline_in_tracebackclonecolumn_labelscolumnscombinecompressddatedatetimedatetime64daysdfdirnamedrop_nullsdst_pathdtadtypeeager_onlyencodeexpanduserfile_format_versionfile_labelfilterfrom_nativefsdecodefsencodegetget_categoriesget_native_namespacegetfilesystemencodinghiimplementationis_64bitis_inis_pandasis_polarsisalphaisdirisnaitemsiter_columnsiter_rowskeysleftlominmissing_rangesmissing_user_valuesmsnamenarwhals.stable.v2nominalnotenpnsntnthnull_countnumpynwordinalospathpopporpyreadstat._readstat_writerreplacerightroundrow_compressrow_compressionsas7bdatsavscalesetdefaultstablestrerrorsurrogateescapesystable_namethentimetime_unittimestamptimezonetotal_secondstzinfounknownupperusutcv2valuesvariable_alignmentvariable_display_widthvariable_formatvariable_informatvariable_measurevariable_value_labelsversionwarnwarningswhenwith_columnswriter_entry_pointwriter_f""ile_formatwriter_formatxportzipPyObject *\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000readstat_to_numpy_types\000sas_all_formats\000sas_date_formats\000sas_datetime_formats\000sas_origin\000sas_time_formats\000spss_all_formats\000spss_date_formats\000spss_datetime_formats\000spss_origin\000spss_time_formats\000stata_all_formats\000stata_date_formats\000stata_datetime_formats\000stata_origin\000stata_time_formatsPyObject *(PyObject *)\000PyObject *(PyObject *, PyObject *, PyObject *, int)\000PyObject *(PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *, int)\000PyObject *(PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, int)\000\000Py_ssize_t (void const *, size_t, void *)\000char *(__pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type)\000double (__pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type, PyObject *)\000int (PyObject *)\000int (PyObject *, PyObject *)\000int (PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *, int, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int, int)\000int (PyObject *, PyObject *, int)\000int (int)\000void (int, int, PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *)\000filepath_to_bytes\000get_narwhals_column_types\000vectorized_convert_datetime_to_number\000vectorized_convert_date_to_number\000vectorized_convert_time_to_number\000write_bytes\000get_datetimelike_format_for_readstat\000convert_datetimelike_to_number\000open_file\000check_series_all_same_types\000run_write\000get_narwhals_str_series_max_length\000close_file\000initial_checksvoid (readstat_error_t)\000check_exit_status\320\000%\320%=\270Q\330\027\030\330\027\030\330\0272""\3202B\320BV\320VW\330\0201\3201K\3101\330\020\021\330\020\021\330\020\021\330\020\021\330\020\021\330\020\021\360\010\000\005$\2401\330\004 \240\001\360\010\000\005\010\200~\220S\230\001\330\010\035\230Q\330\010\036\230a\330\010\013\2109\220D\230\001\330\014\022\220/\240\021\240!\330\010\013\2101\330\014\"\240!\330\010\013\2101\330\014\036\230a\330\t\027\220s\230!\330\010\035\230Q\330\010\013\2108\2203\220a\330\014\"\240!\330\r\025\220S\230\001\330\014\"\240!\330\r\025\220S\230\001\330\014\"\240!\330\r\025\220S\230\001\330\014\"\240!\330\r\025\220T\230\024\230Q\330\014\"\240!\330\r\025\220T\230\023\230A\330\014\"\240!\340\014\022\220/\240\021\240!\330\010\017\210q\330\t\027\220s\230!\330\010\035\230Q\330\010\036\230a\330\t\027\220s\230!\330\010\035\230Q\330\t\027\220s\230!\330\010\035\230Q\360\006\000\t\014\2101\330\014\036\230a\340\010\016\210o\230Q\230a\340\004\r\210Q\210d\220*\320\0340\260\014\270A\330\010\035\230V\240<\320/F\320FV\320VW\330\010\034\320\0344\3204F\320FW\320Wj\320jk\330\010\t";
+    #else /* compression: none (6116 bytes) */
+static const char bytes[] = "  (errno  and it must be str (not starting with numbers!) does not exist! in variable  instead must be boolean or be 1 or 0 must be dict, got  must be either nominal, ordinal, scale or unknown got  must be either right, center, left or unknown got  must be int must be numeric must be string must match the type of the column in dataframe and be of type date, datetime or time\047 (ordinal \047 for writing: \047 is of type \047 starts with an illegal (neither alphabetic nor an underscore) character: \047)). The file may be locked by another process or you may not have write permission..?Column labels must be stringsCould not open file \047Non unique column names detected in the dataframe!NoneNote that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the \047annotation_typing\047 directive to False.Unknown data format to insertUnknown pywriter variable formatVersion not supportedadd_notealignment for variable character missing_ranges value given for non character variable %scolumn_labels must be either list or dict!compress and row_compress cannot be both Truedataframe must be pandas or polars dataframedictionaries in missing_ranges must have the keys hi and lofile path could not be encoded with %s which is set as your system encoding, trying to encode it as utf-8. Please set your system encoding correctly.length of column labels must be the same as number of columnsmeasure for variable missing_ranges: hi and lo values must be both either of numeric or string typemissing_ranges: hi and lo values must be both the same for string typemissing_ranges: max 1 discrete numeric value if combined with 1 range value per variable allowedmissing_ranges: max 1 range value per variable allowedmissing_ranges: max 3 discrete numeric values per variable allowedmissing_ranges: max 3 string values per variable allowedmissing_ranges: string values length must not be larger than 8missing_ranges: values in dictionar""y must be listmissing_ranges: values must be both either of numeric or string typemissing_user_values not allowed for character variable %smissing_user_values supports values a to z for Stata and A to Z and _ for SAS, got %s insteadmissing_user_values: values in dictionary must be listnote should be either str or list, got numeric missing_ranges value given for non numeric variable %spath must be either str or bytespyreadstat._readstat_parserpyreadstat/_readstat_writer.pyxthe destination folder unknown file formatutf-8variable name \047variable name \047%s\047 contains a space, which is not allowedvariable names must be non-empty strings, not starting with numbersvariable_value_labels: type of Label variable_value_labels: type of Value variable_value_labels: value for key wrong writer formatBooleanCategoricalDateDatetimeDecimalEnumFloat32Float64Int128Int16Int32Int64Int8ObjectPyreadstatErrorReadstatErrorStringTimeUInt128UInt16UInt32UInt64UInt8___Pyx_PyDict_NextRef__annotate____class_getitem____func____main____module____name____pyx_capi____qualname____test___is_coroutine_readstat_parserasyncio.coroutinescastcatcentercline_in_tracebackclonecolumn_labelscolumnscombinecompresscompressionddatedatetimedatetime64daysdfdirnamedrop_nullsdst_pathdtadtypeeager_onlyencodeexpanduserfile_format_versionfile_labelfilterfrom_nativefsdecodefsencodegetget_categoriesget_native_namespacegetfilesystemencodinghiimplementationis_64bitis_inis_pandasis_polarsisalphaisdirisnaitemsiter_columnsiter_rowskeysleftlominmissing_rangesmissing_user_valuesmsnamenarwhals.stable.v2nominalnotenpnsntnthnull_countnumpynwordinalospathpopporpyreadstat._readstat_writerreplacerightroundrow_compresssas7bdatsavscalesetdefaultstablestrerrorsurrogateescapesystable_namethentimetime_unittimestamptimezonetotal_secondstzinfounknownupperusutcv2valuesvariable_alignmentvariable_display_widthvariable_formatvariable_informatvariable_measurevariable_value_labelsversionwarnwarningswhenwith_columnswriter_entry_pointwriter_file_""formatwriter_formatxportzipPyObject *\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000readstat_to_numpy_types\000sas_all_formats\000sas_date_formats\000sas_datetime_formats\000sas_origin\000sas_time_formats\000spss_all_formats\000spss_date_formats\000spss_datetime_formats\000spss_origin\000spss_time_formats\000stata_all_formats\000stata_date_formats\000stata_datetime_formats\000stata_origin\000stata_time_formatsPyObject *(PyObject *)\000PyObject *(PyObject *, PyObject *, PyObject *, int)\000PyObject *(PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *, int)\000PyObject *(PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, int)\000\000Py_ssize_t (void const *, size_t, void *)\000char *(__pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type)\000double (__pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, __pyx_t_10pyreadstat_16_readstat_writer_pywriter_variable_type, PyObject *)\000int (PyObject *)\000int (PyObject *, PyObject *)\000int (PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *, int, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, readstat_compress_t, int)\000int (PyObject *, PyObject *, int)\000int (int)\000void (int, int, PyObject *, PyObject *, __pyx_t_10pyreadstat_16_readstat_writer_dst_file_format, PyObject *, PyObject *)\000filepath_to_bytes\000get_narwhals_column_types\000vectorized_convert_datetime_to_number\000vectorized_convert_date_to_number\000vectorized_convert_time_to_number\000write_bytes\000get_datetimelike_format_for_readstat\000convert_datetimelike_to_number\000open_file\000check_series_all_same_types\000run_write\000get_narwhals_str_series_max_length\000close_file\000initial_checksvoid (readstat_error_t)\000check_exit_status\320\000%\320%=\270Q\330\027\030\330\027""\030\330\0272\3202B\320BV\320VW\330\0201\3201K\3101\330\020\021\330\020\021\330\020\021\330\020\021\330\020\021\330\020\021\360\010\000\005$\2401\330\004+\2501\360\010\000\005\010\200~\220S\230\001\330\010\035\230Q\330\010\036\230a\330\010\013\2109\220D\230\001\330\014\022\220/\240\021\240!\330\010\013\2101\330\014\"\240!\330\010\013\2101\330\014\032\230!\330\t\027\220s\230!\330\010\035\230Q\330\010\013\2108\2203\220a\330\014\"\240!\330\r\025\220S\230\001\330\014\"\240!\330\r\025\220S\230\001\330\014\"\240!\330\r\025\220S\230\001\330\014\"\240!\330\r\025\220T\230\024\230Q\330\014\"\240!\330\r\025\220T\230\023\230A\330\014\"\240!\340\014\022\220/\240\021\240!\330\010\017\210q\330\t\027\220s\230!\330\010\035\230Q\330\010\036\230a\330\t\027\220s\230!\330\010\035\230Q\330\t\027\220s\230!\330\010\035\230Q\330\010\013\2109\220D\230\001\330\014\022\220/\240\021\240!\340\010\013\2101\330\014\032\230!\340\010\013\2101\330\014\032\230!\340\010\016\210o\230Q\230a\340\004\r\210Q\210d\220*\320\0340\260\014\270A\330\010\035\230V\240<\320/F\320FV\320VW\330\010\034\320\0344\3204F\320FW\320Wj\320jk\330\010\t";
     PyObject *data = NULL;
     #define __Pyx_DecompressString_UNUSED
     #define __Pyx_DecompressString_LZSS_UNUSED
@@ -21019,8 +21119,8 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   if (unlikely(!tuple_dedup_map)) return -1;
   {
     const __Pyx_PyCode_New_function_description descr = {19, 0, 0, 22, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1007};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_df, __pyx_mstate->__pyx_n_u_dst_path, __pyx_mstate->__pyx_n_u_writer_format, __pyx_mstate->__pyx_n_u_file_label, __pyx_mstate->__pyx_n_u_version, __pyx_mstate->__pyx_n_u_table_name, __pyx_mstate->__pyx_n_u_column_labels, __pyx_mstate->__pyx_n_u_compress, __pyx_mstate->__pyx_n_u_row_compress, __pyx_mstate->__pyx_n_u_note, __pyx_mstate->__pyx_n_u_variable_value_labels, __pyx_mstate->__pyx_n_u_missing_ranges, __pyx_mstate->__pyx_n_u_variable_display_width, __pyx_mstate->__pyx_n_u_variable_measure, __pyx_mstate->__pyx_n_u_missing_user_values, __pyx_mstate->__pyx_n_u_variable_format, __pyx_mstate->__pyx_n_u_variable_alignment, __pyx_mstate->__pyx_n_u_variable_informat, __pyx_mstate->__pyx_n_u_is_64bit, __pyx_mstate->__pyx_n_u_file_format_version, __pyx_mstate->__pyx_n_u_row_compression, __pyx_mstate->__pyx_n_u_writer_file_format};
-    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_pyreadstat__readstat_writer_pyx, __pyx_mstate->__pyx_n_u_writer_entry_point, __pyx_mstate->__pyx_kp_b_iso88591_Q_22BBVVW_11K1_1_S_Q_a_9D_1_1_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_df, __pyx_mstate->__pyx_n_u_dst_path, __pyx_mstate->__pyx_n_u_writer_format, __pyx_mstate->__pyx_n_u_file_label, __pyx_mstate->__pyx_n_u_version, __pyx_mstate->__pyx_n_u_table_name, __pyx_mstate->__pyx_n_u_column_labels, __pyx_mstate->__pyx_n_u_compress, __pyx_mstate->__pyx_n_u_row_compress, __pyx_mstate->__pyx_n_u_note, __pyx_mstate->__pyx_n_u_variable_value_labels, __pyx_mstate->__pyx_n_u_missing_ranges, __pyx_mstate->__pyx_n_u_variable_display_width, __pyx_mstate->__pyx_n_u_variable_measure, __pyx_mstate->__pyx_n_u_missing_user_values, __pyx_mstate->__pyx_n_u_variable_format, __pyx_mstate->__pyx_n_u_variable_alignment, __pyx_mstate->__pyx_n_u_variable_informat, __pyx_mstate->__pyx_n_u_is_64bit, __pyx_mstate->__pyx_n_u_file_format_version, __pyx_mstate->__pyx_n_u_compression, __pyx_mstate->__pyx_n_u_writer_file_format};
+    __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_pyreadstat__readstat_writer_pyx, __pyx_mstate->__pyx_n_u_writer_entry_point, __pyx_mstate->__pyx_kp_b_iso88591_Q_22BBVVW_11K1_1_1_S_Q_a_9D_1_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;

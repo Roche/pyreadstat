@@ -912,16 +912,20 @@ class TestBasic(unittest.TestCase):
     def test_sas7bdat_write_compress_32bit(self):
         path = os.path.join(self.write_folder, "write_options.sas7bdat")
         # byte 32 of the header is the 64 bit alignment marker (0x33)
-        # RLE compressed files carry the signature SASYZCRL
+        # RLE compressed files carry the signature SASYZCRL, RDC compressed files SASYZCR2
         for is_64bit in (True, False):
-            for row_compress in (False, True):
-                pyreadstat.write_sas7bdat(self.df_pandas, path, is_64bit=is_64bit, row_compress=row_compress)
+            for compress, row_compress in ((False, False), (False, True), (True, False)):
+                pyreadstat.write_sas7bdat(self.df_pandas, path, is_64bit=is_64bit, compress=compress,
+                                          row_compress=row_compress)
                 df, meta = pyreadstat.read_sas7bdat(path)
                 self.assertTrue(df.equals(self.df_pandas))
                 with open(path, "rb") as fh:
                     raw = fh.read()
                 self.assertEqual(raw[32] == 0x33, is_64bit)
                 self.assertEqual(b"SASYZCRL" in raw, row_compress)
+                self.assertEqual(b"SASYZCR2" in raw, compress)
+        with self.assertRaises(pyreadstat.PyreadstatError):
+            pyreadstat.write_sas7bdat(self.df_pandas, path, compress=True, row_compress=True)
 
     def test_sas7bdat_write_dates(self):
         path = os.path.join(self.write_folder, "dates_write.sas7bdat")

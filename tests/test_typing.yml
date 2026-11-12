@@ -280,6 +280,7 @@
     write_sas7bdat(pandas_df, "file.sas7bdat")
     write_sas7bdat(polars_df, "file.sas7bdat")
     write_sas7bdat(pandas_df, Path("file.sas7bdat"), is_64bit=False, row_compress=True)
+    write_sas7bdat(polars_df, "file.sas7bdat", compress=True)
     write_sas7bdat(pandas_df, "file.sas7bdat", missing_user_values={"a": ["A"]})
 
 - case: set_value_labels_types

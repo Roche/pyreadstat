@@ -685,7 +685,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                    int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format,
-                   dict variable_informat, bint row_compression, bint is_64bit) except *:
+                   dict variable_informat, readstat_compress_t compression, bint is_64bit) except *:
     """
     main entry point for writing all formats. Some parameters are specific for certain file type
     and are even incompatible between them. This function relies on the caller to select the right
@@ -797,8 +797,8 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         if file_format_version > -1:
             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))
 
-        if row_compression:
-            check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))
+        if compression != READSTAT_COMPRESS_NONE:
+            check_exit_status(readstat_writer_set_compression(writer, compression))
 
         # only used by SAS formats (sas7bdat, sas7bcat)
         check_exit_status(readstat_writer_set_file_format_is_64bit(writer, is_64bit))
@@ -1019,7 +1019,7 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
 
 
     cdef int file_format_version = 0
-    cdef bint row_compression = 0
+    cdef readstat_compress_t compression = READSTAT_COMPRESS_NONE
 
     cdef dst_file_format writer_file_format
 
@@ -1031,7 +1031,7 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
         if compress:
             file_format_version = 3
         if row_compress:
-            row_compression = 1
+            compression = READSTAT_COMPRESS_ROWS
     elif writer_format == "dta":
         writer_file_format = FILE_FORMAT_DTA
         if version == 15:
@@ -1056,14 +1056,18 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
         writer_file_format = FILE_FORMAT_POR
     elif writer_format == "sas7bdat":
         writer_file_format = FILE_FORMAT_SAS7BDAT
-        # RLE compression (SAS COMPRESS=CHAR). compress is reserved for binary (RDC)
-        # compression, which Readstat cannot write yet
+        if compress and row_compress:
+            raise PyreadstatError("compress and row_compress cannot be both True")
+        # binary compression: RDC (SAS COMPRESS=BINARY)
+        if compress:
+            compression = READSTAT_COMPRESS_BINARY
+        # row compression: RLE (SAS COMPRESS=CHAR)
         if row_compress:
-            row_compression = 1
+            compression = READSTAT_COMPRESS_ROWS
     else:
         raise PyreadstatError("wrong writer format")
 
     run_write(df, dst_path, writer_file_format, file_label, column_labels,
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression,
+        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, compression,
         is_64bit)
