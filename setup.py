@@ -16,6 +16,7 @@
 
 from setuptools import setup, Extension
 import os
+import re
 import sys
 import Cython
 from Cython.Build import cythonize
@@ -57,9 +58,18 @@ def is_conda():
     """
     if os.environ.get('CONDA_BUILD'):
         return False
-    if not os.path.exists(os.path.join(sys.prefix, 'conda-meta')):
-        return False
-    return os.path.isfile(os.path.join(sys.prefix, 'include', 'iconv.h'))
+    # in a venv created from a conda python, sys.prefix is the venv, but the headers (conda's iconv.h) still come
+    # from the conda python in sys.base_prefix
+    for prefix in {sys.prefix, sys.base_prefix}:
+        if not os.path.exists(os.path.join(prefix, 'conda-meta')):
+            continue
+        header = os.path.join(prefix, 'include', 'iconv.h')
+        if not os.path.isfile(header):
+            continue
+        with open(header, encoding='utf-8', errors='replace') as f:
+            if re.search(r'^\s*#\s*define\s+iconv\s+libiconv\b', f.read(), re.MULTILINE):
+                return True
+    return False
 
 data_files = []
 libraries = []
