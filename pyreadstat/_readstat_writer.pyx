@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 # ###cython: profile=True
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
@@ -27,10 +27,10 @@ from datetime import timezone
 import numpy as np
 import narwhals.stable.v2 as nw
 
-from readstat_api cimport *
+from .readstat_api cimport *
 from libc.errno cimport errno
-from _readstat_parser import ReadstatError, PyreadstatError
-from _readstat_parser cimport check_exit_status
+from ._readstat_parser import ReadstatError, PyreadstatError
+from ._readstat_parser cimport check_exit_status
 
 cdef set int_types = {nw.Int32, nw.Int16, nw.Int8, nw.UInt16, nw.UInt8, }
 cdef set float_types = {nw.Float64, nw.Float32, nw.Decimal, nw.Int128, nw.Int64, nw.UInt128, nw.UInt64, nw.UInt32}
@@ -306,7 +306,8 @@ cdef list get_narwhals_column_types(object df, dict missing_user_values, dict va
         curtype = None
         equal = True
         # let's deal first with object type, Enum could also be anything
-        if col_type == nw.Object or col_type==nw.Enum:
+        # if the series is empty (all nulls) it is handled at the end as other unknown types
+        if (col_type == nw.Object or col_type==nw.Enum) and len(curseries):
             curtype = type(curseries[0])
             equal = check_series_all_same_types(curseries, curtype)
             # if all elements are equal, they could be a few we expect to be an object class
@@ -684,7 +685,7 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                    int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format,
-                   dict variable_informat, bint row_compression) except *:
+                   dict variable_informat, readstat_compress_t compression, bint is_64bit) except *:
     """
     main entry point for writing all formats. Some parameters are specific for certain file type
     and are even incompatible between them. This function relies on the caller to select the right
@@ -796,10 +797,13 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
         if file_format_version > -1:
             check_exit_status(readstat_writer_set_file_format_version(writer, file_format_version))
 
-        if row_compression:
-            check_exit_status(readstat_writer_set_compression(writer, READSTAT_COMPRESS_ROWS))
+        if compression != READSTAT_COMPRESS_NONE:
+            check_exit_status(readstat_writer_set_compression(writer, compression))
 
-        # table name is used only for xpt files
+        # only used by SAS formats (sas7bdat, sas7bcat)
+        check_exit_status(readstat_writer_set_file_format_is_64bit(writer, is_64bit))
+
+        # table name is used only for xpt and sas7bdat files
         if table_name:
             table_name_bytes = table_name.encode("utf-8")
             tab_name = <char *> table_name_bytes
@@ -1010,11 +1014,12 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
                 dict variable_format=None,
                 dict variable_alignment = None,
                 dict variable_informat=None,
+                bint is_64bit=True,
                        ):
 
 
     cdef int file_format_version = 0
-    cdef bint row_compression = 0
+    cdef readstat_compress_t compression = READSTAT_COMPRESS_NONE
 
     cdef dst_file_format writer_file_format
 
@@ -1026,7 +1031,7 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
         if compress:
             file_format_version = 3
         if row_compress:
-            row_compression = 1
+            compression = READSTAT_COMPRESS_ROWS
     elif writer_format == "dta":
         writer_file_format = FILE_FORMAT_DTA
         if version == 15:
@@ -1049,9 +1054,20 @@ def writer_entry_point(df, dst_path, str writer_format=None, str file_label="",
         file_format_version = version
     elif writer_format == "por":
         writer_file_format = FILE_FORMAT_POR
+    elif writer_format == "sas7bdat":
+        writer_file_format = FILE_FORMAT_SAS7BDAT
+        if compress and row_compress:
+            raise PyreadstatError("compress and row_compress cannot be both True")
+        # binary compression: RDC (SAS COMPRESS=BINARY)
+        if compress:
+            compression = READSTAT_COMPRESS_BINARY
+        # row compression: RLE (SAS COMPRESS=CHAR)
+        if row_compress:
+            compression = READSTAT_COMPRESS_ROWS
     else:
         raise PyreadstatError("wrong writer format")
 
-    run_write(df, dst_path, writer_file_format, file_label, column_labels, 
+    run_write(df, dst_path, writer_file_format, file_label, column_labels,
         file_format_version, note, table_name, variable_value_labels, missing_ranges, missing_user_values,
-        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, row_compression)
+        variable_alignment, variable_display_width, variable_measure, variable_format, variable_informat, compression,
+        is_64bit)

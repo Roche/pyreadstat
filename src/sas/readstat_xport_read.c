@@ -314,6 +314,8 @@ static readstat_error_t xport_construct_format(char *dst, size_t dst_len,
     }
     if (decimals) {
         pos += snprintf(pos, dst_len-(pos-dst), ".%d", decimals);
+    } else if (width) {
+        pos += snprintf(pos, dst_len-(pos-dst), ".");
     }
 
     free(format);
@@ -729,6 +731,21 @@ static readstat_error_t xport_read_data(xport_ctx_t *ctx) {
 
         if (ctx->row_limit > 0 && ctx->parsed_row_count == ctx->row_limit)
             break;
+    }
+
+    /* Padding never fills a whole line, so blank rows at least a line
+     * wide are data rather than end-of-file padding */
+    if (ctx->row_length >= LINE_LEN) {
+        while (num_blank_rows) {
+            if (ctx->row_limit > 0 && ctx->parsed_row_count == ctx->row_limit)
+                break;
+
+            retval = xport_process_row(ctx, blank_row, ctx->row_length);
+            if (retval != READSTAT_OK)
+                goto cleanup;
+
+            num_blank_rows--;
+        }
     }
 
 cleanup:

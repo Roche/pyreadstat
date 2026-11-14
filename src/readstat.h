@@ -111,7 +111,8 @@ typedef enum readstat_error_e {
     READSTAT_ERROR_LABEL_IS_TOO_LONG,
     READSTAT_ERROR_DUPLICATE_VALUE_LABEL,
     READSTAT_ERROR_UNUSED_STRING_REF,
-    READSTAT_ERROR_DUPLICATE_VARIABLE_NAME
+    READSTAT_ERROR_DUPLICATE_VARIABLE_NAME,
+    READSTAT_ERROR_TOO_MANY_ROWS
 } readstat_error_t;
 
 const char *readstat_error_message(readstat_error_t error_code);
@@ -162,6 +163,8 @@ readstat_compress_t readstat_get_compression(readstat_metadata_t *metadata);
 readstat_endian_t readstat_get_endianness(readstat_metadata_t *metadata);
 const char *readstat_get_table_name(readstat_metadata_t *metadata);
 const char *readstat_get_file_label(readstat_metadata_t *metadata);
+/* Returns NULL if the file doesn't record an encoding (e.g. SAS7BDAT and
+ * SAS7BCAT files with an encoding byte of 0). */
 const char *readstat_get_file_encoding(readstat_metadata_t *metadata);
 const mr_set_t *readstat_get_multiple_response_sets(readstat_metadata_t *metadata);
 size_t readstat_get_multiple_response_sets_length(readstat_metadata_t *metadata);
@@ -613,7 +616,7 @@ readstat_error_t readstat_writer_set_file_format_is_64bit(readstat_writer_t *wri
         int is_64bit); // applies only to SAS files; defaults to 1=true
 readstat_error_t readstat_writer_set_compression(readstat_writer_t *writer,
         readstat_compress_t compression); 
-        // READSTAT_COMPRESS_BINARY is supported only with SAV files (i.e. ZSAV files)
+        // READSTAT_COMPRESS_BINARY is supported only with sas7bdat and SAV files (i.e. ZSAV files)
         // READSTAT_COMPRESS_ROWS is supported only with sas7bdat and SAV files
 
 // Optional error handler

@@ -114,6 +114,7 @@ typedef enum sas_subheader_type_e {
 
 #define SAS_PAGE_TYPE_DELETED_ROWS  0x0080
 #define SAS_PAGE_TYPE_META2         0x4000
+#define SAS_PAGE_TYPE_INDEX_LEAF    0x8000
 #define SAS_PAGE_TYPE_COMP          0x9000
 
 #define SAS_SUBHEADER_POINTER_SIZE_32BIT    12
@@ -136,6 +137,9 @@ typedef enum sas_subheader_type_e {
 #define SAS_COMPRESSION_SIGNATURE_RDC  "SASYZCR2"
 
 #define SAS_DEFAULT_FILE_VERSION  9
+
+/* Used when a file doesn't record its encoding (header byte is 0) */
+#define SAS_DEFAULT_STRING_ENCODING "WINDOWS-1252"
 
 extern unsigned char sas7bdat_magic_number[32];
 extern unsigned char sas7bdat_magic_number_alt[32];

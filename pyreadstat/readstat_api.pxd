@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
@@ -268,6 +268,7 @@ cdef extern from "readstat.h":
     cdef readstat_error_t readstat_variable_add_missing_string_range(readstat_variable_t *variable, const char *lo, const char *hi);
 
     cdef readstat_error_t readstat_writer_set_table_name(readstat_writer_t *writer, const char *table_name)
+    cdef readstat_error_t readstat_writer_set_file_format_is_64bit(readstat_writer_t *writer, int is_64bit)
 
     cdef readstat_variable_t *readstat_get_variable(readstat_writer_t *writer, int index)
 

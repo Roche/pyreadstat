@@ -8,6 +8,7 @@
 #include <limits.h>
 #include "readstat_sas.h"
 #include "readstat_sas_rle.h"
+#include "readstat_sas_rdc.h"
 #include "../readstat_iconv.h"
 #include "../readstat_convert.h"
 #include "../readstat_malloc.h"
@@ -573,91 +574,29 @@ cleanup:
 }
 
 static readstat_error_t sas7bdat_parse_subheader_rdc(const char *subheader, size_t len, sas7bdat_ctx_t *ctx) {
+    if (ctx->row_limit == ctx->parsed_row_count)
+        return READSTAT_OK;
+
     readstat_error_t retval = READSTAT_OK;
-    const unsigned char *input = (const unsigned char *)subheader;
-    char *buffer = malloc(ctx->row_length);
-    if (buffer == NULL) return READSTAT_ERROR_MALLOC;
-    char *output = buffer;
-    while (input + 2 <= (const unsigned char *)subheader + len) {
-        int i;
-        unsigned short prefix = (input[0] << 8) + input[1];
-        input += 2;
-        for (i=0; i<16; i++) {
-            if ((prefix & (1 << (15 - i))) == 0) {
-                if (input + 1 > (const unsigned char *)subheader + len) {
-                    break;
-                }
-                if (output + 1 > buffer + ctx->row_length) {
-                    retval = READSTAT_ERROR_ROW_WIDTH_MISMATCH;
-                    goto cleanup;
-                }
-                *output++ = *input++;
-                continue;
-            }
+    ssize_t bytes_decompressed = 0;
 
-            if (input + 2 > (const unsigned char *)subheader + len) {
-                retval = READSTAT_ERROR_PARSE;
-                goto cleanup;
-            }
+    if (ctx->row == NULL)
+        return READSTAT_ERROR_PARSE;
 
-            unsigned char marker_byte = *input++;
-            unsigned char next_byte = *input++;
-            size_t insert_len = 0, copy_len = 0;
-            unsigned char insert_byte = 0x00;
-            size_t back_offset = 0;
+    bytes_decompressed = sas_rdc_decompress(ctx->row, ctx->row_length, subheader, len);
 
-            if (marker_byte <= 0x0F) {
-                insert_len = 3 + marker_byte;
-                insert_byte = next_byte;
-            } else if ((marker_byte >> 4) == 1) {
-                if (input + 1 > (const unsigned char *)subheader + len) {
-                    retval = READSTAT_ERROR_PARSE;
-                    goto cleanup;
-                }
-                insert_len = 19 + (marker_byte & 0x0F) + next_byte * 16;
-                insert_byte = *input++;
-            } else if ((marker_byte >> 4) == 2) {
-                if (input + 1 > (const unsigned char *)subheader + len) {
-                    retval = READSTAT_ERROR_PARSE;
-                    goto cleanup;
-                }
-                copy_len = 16 + (*input++);
-                back_offset = 3 + (marker_byte & 0x0F) + next_byte * 16;
-            } else {
-                copy_len = (marker_byte >> 4);
-                back_offset = 3 + (marker_byte & 0x0F) + next_byte * 16;
-            }
-
-            if (insert_len) {
-                if (output + insert_len > buffer + ctx->row_length) {
-                    retval = READSTAT_ERROR_ROW_WIDTH_MISMATCH;
-                    goto cleanup;
-                }
-                memset(output, insert_byte, insert_len);
-                output += insert_len;
-            } else if (copy_len) {
-                if (output - buffer < back_offset || copy_len > back_offset) {
-                    retval = READSTAT_ERROR_PARSE;
-                    goto cleanup;
-                }
-                if (output + copy_len > buffer + ctx->row_length) {
-                    retval = READSTAT_ERROR_ROW_WIDTH_MISMATCH;
-                    goto cleanup;
-                }
-                memcpy(output, output - back_offset, copy_len);
-                output += copy_len;
-            }
-        }
-    }
-
-    if (output - buffer != ctx->row_length) {
+    if (bytes_decompressed != ctx->row_length) {
         retval = READSTAT_ERROR_ROW_WIDTH_MISMATCH;
+        if (ctx->handle.error) {
+            snprintf(ctx->error_buf, sizeof(ctx->error_buf),
+                    "ReadStat: Row #%d decompressed to %ld bytes (expected %d bytes)",
+                    ctx->parsed_row_count, (long)(bytes_decompressed), ctx->row_length);
+            ctx->handle.error(ctx->error_buf, ctx->user_ctx);
+        }
         goto cleanup;
     }
-    retval = sas7bdat_parse_single_row(buffer, ctx);
+    retval = sas7bdat_parse_single_row(ctx->row, ctx);
 cleanup:
-    free(buffer);
-
     return retval;
 }
 
@@ -748,14 +687,36 @@ static readstat_error_t sas7bdat_construct_format(char *dst, size_t dst_len,
     if (retval != READSTAT_OK)
         return retval;
 
+    /* Digits require a width */
+    if (width == 0 && digits != 0)
+        return READSTAT_ERROR_PARSE;
+
+    if (strchr(dst, '.')) {
+        /* Legacy layout: earlier ReadStat writers stored the full format
+         * string (e.g. "YYMMDD10." or "BEST.") verbatim as the name, with
+         * width and digits both 0. Return it unchanged. */
+        if (width == 0 && digits == 0)
+            return READSTAT_OK;
+        return READSTAT_ERROR_PARSE;
+    }
+
+    /* No format at all */
+    if (dst[0] == '\0' && width == 0)
+        return READSTAT_OK;
+
+    /* NAME. / NAMEw. / NAMEw.d (NAME may be empty, as in the w.d format) */
     size_t len = strlen(dst);
-    if (width && len < dst_len - 1) {
-        snprintf(dst + len, dst_len - len, "%d", width);
-        len = strlen(dst);
+    int written;
+    if (digits) {
+        written = snprintf(dst + len, dst_len - len, "%d.%d", width, digits);
+    } else if (width) {
+        written = snprintf(dst + len, dst_len - len, "%d.", width);
+    } else {
+        written = snprintf(dst + len, dst_len - len, ".");
     }
-    if (len && digits && len < dst_len - 1) {
-        snprintf(dst + len, dst_len - len, ".%d", digits);
-    }
+    if (written < 0 || (size_t)written >= dst_len - len)
+        return READSTAT_ERROR_PARSE;
+
     return READSTAT_OK;
 }
 
@@ -1529,8 +1490,12 @@ readstat_error_t readstat_parse_sas7bdat(readstat_parser_t *parser, const char *
         goto cleanup;
     }
 
-    if (ctx->input_encoding && ctx->output_encoding && strcmp(ctx->input_encoding, ctx->output_encoding) != 0) {
-        iconv_t converter = iconv_open(ctx->output_encoding, ctx->input_encoding);
+    const char *input_encoding = ctx->input_encoding;
+    if (input_encoding == NULL) {
+        input_encoding = SAS_DEFAULT_STRING_ENCODING;
+    }
+    if (ctx->output_encoding && strcmp(input_encoding, ctx->output_encoding) != 0) {
+        iconv_t converter = iconv_open(ctx->output_encoding, input_encoding);
         if (converter == (iconv_t)-1) {
             retval = READSTAT_ERROR_UNSUPPORTED_CHARSET;
             goto cleanup;

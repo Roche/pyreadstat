@@ -14,18 +14,12 @@
 # limitations under the License.
 # #############################################################################
 
-import setuptools
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 import os
+import re
 import sys
 import Cython
 from Cython.Build import cythonize
-
-PY_MAJOR_VERSION = sys.version_info[0]
-PY_MINOR_VERSION = sys.version_info[1]
-
-if PY_MAJOR_VERSION < 3 and os.name == 'nt':
-    raise Exception("Python 2 is not supported on Windows.")
 
 cyver = int(Cython.__version__.split(".")[0])
 if cyver < 3:
@@ -57,12 +51,25 @@ for dirname, _ , filenames in os.walk(source_dir_root):
 source_dirs = [dirname for dirname, _, _ in os.walk(source_dir_root) if dirname not in omitted_source_dirs]
 
 def is_conda():
-    """Check if running in a conda/miniforge environment."""
+    """
+    Check if running in a conda/miniforge environment with GNU libiconv installed.
+    The libiconv iconv.h renames iconv_open/iconv/iconv_close to libiconv_open/libiconv/libiconv_close,
+    so when that header is picked up, libiconv must be linked. Without it, glibc's iconv is used.
+    """
     if os.environ.get('CONDA_BUILD'):
         return False
-    if not os.path.exists(os.path.join(sys.prefix, 'conda-meta')):
-        return False
-    return (3, 11) <= sys.version_info[:2] <= (3, 13)
+    # in a venv created from a conda python, sys.prefix is the venv, but the headers (conda's iconv.h) still come
+    # from the conda python in sys.base_prefix
+    for prefix in {sys.prefix, sys.base_prefix}:
+        if not os.path.exists(os.path.join(prefix, 'conda-meta')):
+            continue
+        header = os.path.join(prefix, 'include', 'iconv.h')
+        if not os.path.isfile(header):
+            continue
+        with open(header, encoding='utf-8', errors='replace') as f:
+            if re.search(r'^\s*#\s*define\s+iconv\s+libiconv\b', f.read(), re.MULTILINE):
+                return True
+    return False
 
 data_files = []
 libraries = []
@@ -115,9 +122,8 @@ extensions = [Extension("pyreadstat._readstat_parser",
 for e in extensions:
     e.cython_directives = {"embedsignature": True}
 
-# let's use cython with force so that it always recompiles in case 
-# somebody is switching between python 2 and 3
-extensions = cythonize(extensions, compile_time_env={'PY_MAJOR_VERSION':PY_MAJOR_VERSION}, force=True)
+# let's use cython with force so that the C files are always regenerated
+extensions = cythonize(extensions, force=True)
 
 long_description = """ A Python package to read and write SAS
 (sas7bdat, sas7bcat, xport/xpt), SPSS (sav, zsav, por) and Stata (dta) files into/from pandas and polars data frames. It is a wrapper
@@ -129,7 +135,7 @@ short_description = "Reads and Writes SAS, SPSS and Stata files into/from pandas
 
 setup(
     name='pyreadstat',
-    version='1.3.7',
+    version='1.3.8',
     description=short_description,
     author="Otto Fajardo",
     author_email="pleasecontactviagithub@notvalid.com",

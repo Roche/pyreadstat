@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -16,7 +16,7 @@
 # #############################################################################
 from libc.stddef cimport wchar_t
 
-from readstat_api cimport *
+from .readstat_api cimport *
 #cdef int write_test()
 
 cdef extern from "readstat_io_unistd.h":
@@ -95,4 +95,4 @@ cdef int run_write(df, object filename_path, dst_file_format file_format, str fi
                    int file_format_version, object note, str table_name, dict variable_value_labels, 
                    dict missing_ranges, dict missing_user_values, dict variable_alignment,
                    dict variable_display_width, dict variable_measure, dict variable_format, dict variable_informat,
-                   bint row_compression) except *
+                   readstat_compress_t compression, bint is_64bit) except *

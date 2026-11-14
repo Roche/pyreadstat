@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
@@ -34,16 +34,16 @@ import re
 import narwhals.stable.v2 as nw
 import numpy as np
 
-from readstat_api cimport *
+from .readstat_api cimport *
 
-from pyclasses import metadata_container
+from .pyclasses import metadata_container
 
 # necessary to work with the datetime C API
 import_datetime()
 
 cdef object unix_origin = datetime_new(1970, 1, 1, 0, 0, 0, 0, None)
 
-cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d+)?$|$)")
+cdef object format_regex = re.compile(r"^([A-Z][A-Z0-9]+[A-Z])(\d+)?(?(2)(?:\.\d*)?$|\.?$)")
 cdef list sas_date_formats = ["WEEKDATE", "MMDDYY", "DDMMYY", "YYMMDD", "DATE", "YYMMDD",
                                 "DDMMYYB", "DDMMYYC", "DDMMYYD",
                                 "DDMMYYN", "DDMMYYP", "DDMMYYS",

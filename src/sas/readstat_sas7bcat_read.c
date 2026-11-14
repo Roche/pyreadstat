@@ -195,7 +195,7 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
     int string_offset = 0;
     int payload_offset = 106;
     uint16_t flags = 0;
-    char name[4*32+1];
+    char name[4*32+2]; /* room for the trailing dot */
 
     if (data_size < payload_offset)
         goto cleanup;
@@ -227,7 +227,7 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
         goto cleanup;
     }
 
-    if ((retval = readstat_convert(name, sizeof(name), &data[8], 8, ctx->converter)) != READSTAT_OK)
+    if ((retval = readstat_convert(name, sizeof(name) - 1, &data[8], 8, ctx->converter)) != READSTAT_OK)
         goto cleanup;
 
     if (pad) {
@@ -238,11 +238,14 @@ static readstat_error_t sas7bcat_parse_block(const char *data, size_t data_size,
         if (data_size < payload_offset + pad + 32)
             goto cleanup;
 
-        retval = readstat_convert(name, sizeof(name), &data[payload_offset+pad], 32, ctx->converter);
+        retval = readstat_convert(name, sizeof(name) - 1, &data[payload_offset+pad], 32, ctx->converter);
         if (retval != READSTAT_OK)
             goto cleanup;
         pad += 32;
     }
+
+    /* Present format names the way SAS does, e.g. "MYFMT." or "$MYFMT." */
+    strcat(name, ".");
 
     if (data_size < payload_offset + pad)
         goto cleanup;
@@ -296,7 +299,10 @@ cleanup:
 static int compare_block_pointers(const void *elem1, const void *elem2) {
     uint64_t v1 = *(const uint64_t *)elem1;
     uint64_t v2 = *(const uint64_t *)elem2;
-    return v1 - v2;
+    /* The values pack a page number into the high 32 bits, so a plain
+     * subtraction truncated to int loses that half and misorders (or reports
+     * as equal) pointers on different pages. Compare three-way instead. */
+    return (v1 > v2) - (v1 < v2);
 }
 
 static void sas7bcat_sort_index(sas7bcat_ctx_t *ctx) {
@@ -473,8 +479,12 @@ readstat_error_t readstat_parse_sas7bcat(readstat_parser_t *parser, const char *
         ctx->xlsr_O_offset += 24;
     }
 
-    if (ctx->input_encoding && ctx->output_encoding && strcmp(ctx->input_encoding, ctx->output_encoding) != 0) {
-        iconv_t converter = iconv_open(ctx->output_encoding, ctx->input_encoding);
+    const char *input_encoding = ctx->input_encoding;
+    if (input_encoding == NULL) {
+        input_encoding = SAS_DEFAULT_STRING_ENCODING;
+    }
+    if (ctx->output_encoding && strcmp(input_encoding, ctx->output_encoding) != 0) {
+        iconv_t converter = iconv_open(ctx->output_encoding, input_encoding);
         if (converter == (iconv_t)-1) {
             retval = READSTAT_ERROR_UNSUPPORTED_CHARSET;
             goto cleanup;

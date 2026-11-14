@@ -123,7 +123,7 @@ typedef struct value_label_s {
     char            *label;
 } value_label_t;
 
-static readstat_error_t sav_update_progress(sav_ctx_t *ctx);
+readstat_error_t sav_update_progress(sav_ctx_t *ctx);
 static readstat_error_t sav_read_data(sav_ctx_t *ctx);
 static readstat_error_t sav_read_compressed_data(sav_ctx_t *ctx,
         readstat_error_t (*row_handler)(unsigned char *, size_t, sav_ctx_t *));
@@ -182,7 +182,7 @@ static void sav_tag_missing_double(readstat_value_t *value, sav_ctx_t *ctx) {
         value->is_system_missing = 1;
 }
 
-static readstat_error_t sav_update_progress(sav_ctx_t *ctx) {
+readstat_error_t sav_update_progress(sav_ctx_t *ctx) {
     readstat_io_t *io = ctx->io;
     return io->update(ctx->file_size, ctx->handle.progress, ctx->user_ctx, io->io_ctx);
 }

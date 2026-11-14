@@ -1,4 +1,4 @@
-# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=2
+# cython: c_string_type=unicode, c_string_encoding=utf8, language_level=3
 # #############################################################################
 # Copyright 2018 Hoffmann-La Roche
 #
@@ -16,7 +16,7 @@
 # #############################################################################
 
 from libc.stddef cimport wchar_t
-from readstat_api cimport *
+from .readstat_api cimport *
 
 # Definitions of enum types
 ctypedef enum py_file_extension:

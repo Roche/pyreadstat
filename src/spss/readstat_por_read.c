@@ -138,8 +138,8 @@ static readstat_error_t read_double_with_peek(por_ctx_t *ctx, double *out_double
     bytes_read = readstat_por_parse_double(utf8_buffer, len, &value, ctx->handle.error, ctx->user_ctx);
     if (bytes_read == -1) {
         if (ctx->handle.error) {
-            snprintf(error_buf, sizeof(error_buf), "Error parsing double string (length=%" PRId64 "): %.*s [%s]", 
-                    len, (int)len, utf8_buffer, buffer);
+            snprintf(error_buf, sizeof(error_buf), "Error parsing double string (length=%" PRId64 "): %.*s [%.*s]",
+                    len, (int)len, utf8_buffer, (int)i, buffer);
             ctx->handle.error(error_buf, ctx->user_ctx);
         }
         retval = READSTAT_ERROR_PARSE;

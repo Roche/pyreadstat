@@ -181,6 +181,7 @@ class TestRuntimeTypes(unittest.TestCase):
             "write_dta": ".dta",
             "write_xport": ".xpt",
             "write_por": ".por",
+            "write_sas7bdat": ".sas7bdat",
         }
         for func_name, ext in writers.items():
             func = getattr(pyreadstat, func_name)

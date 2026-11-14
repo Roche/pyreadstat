@@ -146,4 +146,5 @@ typedef struct sav_ctx_s {
 #define SAV_EIGHT_SPACES              "        "
 
 sav_ctx_t *sav_ctx_init(sav_file_header_record_t *header, readstat_io_t *io);
+readstat_error_t sav_update_progress(sav_ctx_t *ctx);
 void sav_ctx_free(sav_ctx_t *ctx);
