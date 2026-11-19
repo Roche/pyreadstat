@@ -1361,7 +1361,7 @@ class TestBasic(unittest.TestCase):
         df, meta = pyreadstat.read_sav(path, apply_value_formats=True, formats_as_ordered_category=True, output_format=self.backend)
         if self.backend == "pandas":
             self.assertTrue(df["Col1"].cat.ordered)
-            categories = nw.from_native(df)["Col1"].cat.get_categories().to_list()
+            categories = df["Col1"].cat.categories.to_list()
         else:
             # in polars it is enum, it is ordered by default
             self.assertTrue(type(nw.from_native(df)["Col1"].dtype) == nw.Enum)
