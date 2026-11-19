@@ -22,13 +22,13 @@ def http_server(directory):
         def log_message(self, *args):
             pass
 
-    server = HTTPServer(("127.0.0.1", 0), QuietHandler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    try:
-        yield f"http://127.0.0.1:{server.server_address[1]}"
-    finally:
-        server.shutdown()
+    with HTTPServer(("127.0.0.1", 0), QuietHandler) as server:
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            yield f"http://127.0.0.1:{server.server_address[1]}"
+        finally:
+            server.shutdown()
 
 
 class TestHttpIntegration(unittest.TestCase):
