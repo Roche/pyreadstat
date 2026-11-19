@@ -19,35 +19,20 @@ the recommended way. I keep here also at the end how to compile with mingw with 
 This assumes that MSVC is installed and working. The only pre-requisite before compiling is that we need two external libraries.
 There are two ways of getting them:
 
-### Compiling external libraries
+### Installing libraries with vcpkg
 
-The advantage of this way is that we can do a static compilation of those libraries, therefore pyreadstat is not going to depend on any dll file.
-This is the way used to produce the wheels on pypi.
-The libraries must be compiled with the same MSVC version as we pretend to compile pyreadstat, and the static libraries and header files should be copied
-to the win\_libs/64bit folder in pyreadstat:
+The libraries are declared in `vcpkg.json` in the repository root. Installing them with the `*-windows-static-md` triplets
+produces static libraries (so pyreadstat does not depend on any extra dll) linked against the dynamic C runtime, like Python itself.
+This is the way used in CI and for the wheels.
 
+From the repository root (with [vcpkg](https://learn.microsoft.com/vcpkg/get_started/get-started) available):
 ```
-# libiconv
-git clone https://github.com/kiyolee/libiconv-win-build.git
-msbuild.exe libiconv-win-build/build-VS2019-MT/libiconv.sln /property:Configuration=Release;Platform=X64
-copy libiconv-win-build\\include\\iconv.h pyreadstat\\win_libs\\64bit                                   
-copy libiconv-win-build\\build-VS2019-MT\\x64\\Release\\libiconv-static.lib  pyreadstat\\win_libs\\64bit
-# libz
-git clone https://github.com/kiyolee/zlib-win-build.git
-msbuild.exe zlib-win-build/build-VS2019-MT/zlib.sln /property:Configuration=Release;Platform=X64
-copy zlib-win-build\\zlib.h pyreadstat\\win_libs\\64bit                                   
-copy zlib-win-build\\zconf.h pyreadstat\\win_libs\\64bit                                   
-copy zlib-win-build\\build-VS2019-MT\\x64\\Release\\libz-static.lib  pyreadstat\\win_libs\\64bit
-``` 
-
-Maybe you observed that win\_libs/samples\_64bit already contains the files needed. It may be therefore that those already
-works for you, but chances are that MSVC is going to compile that those files were not generated with the same
-MSVC version as you have, and therefore you have to do what is descrived before.
-
-Once this is done, one can build the library as usual:
-```
+vcpkg install --triplet x64-windows-static-md     # or arm64-windows-static-md on ARM64
 python setup.py build_ext --inplace
 ```
+
+`setup.py` looks in `vcpkg_installed/<triplet>`. Set `VCPKG_INSTALLED_DIR` and/or `VCPKG_TARGET_TRIPLET` to override
+the location or triplet.
 
 Of course any other variant of installation (setup.py install, pip etc) should work as well. 
 

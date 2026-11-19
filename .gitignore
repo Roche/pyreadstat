@@ -11,3 +11,4 @@
 dist/
 test_data/write/
 .vscode
+vcpkg_installed/

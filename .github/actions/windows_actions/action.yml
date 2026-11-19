@@ -1,39 +1,27 @@
 name: Windows Specific steps
-description: "Builds libiconv and zlib with MSVC for Windows"
+description: "Builds libiconv and zlib for Windows with vcpkg (see vcpkg.json)"
 
 runs:
   using: "composite"
   steps:
-    - name: Checkout libiconv
-      uses: actions/checkout@v6
+    - name: Cache vcpkg packages
+      uses: actions/cache@v6
       with:
-        repository: kiyolee/libiconv-win-build
-        ref: dff1030d222ba934e0f4a9cdab9c34134f072f68 # v1.18
-        path: libiconv-win-build
-        persist-credentials: false
+        path: vcpkg_installed
+        key: vcpkg-${{ runner.arch }}-${{ hashFiles('vcpkg.json') }}
 
-    - name: Checkout zlib
-      uses: actions/checkout@v6
-      with:
-        repository: kiyolee/zlib-win-build
-        ref: 30623e05e64fe4b97f2073ddaf8d3ba0e99d7249
-        path: zlib-win-build
-        persist-credentials: false
-
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v3
-
-    - name: Build libiconv
+    - name: Install Windows libraries (vcpkg)
+      shell: pwsh
       run: |
-        msbuild.exe libiconv-win-build/build-VS2022-MT/libiconv.sln /property:Configuration=Release;Platform=X64
-        copy libiconv-win-build\\include\\iconv.h win_libs\\64bit
-        copy libiconv-win-build\\build-VS2022-MT\\x64\\Release\\libiconv-static.lib win_libs\\64bit
-      shell: cmd
-
-    - name: Build zlib
-      run: |
-        msbuild.exe zlib-win-build/build-VS2022-MT/zlib.sln /property:Configuration=Release;Platform=X64
-        copy zlib-win-build\\zlib.h win_libs\\64bit
-        copy zlib-win-build\\zconf.h win_libs\\64bit
-        copy zlib-win-build\\build-VS2022-MT\\x64\\Release\\libz-static.lib win_libs\\64bit
-      shell: cmd
+        # The runner's vcpkg clone may predate the builtin-baseline in
+        # vcpkg.json. vcpkg reads the port version database from the
+        # working tree, so fetching alone is not enough: check out the
+        # baseline and bootstrap the matching vcpkg tool.
+        $ErrorActionPreference = 'Stop'
+        $PSNativeCommandUseErrorActionPreference = $true
+        $baseline = (Get-Content vcpkg.json -Raw | ConvertFrom-Json).'builtin-baseline'
+        git -C "$env:VCPKG_INSTALLATION_ROOT" fetch --quiet origin $baseline
+        git -C "$env:VCPKG_INSTALLATION_ROOT" checkout --quiet --force $baseline
+        & "$env:VCPKG_INSTALLATION_ROOT\bootstrap-vcpkg.bat" -disableMetrics
+        $triplet = if ($env:RUNNER_ARCH -eq 'ARM64') { 'arm64-windows-static-md' } else { 'x64-windows-static-md' }
+        & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install --triplet $triplet
