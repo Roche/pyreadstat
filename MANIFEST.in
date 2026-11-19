@@ -6,3 +6,4 @@ recursive-include pyreadstat *.pyx
 include *.pxd
 recursive-include pyreadstat *.pxd
 recursive-include pyreadstat py.typed
+include vcpkg.json
