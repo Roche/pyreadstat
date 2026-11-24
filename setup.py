@@ -76,16 +76,20 @@ libraries = []
 include_dirs = [source_dir_root] + source_dirs + ["pyreadstat", "."]
 library_dirs = []
 # Windows
-# On Windows we have two possible setups: the user has included the static libraries in win_libs/64bit
-# Or the user is going to use the Conda forge versions of those. See the windows compilation document
+# On Windows we have two possible setups: libiconv and zlib were installed with vcpkg (see vcpkg.json),
+# or the user is going to use the Conda forge versions of those. See the windows compilation document
 # for more details
 if os.name == 'nt':
-    is64bit = sys.maxsize > 2 ** 32
-    # The user included the compiled static libraries
-    if os.path.isfile("win_libs/64bit/libiconv-static.lib") and os.path.isfile("win_libs/64bit/libz-static.lib"):
-        libraries.extend(["libiconv-static", "libz-static"])
-        include_dirs.append("win_libs/64bit")
-        library_dirs.append("win_libs/64bit")
+    import platform
+    # vcpkg manifest mode installs into ./vcpkg_installed/<triplet> by default.
+    # The *-static-md triplets give static libraries linked against the dynamic CRT, as Python itself is.
+    _default_triplet = "arm64-windows-static-md" if platform.machine().upper() == "ARM64" else "x64-windows-static-md"
+    vcpkg_triplet = os.environ.get("VCPKG_TARGET_TRIPLET", _default_triplet)
+    vcpkg_dir = os.path.join(os.environ.get("VCPKG_INSTALLED_DIR", os.path.join(dir_path, "vcpkg_installed")), vcpkg_triplet)
+    if os.path.isdir(vcpkg_dir):
+        libraries.extend(["iconv", "charset", "libzs"])
+        include_dirs.append(os.path.join(vcpkg_dir, "include"))
+        library_dirs.append(os.path.join(vcpkg_dir, "lib"))
     # conda forge libraries
     else:
         libraries.extend(["iconv", "zlib"])

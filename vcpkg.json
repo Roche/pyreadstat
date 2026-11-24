@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "pyreadstat",
+  "description": "Native dependencies for building pyreadstat on Windows",
+  "dependencies": [
+    "libiconv",
+    "zlib"
+  ],
+  "builtin-baseline": "2ebb714221ad4e482e596d64c129f63fbbfb3fd5"
+}
